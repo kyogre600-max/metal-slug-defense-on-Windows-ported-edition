@@ -1,0 +1,34 @@
+# Bundled game files and runtime are distributed through GitHub Releases.
+game_data/
+windows_runtime/
+custom_content/
+dist/
+*.zip
+*.apk
+*.dll
+*.exe
+*.o
+*.pyc
+__pycache__/
+
+# Personal progress and generated diagnostics.
+play_save*/
+guest/
+ui_test_guest/
+screenshots/
+launch_backups/
+window_settings.json
+*_status.json
+player_*.png
+ui_test_*.png
+*.log
+*.wav
+
+# Native build output.
+src/build/
+
+# Local authentication material.
+.env
+.env.*
+*.pem
+*.key
