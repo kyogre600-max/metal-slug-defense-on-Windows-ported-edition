@@ -10,8 +10,9 @@ ASSET_NAMES=frozenset(('menu_news00.obm','menu_news00_us.obm',
 
 class MenuScreenOverride:
     """Load at first menu access; retain one immutable atlas per game session."""
-    def __init__(self,folder,log):
+    def __init__(self,folder,log,filename=FILE_NAME):
         self.folder=Path(folder);self.log=log;self.loaded=False
+        self.filename=filename
         self.atlas=None;self.metadata=None;self.reported_assets=set()
 
     def read_asset(self,path,mode,asset_folder):
@@ -27,7 +28,7 @@ class MenuScreenOverride:
         return self.atlas
 
     def _load(self):
-        self.loaded=True;source=self.folder/FILE_NAME
+        self.loaded=True;source=self.folder/self.filename
         if not source.is_file():
             self.log('CUSTOM_MENU_DEFAULT',str(source));return
         try:

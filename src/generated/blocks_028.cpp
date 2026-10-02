@@ -4896,7 +4896,7 @@ static void b_101b6706(Context& c){
 {uint32_t a=(c.r[13]+0u+4u);wr<uint32_t>(c,a+0u,c.r[3]);}
 {setsbits(c,15,c.r[0]);}
 {uint32_t v=c.r[4];c.r[0]=v;}
-{setfs(c,15,int32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(int32_t(sbits(c,15))),-1));}
 {setsbits(c,15,cvti(fs(c,15),true));}
 {c.r[3]=sbits(c,15);}
 {c.r[14]=270231339u;c.pc=(270393892u|1u);return;}
@@ -9450,7 +9450,7 @@ static void b_101b853a(Context& c){
 {setsbits(c,15,c.r[0]);}
 {uint32_t v=c.r[4];c.r[0]=v;}
 {uint32_t a=c.r[13];c.r[4]=rd<uint32_t>(c,a+0u);c.r[14]=rd<uint32_t>(c,a+4u);c.r[13]=a+8u;}
-{setfs(c,15,int32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(int32_t(sbits(c,15))),-9));}
 {setsbits(c,15,cvti(fs(c,15),true));}
 {c.r[2]=sbits(c,15);}
 {c.pc=(270393746u|1u);return;}

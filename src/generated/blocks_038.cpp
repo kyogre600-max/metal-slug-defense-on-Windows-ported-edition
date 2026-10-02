@@ -9138,7 +9138,7 @@ static void b_101ec440(Context& c){
 {uint32_t a=(c.r[13]+0u+8u);wr<uint32_t>(c,a+0u,c.r[3]);}
 {setsbits(c,15,c.r[0]);}
 {uint32_t v=c.r[7];c.r[0]=v;}
-{setfs(c,15,int32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(int32_t(sbits(c,15))),-1));}
 {setfs(c,19,(fs(c,19))-(fs(c,15)));}
 {uint32_t a=((270451810u&~3u)+0u+188u);setsbits(c,15,rd<uint32_t>(c,a+0u));}
 {setfs(c,18,(fs(c,18))-(fs(c,15)));}

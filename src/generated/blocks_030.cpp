@@ -5622,7 +5622,7 @@ c.pc=270272793u;}
 static void b_101c0918(Context& c){
 {uint32_t v=(c.r[7])*(c.r[0]);c.r[1]=v;}
 {setsbits(c,15,c.r[1]);}
-{setfs(c,15,uint32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(uint32_t(sbits(c,15))),-1));}
 {c.pc=(270272822u|1u);return;}
 c.pc=270272807u;}
 static void b_101c0926(Context& c){
@@ -6098,11 +6098,11 @@ static void b_101c0d60(Context& c){
 {uint32_t v=add(c,c.r[0],~(1u),1,true);c.r[3]=v;}
 {uint32_t v=(c.r[5])*(c.r[3]);c.r[3]=v;nz(c,v);}
 {setsbits(c,15,c.r[3]);}
-{setfs(c,15,uint32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(uint32_t(sbits(c,15))),-1));}
 {c.pc=(270273918u|1u);return;}
 c.pc=270273903u;}
 static void b_101c0d68(Context& c){
-{setfs(c,15,uint32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(uint32_t(sbits(c,15))),-1));}
 {c.pc=(270273918u|1u);return;}
 c.pc=270273903u;}
 static void b_101c0d6e(Context& c){
@@ -6263,7 +6263,7 @@ c.pc=270274209u;}
 static void b_101c0ea0(Context& c){
 {uint32_t v=(c.r[7])*(c.r[0]);c.r[1]=v;}
 {setsbits(c,15,c.r[1]);}
-{setfs(c,15,uint32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(uint32_t(sbits(c,15))),-1));}
 {c.pc=(270274238u|1u);return;}
 c.pc=270274223u;}
 static void b_101c0eae(Context& c){

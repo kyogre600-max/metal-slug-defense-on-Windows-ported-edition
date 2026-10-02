@@ -4679,7 +4679,7 @@ static void b_101381ee(Context& c){
 {uint32_t a=(c.r[0]+0u+0u);c.r[3]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[3]+0u+0u);c.r[3]=rd<uint32_t>(c,a+0u);}
 {setsbits(c,15,c.r[1]);}
-{setfs(c,15,int32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(int32_t(sbits(c,15))),-12));}
 {setsbits(c,15,cvti(fs(c,15),true));}
 {c.r[1]=sbits(c,15);}
 {c.r[1]=uint32_t(int16_t(c.r[1]));}

@@ -6332,7 +6332,7 @@ static void b_101d5a4a(Context& c){
 c.pc=270359119u;}
 static void b_101d5a52(Context& c){
 {uint32_t a=(c.r[5]+0u+24u);setsbits(c,15,rd<uint32_t>(c,a+0u));}
-{setfs(c,15,int32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(int32_t(sbits(c,15))),-1));}
 {c.pc=(270359148u|1u);return;}
 c.pc=270359133u;}
 static void b_101d5a5c(Context& c){

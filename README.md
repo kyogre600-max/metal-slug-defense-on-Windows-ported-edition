@@ -8,6 +8,11 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+### Update 1.46.1
+
+- Fixed the persistent sprite flickering and body-part misalignment affecting Sol Dae Rokker, including its enraged variant.
+- Added three independent units: **NOP-03 SARUBIA (Future)**, **M-15A (Future)**, and **HEAVY B (Future)**.
+
 ### Update 2026.10.02.1
 
 This release includes performance improvements targeting **30 FPS**, the Event deck-switch keyboard fix, and weapon behaviour changes for **ten units**: Marco, Tarma, Eri, Fio, Fat Marco, Fat Tarma, Fat Eri, Fat Fio, Christmas Eri, and Christmas Fio.
@@ -49,6 +54,11 @@ To update an existing installation, close the game, back up `play_save/`, extrac
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+### 1.46.1 更新
+
+- 修复索尔罗卡（Sol Dae Rokker）及其愤怒版持续出现的贴图闪烁与身体部件错位问题。
+- 新增三个独立单位：**爆竹红（未来）**、**M-15A 型（未来）**、**未来重装 B 型**。
 
 ### 2026.10.02.1 更新
 

@@ -2759,7 +2759,7 @@ static void b_101c483e(Context& c){
 {uint32_t a=(c.r[13]+0u+140u);c.r[2]=rd<uint32_t>(c,a+0u);}
 {uint32_t v=(c.r[4])*(c.r[2]);c.r[2]=v;nz(c,v);}
 {setsbits(c,15,c.r[2]);}
-{setfs(c,15,uint32_t(sbits(c,15)));}
+{setfs(c,15,std::ldexp(double(uint32_t(sbits(c,15))),-1));}
 {c.pc=(270288990u|1u);return;}
 c.pc=270288973u;}
 static void b_101c484c(Context& c){

@@ -10,7 +10,8 @@ import glfw
 from probe import Probe, ProbeCancelled
 from window_layout import game_point, fit_rect, WIDTH, HEIGHT
 
-TITLE='MSD WINDOWS S1XLV'
+from branding import load as load_branding
+TITLE=load_branding(ROOT)['application_name']
 
 class Player:
     def __init__(self, self_test=False, audio_mode=None, fullscreen=None):

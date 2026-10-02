@@ -40,6 +40,8 @@ class Probe:
         self.on_progress=on_progress
         self.audio_mode=audio_mode
         self.audio_capture=audio_capture
+        from branding import load as load_branding
+        self.branding=load_branding(ROOT)
         from asset_cache import AssetCache
         self.asset_cache=AssetCache(RESOURCE_ROOT/PKG)
         self.file_commits={}
@@ -553,7 +555,7 @@ class Probe:
             value=usage.total if 'Total' in method[1] else usage.free
             if method[2]=='()J': self.uc.reg_write(UC_ARM_REG_R1,value>>32);return value&0xffffffff
             return min(value,0x7fffffff)
-        if method[1]=='getAppVersionName': return self.managed_obj('1.46.0')
+        if method[1]=='getAppVersionName': return self.managed_obj(self.branding['display_version'])
         if method[1]=='onTextDraw':return self.draw_text(a,idx)
         from local_platform import handle_java_call
         handled,value=handle_java_call(self,method,arg)
@@ -764,7 +766,8 @@ class Probe:
                 from custom_menu import MenuScreenOverride
                 if not hasattr(self,'menu_screen_override'):
                     self.menu_screen_override=MenuScreenOverride(
-                        getattr(self,'custom_content_root',ROOT/'custom_content'),self.log)
+                        getattr(self,'custom_content_root',ROOT/'custom_content'),self.log,
+                        filename=self.branding['menu_image'])
                 replacement=self.menu_screen_override.read_asset(
                     path,mode,(RESOURCE_ROOT/PKG).resolve())
                 if replacement is not None:
@@ -842,6 +845,10 @@ class Probe:
         return self.get_audio().dispatch(name,a)
 
     def initialize(self):
+        registry=ROOT/'community_content/registry.json'
+        if registry.is_file() and not hasattr(self,'community'):
+            from community_content import CommunityContent
+            self.community=CommunityContent(self,registry.parent)
         section=self.elf.get_section_by_name('.init_array')
         constructors=[self.word(BASE+section['sh_addr']+i) for i in range(0,section['sh_size'],4)]
         for p in constructors:
@@ -856,6 +863,7 @@ class Probe:
         scale=min(width/960,height/640)
         self.native('init',width,height,width,height,u32f(scale),u32f(scale))
         self.log('SURFACE_INIT_COMPLETE')
+        if hasattr(self,'community') and not self.community.ready:self.community.install()
 
     def start(self):
         self.initialize()
@@ -884,6 +892,8 @@ class Probe:
         from local_platform import pump
         pump(self)
         if hasattr(self,'audio_bridge'):self.audio_bridge.pump()
+
+        if hasattr(self,'community'):self.community.flush()
 
     def control_loop(self):
         self.log('CONTROL_READY')
@@ -929,6 +939,7 @@ class Probe:
         self.native('onTouchEvent',ids,coords)
 
     def close(self):
+        if hasattr(self,'community'):self.community.flush()
         if hasattr(self,'native_audio_cache'):self.native_audio_cache.close()
         if hasattr(self,'asset_cache'):self.asset_cache.close()
         if hasattr(self,'audio_bridge') and not self.audio_bridge.closed:
