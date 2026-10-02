@@ -10,7 +10,7 @@
       "identity": "X Army",
       "shop_price": 300,
       "available_from_start": true,
-      "ap": 600,
+      "ap": 500,
       "hp_multiplier": 3,
       "special_damage_multiplier": [
         4,
@@ -1664,7 +1664,7 @@
       "identity": "X Army",
       "shop_price": 300,
       "available_from_start": true,
-      "ap": 270,
+      "ap": 250,
       "hp_multiplier": 3,
       "special_damage_multiplier": [
         1,
@@ -5460,47 +5460,47 @@
       "localization": {
         "EN": {
           "name": "M-15A (Future)",
-          "description": "STAND. ATK : 4-Shot Heavy Missile     SPEC. ATK : 8-Shot Heavy Missile\nAn M-15A from the future.\nIts heavy-missile salvo capacity has been increased."
+          "description": "STAND. ATK : 4-Shot Heavy Missile     SPEC. ATK : 8-Shot Heavy Missile\nAn M-15A from the future.\nDespite its greater firepower, its range remains short."
         },
         "JP": {
           "name": "M-15A型（未来）",
-          "description": "通常攻撃：大型ミサイル4連射     特殊攻撃：大型ミサイル8連射\n未来からやって来たM-15A型。\n大型ミサイルの連射能力が強化されている。"
+          "description": "通常攻撃：大型ミサイル4連射     特殊攻撃：大型ミサイル8連射\n未来からやって来たM-15A型。\n火力は強化されたが、射程は依然として短い。"
         },
         "KR": {
           "name": "M-15A형 (미래)",
-          "description": "일반 공격: 대형 미사일 4연사     특수 공격: 대형 미사일 8연사\n미래에서 온 M-15A형.\n대형 미사일 연사 능력이 강화되었다."
+          "description": "일반 공격: 대형 미사일 4연사     특수 공격: 대형 미사일 8연사\n미래에서 온 M-15A형.\n화력이 더욱 강해졌지만 사거리는 여전히 짧다."
         },
         "ES": {
           "name": "M-15A (Futuro)",
-          "description": "ATQ. ESTÁND. : 4 misiles pesados     ATQ. ESPEC. : 8 misiles pesados\nUn M-15A llegado del futuro.\nSu capacidad de disparo de misiles pesados ha aumentado."
+          "description": "ATQ. ESTÁND. : 4 misiles pesados     ATQ. ESPEC. : 8 misiles pesados\nUn M-15A llegado del futuro.\nAunque su potencia de fuego es mayor, su alcance sigue siendo corto."
         },
         "PT": {
           "name": "M-15A (Futuro)",
-          "description": "ATQ. PADR. : 4 mísseis pesados     ATQ. ESPEC. : 8 mísseis pesados\nUm M-15A vindo do futuro.\nSua capacidade de disparo de mísseis pesados foi ampliada."
+          "description": "ATQ. PADR. : 4 mísseis pesados     ATQ. ESPEC. : 8 mísseis pesados\nUm M-15A vindo do futuro.\nApesar do maior poder de fogo, seu alcance continua curto."
         },
         "RU": {
           "name": "M-15A (будущее)",
-          "description": "СТАНД. АТАК: 4 тяжёлые ракеты     СПЕЦ. АТАК: 8 тяжёлых ракет\nM-15A из будущего.\nКоличество тяжёлых ракет в залпе увеличено."
+          "description": "СТАНД. АТАК: 4 тяжёлые ракеты     СПЕЦ. АТАК: 8 тяжёлых ракет\nM-15A из будущего.\nНесмотря на возросшую огневую мощь, дальность стрельбы остаётся небольшой."
         },
         "FR": {
           "name": "M-15A (Futur)",
-          "description": "ATT. STAND : 4 missiles lourds     ATT. SPÉ : 8 missiles lourds\nUn M-15A venu du futur.\nSa capacité de tir de missiles lourds a été renforcée."
+          "description": "ATT. STAND : 4 missiles lourds     ATT. SPÉ : 8 missiles lourds\nUn M-15A venu du futur.\nMalgré sa puissance de feu accrue, sa portée reste courte."
         },
         "DE": {
           "name": "M-15A (Zukunft)",
-          "description": "STANDARDANGR. : 4 schwere Raketen     SPEZIALANGR. : 8 schwere Raketen\nEin M-15A aus der Zukunft.\nSeine Salven aus schweren Raketen wurden verstärkt."
+          "description": "STANDARDANGR. : 4 schwere Raketen     SPEZIALANGR. : 8 schwere Raketen\nEin M-15A aus der Zukunft.\nTrotz höherer Feuerkraft bleibt seine Reichweite gering."
         },
         "IT": {
           "name": "M-15A (Futuro)",
-          "description": "ATC STAND.: 4 missili pesanti     ATC SPEC.: 8 missili pesanti\nUn M-15A arrivato dal futuro.\nLa sua capacità di lancio di missili pesanti è aumentata."
+          "description": "ATC STAND.: 4 missili pesanti     ATC SPEC.: 8 missili pesanti\nUn M-15A arrivato dal futuro.\nNonostante la maggiore potenza di fuoco, la sua gittata resta corta."
         },
         "ZT": {
           "name": "M-15A型（未來）",
-          "description": "普通攻擊：大型飛彈4連射     特殊攻擊：大型飛彈8連射\n從未來而來的M-15A型。\n大型飛彈的連射能力得到強化。"
+          "description": "普通攻擊：大型飛彈4連射     特殊攻擊：大型飛彈8連射\n從未來而來的M-15A型。\n雖然有著更強的火力，但射程依然很短。"
         },
         "ZS": {
           "name": "M-15A型（未来）",
-          "description": "普通攻击：大型飞弹4连射     特殊攻击：大型飞弹8连射\n从未来而来的M-15A型。\n大型飞弹的连射能力得到强化。"
+          "description": "普通攻击：大型飞弹4连射     特殊攻击：大型飞弹8连射\n从未来而来的M-15A型。\n虽然有着更强的火力，但射程依然很短。"
         }
       }
     },
@@ -5512,7 +5512,7 @@
       "identity": "X Army",
       "shop_price": 300,
       "available_from_start": true,
-      "ap": 270,
+      "ap": 250,
       "hp_multiplier": 3,
       "special_damage_multiplier": [
         1,
@@ -7689,57 +7689,57 @@
       "localization": {
         "EN": {
           "name": "HEAVY B (Future)",
-          "description": "STAND. ATK : 4-Shot Rocket Launcher     SPEC. ATK : Charge\nA HEAVY B from the future.\nIts rocket firing rate and charge distance have been increased."
+          "description": "STAND. ATK : 4-Shot Rocket Launcher     SPEC. ATK : Charge\nA HEAVY B from the future.\nEven in the future, its mobility remains unrivaled."
         },
         "JP": {
           "name": "未来型ヘビィB",
-          "description": "通常攻撃：ロケット砲4連射     特殊攻撃：突撃\n未来からやって来たヘビィB。\nロケット砲の連射速度と突撃距離が強化されている。"
+          "description": "通常攻撃：ロケット砲4連射     特殊攻撃：突撃\n未来からやって来たヘビィB。\n未来でも、その機動性はいまだ比類がない。"
         },
         "KR": {
           "name": "미래형 헤비 B",
-          "description": "일반 공격: 로켓포 4연사     특수 공격: 돌격\n미래에서 온 헤비 B.\n로켓포 연사 속도와 돌격 거리가 증가했다."
+          "description": "일반 공격: 로켓포 4연사     특수 공격: 돌격\n미래에서 온 헤비 B.\n미래에서도 그 기동성은 여전히 타의 추종을 불허한다."
         },
         "ES": {
           "name": "HEAVY B (Futuro)",
-          "description": "ATQ. ESTÁND. : 4 cohetes     ATQ. ESPEC. : Carga\nUn HEAVY B llegado del futuro.\nDispara cohetes más rápido y recorre mayor distancia al cargar."
+          "description": "ATQ. ESTÁND. : 4 cohetes     ATQ. ESPEC. : Carga\nUn HEAVY B llegado del futuro.\nIncluso en el futuro, su movilidad sigue siendo inigualable."
         },
         "PT": {
           "name": "HEAVY B (Futuro)",
-          "description": "ATQ. PADR. : 4 foguetes     ATQ. ESPEC. : Investida\nUm HEAVY B vindo do futuro.\nA cadência dos foguetes e a distância da investida aumentaram."
+          "description": "ATQ. PADR. : 4 foguetes     ATQ. ESPEC. : Investida\nUm HEAVY B vindo do futuro.\nMesmo no futuro, sua mobilidade continua incomparável."
         },
         "RU": {
           "name": "ТЯЖЕЛЫЙ B (будущее)",
-          "description": "СТАНД. АТАК: 4 ракеты     СПЕЦ. АТАК: Рывок\nТЯЖЕЛЫЙ B из будущего.\nТемп ракетного огня и дистанция рывка увеличены."
+          "description": "СТАНД. АТАК: 4 ракеты     СПЕЦ. АТАК: Рывок\nТЯЖЕЛЫЙ B из будущего.\nДаже в будущем его подвижность остаётся непревзойдённой."
         },
         "FR": {
           "name": "HEAVY B (Futur)",
-          "description": "ATT. STAND : 4 roquettes     ATT. SPÉ : Charge\nUn HEAVY B venu du futur.\nSa cadence de tir et sa distance de charge ont augmenté."
+          "description": "ATT. STAND : 4 roquettes     ATT. SPÉ : Charge\nUn HEAVY B venu du futur.\nMême dans le futur, sa mobilité demeure inégalée."
         },
         "DE": {
           "name": "HEAVY B (Zukunft)",
-          "description": "STANDARDANGR. : 4 Raketen     SPEZIALANGR. : Sturmangriff\nEin HEAVY B aus der Zukunft.\nSeine Feuerrate und die Distanz des Sturmangriffs wurden erhöht."
+          "description": "STANDARDANGR. : 4 Raketen     SPEZIALANGR. : Sturmangriff\nEin HEAVY B aus der Zukunft.\nAuch in der Zukunft bleibt seine Beweglichkeit unübertroffen."
         },
         "IT": {
           "name": "HEAVY B (Futuro)",
-          "description": "ATC STAND.: 4 razzi     ATC SPEC.: Carica\nUn HEAVY B arrivato dal futuro.\nLa cadenza dei razzi e la distanza della carica sono aumentate."
+          "description": "ATC STAND.: 4 razzi     ATC SPEC.: Carica\nUn HEAVY B arrivato dal futuro.\nAnche nel futuro, la sua mobilità resta insuperata."
         },
         "ZT": {
           "name": "未來重裝B型",
-          "description": "普通攻擊：火箭砲4連射     特殊攻擊：突擊\n從未來而來的重裝B型。\n火箭砲的連射速度與突擊距離得到強化。"
+          "description": "普通攻擊：火箭砲4連射     特殊攻擊：突擊\n從未來而來的重裝B型。\n就算是未來其可動性也依然無人能及。"
         },
         "ZS": {
           "name": "未来重装B型",
-          "description": "普通攻击：火箭炮4连射     特殊攻击：突击\n从未来而来的重装B型。\n火箭炮的连射速度与突击距离得到强化。"
+          "description": "普通攻击：火箭炮4连射     特殊攻击：突击\n从未来而来的重装B型。\n就算是未来其可动性也依然无人能及。"
         }
       }
     }
   ],
   "assets": {
-    "future_heavy_b_out.obm": "d0ed35379e7ae90a9579737bd6b1e40bd251645afa342d422355de29e79fec18",
+    "future_heavy_b_out.obm": "1421eb27af60477bb4e79d12b5405d40f25ad22c592c7a3be4bca09afa8a6573",
     "future_m15a_out1.obm": "38e0d348c382ca2cde8c316cd08ff7db959f9684d31f81cb1e704cf3bb0be290",
     "future_m15a_out2.obm": "1d76aeb5dcc94a2afc147b6cde024821b65d07aae625b66ca086c5685d59af88",
     "sarubia_future.obm": "e09f6a336cb40bea757e90a240a7c1e6d2a64f98b5937be461a897453460a980",
-    "unit_icon_02.obm": "c759dbf343de86b35e6fb256565a1f15b5e582e8d2a510bde083870da22e8946"
+    "unit_icon_02.obm": "cc2d1a353dd5fc2a5bd374a5240c7875d6384d3f2d12d63d9667eaa76e2edd67"
   },
   "unit_id_base": 1024
 }
