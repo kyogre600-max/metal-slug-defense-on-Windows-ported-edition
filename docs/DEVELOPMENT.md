@@ -10,7 +10,7 @@ The pre-generated native core can be compiled with Python 3 and MinGW-w64 GCC by
 
 Version 2026.10.02.1 compiles `native_imports.cpp` and `native_audio.cpp` into the core. The Vorbis decoder source, MIT license and provenance are included in `src/third_party/`; its runtime notice is bundled in `licenses/stb_vorbis.txt`. The host includes bounded resource/audio caches and a Windows deadline timer. The ten-unit weapon adjustment uses each original unit instance's special-attack counter and preserves the existing save format. Release validation is documented in [VALIDATION_2026.10.02.1.md](VALIDATION_2026.10.02.1.md).
 
-The executable name remains **MSD WINDOWS S1XLV.exe**. The repository title is **metal slug defense on Windows ported edition**. Replace `custom_content/menu_screen.png` in the extracted package with a **360 × 240 PNG (3:2)** to change the menu monitor's image. Its native static transition and CRT effects remain active; the monitor does not open links.
+The executable name remains **MSD WINDOWS S1XLV.exe**. The repository title is **metal slug defense on Windows ported edition**. The menu monitor retains the project's identity image, native static transition and CRT effects; the monitor does not open links.
 
 ## 中文
 
@@ -22,4 +22,4 @@ The executable name remains **MSD WINDOWS S1XLV.exe**. The repository title is *
 
 2026.10.02.1 版本将 `native_imports.cpp` 与 `native_audio.cpp` 编译至核心。Vorbis 解码器源码、MIT 许可及来源记录位于 `src/third_party/`，运行包中的对应说明位于 `licenses/stb_vorbis.txt`。宿主包含有容量限制的资源及音频缓存，并采用 Windows 截止时间计时器。十个单位的武器调整使用原有单位实例中的绝招计数，保留现有存档格式。发布验证见 [VALIDATION_2026.10.02.1.md](VALIDATION_2026.10.02.1.md)。
 
-启动程序名称继续采用 **MSD WINDOWS S1XLV.exe**，仓库名称为 **metal slug defense on Windows ported edition**。替换运行包中的 `custom_content/menu_screen.png` 可修改主菜单左侧屏幕的图像，建议采用 **360 × 240 PNG，比例 3:2**。保留原生雪花过渡与显像管效果，点击屏幕不触发链接跳转。
+启动程序名称继续采用 **MSD WINDOWS S1XLV.exe**，仓库名称为 **metal slug defense on Windows ported edition**。主菜单左侧屏幕保留项目标识图像、原生雪花过渡与显像管效果，点击屏幕不触发链接跳转。

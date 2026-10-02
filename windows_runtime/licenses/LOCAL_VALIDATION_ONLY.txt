@@ -1,0 +1,6 @@
+MSD WINDOWS S1XLV - bundled runtime components
+Python, GLFW, Pillow, pyelftools, ANGLE and native dependencies are included.
+The precompiled Windows x64 game core is build/MSD_Core.dll.
+Upstream licence and notice files are retained in this directory.
+ANGLE_SOURCE_BUNDLE_NOTICES.txt contains combined upstream SDK notices; some named components are absent from this player.
+Game assets and libraries retain their existing ownership and notices.

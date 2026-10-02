@@ -42,10 +42,6 @@ The package starts with an initial save. Units can be purchased with medals, and
 
 To update an existing installation, close the game, back up `play_save/`, extract the new package into a separate folder, and copy the complete `play_save/` folder into it. The existing save format remains compatible; the initial seed is used only when no save exists.
 
-### Custom menu screen
-
-Replace `custom_content/menu_screen.png` with a PNG image, preferably **360 × 240 pixels (3:2)**. The complete image is fitted proportionally inside the monitor, retaining the original static transition and CRT effects. Clicking the monitor has no action.
-
 ## 中文
 
 本项目基于安卓原版 **《合金弹头塔防》（Metal Slug Defense）1.46.0**，将游戏移植至 Windows。游戏核心通过静态重编译生成 Windows x64 代码，并适配本地的图形、音频、输入与存档功能。
@@ -88,6 +84,3 @@ Replace `custom_content/menu_screen.png` with a PNG image, preferably **360 × 2
 
 更新已有安装时，请先关闭游戏并备份 `play_save/`，将新运行包解压至独立目录，再将完整的 `play_save/` 文件夹复制至该目录。现有存档格式保持兼容；初始种子仅在存档不存在时使用。
 
-### 自定义菜单屏幕
-
-替换 `custom_content/menu_screen.png`，推荐采用 **360 × 240 像素（3:2）** 的 PNG 图像。完整图像在显示器内等比适配，保留原版雪花切换及显像管效果。点击该显示器不触发任何操作。

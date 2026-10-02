@@ -1,0 +1,111 @@
+"""Local Windows services for the archived game's original JNI contracts."""
+
+MEDAL_PACKS={f'msd_{i:03d}_medalpack':n for i,n in enumerate((30,90,180,330,690,1080,1860,3900),1)}
+CALLBACK_PREFIX='Java_com_snkplaymore_android003_MainActivity_'
+
+def app_instance(p):
+    # Equivalent to the original exported singleton getter; no native re-entry.
+    getter=p.symbols['_ZN7AppMain11getInstanceEv']&~1
+    return p.word(p.word(getter+6+p.word(getter+12)))
+
+def queue_callback(p,name,args,refs=()):
+    if not hasattr(p,'platform_callbacks'):p.platform_callbacks=[]
+    for ref in refs:
+        p.jni_retain(ref,'global')
+        p.jni_release(ref)
+    p.platform_callbacks.append((CALLBACK_PREFIX+name,tuple(args),tuple(refs)))
+
+def string_array(p,values):
+    refs=[p.managed_obj(value) for value in values]
+    array=p.managed_obj({'kind':'objects','length':len(refs),'items':refs})
+    for ref in refs:p.jni_release(ref)
+    return array
+
+def handle_java_call(p,method,arg):
+    name=method[1]
+    if name in ('purchasesInit','purchasesFinalize'):
+        p.local_store_state=2 if name=='purchasesInit' else 0
+        p.log('LOCAL_MEDAL_STORE',name)
+        return True,0
+    if name=='getAppStoreState':return True,getattr(p,'local_store_state',0)
+    if name=='checkUnCosumableData':return True,0
+    if name=='getPurchasesData':
+        products=[p.objects[ref] for ref in p.objects[arg(0)]['items']]
+        titles=[f'{MEDAL_PACKS[sku]} MEDALS' if sku in MEDAL_PACKS else sku for sku in products]
+        prices=['FREE' if sku in MEDAL_PACKS else '--' for sku in products]
+        descriptions=['Local medal reward' if sku in MEDAL_PACKS else 'Unavailable' for sku in products]
+        arrays=[string_array(p,values) for values in (titles,prices,['inapp']*len(products),descriptions,products)]
+        queue_callback(p,'purchaseListFinished',(p.env,0,len(products),*arrays),arrays)
+        p.log('LOCAL_MEDAL_CATALOG',products)
+        return True,0
+    if name=='requestUnManagedConsume' and method[2]=='()V':return True,0
+    if name in ('requestBilling','requestUnManagedConsume'):
+        sku=p.objects[arg(0)]
+        # Completion remains in the original game: it selects the SKU quantity,
+        # adds medals with the original cap, and commits its own save format.
+        code=0 if sku in MEDAL_PACKS else 4
+        ref=p.managed_obj(sku)
+        queue_callback(p,'purchaseFinished',(p.env,0,code,ref),(ref,))
+        p.log('LOCAL_MEDAL_BUY',sku,MEDAL_PACKS.get(sku,0),'FREE',code)
+        return True,0
+    if name in ('consumeBilling','unManagedBilling','restoreBilling'):
+        # No remote receipts exist for a local reward. Restoration finishes empty.
+        sku=p.objects[arg(0)] if name=='consumeBilling' else ''
+        ref=p.managed_obj(sku)
+        queue_callback(p,'purchaseFinished',(p.env,0,5 if name!='restoreBilling' else 2,ref),(ref,))
+        return True,0
+    if name in ('eventTracking','PartyTrackEvent','PartyTrackPayment'):
+        p.log('LOCAL_ANALYTICS_DISABLED',name)
+        return True,0
+    if name=='isGameCenterEnable':return True,0
+    if name in ('signIn','signOut'):
+        p.log('LOCAL_SIGN_IN_UNAVAILABLE',name)
+        return True,0
+    if name in ('cancelRoom','resetDisconnectedPlayer','clearInvitationId'):
+        p.log('LOCAL_NETWORK_IDLE',name)
+        return True,0
+    if name=='getDisconnectedPlayerNum':return True,0
+    if name=='setRoomVariant' and method[2]=='(I)V':
+        p.local_room_variant=arg(0)
+        p.log('LOCAL_ROOM_VARIANT',p.local_room_variant)
+        return True,0
+    if name in ('sendDataTCP','sendDataUDP') and method[2]=='([BLjava/lang/String;)V':
+        # These original player-info announcements are redundant in NPC mode.
+        # Read the game's exported singleton without re-entering native execution.
+        app=app_instance(p)
+        if app and p.read(app+0xc061,1)==b'\x01' and p.word(app+0xc63c)==4:
+            if not hasattr(p,'local_npc_message_counts'):p.local_npc_message_counts={}
+            p.local_npc_message_counts[name]=p.local_npc_message_counts.get(name,0)+1
+            if p.local_npc_message_counts[name]==1:p.log('LOCAL_NPC_NETWORK_MESSAGE_OMITTED',name)
+            return True,0
+    if name=='startQuickGame' and method[2]=='(III)V':
+        app=app_instance(p)
+        if app and p.word(app+0xc06c)==1 and p.word(app+0xc63c)==4:
+            p.log('LOCAL_EVENT_MATCH_REQUEST_OMITTED')
+            return True,0
+    if name=='getLeaderboardMyRank':
+        p.local_leaderboard_rank=-1
+        p.log('LOCAL_LEADERBOARD_UNAVAILABLE')
+        return True,0
+    if name=='getLeaderboardMyRankNum':return True,0xffffffff
+    if name=='getDisplayDefaultName':return True,p.managed_obj('----------')
+    if name=='showLeaderboard':
+        p.log('LOCAL_LEADERBOARD_UNAVAILABLE')
+        return True,0
+    if name=='isShowMoreAppsState':return True,0
+    return False,0
+
+def pump(p):
+    """Deliver Java-to-native callbacks only after the active native frame returns."""
+    callbacks=getattr(p,'platform_callbacks',None)
+    while callbacks:
+        name,args,refs=callbacks.pop(0)
+        # A real Java -> JNI native call has an implicit local-reference frame.
+        locals_before={ref:counts['local'] for ref,counts in p.jni_refs.items()}
+        p.log('LOCAL_CALLBACK',name,[hex(x) for x in args],[(hex(ref),p.jni_refs.get(ref)) for ref in refs])
+        try:p.call(name,*args)
+        finally:
+            for ref,counts in list(p.jni_refs.items()):
+                extra=counts['local']-locals_before.get(ref,0)
+                for _ in range(max(0,extra)):p.jni_release(ref)
+            for ref in refs:p.jni_release(ref,'global')
