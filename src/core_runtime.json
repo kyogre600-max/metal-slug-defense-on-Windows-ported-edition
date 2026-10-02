@@ -1,4 +1,4 @@
 {
-  "library": "MSD_Core.dll",
-  "sha256": "564ad4aab0ac6e1769b89f6657a7e50882945823a52703c542aa46f17022130d"
+  "library": "msd_aot.dll",
+  "sha256": "a613dfe9a40291cbeed1046eed24804694ad2a165c5e96566d253a4c0c995975"
 }

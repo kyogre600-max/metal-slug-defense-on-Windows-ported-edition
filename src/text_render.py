@@ -1,6 +1,7 @@
 """Local Windows font selection shared by JNI measurements and rasterization."""
 from pathlib import Path
 import os
+from functools import lru_cache
 from PIL import ImageFont
 
 FONT_DIR = Path(os.environ['SystemRoot']) / 'Fonts'
@@ -31,6 +32,7 @@ class FontLayout:
                 runs.append((font, character))
         return runs
 
+    @lru_cache(maxsize=2048)
     def getlength(self, text):
         return sum(font.getlength(run) for font, run in self.runs(text))
 
@@ -41,6 +43,10 @@ class FontLayout:
             x += font.getlength(run)
 
 def font_for(probe, size, language):
+    selection_key=language,int(size)
+    selected=getattr(probe,'font_selection',None)
+    if selected is None:probe.font_selection=selected={}
+    if selection_key in selected:return selected[selection_key]
     names = LANGUAGE_FONTS.get(language, ('arial.ttf',))
     primary_path = next((FONT_DIR / name for name in names if (FONT_DIR / name).is_file()), None)
     if primary_path is None:
@@ -58,4 +64,5 @@ def font_for(probe, size, language):
         probe.fonts[key] = FontLayout(primary, fallback)
         probe.log('FONT_SELECTED', language, size, primary_path.name,
                   fallback_path.name if fallback_path else None)
-    return probe.fonts[key]
+    selected[selection_key]=probe.fonts[key]
+    return selected[selection_key]

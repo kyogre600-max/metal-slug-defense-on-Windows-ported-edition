@@ -7436,7 +7436,7 @@ static void b_101dbd1c(Context& c){
 {uint32_t a=(c.r[5]+0u+12u);c.r[2]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[5]+0u+16u);c.r[3]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[1]+0u+24u);c.r[1]=rd<uint32_t>(c,a+0u);}
-{uint32_t a=(c.r[1]+shift(c,c.r[2],2,1,false)+0u);c.r[2]=rd<uint32_t>(c,a+0u);}
+{c.r[2]=rd<uint32_t>(c,c.r[1]+(c.r[2]<<2));extern void msd_retained_weapon_script(Context&);msd_retained_weapon_script(c);}
 {uint32_t v=add(c,c.r[2],shift(c,c.r[3],2,1,false),0,false);c.r[6]=v;}
 {uint32_t a=(c.r[2]+shift(c,c.r[3],2,1,false)+0u);c.r[11]=rd<uint32_t>(c,a+0u);}
 {uint32_t v=add(c,c.r[11],~(23u),1,true);}
@@ -7456,7 +7456,7 @@ static void b_101dbd28(Context& c){
 {uint32_t a=(c.r[5]+0u+12u);c.r[2]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[5]+0u+16u);c.r[3]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[1]+0u+24u);c.r[1]=rd<uint32_t>(c,a+0u);}
-{uint32_t a=(c.r[1]+shift(c,c.r[2],2,1,false)+0u);c.r[2]=rd<uint32_t>(c,a+0u);}
+{c.r[2]=rd<uint32_t>(c,c.r[1]+(c.r[2]<<2));extern void msd_retained_weapon_script(Context&);msd_retained_weapon_script(c);}
 {uint32_t v=add(c,c.r[2],shift(c,c.r[3],2,1,false),0,false);c.r[6]=v;}
 {uint32_t a=(c.r[2]+shift(c,c.r[3],2,1,false)+0u);c.r[11]=rd<uint32_t>(c,a+0u);}
 {uint32_t v=add(c,c.r[11],~(23u),1,true);}
@@ -7467,7 +7467,7 @@ static void b_101dbd46(Context& c){
 {uint32_t a=(c.r[5]+0u+12u);c.r[2]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[5]+0u+16u);c.r[3]=rd<uint32_t>(c,a+0u);}
 {uint32_t a=(c.r[1]+0u+24u);c.r[1]=rd<uint32_t>(c,a+0u);}
-{uint32_t a=(c.r[1]+shift(c,c.r[2],2,1,false)+0u);c.r[2]=rd<uint32_t>(c,a+0u);}
+{c.r[2]=rd<uint32_t>(c,c.r[1]+(c.r[2]<<2));extern void msd_retained_weapon_script(Context&);msd_retained_weapon_script(c);}
 {uint32_t v=add(c,c.r[2],shift(c,c.r[3],2,1,false),0,false);c.r[6]=v;}
 {uint32_t a=(c.r[2]+shift(c,c.r[3],2,1,false)+0u);c.r[11]=rd<uint32_t>(c,a+0u);}
 {uint32_t v=add(c,c.r[11],~(23u),1,true);}
@@ -7604,7 +7604,7 @@ static void b_101dbe7c(Context& c){
 {c.pc=(270385584u|1u);return;}
 c.pc=270384771u;}
 static void b_101dbe82(Context& c){
-{uint32_t a=(c.r[6]+0u+4u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{c.r[3]=rd<uint32_t>(c,c.r[6]+4u);extern void msd_retained_weapon_frame(Context&);msd_retained_weapon_frame(c);}
 {uint32_t a=(c.r[5]+0u+8u);wr<uint32_t>(c,a+0u,c.r[3]);}
 {c.pc=(270384454u|1u);return;}
 c.pc=270384777u;}
@@ -7806,7 +7806,7 @@ static void b_101dc02c(Context& c){
 {c.pc=(270385626u|1u);return;}
 c.pc=270385209u;}
 static void b_101dc04c(Context& c){
-{uint32_t a=(c.r[5]+0u+28u);c.r[2]=rd<uint32_t>(c,a+0u);}
+{extern bool msd_retained_weapon_discard(Context&);if(msd_retained_weapon_discard(c)){c.pc=0x101dbd47u;return;}c.r[2]=rd<uint32_t>(c,c.r[5]+28u);}
 {if(c.r[2] != 0){c.pc=(270385300u|1u);return;}}
 c.pc=270385233u;}
 static void b_101dc050(Context& c){

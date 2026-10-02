@@ -4,6 +4,18 @@ import time
 
 KEYS={'special_all':'SPACE','upgrade_ap':'`','slug_attack':'-','deploy_all':'='}
 
+def player_controller(p,main):
+    # The visible unit/AP panels dispatch through this operator's controller.
+    # Resolve it for every action: Event/NPC setup and temporary deck changes
+    # can rebuild the operator or change the scene's team-selection index.
+    scene=p.call('_ZN10BattleMain12getMainSceneEv',main)
+    if scene:
+        operator=p.word(scene+0x3c)
+        if 0x10000000<=operator<0x1ffff000 and p.word(operator)==p.symbols['_ZTV20BattlePlayerOperator']+8:
+            controller=p.word(operator+0x18)
+            if 0x10000000<=controller<0x1ffff000:return controller
+    return p.call('_ZN10BattleMain19getPlayerControllerEv',main)
+
 
 def context(p):
     app=p.app_instance()
@@ -14,7 +26,7 @@ def context(p):
         return None,'not_playing',scene
     master=p.call('_ZN16BattleGameMaster11getInstanceEv')
     if p.read(master+0x1c,1)[0]:return None,'paused',scene
-    controller=p.call('_ZN10BattleMain19getPlayerControllerEv',main)
+    controller=player_controller(p,main)
     if not controller or p.word(p.word(controller)+0x94)!=p.symbols['_ZN26BattleControllerPlayerBase10createUnitEi']:
         return None,'controller',scene
     return controller,None,scene

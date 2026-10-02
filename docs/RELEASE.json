@@ -1,13 +1,13 @@
 {
   "project": "metal slug defense on Windows ported edition",
   "repository": "https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition",
-  "version": "2026.10.02",
+  "version": "2026.10.02.1",
   "android_version": "1.46.0",
   "platform": "Windows x64",
-  "archive": "MSD WINDOWS S1XLV_2026.10.02.zip",
-  "archive_bytes": 146077814,
-  "archive_sha256": "a70b384f705d2d1b2f0021561047e643e27353a625719ab7db61d15711f494b5",
-  "native_core_sha256": "564ad4aab0ac6e1769b89f6657a7e50882945823a52703c542aa46f17022130d",
+  "archive": "MSD.WINDOWS.S1XLV_2026.10.02.1.zip",
+  "archive_bytes": 146235408,
+  "archive_sha256": "f2a931fbca1fb1b4b393064947b52ad31a143fa71dde408a69a61d2210d5ed22",
+  "native_core_sha256": "a613dfe9a40291cbeed1046eed24804694ad2a165c5e96566d253a4c0c995975",
   "keyboard_feedback_overlay": false,
   "window_title_status": false,
   "stamina_points_per_second": 1,
@@ -16,5 +16,19 @@
     720
   ],
   "personal_saves_included": false,
-  "activity_rewards_preserved": true
+  "activity_rewards_preserved": true,
+  "target_fps": 30,
+  "retained_weapon_unit_ids": [
+    16,
+    17,
+    18,
+    19,
+    96,
+    97,
+    98,
+    99,
+    344,
+    362
+  ],
+  "event_deck_keyboard_fix": true
 }

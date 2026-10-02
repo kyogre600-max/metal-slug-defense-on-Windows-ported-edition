@@ -40,6 +40,8 @@ class Probe:
         self.on_progress=on_progress
         self.audio_mode=audio_mode
         self.audio_capture=audio_capture
+        from asset_cache import AssetCache
+        self.asset_cache=AssetCache(RESOURCE_ROOT/PKG)
         self.file_commits={}
         self.logfile = open(ROOT / log_name, 'w', encoding='utf-8', buffering=1)
         self.zip = zipfile.ZipFile(APK)
@@ -67,6 +69,9 @@ class Probe:
         self.errno = self.alloc(4)
         self.saves = self.guest_root / 'data/data' / PKG
         self.saves.mkdir(parents=True, exist_ok=True)
+        # Resource overrides are discovered at launch; absent local textures
+        # can fall through to the bundled assets without repeated failed opens.
+        self.local_asset_names={q.name for q in self.saves.iterdir()}
         initial = self.saves / 'test.dat'
         if not initial.exists():
             verified=ROOT/'guest/data/data'/PKG/'test.dat'
@@ -83,6 +88,10 @@ class Probe:
         self.uc.hook_add(UC_HOOK_MEM_INVALID, self.invalid_memory)
         self.load()
         self.make_jni()
+        from native_imports import bind
+        bind(self)
+        from native_audio import bind as bind_audio
+        bind_audio(self)
 
     def log(self, *values):
         if self.on_progress:self.on_progress(values)
@@ -370,6 +379,9 @@ class Probe:
             self.uc.reg_write(UC_ARM_REG_R1, hi)
             return lo
         a = self.args()
+        if name in ('windows_vorbis_plus','windows_vorbis_sync'):
+            from native_audio import decode
+            return decode(self,name,a)
         if name.startswith('jni_'): return self.jni(int(name[4:]), a)
         if name.startswith('jvm_'):
             idx = int(name[4:])
@@ -580,22 +592,11 @@ class Probe:
             return reason=='created'
         if not 0 <= slot < 10:
             return report('invalid_slot')
-        app = self.app_instance()
-        result['scene']=self.word(app+0x22bc) if app else None
-        if not app or result['scene'] != 100:
-            return report('not_battle')
-        main = self.word(app + 0xc220)
-        if not main or not self.word(main + 8) or not self.call('_ZN10BattleMain15isBattlePlayingEv', main):
-            return report('not_playing')
-        master = self.call('_ZN16BattleGameMaster11getInstanceEv')
-        if self.read(master + 0x1c, 1)[0]:
-            return report('paused')
-        controller = self.call('_ZN10BattleMain19getPlayerControllerEv', main)
-        if not controller:
-            return report('controller')
+        from battle_controls import context
+        controller,blocked,scene=context(self)
+        result['scene']=scene
+        if blocked:return report(blocked)
         action = self.word(self.word(controller) + 0x94)
-        if action != self.symbols['_ZN26BattleControllerPlayerBase10createUnitEi']:
-            return report('controller')
         info=self.call('_ZNK16BattleController11getUnitInfoEi',controller,slot)
         if not info:return report('empty')
         result.update(unit_id=self.word(info+0x10),cost=self.word(info),
@@ -731,19 +732,33 @@ class Probe:
         raise RuntimeError(name)
 
     def path(self,s):
+        asset_path=PKG in s and ('.obm' in s or '.msdf' in s)
+        if asset_path:
+            cache=getattr(self,'asset_paths',None)
+            if cache is None:self.asset_paths=cache={}
+            if s in cache:return cache[s]
         if s.startswith('/data/data/'+PKG): p=self.saves/s.removeprefix('/data/data/'+PKG).lstrip('/')
         elif PKG in s and ('.obm' in s or '.msdf' in s):
             p=RESOURCE_ROOT/PKG/s.split(PKG,1)[1].lstrip('/')
         else: p=self.guest_root/s.lstrip('/').replace(':','_')
-        p=p.resolve()
+        if asset_path and p.parent==self.asset_cache.root and p.name in self.asset_cache.safe_names:
+            pass  # A single basename under the canonical asset directory.
+        else:p=p.resolve()
         permitted=self.guest_root
-        assets=(RESOURCE_ROOT/PKG).resolve()
+        assets=self.asset_cache.root
         if not(p.is_relative_to(permitted) or p.is_relative_to(assets)): raise RuntimeError('Path escape: '+s)
+        if asset_path:cache[s]=p
         return p
 
     def filecall(self,name,a):
         if name=='fopen':
-            path=self.path(self.string(a[0])); mode=self.string(a[1]); self.log('FILE_OPEN',str(path),mode)
+            requested=self.string(a[0]);mode=self.string(a[1])
+            prefix='/data/data/'+PKG+'/'
+            if mode.startswith('r') and requested.startswith(prefix):
+                leaf=requested[len(prefix):]
+                if Path(leaf).name==leaf and leaf.endswith(('.obm','.msdf')) and leaf not in self.local_asset_names:
+                    self.put(self.errno,2);return 0
+            path=self.path(requested); self.log('FILE_OPEN',str(path),mode)
             if any(k in mode for k in 'wa+') and not path.is_relative_to(self.guest_root): raise RuntimeError('Original asset write blocked')
             if path.name.startswith('menu_news00') and mode.startswith('r'):
                 from custom_menu import MenuScreenOverride
@@ -762,6 +777,8 @@ class Probe:
                     import tempfile
                     fd,tmp=tempfile.mkstemp(prefix=path.name+'.',suffix='.pending',dir=path.parent)
                     f=os.fdopen(fd,binary);pending=(Path(tmp),path)
+                elif mode.startswith('r') and '+' not in mode and path.is_relative_to(self.asset_cache.root):
+                    f=self.asset_cache.open(path)
                 else:f=open(path,binary)
             except FileNotFoundError: self.put(self.errno,2); return 0
             handle=self.alloc(16); self.handles[handle]=f
@@ -912,6 +929,8 @@ class Probe:
         self.native('onTouchEvent',ids,coords)
 
     def close(self):
+        if hasattr(self,'native_audio_cache'):self.native_audio_cache.close()
+        if hasattr(self,'asset_cache'):self.asset_cache.close()
         if hasattr(self,'audio_bridge') and not self.audio_bridge.closed:
             self.log('AUDIO_SUMMARY',json.dumps(self.audio_bridge.stats()))
             self.audio_bridge.close()
@@ -920,6 +939,8 @@ class Probe:
                 try:value.close()
                 except Exception:pass
         if hasattr(self,'graphics'):self.graphics.close()
+        from native_imports import release
+        release(self)
         self.zip.close();self.logfile.close()
 
 if __name__ == '__main__':

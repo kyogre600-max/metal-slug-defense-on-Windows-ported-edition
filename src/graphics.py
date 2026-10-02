@@ -43,6 +43,8 @@ class Graphics:
         renderer=self.function('glGetString','u',P)(0x1F01)
         probe.log('GLES_RENDERER',C.string_at(renderer).decode())
         self.function('glViewport','iiii')(*self.surface_rect(self.default_viewport))
+        from native_imports import bind
+        bind(probe,self)
 
     def surface_rect(self, rect):
         from window_layout import fit_rect
@@ -129,7 +131,15 @@ class Graphics:
             shader,count,ptr,lens=args[:4]
             strings=(C.c_void_p*count)(*[p.host(p.word(ptr+i*4)) for i in range(count)])
             self.function(name,'uipp')(shader,count,C.cast(strings,C.c_void_p),p.host(lens));return 0
-        if name=='glBindBuffer':self.bindings[args[0]]=args[1]
+        if name=='glBindBuffer':
+            self.bindings[args[0]]=args[1]
+            if hasattr(p.uc.lib,'msd_set_bound_buffer'):
+                fn=p.uc.lib.msd_set_bound_buffer;fn.argtypes=[C.POINTER(type(p.uc.ctx)),C.c_uint32,C.c_uint32]
+                fn(C.byref(p.uc.ctx),args[0],args[1])
+        if name in ('glVertexAttribPointer','glDrawElements') and hasattr(p.uc.lib,'msd_bound_buffer'):
+            target=0x8892 if name=='glVertexAttribPointer' else 0x8893
+            fn=p.uc.lib.msd_bound_buffer;fn.argtypes=[C.POINTER(type(p.uc.ctx)),C.c_uint32];fn.restype=C.c_uint32
+            self.bindings[target]=fn(C.byref(p.uc.ctx),target)
         sigs={
             'glEnable':'u','glDisable':'u','glBindTexture':'uu','glBlendFunc':'uu','glDepthFunc':'u','glBlendEquation':'u',
             'glScissor':'iiii','glDepthMask':'b','glUseProgram':'u','glFramebufferTexture2D':'uuuui',

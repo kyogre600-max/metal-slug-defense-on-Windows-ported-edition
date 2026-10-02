@@ -160,7 +160,7 @@ class Player:
         if action==glfw.PRESS and key==glfw.KEY_F9:self.mute_requested=True
 
     def game_thread(self):
-        p=None
+        p=None;pacer=None
         try:
             p=Probe(guest_root=self.guest_root,log_name=self.log_name,
                     window_handle=self.hwnd,window_size=(WIDTH,HEIGHT),
@@ -170,7 +170,9 @@ class Player:
             p.render_surface_size=self.framebuffer_size
             assert not any(n == 'unicorn' or n.startswith('unicorn.') for n in sys.modules), 'Unexpected ARM engine dependency'
             p.initialize()
-            sample_time=time.perf_counter();sample_frames=0;next_tick=sample_time
+            from frame_pacer import FramePacer
+            pacer=FramePacer(30)
+            sample_time=time.perf_counter();sample_frames=0
             while not self.stop.is_set():
                 if self.minimized and self.ready:
                     self.stop.wait(0.05);continue
@@ -217,10 +219,7 @@ class Player:
                 if self.last_present-sample_time>=1:
                     self.fps=sample_frames/(self.last_present-sample_time)
                     sample_frames=0;sample_time=self.last_present
-                interval=max(1,getattr(p,'frame_interval',33))/1000
-                next_tick=max(next_tick+interval,time.perf_counter())
-                delay=next_tick-time.perf_counter()
-                if delay>0:time.sleep(delay)
+                pacer.wait()
         except ProbeCancelled:
             if p:p.log('WINDOW_CLOSED_BY_USER')
         except Exception:
@@ -232,6 +231,7 @@ class Player:
                     try:p.graphics.capture(ROOT/'player_error_frame.png')
                     except Exception:pass
         finally:
+            if pacer:pacer.close()
             try:
                 if p:p.close()
             except Exception:
