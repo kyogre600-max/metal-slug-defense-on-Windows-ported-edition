@@ -1693,4 +1693,9 @@ old_release_uid_boundary=find_block(0x101dcd31u);register_block(0x101dcd31u,rele
 old_status_boundary=find_block(0x101cfbcdu);register_block(0x101cfbcdu,status_boundary);
 old_create_params_boundary=find_block(0x101cfa99u);register_block(0x101cfa99u,create_params_boundary);
 old_real_unit_factory_boundary=find_block(0x101d1421u);register_block(0x101d1421u,real_unit_factory_boundary);
+old_enemy_roster=find_block(0x101c9d07u);register_block(0x101c9d07u,enemy_roster);
+old_enemy_unit_enable=find_block(0x101c98fbu);register_block(0x101c98fbu,enemy_unit_enable);
+old_enemy_special_policy=find_block(0x101c9da3u);register_block(0x101c9da3u,enemy_special_policy);
+old_extension_music=find_block(0x101c6625u);register_block(0x101c6625u,extension_music);
+old_extension_mission=find_block(0x101d09fdu);register_block(0x101d09fdu,extension_mission);
 }

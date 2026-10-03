@@ -159,6 +159,8 @@ class Player:
             if queued:self.events.put(('battle',battle_action))
         if action==glfw.PRESS and key==glfw.KEY_F12:self.capture_requested=True
         if action==glfw.PRESS and key==glfw.KEY_F9:self.mute_requested=True
+        if action==glfw.PRESS and key==glfw.KEY_F6 and self.ready:
+            self.events.put(('content_menu','worlds'))
 
     def game_thread(self):
         p=None;pacer=None
@@ -195,6 +197,8 @@ class Player:
                         elif event[0]=='battle':
                             p.log('WINDOW_BATTLE_REQUEST',event[1],p.frame)
                             self.last_unit_result=p.battle_key_action(event[1])
+                        elif event[0]=='content_menu':
+                            if event[1]=='worlds' and hasattr(p,'campaign'):p.campaign.open()
                         else:
                             p.touch_event(*event)
                             p.log('WINDOW_TOUCH',*event)

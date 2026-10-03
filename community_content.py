@@ -76,6 +76,8 @@ class CommunityContent:
             if 'unit_icon_02.obm' not in self.assets:raise ValueError('Missing community icon atlas')
             width,height=self.asset_dimensions['unit_icon_02.obm'];x,y,w,h=u['icon']['rect']
             if x+w>width or y+h>height:raise ValueError('Icon rectangle outside its atlas')
+        from campaign_catalog import merge_scenes
+        merge_scenes(self)
         import community_maps
         community_maps.validate(self.manifest,self.assets)
         self.overridden_assets=set()

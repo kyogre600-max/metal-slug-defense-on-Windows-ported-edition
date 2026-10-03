@@ -1,0 +1,35 @@
+{
+  "version": "1.46.2",
+  "status": "verified_locally",
+  "core": {
+    "library": "MSD_Core.dll",
+    "sha256": "9d60321916553fc55f7caffa2fe135e0049b0daa26d9933b4a71a142082000ab"
+  },
+  "rules": {
+    "base_player_level_cap": 35,
+    "matching_faction_core_player_level_cap": 40,
+    "world_progress_level_gate": false,
+    "paid_intermediate_cap_unlock": false,
+    "normal_msp_upgrade_cost": "preserved",
+    "enemy_configuration_levels": "preserved"
+  },
+  "validation": {
+    "original_unit_rows": 400,
+    "registered_custom_unit_rows": 6,
+    "faction_core_rule_checks": 16240,
+    "native_ui_upgrade_steps": 78,
+    "native_survival_shop_core_purchases": 2,
+    "save_restart": "passed",
+    "hidden_world_3_enemy_roster_missions": 54,
+    "enemy_parameter_comparisons": 2030,
+    "configured_enemy_levels_checked": [
+      35,
+      40,
+      50,
+      60
+    ],
+    "original_enemy_parameters_unchanged": true
+  },
+  "scope": "Player level progression; enemy roster and parameter comparisons use the previous 1.46.2 release. Existing concurrent campaign and online changes remain in the working tree and retain their independent validation scope.",
+  "publication": "Awaiting manual GitHub Desktop commit and push"
+}

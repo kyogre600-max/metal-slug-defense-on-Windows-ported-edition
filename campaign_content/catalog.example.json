@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "assets": {},
+  "scenes": [],
+  "music": [],
+  "worlds": [
+    {
+      "key": "author.world4",
+      "title": "世界 4",
+      "areas": [
+        {
+          "key": "author.world4.area1",
+          "title": "区域 1",
+          "stages": [
+            {
+              "key": "author.world4.area1.stage1",
+              "title": "关卡 1",
+              "template": 1011,
+              "scene": 0,
+              "music": 100,
+              "stamina": 0,
+              "enemy_base_hp": 12000,
+              "reward_msp": 100,
+              "strength_steps": 0,
+              "enemies": [
+                {"unit": "s1xlv.sarubia_future", "level": 40},
+                {"unit": "s1xlv.m15a_future", "level": 40},
+                {"unit": "s1xlv.heavy_b_future", "level": 40},
+                {"unit": "s1xlv.di_cokka_mk2", "level": 40},
+                {"unit": "s1xlv.di_cokka_mk3", "level": 40},
+                {"unit": "s1xlv.girida_o_mk2", "level": 40}
+              ],
+              "waves": [{"tick": 0, "enemy": 3}, {"tick": 90, "enemy": 4}, {"tick": 180, "enemy": 5}, {"tick": 270, "enemy": 0}, {"tick": 360, "enemy": 1}, {"tick": 450, "enemy": 2}]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "author.hidden_world4",
+      "title": "里世界 4",
+      "requires": ["author.world4.area1.stage1"],
+      "areas": [
+        {
+          "key": "author.hidden_world4.area1",
+          "title": "区域 1",
+          "stages": [
+            {
+              "key": "author.hidden_world4.area1.stage1",
+              "title": "关卡 1",
+              "scene": 0,
+              "music": 101,
+              "enemy_base_hp": 20000,
+              "reward_msp": 200,
+              "strength_steps": 5,
+              "enemies": [{"unit": "s1xlv.heavy_b_future", "level": 50}],
+              "waves": [{"tick": 0, "enemy": 0}, {"tick": 180, "enemy": 0}]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

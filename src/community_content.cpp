@@ -75,18 +75,19 @@ static void scale_vehicle_motion(Context& c){
  uint32_t a=rd<uint32_t>(c,pair),b=rd<uint32_t>(c,pair+4u);if(a==b||!b)return;
  for(uint32_t index:{1u,2u}){float x;std::memcpy(&x,&c.r[index],4);x=x*float(a)/float(b);std::memcpy(&c.r[index],&x,4);}
 }
+#include "unit_level_rules.inc"
 HOOK(vehicle_motion,0x101dde11u, scale_vehicle_motion(c);)
 HOOK(unitdata,0x101652a9u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+12));return;})
 HOOK(unitname,0x101652d5u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+0x30u+std::min(c.r[1],10u)*4u));return;})
 HOOK(unitinfo,0x101652e9u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+0x5cu+std::min(c.r[1],10u)*4u));return;})
-HOOK(maxlevel,0x1016533bu, if(record(c,c.r[0])){ret(c,40u);return;})
+HOOK(maxlevel,0x1016533bu, if(active(c)&&real_unit(c,c.r[0])){ret(c,player_level_cap(c,head(c,28),c.r[0]));return;})
 HOOK(getlevel,0x10167af1u, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+24));return;}if(active(c)&&c.r[1]>=400u){ret(c,0xffffffffu);return;})
 HOOK(setlevel,0x10167b5bu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+24,uint32_t(std::max(-1,std::min(39,int32_t(c.r[2])))));dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(addlevel,0x10167b0fu, uint32_t p=record(c,c.r[1]);if(p){int v=std::max(-1,std::min(39,int32_t(rd<uint32_t>(c,p+24))+int32_t(c.r[2])));wr<uint32_t>(c,p+24,uint32_t(v));dirty(c);ret(c,uint32_t(v));return;}if(active(c)&&c.r[1]>=400u){ret(c,0xffffffffu);return;})
-HOOK(getopen,0x10167ccbu, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+28));return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
-HOOK(isopen,0x10167cf3u, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+28)<=39u);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
-HOOK(setopen,0x10167d69u, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+28,std::min(40u,c.r[2]));dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
-HOOK(addopen,0x10167d1du, uint32_t p=record(c,c.r[1]);if(p){uint32_t v=std::min(40u,rd<uint32_t>(c,p+28)+c.r[2]);wr<uint32_t>(c,p+28,v);dirty(c);ret(c,v);return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
+HOOK(getopen,0x10167ccbu, if(active(c)&&real_unit(c,c.r[1])){ret(c,reconcile_player_cap(c,c.r[0],c.r[1]));return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
+HOOK(isopen,0x10167cf3u, if(active(c)){ret(c,0u);return;})
+HOOK(setopen,0x10167d69u, if(active(c)&&real_unit(c,c.r[1]))c.r[2]=player_level_cap(c,c.r[0],c.r[1]);uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+28,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
+HOOK(addopen,0x10167d1du, if(active(c)&&real_unit(c,c.r[1])){ret(c,reconcile_player_cap(c,c.r[0],c.r[1]));return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
 HOOK(gettime,0x10167bafu, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+32));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(settime,0x10167bcfu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+32,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(getdecktime,0x10167c0du, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+0x88u));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
@@ -127,5 +128,33 @@ extern "C" __declspec(dllexport) uint32_t msd_community_combat_profile_version()
 extern "C" __declspec(dllexport) uint32_t msd_community_shop_gate_version(){return 1u;}
 HOOK(create_params_boundary,0x101cfa99u, if(active(c)&&!real_unit(c,c.r[1])){for(uint32_t i=0;i<0x1cu;i+=4u)wr<uint32_t>(c,c.r[3]+i,0u);ret(c,0u);return;})
 HOOK(real_unit_factory_boundary,0x101d1421u, if(active(c)&&!real_unit(c,c.r[2])){ret(c,0u);return;})
+// 敌军名单沿用原生等级与标志计算，社区身份由运行注册表确认。
+HOOK(enemy_roster,0x101c9d07u,
+ uint32_t row=rd<uint32_t>(c,c.r[3]+68u)+c.r[6]*c.r[5];
+ uint32_t uid=rd<uint32_t>(c,row+4u);
+ if(record(c,uid)){
+  c.r[0]=c.r[4];c.r[3]=row;c.r[5]=add(c,c.r[5],1u,0u,true);
+  c.r[1]=uid;c.r[2]=rd<uint32_t>(c,row+8u);c.r[3]=1u;nz(c,1u);
+  c.r[2]=add(c,c.r[2],~1u,1u,true);c.r[14]=0x101c9d23u;c.pc=0x101c9b91u;return;
+ })
+HOOK(enemy_unit_enable,0x101c98fbu, if(record(c,c.r[1])){ret(c,1u);return;})
+HOOK(enemy_special_policy,0x101c9da3u,
+ uint32_t mission=rd<uint32_t>(c,c.r[4]+0x3acu);
+ if(rd<uint32_t>(c,0x1ffec000u)==0x45585431u&&mission&&rd<uint32_t>(c,mission)>=1000000u)
+  c.r[3]=rd<uint32_t>(c,0x1ffec014u)?1u:0u;
+ )
+// 独立音乐复用已核验的空闲音频槽，保持原生缓存边界。
+HOOK(extension_music,0x101c6625u,
+ if(c.r[1]==1031u&&rd<uint32_t>(c,0x1ffec000u)==0x45585431u){
+  uint32_t bank=rd<uint32_t>(c,0x1ffec004u);if(bank){ret(c,bank);return;}
+ })
+HOOK(extension_mission,0x101d09fdu,
+ if(rd<uint32_t>(c,0x1ffec000u)==0x45585431u&&c.r[1]>=1000000u){
+  uint32_t base=rd<uint32_t>(c,0x1ffec00cu);uint32_t count=rd<uint32_t>(c,0x1ffec010u);
+  uint32_t i=c.r[1]-1000000u;
+  if(i<count&&rd<uint32_t>(c,base+i*120u)==c.r[1]){ret(c,base+i*120u);return;}
+  ret(c,0u);return;
+ })
+extern "C" __declspec(dllexport) uint32_t msd_content_interface_version(){return 1u;}
 // Generated block overrides and registration are emitted by the build script.
 #include "community_blocks.inc"

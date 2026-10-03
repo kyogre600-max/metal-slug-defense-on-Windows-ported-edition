@@ -4,7 +4,7 @@ Additional world types require a separate carousel and progress adapter.
 """
 import struct
 
-MAX_STAGES=32
+MAX_STAGES=4096
 MAX_MISSIONS=5
 STAGE_ID_BASE=138
 MISSION_INDEX_BASE=195
@@ -55,7 +55,7 @@ def install(content,info,db):
  validate(manifest,content.assets)
  if manifest.get('worlds'):raise ValueError('Additional worlds require a world selector and save adapter')
  stages=manifest.get('stages',[]);missions=manifest.get('missions',[]);campaign=manifest.get('campaign_choices',[])
- if len(stages)>32 or len(missions)>5:raise ValueError('Stage/Mission registry capacity exceeded')
+ if len(stages)>MAX_STAGES or len(missions)>5:raise ValueError('Stage/Mission registry capacity exceeded')
  records=bytearray();stage_count=p.word(db+0x10)
  if stage_count!=138:raise RuntimeError('Unexpected original stage count')
  ctor_global=(p.word(0x101e1c10)+0x101e1bd8)&0xffffffff
@@ -65,9 +65,24 @@ def install(content,info,db):
  for i,s in enumerate(stages):
   if s['id']!=138+i or not 0<=s['base_id']<138 or s['texture'] not in content.assets:raise ValueError('Invalid stage registry entry')
   bid=s['base_id'];row=bytearray(old[bid*0x1c:(bid+1)*0x1c])
-  struct.pack_into('<II',row,0,s['id'],p.cstr(s['texture']));rows+=row
+  struct.pack_into('<II',row,0,s['id'],p.cstr(s['texture']))
+  if 'bounds' in s:
+   left,right=s['bounds'];points=s.get('terrain',[[0,0],[2*(right-left),0]])
+   struct.pack_into('<iii',row,8,left,right,alloc(b''.join(struct.pack('<ii',*point) for point in points)))
+   bases=s.get('bases',[min(68,(right-left)//4),right-left-47])
+   struct.pack_into('<ii',row,20,*bases)
+  rows+=row
   ctors+=p.read(ctor+bid*4,4)
-  records+=struct.pack('<II',s['id'],alloc(p.read(graphics+bid*12,12)))
+  if 'graphics' in s:
+   g=s['graphics']
+   rects=alloc(b''.join(struct.pack('<8h',*rect) for rect in g['rects']))
+   layer_ptrs=[]
+   for name in ('back','front'):
+    layers=[alloc(struct.pack('<'+'I'*(len(frames)+1),len(frames),*frames)) for frames in g.get(name,[])]
+    layer_ptrs.append(alloc(struct.pack('<'+'I'*(len(layers)+1),*layers,0)))
+   graphic=alloc(struct.pack('<3I',*layer_ptrs,rects))
+  else:graphic=alloc(p.read(graphics+bid*12,12))
+  records+=struct.pack('<II',s['id'],graphic)
  if stages:
   p.put(db+0xc,alloc(rows));p.put(db+0x10,138+len(stages));p.put(ctor_global,alloc(ctors))
   assert p.read(p.word(db+0xc),len(old))==old

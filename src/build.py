@@ -20,7 +20,7 @@ def main():
         dependencies=[src,ROOT/'aot_runtime.h']
         if src.parent==ROOT:dependencies.append(ROOT/'native_imports.h')
         if src.name=='native_audio.cpp':dependencies.append(ROOT/'third_party/stb_vorbis.c')
-        if src.name=='community_content.cpp':dependencies.append(ROOT/'community_blocks.inc')
+        if src.name=='community_content.cpp':dependencies.extend([ROOT/'community_blocks.inc',ROOT/'unit_level_rules.inc'])
         if obj.exists() and obj.stat().st_mtime>max(p.stat().st_mtime for p in dependencies):return obj
         command=[str(COMPILER),'-std=c++17','-O2','-Wa,-mbig-obj','-fno-strict-aliasing','-ffp-contract=off','-fno-exceptions','-fno-rtti','-c',str(src),'-o',str(obj)]
         result=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
