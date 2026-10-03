@@ -115,7 +115,12 @@ class CommunityCampaign:
     def clear_music(self):
         p=self.p;app=p.app_instance()
         p.call('_ZN7AppMain13Sound_StopBGMEv',app)
-        if self.music_key is not None:p.call('_ZN7AppMain13Sound_ReleaseE7SoundID',app,MUSIC_SLOT)
+        if self.music_key is not None:
+            counter=app+0xab54+MUSIC_SLOT
+            if p.read(counter,1)[0]>64:raise RuntimeError('独立音乐槽引用计数超出原生释放范围')
+            while p.read(counter,1)[0]:p.call('_ZN7AppMain13Sound_ReleaseE7SoundID',app,MUSIC_SLOT)
+            # 原生释放流程保留缓存指针；独立音乐槽在释放后清除该指针。
+            p.put(app+0x9b30+MUSIC_SLOT*4,0)
         p.put(EXT+4,0);self.music_key=None
     def prepare_world(self,key):
         p=self.p;t=self.trial;self.clear_runtime();world=self.catalog.worlds[key];records=[];stages=[];bgm={}
