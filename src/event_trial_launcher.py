@@ -22,19 +22,31 @@ class TrialProbe(OriginalProbe):
             if path.name.startswith('stage_thumbnail_') and override.is_file():return override
         return path
     def initialize(self):
+        from community_campaign import recover
+        recover(self.saves)
         recover_transaction(self.saves)
         seed=source/'game_data/seed_community.json'
         community=self.saves/'community_progress.json'
         if not community.exists():shutil.copyfile(seed,community)
         super().initialize()
         self.event_trial=EventTrial(self,ROOT)
+        from community_campaign import CommunityCampaign
+        self.campaign=CommunityCampaign(self,self.event_trial)
+        from online_session import OnlineClient,fingerprint
+        import hashlib
+        self.online=OnlineClient(fingerprint(self.community.manifest,self.community.campaign_catalog,
+                                            hashlib.sha256(self.uc.library_path.read_bytes()).hexdigest()))
     def step_frame(self):
         super().step_frame()
         self.event_trial.update()
+        self.campaign.update()
     def touch_event(self,action,x,y):
+        if self.campaign.touch(action,x,y):return
         if self.event_trial.touch(action,x,y):return
         super().touch_event(action,x,y)
     def close(self):
+        if hasattr(self,'online'):self.online.close()
+        if hasattr(self,'campaign'):self.campaign.close()
         if hasattr(self,'event_trial'):self.event_trial.close()
         super().close()
 player.Probe=TrialProbe

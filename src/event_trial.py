@@ -213,6 +213,8 @@ class EventTrial:
             recover_transaction(self.p.saves)
             raise
     def finish_battle(self):
+        if hasattr(self.p,'campaign') and self.p.campaign.active:
+            return self.p.campaign.finish()
         p=self.p;app=self.app;record=self.active_battle;d=self.data[self.selected]
         battle=p.word(app+0xc220)
         won=bool(p.read(battle+0x1c,1)[0])

@@ -33,7 +33,9 @@ class TrialProbe(OriginalProbe):
         from community_campaign import CommunityCampaign
         self.campaign=CommunityCampaign(self,self.event_trial)
         from online_session import OnlineClient,fingerprint
-        self.online=OnlineClient(fingerprint(self.community.manifest,self.community.campaign_catalog))
+        import hashlib
+        self.online=OnlineClient(fingerprint(self.community.manifest,self.community.campaign_catalog,
+                                            hashlib.sha256(self.uc.library_path.read_bytes()).hexdigest()))
     def step_frame(self):
         super().step_frame()
         self.event_trial.update()

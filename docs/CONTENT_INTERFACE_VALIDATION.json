@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "status": "validated_local",
+  "interface_version": 1,
+  "core_sha256": "9d60321916553fc55f7caffa2fe135e0049b0daa26d9933b4a71a142082000ab",
+  "community_registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+  "player_level_rules_preserved": true,
+  "catalog": {
+    "schema": 1,
+    "configured_stage_limit": 100000,
+    "scene_limit": 4096,
+    "unit_limit": 64,
+    "validated_worlds": 8,
+    "validated_stage_records": 10000,
+    "native_mission_lookups": 10000,
+    "selected_world_table_records": 1250,
+    "default_worlds": 0,
+    "example_worlds": [
+      "author.world4",
+      "author.hidden_world4"
+    ]
+  },
+  "runtime": {
+    "enemy_wave_ids": [
+      1024,
+      1025,
+      1026,
+      1027,
+      1028,
+      1029
+    ],
+    "future_registered_unit_spawn": 1030,
+    "invalid_ids_keep_native_fallback": [
+      400,
+      600,
+      1023,
+      1088
+    ],
+    "special_policy": "All six enemy units reached native state 50 under controlled distance and cooldown conditions; disabled policy produced no state 50 during the observation window.",
+    "independent_scene_id": 138,
+    "scene_png_source": [
+      384,
+      240
+    ],
+    "scene_runtime_atlas": [
+      512,
+      256
+    ],
+    "scene_gpu_pixel_roundtrip": true,
+    "scene_width": 1400,
+    "scene_terrain_height": 338,
+    "independent_music_slot": 1031,
+    "two_music_tracks_sequential_reload": true,
+    "pcm_output": "16-bit stereo, 16000 Hz, isolated capture",
+    "controlled_win_and_loss_settlement": true,
+    "first_unit_reward_restart": true,
+    "save_failure_rollback": true,
+    "original_mission_tables_restored": true,
+    "native_map_return_scene": 34
+  },
+  "regression": {
+    "baseline_core_sha256": "6b3081bec48bd796d409a9c12cdffdc9b71cb2ba07fd7f28ccff9de495a0e978",
+    "units": 406,
+    "levels": [
+      1,
+      20,
+      40
+    ],
+    "status_comparisons": 1218,
+    "result": "byte-identical native combat parameters"
+  },
+  "automated_tests": {
+    "entry": "tests/test_content_interfaces.py",
+    "cases": 11,
+    "result": "passed",
+    "coverage": [
+      "PNG pixel and transparency preservation",
+      "power-of-two padding",
+      "16-bit RGB rejection",
+      "palette capacity rejection",
+      "large catalog",
+      "unlock dependency cycle",
+      "coop relay",
+      "pvp rooms and capacity",
+      "authentication rejection",
+      "content mismatch rejection",
+      "malformed snapshot rejection",
+      "external TLS requirement"
+    ]
+  },
+  "network": {
+    "protocol": 1,
+    "transport": "TCP with TLS for external hosts",
+    "validated_environment": "two local loopback clients and reference room service",
+    "in_game_multiplayer_battle": "pending",
+    "server_simulation_and_reconciliation": "pending"
+  },
+  "audio_settings_separation": "deferred_by_user; runtime overlay and input hooks removed",
+  "campaign_ui": {
+    "date": "2026-10-04",
+    "status": "temporarily_hidden_by_user_request",
+    "enabled_by_default": false,
+    "f6_opens_panel": false,
+    "hidden_ui_consumes_mouse": false,
+    "content_interfaces_retained": true,
+    "development_preview": "CommunityCampaign(p, trial, ui_enabled=True)",
+    "validated_targets": 3,
+    "initial_frames_per_target": 215,
+    "main_menu_scene": 28,
+    "evidence": "ui_visibility/deployment.json and ui_visibility/verification/*/verification.json",
+    "scope": "Actual target hosts and cores, isolated save copies; installed main-menu screenshot inspected."
+  },
+  "evidence": "research/metal_slug_defense/content_work/content_interfaces_20261004/",
+  "reports": [
+    "runtime_verification.json",
+    "regression.json",
+    "ai_verification.json",
+    "host_verification.json",
+    "large_runtime_verification.json",
+    "deployment.json",
+    "installed_verification.json",
+    "ui_visibility/deployment.json",
+    "ui_visibility/verification/repository/verification.json",
+    "ui_visibility/verification/local/verification.json",
+    "ui_visibility/verification/installed/verification.json"
+  ],
+  "limitations": [
+    "Large-catalog lookup coverage does not establish full battle completion coverage.",
+    "Natural completion of all new stages, long-term stability and cross-device performance remain unverified.",
+    "Public-server TLS deployment and real multiplayer combat remain unverified.",
+    "The default catalog contains no finished new-world art or campaign content.",
+    "Complex objectives, custom prisoner placements and additional independent action classes require further adapters."
+  ],
+  "deployment": {
+    "targets": [
+      "F:\\egg\\github\\metal-slug-defense-on-Windows-ported-edition",
+      "F:\\egg\\research\\metal_slug_defense\\windows_native\\dist\\MSD_Windows",
+      "F:\\egg\\MSD_WINDOWS_S1XLV_1.46.2\\metal-slug-defense-on-Windows-ported-edition-main"
+    ],
+    "protected_files": [
+      2,
+      65,
+      8
+    ],
+    "protected_hashes_unchanged": true,
+    "actual_host_startup_frames_per_target": 215,
+    "online_content_hash": "f2378c0877375cb274d7494c2d49dc16250066bb7c1aa0d9d9a1e023045d265e",
+    "result": "passed"
+  }
+}

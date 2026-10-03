@@ -54,6 +54,12 @@ The package starts with an initial save. Units can be purchased with medals, and
 
 To update an existing installation, close the game, back up `play_save/`, extract the new package into a separate folder, and copy the complete `play_save/` folder into it. The existing save format remains compatible; the initial seed is used only when no save exists.
 
+### Content authoring and networking interfaces
+
+Configurable worlds, registered community enemies, independent scenes and music are documented in [CONTENT_AUTHORING.md](docs/CONTENT_AUTHORING.md). The unfinished world selection interface is temporarily hidden, and `F6` does not open it. The default catalog is empty; the supplied example can be installed with the authoring tool for development.
+
+The self-hosted room and transport preparation is described in [ONLINE_INTERFACE.md](docs/ONLINE_INTERFACE.md). In-game multiplayer battle synchronization remains under development.
+
 ## 中文
 
 本项目基于安卓原版 **《合金弹头塔防》（Metal Slug Defense）1.46.0**，将游戏移植至 Windows。游戏核心通过静态重编译生成 Windows x64 代码，并适配本地的图形、音频、输入与存档功能。
@@ -107,4 +113,10 @@ To update an existing installation, close the game, back up `play_save/`, extrac
 分发包采用初始存档，玩家可以使用勋章购买单位；原版每日奖励、活动奖励及对应解锁流程均保留。个人进度保存在 `play_save/`，分发包不包含已有个人进度。全关卡覆盖与长期运行稳定性仍需持续验证。
 
 更新已有安装时，请先关闭游戏并备份 `play_save/`，将新运行包解压至独立目录，再将完整的 `play_save/` 文件夹复制至该目录。现有存档格式保持兼容；初始种子仅在存档不存在时使用。
+
+### 内容制作与联机预备接口
+
+世界、社区敌军、独立场景和音乐的配置流程见 [CONTENT_AUTHORING.md](docs/CONTENT_AUTHORING.md)。尚未完成的世界选择界面暂时隐藏，`F6` 暂不打开该界面。默认目录保留空世界列表，示例通过内容制作工具安装用于开发。
+
+自有服务器的房间与传输接口见 [ONLINE_INTERFACE.md](docs/ONLINE_INTERFACE.md)。游戏内双人战斗同步保留后续开发状态。
 

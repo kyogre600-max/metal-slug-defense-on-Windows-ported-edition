@@ -9,6 +9,14 @@ from room_server import RoomServer
 from PIL import Image
 
 class ContentTests(unittest.TestCase):
+    def test_png_16_bit_rgb_rejected(self):
+        import struct,zlib
+        def chunk(name,data):return struct.pack('!I',len(data))+name+data+struct.pack('!I',zlib.crc32(name+data))
+        raw=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('!IIBBBBB',1,1,16,2,0,0,0))+chunk(b'IDAT',zlib.compress(b'\x00\xff\xff\x80\x00\x00\x00'))+chunk(b'IEND',b'')
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/'rgb16.png';dest=Path(temp)/'asset.obm';source.write_bytes(raw)
+            with self.assertRaises(ValueError):import_png(source,dest)
+            self.assertFalse(dest.exists())
     def test_png_roundtrip_and_padding(self):
         with tempfile.TemporaryDirectory() as temp:
             source=Path(temp)/'asset.png';dest=Path(temp)/'asset.obm'
@@ -35,6 +43,7 @@ class ContentTests(unittest.TestCase):
             self.assertEqual(len(catalog.stages),10000)
             manifest={'schema':2,'units':units,'stages':[]};before=fingerprint(manifest,catalog)
             self.assertEqual(fingerprint(dict(manifest,stages=[]),catalog),before)
+            self.assertNotEqual(fingerprint(manifest,catalog,'a'*64),fingerprint(manifest,catalog,'b'*64))
     def test_unlock_cycle(self):
         units=json.loads((ROOT/'community_content/registry.json').read_text(encoding='utf-8'))['units']
         data=json.loads((ROOT/'campaign_content/catalog.example.json').read_text(encoding='utf-8'))
@@ -73,6 +82,13 @@ class NetworkTests(unittest.TestCase):
         clients[2].join('versus','pvp');self.assertEqual(self.messages(clients[2],'rejected')[0]['type'],'rejected')
     def test_version_mismatch(self):
         with self.assertRaises(ValueError):self.client('b'*64)
+    def test_authentication_rejection(self):
+        c=OnlineClient(self.hash);self.clients.append(c)
+        with self.assertRaises(ValueError):c.connect('127.0.0.1',self.server.server_address[1],'incorrect-fixture-token',tls=False)
+    def test_malformed_snapshot_rejected(self):
+        a=self.client();a.join('invalid_state','coop');self.messages(a,'room')
+        a.send({'type':'snapshot','frame':1,'units':[None],'state_hash':'a'*64})
+        self.assertEqual(self.messages(a,'rejected')[0]['type'],'rejected')
     def test_external_tls_requirement(self):
         c=OnlineClient(self.hash)
         with self.assertRaises(ValueError):c.connect('192.0.2.1',14620,'fixture-secret',tls=False)
