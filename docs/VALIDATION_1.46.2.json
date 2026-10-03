@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.46.2",
+  "date": "2026-10-04",
+  "status": "passed",
+  "source_android_version": "1.46.0",
+  "native_core": {
+    "library": "MSD_Core.dll",
+    "sha256": "6b3081bec48bd796d409a9c12cdffdc9b71cb2ba07fd7f28ccff9de495a0e978"
+  },
+  "registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+  "initial_native_seed_preserved": true,
+  "community_units_unowned_on_fresh_start": 6,
+  "existing_player_profiles_preserved": true,
+  "event_configurations": 10,
+  "registered_stage_records": 176,
+  "representative_native_battle_entries": [
+    {
+      "event": "anniversary_2015",
+      "stage": 30011,
+      "bgm": 143,
+      "six_units_deployed": true
+    },
+    {
+      "event": "msd_max_2015",
+      "stage": 31011,
+      "bgm": 140,
+      "six_units_deployed": true
+    },
+    {
+      "event": "midsummer_horror_2015",
+      "stage": 32011,
+      "bgm": 140,
+      "six_units_deployed": true
+    },
+    {
+      "event": "sleeping_gigantic_weapon_2015",
+      "stage": 33011,
+      "bgm": 108,
+      "six_units_deployed": true
+    },
+    {
+      "event": "battle_cats_2015",
+      "stage": 41011,
+      "bgm": 153,
+      "six_units_deployed": true
+    },
+    {
+      "event": "halloween_2015",
+      "stage": 12101,
+      "bgm": 117,
+      "six_units_deployed": true
+    },
+    {
+      "event": "treasure_recovery_2015",
+      "stage": 61011,
+      "bgm": 110,
+      "six_units_deployed": true
+    },
+    {
+      "event": "melty_christmas_2015",
+      "stage": 61011,
+      "bgm": 128,
+      "six_units_deployed": true
+    },
+    {
+      "event": "kof_black_noah_2016",
+      "stage": 12091,
+      "bgm": 151,
+      "six_units_deployed": true
+    },
+    {
+      "event": "cooperation_2016_current",
+      "stage": 61011,
+      "bgm": 161,
+      "six_units_deployed": true
+    }
+  ],
+  "native_victory_rating_and_music": true,
+  "event_map_and_main_menu_round_trip": true,
+  "cat_second_world_and_stage_selection": true,
+  "event_shop_acquisition_and_restart": true,
+  "prisoner_unit_reward_unlock": true,
+  "partial_exchange_rollback": true,
+  "ordinary_shop_prices_preserved": true,
+  "custom_units": [
+    "DI-COKKA MK.II",
+    "DI-COKKA MK.III",
+    "GIRIDA-O MK.II"
+  ],
+  "coverage": "Isolated initial-save initialization; controlled combat, acquisition, persistence and navigation checks using an unlocked reference save. Full completion of every historical stage, online cooperation and long-duration performance remain outside this release check."
+}

@@ -1,0 +1,3520 @@
+{
+  "schema": 2,
+  "events": {
+    "anniversary_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 0,
+          "source_area": 0,
+          "source_world_type": 1,
+          "raw_hex": "21000000cc020000860000001800ffffffff040060af230078af230090af2300a8af23000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_25-1.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 30011,
+              "index": 0,
+              "raw_hex": "aefeffffc9ffffff8f00000000000000ff00000000000000",
+              "bgm_id": 143,
+              "bgm_file": "bgm_kyokuto_russia.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30012,
+              "index": 1,
+              "raw_hex": "7cfffffffeffffff8f00000001000000ff00000000000000",
+              "bgm_id": 143,
+              "bgm_file": "bgm_kyokuto_russia.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30013,
+              "index": 2,
+              "raw_hex": "4b0000009fffffff8000000002000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30014,
+              "index": 3,
+              "raw_hex": "f0000000240000008000000003000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 0,
+          "source_area": 1,
+          "source_world_type": 1,
+          "raw_hex": "02000000820000009f0100000200ffffffff0400c0af2300d8af2300f0af230008b023000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_03.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 30021,
+              "index": 4,
+              "raw_hex": "a50000006effffff6e00000000000000ff00000000000000",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30022,
+              "index": 5,
+              "raw_hex": "410100002c0000006e00000001000000ff00000000000000",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30023,
+              "index": 6,
+              "raw_hex": "c6ffffffd3ffffff6f00000002000000ff00000000000000",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30024,
+              "index": 7,
+              "raw_hex": "bffeffffb3ffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 0,
+          "source_area": 2,
+          "source_world_type": 1,
+          "raw_hex": "19000000e2040000db0100001100ffffffff040020b0230038b0230050b0230068b023000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_19-1.obm",
+            "stage_thumbnail_19-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 30031,
+              "index": 8,
+              "raw_hex": "e3feffffecffffff8800000000000000ff00000000000000",
+              "bgm_id": 136,
+              "bgm_file": "bgm_b_17_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30032,
+              "index": 9,
+              "raw_hex": "9bffffff7dffffff8900000001000000ff00000000000000",
+              "bgm_id": 137,
+              "bgm_file": "bgm_b_17_2.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30033,
+              "index": 10,
+              "raw_hex": "daffffff320000008900000002000000ff00000000000000",
+              "bgm_id": 137,
+              "bgm_file": "bgm_b_17_2.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 30034,
+              "index": 11,
+              "raw_hex": "720000008cffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 0,
+          "source_area": 3,
+          "source_world_type": 1,
+          "raw_hex": "0b0000001a040000bd0000000b0013003700040080b0230098b02300b0b02300c8b023000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_12.obm"
+          ],
+          "prisoner_id": 55,
+          "markers": [
+            {
+              "stage_id": 30041,
+              "index": 12,
+              "raw_hex": "3f0100002a0000008000000000000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 4
+            },
+            {
+              "stage_id": 30042,
+              "index": 13,
+              "raw_hex": "a900000097ffffff8000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            },
+            {
+              "stage_id": 30043,
+              "index": 14,
+              "raw_hex": "b8feffff9bffffff7e00000002000000ff00000000000000",
+              "bgm_id": 126,
+              "bgm_file": "bgm_b_12_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            },
+            {
+              "stage_id": 30044,
+              "index": 15,
+              "raw_hex": "b9ffffffdfffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            }
+          ]
+        }
+      ],
+      "prisoners": {
+        "55": {
+          "raw_hex": "370000001b000000ffffffff01000000e6000000ffffffff",
+          "names": [
+            "DONALD MORDEN",
+            "デビルリバース・モーデン",
+            "도널드 모덴",
+            "DONALD MORDEN",
+            "DONALD MORDEN",
+            "DONALD MORDEN",
+            "",
+            "DONALD MORDEN",
+            "",
+            "惡魔化身・莫丁",
+            "ДОНАЛЬД МОРДЕН"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "DAI-MANJI will be available!",
+            "「ダイマンジ」が使用可能！",
+            "‘다이만지’를 사용 가능!",
+            "¡DAI-MANJI estará disponible!",
+            "DAI-MANJI estará disponível!",
+            "DAI-MANJI est disponible !",
+            "",
+            "DAI-MANJI sarà disponibile!",
+            "",
+            "可以使用[DAI-MANJI]！",
+            "Станет доступен DAI-MANJI!"
+          ]
+        }
+      }
+    },
+    "msd_max_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 1,
+          "source_area": 0,
+          "source_world_type": 1,
+          "raw_hex": "1d000000f6030000c70000001500ffffffff040094f227007cf2270064f227004cf227000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_24-1.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 31011,
+              "index": 0,
+              "raw_hex": "acfeffffe6ffffff8c000000000000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31012,
+              "index": 1,
+              "raw_hex": "74ffffff97ffffff8c000000010000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31013,
+              "index": 2,
+              "raw_hex": "3b000000c8ffffff8c000000020000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31014,
+              "index": 3,
+              "raw_hex": "d5000000460000008c000000030000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 1,
+          "source_area": 1,
+          "source_world_type": 1,
+          "raw_hex": "0c000000180100007c0100000c00ffffffff0400ccf62700b4f627009cf6270084f627000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_13-1.obm",
+            "stage_thumbnail_13-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 31021,
+              "index": 4,
+              "raw_hex": "0300000066ffffff7f00000000000000ff00000000000000",
+              "bgm_id": 127,
+              "bgm_file": "bgm_b_13_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31022,
+              "index": 5,
+              "raw_hex": "ef0000009cffffff7f00000001000000ff00000000000000",
+              "bgm_id": 127,
+              "bgm_file": "bgm_b_13_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31023,
+              "index": 6,
+              "raw_hex": "2fffffff9dffffff7f00000002000000ff00000000000000",
+              "bgm_id": 127,
+              "bgm_file": "bgm_b_13_1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31024,
+              "index": 7,
+              "raw_hex": "f9ffffff2e0000007f00000003000000ff00000000000000",
+              "bgm_id": 127,
+              "bgm_file": "bgm_b_13_1.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 1,
+          "source_area": 2,
+          "source_world_type": 1,
+          "raw_hex": "07000000d80400001c0200000700ffffffff0500c4f82700acf8270094f827007cf8270064f8270000000000",
+          "preview_files": [
+            "stage_thumbnail_08-1.obm",
+            "stage_thumbnail_08-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 31031,
+              "index": 8,
+              "raw_hex": "bafeffff9dffffff7800000000000000ff00000000000000",
+              "bgm_id": 120,
+              "bgm_file": "bgm_b_8_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31032,
+              "index": 9,
+              "raw_hex": "380100009bffffff7800000001000000ff00000000000000",
+              "bgm_id": 120,
+              "bgm_file": "bgm_b_8_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31033,
+              "index": 10,
+              "raw_hex": "f8ffffff66ffffff7900000002000000ff00000000000000",
+              "bgm_id": 121,
+              "bgm_file": "bgm_b_8_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31034,
+              "index": 11,
+              "raw_hex": "940000001a0000007900000003000000ff00000000000000",
+              "bgm_id": 121,
+              "bgm_file": "bgm_b_8_3.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 31035,
+              "index": 12,
+              "raw_hex": "59ffffff1b0000007900000004000000ff00000000000000",
+              "bgm_id": 121,
+              "bgm_file": "bgm_b_8_3.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 1,
+          "source_area": 3,
+          "source_world_type": 1,
+          "raw_hex": "2a0000005b02000029020000160013003800050044e827002ce8270014e82700fce72700e4e7270000000000",
+          "preview_files": [
+            "stage_thumbnail_23-1.obm",
+            "stage_thumbnail_23-2.obm"
+          ],
+          "prisoner_id": 56,
+          "markers": [
+            {
+              "stage_id": 31041,
+              "index": 13,
+              "raw_hex": "18ffffffa6ffffff8b000000000000000d00060001000500",
+              "bgm_id": 139,
+              "bgm_file": "bgm_b_18_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 4
+            },
+            {
+              "stage_id": 31042,
+              "index": 14,
+              "raw_hex": "ccffffff050000008b000000010000000d00060001000500",
+              "bgm_id": 139,
+              "bgm_file": "bgm_b_18_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            },
+            {
+              "stage_id": 31043,
+              "index": 15,
+              "raw_hex": "850000009cffffff8d000000020000000d00060001000500",
+              "bgm_id": 141,
+              "bgm_file": "bgm_australia_S3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            },
+            {
+              "stage_id": 31044,
+              "index": 16,
+              "raw_hex": "2c010000320000008e000000030000000d00060001000500",
+              "bgm_id": 142,
+              "bgm_file": "bgm_australia_S4.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            },
+            {
+              "stage_id": 31045,
+              "index": 17,
+              "raw_hex": "5cfeffff0500000092000000040000000d00060001000a00",
+              "bgm_id": 146,
+              "bgm_file": "bgm_fierce_battle.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            }
+          ]
+        }
+      ],
+      "prisoners": {
+        "56": {
+          "raw_hex": "3800000000000000ffffffff010000000a010000ffffffff",
+          "names": [
+            "HYAKUTARO ICHIMONJI",
+            "一文字百太郎",
+            "이치몬지 햐쿠타로",
+            "HYAKUTARO ICHIMONJI",
+            "HYAKUTARO ICHIMONJI",
+            "HYAKUTARO ICHIMONJI",
+            "",
+            "HYAKUTARO ICHIMONJI",
+            "",
+            "一文字百太郎",
+            "ХЯКУТАРО ИТИМОНДЗИ"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "REGULAR ARMY HELICOPTER will be available!",
+            "「正規軍ヘリ」が使用可能！",
+            "‘정규군 헬기’를 사용 가능!",
+            "¡HELICÓPTERO ARMADA ESTÁNDAR estará disponible!",
+            "HELICÓPTERO EX. REGULAR estará disponível!",
+            "HÉLICOPTÈRE DE L’ARMÉE RÉGULIÈRE est disponible !",
+            "",
+            "ELICOTTERO DELL'ESERCITO REGOLARE sarà disponibile!",
+            "",
+            "可以使用[正規軍直升機]！",
+            "Станет доступен ВЕРТОЛЕТ РЕГУЛЯРНОЙ АРМИИ!"
+          ]
+        }
+      }
+    },
+    "midsummer_horror_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 2,
+          "source_area": 0,
+          "source_world_type": 1,
+          "raw_hex": "1d000000f6030000b40000001500ffff39000400b0aa280098aa280080aa280068aa28000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_24-1.obm"
+          ],
+          "prisoner_id": 57,
+          "markers": [
+            {
+              "stage_id": 32011,
+              "index": 0,
+              "raw_hex": "acfeffffe6ffffff8c000000000000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 2
+            },
+            {
+              "stage_id": 32012,
+              "index": 1,
+              "raw_hex": "74ffffff97ffffff8c000000010000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 2
+            },
+            {
+              "stage_id": 32013,
+              "index": 2,
+              "raw_hex": "3b000000c8ffffff8c000000020000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 2
+            },
+            {
+              "stage_id": 32014,
+              "index": 3,
+              "raw_hex": "d5000000460000008c000000030000000d00060001000500",
+              "bgm_id": 140,
+              "bgm_file": "bgm_canada_1.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 3
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 2,
+          "source_area": 1,
+          "source_world_type": 1,
+          "raw_hex": "220000002d040000460100001900ffff3a000300d8a62800c0a62800a8a62800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_27.obm"
+          ],
+          "prisoner_id": 58,
+          "markers": [
+            {
+              "stage_id": 32021,
+              "index": 4,
+              "raw_hex": "6affffffe7ffffff72000000000000000d00060001000a00",
+              "bgm_id": 114,
+              "bgm_file": "bgm_b_5_3.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 3
+            },
+            {
+              "stage_id": 32022,
+              "index": 5,
+              "raw_hex": "3c0000001e00000072000000010000000d00060001000a00",
+              "bgm_id": 114,
+              "bgm_file": "bgm_b_5_3.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 4
+            },
+            {
+              "stage_id": 32023,
+              "index": 6,
+              "raw_hex": "e6000000a6ffffff72000000020000000d00060001000a00",
+              "bgm_id": 114,
+              "bgm_file": "bgm_b_5_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 2,
+          "source_area": 2,
+          "source_world_type": 1,
+          "raw_hex": "28000000820000009f0100001c00ffff3b000300e0a42800c8a42800b0a42800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_30.obm"
+          ],
+          "prisoner_id": 59,
+          "markers": [
+            {
+              "stage_id": 32031,
+              "index": 7,
+              "raw_hex": "410100002c0000006e000000000000000d00060001000a00",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 6
+            },
+            {
+              "stage_id": 32032,
+              "index": 8,
+              "raw_hex": "c6ffffffd3ffffff6f000000010000000d00060001000a00",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 7
+            },
+            {
+              "stage_id": 32033,
+              "index": 9,
+              "raw_hex": "bffeffffb3ffffff6f000000020000000d00060001000a00",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 8
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 2,
+          "source_area": 3,
+          "source_world_type": 1,
+          "raw_hex": "2b000000d601000082000000080013003c000500f0a32800d8a32800c0a32800a8a3280090a3280000000000",
+          "preview_files": [
+            "stage_thumbnail_09-1.obm",
+            "stage_thumbnail_09-2.obm"
+          ],
+          "prisoner_id": 60,
+          "markers": [
+            {
+              "stage_id": 32041,
+              "index": 10,
+              "raw_hex": "b2feffffcbffffff7a000000000000000d00060001000a00",
+              "bgm_id": 122,
+              "bgm_file": "bgm_b_9_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 5
+            },
+            {
+              "stage_id": 32042,
+              "index": 11,
+              "raw_hex": "8effffff290000007a000000010000000d00060001000a00",
+              "bgm_id": 122,
+              "bgm_file": "bgm_b_9_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 6
+            },
+            {
+              "stage_id": 32043,
+              "index": 12,
+              "raw_hex": "a4000000160000007b000000020000000d00060001000a00",
+              "bgm_id": 123,
+              "bgm_file": "bgm_b_9_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 7
+            },
+            {
+              "stage_id": 32044,
+              "index": 13,
+              "raw_hex": "400100007bffffff7a000000030000000d00060001000a00",
+              "bgm_id": 122,
+              "bgm_file": "bgm_b_9_1.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 8
+            },
+            {
+              "stage_id": 32045,
+              "index": 14,
+              "raw_hex": "2000000066ffffff77000000040000000d00060001000a00",
+              "bgm_id": 119,
+              "bgm_file": "bgm_b_7_4.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 9
+            }
+          ]
+        }
+      ],
+      "prisoners": {
+        "57": {
+          "raw_hex": "3900000001000000ffffffff0100000018010000ffffffff",
+          "names": [
+            "ZOMBIE ERI",
+            "ゾンビエリ",
+            "좀비 에리",
+            "ZOMBI ERI",
+            "ERI ZUMBI",
+            "ZOMBIE ERI",
+            "",
+            "ZOMBIE ERI",
+            "",
+            "殭屍英里",
+            "ЗОМБИ ЭРИ"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "ZOMBIE ERI will be available!",
+            "「ゾンビエリ」が使用可能！",
+            "좀비 에리 사용 가능!",
+            "¡ZOMBI ERI estará disponible!",
+            "ERI ZUMBI se tornará disponível!",
+            "ZOMBIE ERI est disponible !",
+            "",
+            "ZOMBIE ERI sarà disponibile! ",
+            "",
+            "就能使用「殭屍英里」！",
+            "ЗОМБИ ЭРИ будет доступен!"
+          ]
+        },
+        "58": {
+          "raw_hex": "3a00000003000000ffffffff010000001b010000ffffffff",
+          "names": [
+            "ZOMBIE FIO",
+            "ゾンビフィオ",
+            "좀비 피오",
+            "ZOMBI FIO",
+            "FIO ZUMBI",
+            "ZOMBIE FIO",
+            "",
+            "ZOMBIE FIO",
+            "",
+            "殭屍菲歐",
+            "ЗОМБИ ФИО"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "ZOMBIE FIO will be available!",
+            "「ゾンビフィオ」が使用可能！",
+            "좀비 피오 사용 가능!",
+            "¡ZOMBI FIO estará disponible!",
+            "FIO ZUMBI se tornará disponível!",
+            "ZOMBIE FIO est disponible !",
+            "",
+            "ZOMBIE FIO sarà disponibile! ",
+            "",
+            "就能使用「殭屍菲歐」！",
+            "ЗОМБИ ФИО будет доступен!"
+          ]
+        },
+        "59": {
+          "raw_hex": "3b00000002000000ffffffff0100000016010000ffffffff",
+          "names": [
+            "ZOMBIE TARMA",
+            "ゾンビターマ",
+            "좀비 타마",
+            "ZOMBI TARMA",
+            "TARMA ZUMBI",
+            "ZOMBIE TARMA",
+            "",
+            "ZOMBIE TARMA",
+            "",
+            "殭屍塔瑪",
+            "ЗОМБИ ТАРМА"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "ZOMBIE TARMA will be available!",
+            "「ゾンビターマ」が使用可能！",
+            "좀비 타마 사용 가능!",
+            "¡ZOMBI TARMA estará disponible!",
+            "TARMA ZUMBI se tornará disponível!",
+            "ZOMBIE TARMA est disponible !",
+            "",
+            "ZOMBIE TARMA sarà disponibile! ",
+            "",
+            "就能使用「殭屍塔瑪」！",
+            "ЗОМБИ ТАРМА будет доступен!"
+          ]
+        },
+        "60": {
+          "raw_hex": "3c00000000000000ffffffff0100000017010000ffffffff",
+          "names": [
+            "ZOMBIE HYAKUTARO",
+            "ゾンビ百太郎",
+            "좀비 햐쿠타로",
+            "ZOMBI HYAKUTARO",
+            "HYAKUTARO ZUMBI",
+            "ZOMBIE HYAKUTARO",
+            "",
+            "ZOMBIE HYAKUTARO",
+            "",
+            "殭屍百太郎",
+            "ЗОМБИ ХЯКУТАРО"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "TAR MAN(RED) will be available!",
+            "「タールマン（赤）」が使用可能！",
+            "타르만(레드) 사용 가능!",
+            "¡TAR MAN (ROJO) estará disponible!",
+            "HOMEM-PICHEI (VERM.) se tornará disponível!",
+            "TAR MAN (ROUGE) est disponible !",
+            "",
+            "TAR MAN (ROSSO) sarà disponibile! ",
+            "",
+            "就能使用「進化型殭屍（紅）」！",
+            "ДЕГТЯРЬ (КРАСНЫЕ) будет доступен!"
+          ]
+        }
+      }
+    },
+    "sleeping_gigantic_weapon_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 3,
+          "source_area": 0,
+          "source_world_type": 1,
+          "raw_hex": "24000000a70300008f0000001f00ffff3d000300b4ce28009cce280084ce2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": 61,
+          "markers": [
+            {
+              "stage_id": 33011,
+              "index": 0,
+              "raw_hex": "0dffffffdeffffff6c00000000000000ff00000000000000",
+              "bgm_id": 108,
+              "bgm_file": "bgm_b_1_4.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33012,
+              "index": 1,
+              "raw_hex": "f1ffffffb2ffffff6c00000000000000ff00000000000000",
+              "bgm_id": 108,
+              "bgm_file": "bgm_b_1_4.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33013,
+              "index": 2,
+              "raw_hex": "c5000000340000006c00000000000000ff00000000000000",
+              "bgm_id": 108,
+              "bgm_file": "bgm_b_1_4.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 3,
+          "source_area": 1,
+          "source_world_type": 1,
+          "raw_hex": "18000000180100007c0100001f00ffff3e0003006cce280054ce28003cce2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": 62,
+          "markers": [
+            {
+              "stage_id": 33021,
+              "index": 3,
+              "raw_hex": "52ffffff060000007300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33022,
+              "index": 4,
+              "raw_hex": "36000000d0ffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33023,
+              "index": 5,
+              "raw_hex": "100100008cffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 3,
+          "source_area": 2,
+          "source_world_type": 1,
+          "raw_hex": "16000000d6010000820000001f00ffff3f00030024ce28000cce2800f4cd2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": 63,
+          "markers": [
+            {
+              "stage_id": 33031,
+              "index": 6,
+              "raw_hex": "0affffffb4ffffff7300000005000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 5,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33032,
+              "index": 7,
+              "raw_hex": "18000000260000007300000005000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 5,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33033,
+              "index": 8,
+              "raw_hex": "04010000f0ffffff7300000005000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 5,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 3,
+          "source_area": 3,
+          "source_world_type": 1,
+          "raw_hex": "17000000a5000000ae0000001f00ffff40000300dccd2800c4cd2800accd2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": 64,
+          "markers": [
+            {
+              "stage_id": 33041,
+              "index": 9,
+              "raw_hex": "52ffffff060000008000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33042,
+              "index": 10,
+              "raw_hex": "36000000d0ffffff8000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33043,
+              "index": 11,
+              "raw_hex": "100100008cffffff8000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 4,
+          "source_world": 3,
+          "source_area": 4,
+          "source_world_type": 1,
+          "raw_hex": "2a0000005b020000290200001f00ffff4100030094cd28007ccd280064cd2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": 65,
+          "markers": [
+            {
+              "stage_id": 33051,
+              "index": 12,
+              "raw_hex": "a5ffffff69ffffff9200000004000000ff00000000000000",
+              "bgm_id": 146,
+              "bgm_file": "bgm_fierce_battle.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33052,
+              "index": 13,
+              "raw_hex": "3b000000250000009200000004000000ff00000000000000",
+              "bgm_id": 146,
+              "bgm_file": "bgm_fierce_battle.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33053,
+              "index": 14,
+              "raw_hex": "01ffffffe6ffffff9200000004000000ff00000000000000",
+              "bgm_id": 146,
+              "bgm_file": "bgm_fierce_battle.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 5,
+          "source_world": 3,
+          "source_area": 5,
+          "source_world_type": 1,
+          "raw_hex": "140000001f040000f40100001f00ffff420003004ccd280034cd28001ccd2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": 66,
+          "markers": [
+            {
+              "stage_id": 33061,
+              "index": 15,
+              "raw_hex": "0a00000090ffffff7300000002000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33062,
+              "index": 16,
+              "raw_hex": "46fffffffcffffff7300000002000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 33063,
+              "index": 17,
+              "raw_hex": "2a0100001c0000007300000002000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 6,
+          "source_world": 3,
+          "source_area": 6,
+          "source_world_type": 1,
+          "raw_hex": "250000009f0100000e0100001f001500ffff030004cd2800eccc2800d4cc2800000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event00-1.obm",
+            "stage_thumbnail_event00-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 33071,
+              "index": 18,
+              "raw_hex": "40fffffff6ffffff93000000060000000b0000000a006400",
+              "bgm_id": 147,
+              "bgm_file": "bgm_boss_aren.ogg",
+              "preview_frame": 6,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 33072,
+              "index": 19,
+              "raw_hex": "07000000a0ffffff93000000060000000b0000000a006400",
+              "bgm_id": 147,
+              "bgm_file": "bgm_boss_aren.ogg",
+              "preview_frame": 6,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 33073,
+              "index": 20,
+              "raw_hex": "05010000e9ffffff93000000060000000500070101006400",
+              "bgm_id": 147,
+              "bgm_file": "bgm_boss_aren.ogg",
+              "preview_frame": 6,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        }
+      ],
+      "prisoners": {
+        "61": {
+          "raw_hex": "3d00000002000000ffffffff01000000ffffffffffffffff",
+          "names": [
+            "Slug Gigant’s left arm",
+            "スラグギガントの左腕",
+            "슬러그 기간트의 왼팔",
+            "Brazo izquierdo de Gigante Slug",
+            "Braço esquerdo do Gigante Slug",
+            "Bras gauche du Slug Gigantesque",
+            "",
+            "Braccio sinistro dello Slug Gigante",
+            "",
+            "巨靈戰車的左腕",
+            "Левая рука Гиганта"
+          ],
+          "info1": [
+            "Collect all the “Gigant Parts”",
+            "「ギガントパーツ」を全て集めれば",
+            "‘기간트 부속품’을 모두 모으면",
+            "¡Reúne todas las “Partes de gigante”",
+            "Colete todas as ”Partes Gigantes”",
+            "Rassemblez toutes les « Pièces Gigantesques »",
+            "",
+            "Raccogli tutti le \"Parti del Gigante\"",
+            "",
+            "收集全部的【巨靈戰車碎片】",
+            "Собери все \"Гигантские Детали\","
+          ],
+          "info2": [
+            "to play with the “Slug Gigant” Unit!",
+            "「スラグギガント」が使用可能！",
+            "‘슬러그 기간트’를 사용할 수 있답니다!",
+            "para jugar con la unidad “Gigante Slug”!",
+            "para jogar com a unidade ”Gigante Slug”!",
+            "pour obtenir l’Unité « Slug Gigantesque » !",
+            "",
+            "per poter usare l'unità \"Slug Gigante\"!",
+            "",
+            "就可使用【巨靈戰車】！",
+            "чтобы поиграть подразделением \"Гигант\"!"
+          ]
+        },
+        "62": {
+          "raw_hex": "3e00000002000000ffffffff01000000ffffffffffffffff",
+          "names": [
+            "Slug Gigant’s right arm",
+            "スラグギガントの右腕",
+            "슬러그 기간트의 오른팔",
+            "Brazo derecho de Gigante Slug",
+            "Braço direito do Gigante Slug",
+            "Bras droit du Slug Gigantesque",
+            "",
+            "Braccio destro dello Slug Gigante",
+            "",
+            "巨靈戰車的右腕",
+            "Правая рука Гиганта"
+          ],
+          "info1": [
+            "Collect all the “Gigant Parts”",
+            "「ギガントパーツ」を全て集めれば",
+            "‘기간트 부속품’을 모두 모으면",
+            "¡Reúne todas las “Partes de gigante”",
+            "Colete todas as ”Partes Gigantes”",
+            "Rassemblez toutes les « Pièces Gigantesques »",
+            "",
+            "Raccogli tutti le \"Parti del Gigante\"",
+            "",
+            "收集全部的【巨靈戰車碎片】",
+            "Собери все \"Гигантские Детали\","
+          ],
+          "info2": [
+            "to play with the “Slug Gigant” Unit!",
+            "「スラグギガント」が使用可能！",
+            "‘슬러그 기간트’를 사용할 수 있답니다!",
+            "para jugar con la unidad “Gigante Slug”!",
+            "para jogar com a unidade ”Gigante Slug”!",
+            "pour obtenir l’Unité « Slug Gigantesque » !",
+            "",
+            "per poter usare l'unità \"Slug Gigante\"!",
+            "",
+            "就可使用【巨靈戰車】！",
+            "чтобы поиграть подразделением \"Гигант\"!"
+          ]
+        },
+        "63": {
+          "raw_hex": "3f00000003000000ffffffff01000000ffffffffffffffff",
+          "names": [
+            "Slug Gigant’s left leg",
+            "スラグギガントの左脚",
+            "슬러그 기간트의 왼다리",
+            "Pierna izquierda de Gigante Slug",
+            "Perna esquerda do Gigante Slug",
+            "Jambe gauche du Slug Gigantesque",
+            "",
+            "Gamba sinistra dello Slug Gigante",
+            "",
+            "巨靈戰車的左腳",
+            "Левая нога Гиганта"
+          ],
+          "info1": [
+            "Collect all the “Gigant Parts”",
+            "「ギガントパーツ」を全て集めれば",
+            "‘기간트 부속품’을 모두 모으면",
+            "¡Reúne todas las “Partes de gigante”",
+            "Colete todas as ”Partes Gigantes”",
+            "Rassemblez toutes les « Pièces Gigantesques »",
+            "",
+            "Raccogli tutti le \"Parti del Gigante\"",
+            "",
+            "收集全部的【巨靈戰車碎片】",
+            "Собери все \"Гигантские Детали\","
+          ],
+          "info2": [
+            "to play with the “Slug Gigant” Unit!",
+            "「スラグギガント」が使用可能！",
+            "‘슬러그 기간트’를 사용할 수 있답니다!",
+            "para jugar con la unidad “Gigante Slug”!",
+            "para jogar com a unidade ”Gigante Slug”!",
+            "pour obtenir l’Unité « Slug Gigantesque » !",
+            "",
+            "per poter usare l'unità \"Slug Gigante\"!",
+            "",
+            "就可使用【巨靈戰車】！",
+            "чтобы поиграть подразделением \"Гигант\"!"
+          ]
+        },
+        "64": {
+          "raw_hex": "4000000003000000ffffffff01000000ffffffffffffffff",
+          "names": [
+            "Slug Gigant’s right leg",
+            "スラグギガントの右脚",
+            "슬러그 기간트의 오른다리",
+            "Pierna derecha de Gigante Slug",
+            "Perna direita do Gigante Slug",
+            "Jambe droite du Slug Gigantesque",
+            "",
+            "Gamba destra dello Slug Gigante",
+            "",
+            "巨靈戰車的右腳",
+            "Правая нога Гиганта"
+          ],
+          "info1": [
+            "Collect all the “Gigant Parts”",
+            "「ギガントパーツ」を全て集めれば",
+            "‘기간트 부속품’을 모두 모으면",
+            "¡Reúne todas las “Partes de gigante”",
+            "Colete todas as ”Partes Gigantes”",
+            "Rassemblez toutes les « Pièces Gigantesques »",
+            "",
+            "Raccogli tutti le \"Parti del Gigante\"",
+            "",
+            "收集全部的【巨靈戰車碎片】",
+            "Собери все \"Гигантские Детали\","
+          ],
+          "info2": [
+            "to play with the “Slug Gigant” Unit!",
+            "「スラグギガント」が使用可能！",
+            "‘슬러그 기간트’를 사용할 수 있답니다!",
+            "para jugar con la unidad “Gigante Slug”!",
+            "para jogar com a unidade ”Gigante Slug”!",
+            "pour obtenir l’Unité « Slug Gigantesque » !",
+            "",
+            "per poter usare l'unità \"Slug Gigante\"!",
+            "",
+            "就可使用【巨靈戰車】！",
+            "чтобы поиграть подразделением \"Гигант\"!"
+          ]
+        },
+        "65": {
+          "raw_hex": "4100000001000000ffffffff01000000ffffffffffffffff",
+          "names": [
+            "Slug Gigant’s body",
+            "スラグギガントの体",
+            "슬러그 기간트의 몸",
+            "Cabeza de Gigante Slug",
+            "Cabeça do Gigante Slug",
+            "Corps du Slug Gigantesque",
+            "",
+            "Testa dello Slug Gigante",
+            "",
+            "巨靈戰車的身體",
+            "Голова Гиганта"
+          ],
+          "info1": [
+            "Collect all the “Gigant Parts”",
+            "「ギガントパーツ」を全て集めれば",
+            "‘기간트 부속품’을 모두 모으면",
+            "¡Reúne todas las “Partes de gigante”",
+            "Colete todas as ”Partes Gigantes”",
+            "Rassemblez toutes les « Pièces Gigantesques »",
+            "",
+            "Raccogli tutti le \"Parti del Gigante\"",
+            "",
+            "收集全部的【巨靈戰車碎片】",
+            "Собери все \"Гигантские Детали\","
+          ],
+          "info2": [
+            "to play with the “Slug Gigant” Unit!",
+            "「スラグギガント」が使用可能！",
+            "‘슬러그 기간트’를 사용할 수 있답니다!",
+            "para jugar con la unidad “Gigante Slug”!",
+            "para jogar com a unidade ”Gigante Slug”!",
+            "pour obtenir l’Unité « Slug Gigantesque » !",
+            "",
+            "per poter usare l'unità \"Slug Gigante\"!",
+            "",
+            "就可使用【巨靈戰車】！",
+            "чтобы поиграть подразделением \"Гигант\"!"
+          ]
+        },
+        "66": {
+          "raw_hex": "4200000000000000ffffffff01000000ffffffffffffffff",
+          "names": [
+            "Slug Gigant’s head",
+            "スラグギガントの頭",
+            "슬러그 기간트의 왼다리",
+            "Cuerpo de Gigante Slug",
+            "Corpo do Gigante Slug",
+            "Tête du Slug Gigantesque",
+            "",
+            "Corpo dello Slug Gigante",
+            "",
+            "巨靈戰車的身體",
+            "Тело Гиганта"
+          ],
+          "info1": [
+            "Collect all the “Gigant Parts”",
+            "「ギガントパーツ」を全て集めれば",
+            "‘기간트 부속품’을 모두 모으면",
+            "¡Reúne todas las “Partes de gigante”",
+            "Colete todas as ”Partes Gigantes”",
+            "Rassemblez toutes les « Pièces Gigantesques »",
+            "",
+            "Raccogli tutti le \"Parti del Gigante\"",
+            "",
+            "收集全部的【巨靈戰車碎片】",
+            "Собери все \"Гигантские Детали\","
+          ],
+          "info2": [
+            "to play with the “Slug Gigant” Unit!",
+            "「スラグギガント」が使用可能！",
+            "‘슬러그 기간트’를 사용할 수 있답니다!",
+            "para jugar con la unidad “Gigante Slug”!",
+            "para jogar com a unidade ”Gigante Slug”!",
+            "pour obtenir l’Unité « Slug Gigantesque » !",
+            "",
+            "per poter usare l'unità \"Slug Gigante\"!",
+            "",
+            "就可使用【巨靈戰車】！",
+            "чтобы поиграть подразделением \"Гигант\"!"
+          ]
+        }
+      }
+    },
+    "battle_cats_2015": {
+      "world_count": 2,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 0,
+          "source_area": 0,
+          "source_world_type": 2,
+          "raw_hex": "32000000ac0200008d0000002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41011,
+              "index": 0,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 0,
+          "source_area": 1,
+          "source_world_type": 2,
+          "raw_hex": "3200000068010000ff0000002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41021,
+              "index": 1,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 0,
+          "source_area": 2,
+          "source_world_type": 2,
+          "raw_hex": "32000000820000009f0100002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41031,
+              "index": 2,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 0,
+          "source_area": 3,
+          "source_world_type": 2,
+          "raw_hex": "32000000dc010000b8010000210013004300010014362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": 67,
+          "markers": [
+            {
+              "stage_id": 41041,
+              "index": 3,
+              "raw_hex": "b2feffff97ffffff9a00000001000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 4,
+          "source_world": 0,
+          "source_area": 4,
+          "source_world_type": 2,
+          "raw_hex": "320000005b020000290200002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41051,
+              "index": 4,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 5,
+          "source_world": 0,
+          "source_area": 5,
+          "source_world_type": 2,
+          "raw_hex": "32000000d80400001c0200002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41061,
+              "index": 5,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 6,
+          "source_world": 0,
+          "source_area": 6,
+          "source_world_type": 2,
+          "raw_hex": "32000000970400002c0100002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41071,
+              "index": 6,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 7,
+          "source_world": 0,
+          "source_area": 7,
+          "source_world_type": 2,
+          "raw_hex": "320000001a040000bd0000002100130044000100fc352a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": 68,
+          "markers": [
+            {
+              "stage_id": 41081,
+              "index": 7,
+              "raw_hex": "b2feffff97ffffff9a00000002000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 8,
+          "source_world": 0,
+          "source_area": 8,
+          "source_world_type": 2,
+          "raw_hex": "32000000d6010000820000002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41091,
+              "index": 8,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 9,
+          "source_world": 0,
+          "source_area": 9,
+          "source_world_type": 2,
+          "raw_hex": "32000000cd000000c80000002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41101,
+              "index": 9,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 10,
+          "source_world": 0,
+          "source_area": 10,
+          "source_world_type": 2,
+          "raw_hex": "3200000032000000090100002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41111,
+              "index": 10,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 11,
+          "source_world": 0,
+          "source_area": 11,
+          "source_world_type": 2,
+          "raw_hex": "32000000be0000001c0200002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41121,
+              "index": 11,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 12,
+          "source_world": 0,
+          "source_area": 12,
+          "source_world_type": 2,
+          "raw_hex": "3200000034050000580200002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41131,
+              "index": 12,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 13,
+          "source_world": 0,
+          "source_area": 13,
+          "source_world_type": 2,
+          "raw_hex": "320000002d040000740100002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 41141,
+              "index": 13,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 14,
+          "source_world": 0,
+          "source_area": 14,
+          "source_world_type": 2,
+          "raw_hex": "320000006c020000220100002100130045000100fc352a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": 69,
+          "markers": [
+            {
+              "stage_id": 41151,
+              "index": 14,
+              "raw_hex": "b2feffff97ffffff9a00000002000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 0,
+          "source_world": 1,
+          "source_area": 0,
+          "source_world_type": 2,
+          "raw_hex": "32000000ac0200008d0000002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42011,
+              "index": 15,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 1,
+          "source_world": 1,
+          "source_area": 1,
+          "source_world_type": 2,
+          "raw_hex": "3200000068010000ff0000002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42021,
+              "index": 16,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 2,
+          "source_world": 1,
+          "source_area": 2,
+          "source_world_type": 2,
+          "raw_hex": "32000000820000009f0100002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42031,
+              "index": 17,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 3,
+          "source_world": 1,
+          "source_area": 3,
+          "source_world_type": 2,
+          "raw_hex": "32000000dc010000b80100002100ffffffff010074362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42041,
+              "index": 18,
+              "raw_hex": "b2feffff97ffffff9900000000000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 4,
+          "source_world": 1,
+          "source_area": 4,
+          "source_world_type": 2,
+          "raw_hex": "320000005b0200002902000021001300ffff01002c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42051,
+              "index": 19,
+              "raw_hex": "b2feffff97ffffff9a00000000000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 5,
+          "source_world": 1,
+          "source_area": 5,
+          "source_world_type": 2,
+          "raw_hex": "32000000d80400001c0200002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42061,
+              "index": 20,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 6,
+          "source_world": 1,
+          "source_area": 6,
+          "source_world_type": 2,
+          "raw_hex": "32000000970400002c0100002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42071,
+              "index": 21,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 7,
+          "source_world": 1,
+          "source_area": 7,
+          "source_world_type": 2,
+          "raw_hex": "320000001a040000bd0000002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42081,
+              "index": 22,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 8,
+          "source_world": 1,
+          "source_area": 8,
+          "source_world_type": 2,
+          "raw_hex": "32000000d6010000820000002100ffffffff01005c362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42091,
+              "index": 23,
+              "raw_hex": "b2feffff97ffffff9900000001000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 9,
+          "source_world": 1,
+          "source_area": 9,
+          "source_world_type": 2,
+          "raw_hex": "32000000cd000000c800000021001300ffff010014362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42101,
+              "index": 24,
+              "raw_hex": "b2feffff97ffffff9a00000001000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 10,
+          "source_world": 1,
+          "source_area": 10,
+          "source_world_type": 2,
+          "raw_hex": "3200000032000000090100002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42111,
+              "index": 25,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 11,
+          "source_world": 1,
+          "source_area": 11,
+          "source_world_type": 2,
+          "raw_hex": "32000000be0000001c0200002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42121,
+              "index": 26,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 12,
+          "source_world": 1,
+          "source_area": 12,
+          "source_world_type": 2,
+          "raw_hex": "3200000034050000580200002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42131,
+              "index": 27,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 13,
+          "source_world": 1,
+          "source_area": 13,
+          "source_world_type": 2,
+          "raw_hex": "320000002d040000740100002100ffffffff010044362a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42141,
+              "index": 28,
+              "raw_hex": "b2feffff97ffffff9900000002000000ff00000000000000",
+              "bgm_id": 153,
+              "bgm_file": "bgm_nyanko_battle.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 14,
+          "source_world": 1,
+          "source_area": 14,
+          "source_world_type": 2,
+          "raw_hex": "32000000950300009500000021001300ffff0100fc352a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 42151,
+              "index": 29,
+              "raw_hex": "b2feffff97ffffff9a00000002000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 1,
+          "area": 15,
+          "source_world": 1,
+          "source_area": 15,
+          "source_world_type": 2,
+          "raw_hex": "320000006c020000220100002100130046000100fc352a000000000000000000000000000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event02.obm"
+          ],
+          "prisoner_id": 70,
+          "markers": [
+            {
+              "stage_id": 42161,
+              "index": 30,
+              "raw_hex": "b2feffff97ffffff9a00000002000000ff00000000000000",
+              "bgm_id": 154,
+              "bgm_file": "bgm_nyanko_boss.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            }
+          ]
+        }
+      ],
+      "prisoners": {
+        "67": {
+          "raw_hex": "4300000000000000ffffffff0100000025010000ffffffff",
+          "names": [
+            "CAT",
+            "ネコ",
+            "고양이",
+            "GATO",
+            "GATO",
+            "Chat",
+            "",
+            "GATTO",
+            "",
+            "貓",
+            "КОТ"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "CAT will be available!",
+            "「ネコ」が使用可能！",
+            "고양이 사용 가능!",
+            "¡GATO estará disponible!",
+            "GATO se tornará disponível!",
+            "Chat est disponible !",
+            "",
+            "GATTO sarà disponibile! ",
+            "",
+            "就能使用「貓」！",
+            "КОТ будет доступен!"
+          ]
+        },
+        "68": {
+          "raw_hex": "4400000000000000ffffffff010000002b010000ffffffff",
+          "names": [
+            "BLACK CAT",
+            "ブラックネコ",
+            "블랙 고양이",
+            "GATO NEGRO",
+            "GATO PRETO",
+            "Chat Noir",
+            "",
+            "GATTO NERO",
+            "",
+            "黑貓",
+            "ЧЕРНЫЙ КОТ"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "BLACK CAT will be available!",
+            "「ブラックネコ」が使用可能！",
+            "블랙 고양이 사용 가능!",
+            "¡GATO NEGRO estará disponible!",
+            "GATO PRETO se tornará disponível!",
+            "Chat Noir est disponible !",
+            "",
+            "GATTO NERO sarà disponibile! ",
+            "",
+            "就能使用「黑貓」！",
+            "ЧЕРНЫЙ КОТ будет доступен!"
+          ]
+        },
+        "69": {
+          "raw_hex": "4500000000000000060000000100000032010000ffffffff",
+          "names": [
+            "CAT STORAGE",
+            "にゃんこ貯蔵庫",
+            "냥코 저장고",
+            "ALMACENAJE GATUNO",
+            "ARMAZENAMENTO GATO",
+            "Coffre Chat",
+            "",
+            "SCATOLA DI GATTI",
+            "",
+            "貓咪儲藏櫃",
+            "КОШАЧЬЕ ХРАНИЛИЩЕ"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "CAT STORAGE will be available!",
+            "「にゃんこ貯蔵庫」が使用可能！",
+            "냥코 저장고 사용 가능!",
+            "¡ALMACENAJE GATUNO estará disponible!",
+            "ARMAZENAMENTO GATO se tornará disponível!",
+            "Coffre Chat est disponible !",
+            "",
+            "SCATOLA DI GATTI sarà disponibile! ",
+            "",
+            "就能使用「貓咪儲藏櫃」！",
+            "КОШАЧЬЕ ХРАНИЛИЩЕ будет доступен!"
+          ]
+        },
+        "70": {
+          "raw_hex": "4600000000000000000000000100000033010000ffffffff",
+          "names": [
+            "CAT SLUG",
+            "にゃんこスラッグ",
+            "고양이 슬러그",
+            "SLUG GATUNO",
+            "SLUG GATO",
+            "Slug Chat",
+            "",
+            "GATTO SLUG",
+            "",
+            "貓咪戰車",
+            "КОТ"
+          ],
+          "info1": [
+            "If all prisoners of war are freed,",
+            "捕虜がすべて解放されれば",
+            "포로를 모두 해방하면,",
+            "Si liberas a todos los prisioneros de guerra...",
+            "Se todos os prisioneiros forem libertados,",
+            "Si tous les prisonniers de guerre sont libérés,",
+            "",
+            "Se tutti i prigionieri vengono liberati, ",
+            "",
+            "只要解放所有俘虜",
+            "Если все военнопленные освобождены,"
+          ],
+          "info2": [
+            "CAT SLUG will be available!",
+            "「にゃんこスラッグ」が使用可能！",
+            "고양이 슬러그 사용 가능!",
+            "¡SLUG GATUNO estará disponible!",
+            "SLUG GATO se tornará disponível!",
+            "Slug Chat est disponible !",
+            "",
+            "GATTO SLUG sarà disponibile! ",
+            "",
+            "就能使用「貓咪戰車」！",
+            "КОТ будет доступен!"
+          ]
+        }
+      }
+    },
+    "halloween_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 11,
+          "source_area": 9,
+          "source_world_type": 0,
+          "raw_hex": "06000000970400002c01000022001700ffff0500e8d02a00d0d02a00b8d02a00a0d02a0088d02a0000000000",
+          "preview_files": [
+            "stage_thumbnail_07.obm",
+            "stage_thumbnail_07-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 12101,
+              "index": 0,
+              "raw_hex": "8efeffff96ffffff75000000000000000500000101006400",
+              "bgm_id": 117,
+              "bgm_file": "bgm_b_7_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 12102,
+              "index": 1,
+              "raw_hex": "5affffffe0ffffff76000000010000000500020101006400",
+              "bgm_id": 118,
+              "bgm_file": "bgm_b_7_2.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 12103,
+              "index": 2,
+              "raw_hex": "0b00000067ffffff76000000020000000500fe0001006400",
+              "bgm_id": 118,
+              "bgm_file": "bgm_b_7_2.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 12104,
+              "index": 3,
+              "raw_hex": "f7000000c8ffffff77000000030000000500ff0001006400",
+              "bgm_id": 119,
+              "bgm_file": "bgm_b_7_4.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 12105,
+              "index": 4,
+              "raw_hex": "3b0000002500000073000000040000000500200101006400",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        }
+      ],
+      "prisoners": {}
+    },
+    "treasure_recovery_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 0,
+          "source_area": 0,
+          "source_world_type": 3,
+          "raw_hex": "0b0000001a040000bd0000000200ffffffff04009ce82c0084e82c006ce82c0054e82c000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_03.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61011,
+              "index": 0,
+              "raw_hex": "3f0100002a0000006e00000000000000ff00000000000000",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61012,
+              "index": 1,
+              "raw_hex": "a900000097ffffff6e00000001000000ff00000000000000",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61013,
+              "index": 2,
+              "raw_hex": "b8feffff9bffffff6f00000002000000ff00000000000000",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61014,
+              "index": 3,
+              "raw_hex": "b9ffffffdfffffff6f00000003000000ff00000000000000",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 0,
+          "source_area": 1,
+          "source_world_type": 3,
+          "raw_hex": "07000000d80400001c0200002300ffffffff040034ea2c000cd92c00f4d82c00ece92c000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_19-1.obm",
+            "stage_thumbnail_event04.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61021,
+              "index": 4,
+              "raw_hex": "bafeffff9dffffff8800000000000000ff00000000000000",
+              "bgm_id": 136,
+              "bgm_file": "bgm_b_17_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61022,
+              "index": 5,
+              "raw_hex": "380100009bffffff9b00000004000000ff00000000000000",
+              "bgm_id": 155,
+              "bgm_file": "bgm_ruins_excavation.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61023,
+              "index": 6,
+              "raw_hex": "f8ffffff66ffffff9b00000005000000ff00000000000000",
+              "bgm_id": 155,
+              "bgm_file": "bgm_ruins_excavation.ogg",
+              "preview_frame": 5,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61024,
+              "index": 7,
+              "raw_hex": "940000001a0000009200000003000000ff00000000000000",
+              "bgm_id": 146,
+              "bgm_file": "bgm_fierce_battle.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 0,
+          "source_area": 2,
+          "source_world_type": 3,
+          "raw_hex": "02000000820000009f0100002400ffffffff04002cec2c0014ec2c00fceb2c00e4eb2c000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event05.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61031,
+              "index": 8,
+              "raw_hex": "a50000006effffff6e00000000000000ff00000000000000",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61032,
+              "index": 9,
+              "raw_hex": "410100002c0000006e00000001000000ff00000000000000",
+              "bgm_id": 110,
+              "bgm_file": "bgm_b_3_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61033,
+              "index": 10,
+              "raw_hex": "c6ffffffd3ffffff6f00000002000000ff00000000000000",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61034,
+              "index": 11,
+              "raw_hex": "bffeffffb3ffffff6f00000003000000ff00000000000000",
+              "bgm_id": 111,
+              "bgm_file": "bgm_b_3_3.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 0,
+          "source_area": 3,
+          "source_world_type": 3,
+          "raw_hex": "09000000be0000001c0200002500ffffffff040044e92c002ce92c0014e92c00fce82c000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event03.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61041,
+              "index": 12,
+              "raw_hex": "d7ffffff210000007900000000000000ff00000000000000",
+              "bgm_id": 121,
+              "bgm_file": "bgm_b_8_3.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61042,
+              "index": 13,
+              "raw_hex": "5700000064ffffff7900000001000000ff00000000000000",
+              "bgm_id": 121,
+              "bgm_file": "bgm_b_8_3.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61043,
+              "index": 14,
+              "raw_hex": "2dffffff98ffffff7900000002000000ff00000000000000",
+              "bgm_id": 121,
+              "bgm_file": "bgm_b_8_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61044,
+              "index": 15,
+              "raw_hex": "330100009cffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 4,
+          "source_world": 0,
+          "source_area": 4,
+          "source_world_type": 3,
+          "raw_hex": "330000005b020000290200002600ffffffff0500dcd82c00c4d82c00acd82c0094d82c007cd82c0000000000",
+          "preview_files": [
+            "stage_thumbnail_event06-1.obm",
+            "stage_thumbnail_event06-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61051,
+              "index": 16,
+              "raw_hex": "a5ffffff69ffffff9d00000000000000ff00000000000000",
+              "bgm_id": 157,
+              "bgm_file": "bgm_ms4_final.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61052,
+              "index": 17,
+              "raw_hex": "00000000250000009d00000001000000ff00000000000000",
+              "bgm_id": 157,
+              "bgm_file": "bgm_ms4_final.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61053,
+              "index": 18,
+              "raw_hex": "01ffffffe6ffffff9d00000002000000ff00000000000000",
+              "bgm_id": 157,
+              "bgm_file": "bgm_ms4_final.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61054,
+              "index": 19,
+              "raw_hex": "d30000006cffffff9e00000003000000ff00000000000000",
+              "bgm_id": 158,
+              "bgm_file": "bgm_ms4_finalboss.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61055,
+              "index": 20,
+              "raw_hex": "fa000000250000009e00000004000000ff00000000000000",
+              "bgm_id": 158,
+              "bgm_file": "bgm_ms4_finalboss.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        }
+      ],
+      "prisoners": {}
+    },
+    "melty_christmas_2015": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 0,
+          "source_area": 0,
+          "source_world_type": 3,
+          "raw_hex": "2400000095030000950000000d00ffffffff04000ce32d00f4e22d00dce22d00c4e22d000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_14.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61011,
+              "index": 0,
+              "raw_hex": "0b00000069ffffff8000000000000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61012,
+              "index": 1,
+              "raw_hex": "2b01000098ffffff8000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61013,
+              "index": 2,
+              "raw_hex": "93000000200000008000000002000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61014,
+              "index": 3,
+              "raw_hex": "1affffffa3ffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 0,
+          "source_area": 1,
+          "source_world_type": 3,
+          "raw_hex": "250000009f0100000e0100001b00ffffffff04004ce22d0034e22d001ce22d0004e22d000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_29.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61021,
+              "index": 4,
+              "raw_hex": "b2feffff97ffffff9000000000000000ff00000000000000",
+              "bgm_id": 144,
+              "bgm_file": "bgm_nepal.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61022,
+              "index": 5,
+              "raw_hex": "25010000a6ffffff9000000001000000ff00000000000000",
+              "bgm_id": 144,
+              "bgm_file": "bgm_nepal.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61023,
+              "index": 6,
+              "raw_hex": "f4ffffff6cffffff9000000002000000ff00000000000000",
+              "bgm_id": 144,
+              "bgm_file": "bgm_nepal.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61024,
+              "index": 7,
+              "raw_hex": "88000000190000007300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 0,
+          "source_area": 2,
+          "source_world_type": 3,
+          "raw_hex": "10000000cd000000c80000001e00ffffffff0400ece42d00d4e42d00bce42d00a4e42d000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_14.obm",
+            "stage_thumbnail_14-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61031,
+              "index": 8,
+              "raw_hex": "b2feffffcbffffff8000000000000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61032,
+              "index": 9,
+              "raw_hex": "8effffff290000008000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61033,
+              "index": 10,
+              "raw_hex": "a4000000160000008000000002000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61034,
+              "index": 11,
+              "raw_hex": "400100007bffffff7300000003000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 0,
+          "source_area": 3,
+          "source_world_type": 3,
+          "raw_hex": "2b000000d6010000820000000800ffffffff04006cda2d0054da2d003cda2d003cd42d000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_09-1.obm",
+            "stage_thumbnail_09-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61041,
+              "index": 12,
+              "raw_hex": "40fffffff6ffffff7a000000000000000d00070001000a00",
+              "bgm_id": 122,
+              "bgm_file": "bgm_b_9_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61042,
+              "index": 13,
+              "raw_hex": "07000000a0ffffff7a000000010000000d00070001000a00",
+              "bgm_id": 122,
+              "bgm_file": "bgm_b_9_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61043,
+              "index": 14,
+              "raw_hex": "05010000e9ffffff7b000000020000000d00070001000a00",
+              "bgm_id": 123,
+              "bgm_file": "bgm_b_9_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61044,
+              "index": 15,
+              "raw_hex": "070000004b00000073000000030000000d00070001000a00",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 4,
+          "source_world": 0,
+          "source_area": 4,
+          "source_world_type": 3,
+          "raw_hex": "1d0000001a040000bd0000000b00ffffffff0400cce32d00b4e32d009ce32d0084e32d000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_12.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61051,
+              "index": 16,
+              "raw_hex": "3f0100002a0000008000000000000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61052,
+              "index": 17,
+              "raw_hex": "a900000097ffffff8000000001000000ff00000000000000",
+              "bgm_id": 128,
+              "bgm_file": "bgm_b_14_1.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61053,
+              "index": 18,
+              "raw_hex": "b8feffff9bffffff7e00000002000000ff00000000000000",
+              "bgm_id": 126,
+              "bgm_file": "bgm_b_12_3.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61054,
+              "index": 19,
+              "raw_hex": "b9ffffffdfffffff9100000003000000ff00000000000000",
+              "bgm_id": 145,
+              "bgm_file": "bgm_final_attack.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        }
+      ],
+      "prisoners": {}
+    },
+    "kof_black_noah_2016": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 11,
+          "source_area": 8,
+          "source_world_type": 0,
+          "raw_hex": "310000006c0200002201000020001600ffff050098762e0080762e0068762e0050762e0038762e0000000000",
+          "preview_files": [
+            "stage_thumbnail_event01.obm",
+            "stage_thumbnail_event07.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 12091,
+              "index": 0,
+              "raw_hex": "aefeffffa4ffffff97000000000000000d00070001000500",
+              "bgm_id": 151,
+              "bgm_file": "bgm_kof_ikari96_arr.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 12092,
+              "index": 1,
+              "raw_hex": "49ffffff1400000096000000010000000d00070001000500",
+              "bgm_id": 150,
+              "bgm_file": "bgm_kof_jokaku94_arr.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 12093,
+              "index": 2,
+              "raw_hex": "dbffffff74ffffff95000000020000000d00070001000500",
+              "bgm_id": 149,
+              "bgm_file": "bgm_kof_iori96_arr.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 12094,
+              "index": 3,
+              "raw_hex": "280000002800000094000000030000000d00070001000500",
+              "bgm_id": 148,
+              "bgm_file": "bgm_kof_kyo96_arr.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 1
+            },
+            {
+              "stage_id": 12095,
+              "index": 4,
+              "raw_hex": "be00000074ffffffa0000000040000000d00070001000500",
+              "bgm_id": 160,
+              "bgm_file": "bgm_rugal98_battle.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        }
+      ],
+      "prisoners": {}
+    },
+    "cooperation_2016_current": {
+      "world_count": 1,
+      "areas": [
+        {
+          "world": 0,
+          "area": 0,
+          "source_world": 0,
+          "source_area": 0,
+          "source_world_type": 3,
+          "raw_hex": "3400000095030000950000002700ffffffff040010e63100f8e53100e0e53100c8e531000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event08-1.obm",
+            "stage_thumbnail_event08-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61011,
+              "index": 0,
+              "raw_hex": "0b00000069ffffffa100000002000000ff00000000000000",
+              "bgm_id": 161,
+              "bgm_file": "bgm_ms4_m1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61012,
+              "index": 1,
+              "raw_hex": "2b01000098ffffffa100000002000000ff00000000000000",
+              "bgm_id": 161,
+              "bgm_file": "bgm_ms4_m1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61013,
+              "index": 2,
+              "raw_hex": "9300000020000000a100000002000000ff00000000000000",
+              "bgm_id": 161,
+              "bgm_file": "bgm_ms4_m1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61014,
+              "index": 3,
+              "raw_hex": "1affffffa3ffffffa100000002000000ff00000000000000",
+              "bgm_id": 161,
+              "bgm_file": "bgm_ms4_m1.ogg",
+              "preview_frame": 2,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 1,
+          "source_world": 0,
+          "source_area": 1,
+          "source_world_type": 3,
+          "raw_hex": "350000009f0100000e0100002700ffffffff0400b0e5310098e5310080e5310068e531000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event08-1.obm",
+            "stage_thumbnail_event08-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61021,
+              "index": 4,
+              "raw_hex": "0b00000069ffffffa200000001000000ff00000000000000",
+              "bgm_id": 162,
+              "bgm_file": "bgm_ms4_m2.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61022,
+              "index": 5,
+              "raw_hex": "2b01000098ffffffa200000001000000ff00000000000000",
+              "bgm_id": 162,
+              "bgm_file": "bgm_ms4_m2.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61023,
+              "index": 6,
+              "raw_hex": "9300000020000000a200000001000000ff00000000000000",
+              "bgm_id": 162,
+              "bgm_file": "bgm_ms4_m2.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61024,
+              "index": 7,
+              "raw_hex": "1affffffa3ffffffa200000001000000ff00000000000000",
+              "bgm_id": 162,
+              "bgm_file": "bgm_ms4_m2.ogg",
+              "preview_frame": 1,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 2,
+          "source_world": 0,
+          "source_area": 2,
+          "source_world_type": 3,
+          "raw_hex": "36000000cd000000c80000002700ffffffff040050e5310038e5310020e5310008e531000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event08-1.obm",
+            "stage_thumbnail_event08-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61031,
+              "index": 8,
+              "raw_hex": "0b00000069ffffffa300000003000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61032,
+              "index": 9,
+              "raw_hex": "2b01000098ffffffa300000003000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61033,
+              "index": 10,
+              "raw_hex": "9300000020000000a300000003000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61034,
+              "index": 11,
+              "raw_hex": "1affffffa3ffffffa300000003000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 3,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 3,
+          "source_world": 0,
+          "source_area": 3,
+          "source_world_type": 3,
+          "raw_hex": "37000000d6010000820000002700ffffffff0400f0e43100d8e43100c0e43100a8e431000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event08-1.obm",
+            "stage_thumbnail_event08-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61041,
+              "index": 12,
+              "raw_hex": "0b00000069ffffffa300000000000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61042,
+              "index": 13,
+              "raw_hex": "2b01000098ffffffa300000000000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61043,
+              "index": 14,
+              "raw_hex": "9300000020000000a300000000000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61044,
+              "index": 15,
+              "raw_hex": "1affffffa3ffffffa300000000000000ff00000000000000",
+              "bgm_id": 163,
+              "bgm_file": "bgm_ms5_final.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 4,
+          "source_world": 0,
+          "source_area": 4,
+          "source_world_type": 3,
+          "raw_hex": "380000001a040000bd0000002700ffffffff040090e4310078e4310060e4310048e431000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event08-1.obm",
+            "stage_thumbnail_event08-2.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61051,
+              "index": 16,
+              "raw_hex": "0b00000069ffffffa400000004000000ff00000000000000",
+              "bgm_id": 164,
+              "bgm_file": "bgm_ms7_finalboss.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61052,
+              "index": 17,
+              "raw_hex": "2b01000098ffffffa400000004000000ff00000000000000",
+              "bgm_id": 164,
+              "bgm_file": "bgm_ms7_finalboss.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61053,
+              "index": 18,
+              "raw_hex": "9300000020000000a400000004000000ff00000000000000",
+              "bgm_id": 164,
+              "bgm_file": "bgm_ms7_finalboss.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61054,
+              "index": 19,
+              "raw_hex": "1affffffa3ffffffa400000004000000ff00000000000000",
+              "bgm_id": 164,
+              "bgm_file": "bgm_ms7_finalboss.ogg",
+              "preview_frame": 4,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        },
+        {
+          "world": 0,
+          "area": 5,
+          "source_world": 0,
+          "source_area": 5,
+          "source_world_type": 3,
+          "raw_hex": "0f000000ac0200008d0000002900ffffffff040030e4310018e4310000e43100e8e331000000000000000000",
+          "preview_files": [
+            "stage_thumbnail_event10.obm"
+          ],
+          "prisoner_id": -1,
+          "markers": [
+            {
+              "stage_id": 61061,
+              "index": 20,
+              "raw_hex": "0b00000069ffffff7300000000000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61062,
+              "index": 21,
+              "raw_hex": "2b01000098ffffff7300000000000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61063,
+              "index": 22,
+              "raw_hex": "93000000200000007300000000000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            },
+            {
+              "stage_id": 61064,
+              "index": 23,
+              "raw_hex": "1affffffa3ffffff7300000000000000ff00000000000000",
+              "bgm_id": 115,
+              "bgm_file": "bgm_b_5_5.ogg",
+              "preview_frame": 0,
+              "origin": "source_native_stage_marker",
+              "pow_max": 0
+            }
+          ]
+        }
+      ],
+      "prisoners": {}
+    }
+  },
+  "fallbacks": [],
+  "resources": [
+    "bgm_australia_S3.ogg",
+    "bgm_australia_S4.ogg",
+    "bgm_b_12_3.ogg",
+    "bgm_b_13_1.ogg",
+    "bgm_b_14_1.ogg",
+    "bgm_b_17_1.ogg",
+    "bgm_b_17_2.ogg",
+    "bgm_b_18_1.ogg",
+    "bgm_b_1_4.ogg",
+    "bgm_b_3_1.ogg",
+    "bgm_b_3_3.ogg",
+    "bgm_b_5_3.ogg",
+    "bgm_b_5_5.ogg",
+    "bgm_b_7_1.ogg",
+    "bgm_b_7_2.ogg",
+    "bgm_b_7_4.ogg",
+    "bgm_b_8_1.ogg",
+    "bgm_b_8_3.ogg",
+    "bgm_b_9_1.ogg",
+    "bgm_b_9_3.ogg",
+    "bgm_boss_aren.ogg",
+    "bgm_canada_1.ogg",
+    "bgm_fierce_battle.ogg",
+    "bgm_final_attack.ogg",
+    "bgm_kof_ikari96_arr.ogg",
+    "bgm_kof_iori96_arr.ogg",
+    "bgm_kof_jokaku94_arr.ogg",
+    "bgm_kof_kyo96_arr.ogg",
+    "bgm_kyokuto_russia.ogg",
+    "bgm_ms4_final.ogg",
+    "bgm_ms4_finalboss.ogg",
+    "bgm_ms4_m1.ogg",
+    "bgm_ms4_m2.ogg",
+    "bgm_ms5_final.ogg",
+    "bgm_ms7_finalboss.ogg",
+    "bgm_nepal.ogg",
+    "bgm_nyanko_battle.ogg",
+    "bgm_nyanko_boss.ogg",
+    "bgm_rugal98_battle.ogg",
+    "bgm_ruins_excavation.ogg"
+  ]
+}

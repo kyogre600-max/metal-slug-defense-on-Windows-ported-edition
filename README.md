@@ -8,6 +8,13 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+### Update 1.46.2
+
+- Added a selector for historical MSD Event missions.
+- Enabled acquisition of Event units through the corresponding Event shops and prisoner rewards.
+- Added three units: **DI-COKKA MK.II**, **DI-COKKA MK.III**, and **GIRIDA-O MK.II**.
+- Fixed misaligned sprite pixels on **HEAVY B (Future)**.
+
 ### Update 1.46.1
 
 - Fixed the persistent sprite flickering and body-part misalignment affecting Sol Dae Rokker, including its enraged variant.
@@ -54,6 +61,13 @@ To update an existing installation, close the game, back up `play_save/`, extrac
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+### 1.46.2 更新
+
+- 新增 MSD 历史 Event 任务选择功能。
+- 支持通过对应 Event 商店及捕虏奖励获取活动单位。
+- 新增三个单位：**基 · 寇卡坦克 MK.II**、**基 · 寇卡坦克 MK.III**、**吉利塔 · O MK.II**。
+- 修复**未来重装 B 型**的像素错位问题。
 
 ### 1.46.1 更新
 

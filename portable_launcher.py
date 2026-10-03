@@ -14,5 +14,5 @@ sys.path.insert(0, str(ROOT))
 
 if __name__ == '__main__':
     import runpy
-    sys.argv[0] = str(ROOT / 'player.py')
+    sys.argv[0] = str(ROOT / 'event_trial_launcher.py')
     runpy.run_path(sys.argv[0], run_name='__main__')

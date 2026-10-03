@@ -6,6 +6,49 @@ static void cc_101c9abc(Context& c){if(!active(c)){old_block_101c9abc(c);return;
 {if(cond(c,4)){uint32_t v=1u;c.r[0]=v;}}
 {uint32_t a=c.r[13];c.r[4]=rd<uint32_t>(c,a+0u);uint32_t newpc=rd<uint32_t>(c,a+4u);c.r[13]=a+8u;c.pc=newpc;return;}
 c.pc=270310089u;}
+static Block old_block_101d09b4;
+static void cc_101d09b4(Context& c){if(!active(c)){old_block_101d09b4(c);return;}
+{uint32_t a=(c.r[5]+0u+132u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t v=add(c,c.r[3],~(0u),1,true);}
+{}
+{if(cond(c,14)){uint32_t a=(c.r[5]+0u+28u);c.r[3]=rd<uint32_t>(c,a+0u);}}
+{uint32_t a=(c.r[5]+0u+208u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+888u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+212u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+892u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+216u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+896u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+220u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+900u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+224u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+904u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+228u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+908u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+232u);wr<uint32_t>(c,a+0u,c.r[3]);}
+apply_combat_status(c,c.r[5]);
+{uint32_t v=add(c,c.r[13],32u,0,false);c.r[13]=v;}
+{uint32_t a=c.r[13];c.d[8]=rd<uint64_t>(c,a+0u);c.r[13]=a+8u;}
+{uint32_t a=c.r[13];c.r[4]=rd<uint32_t>(c,a+0u);c.r[5]=rd<uint32_t>(c,a+4u);c.r[6]=rd<uint32_t>(c,a+8u);uint32_t newpc=rd<uint32_t>(c,a+12u);c.r[13]=a+16u;c.pc=newpc;return;}
+c.pc=270338555u;}
+static Block old_block_101d09c2;
+static void cc_101d09c2(Context& c){if(!active(c)){old_block_101d09c2(c);return;}
+{uint32_t a=(c.r[4]+0u+888u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+212u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+892u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+216u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+896u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+220u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+900u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+224u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+904u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+228u);wr<uint32_t>(c,a+0u,c.r[3]);}
+{uint32_t a=(c.r[4]+0u+908u);c.r[3]=rd<uint32_t>(c,a+0u);}
+{uint32_t a=(c.r[5]+0u+232u);wr<uint32_t>(c,a+0u,c.r[3]);}
+apply_combat_status(c,c.r[5]);
+{uint32_t v=add(c,c.r[13],32u,0,false);c.r[13]=v;}
+{uint32_t a=c.r[13];c.d[8]=rd<uint64_t>(c,a+0u);c.r[13]=a+8u;}
+{uint32_t a=c.r[13];c.r[4]=rd<uint32_t>(c,a+0u);c.r[5]=rd<uint32_t>(c,a+4u);c.r[6]=rd<uint32_t>(c,a+8u);uint32_t newpc=rd<uint32_t>(c,a+12u);c.r[13]=a+16u;c.pc=newpc;return;}
+c.pc=270338555u;}
 static Block old_block_101dacbc;
 static void cc_101dacbc(Context& c){if(!active(c)){old_block_101dacbc(c);return;}
 {uint32_t a=(c.r[0]+0u+16u);c.r[5]=rd<uint32_t>(c,a+0u);}
@@ -1448,6 +1491,8 @@ static void cc_1020dc74(Context& c){if(!active(c)){old_block_1020dc74(c);return;
 c.pc=270589049u;}
 extern "C" __declspec(dllexport) void msd_enable_community_content(){static bool done=false;if(done)return;find_block(0x101652a9u);done=true;
 old_block_101c9abc=find_block(270310077u);register_block(270310077u,cc_101c9abc);
+old_block_101d09b4=find_block(270338485u);register_block(270338485u,cc_101d09b4);
+old_block_101d09c2=find_block(270338499u);register_block(270338499u,cc_101d09c2);
 old_block_101dacbc=find_block(270380221u);register_block(270380221u,cc_101dacbc);
 old_block_101dc844=find_block(270387269u);register_block(270387269u,cc_101dc844);
 old_block_101dc85e=find_block(270387295u);register_block(270387295u,cc_101dc85e);
@@ -1603,6 +1648,7 @@ old_block_1020be14=find_block(270581269u);register_block(270581269u,cc_1020be14)
 old_block_1020c0c4=find_block(270581957u);register_block(270581957u,cc_1020c0c4);
 old_block_1020c0e8=find_block(270581993u);register_block(270581993u,cc_1020c0e8);
 old_block_1020dc74=find_block(270589045u);register_block(270589045u,cc_1020dc74);
+old_vehicle_motion=find_block(0x101dde11u);register_block(0x101dde11u,vehicle_motion);
 old_unitdata=find_block(0x101652a9u);register_block(0x101652a9u,unitdata);
 old_unitname=find_block(0x101652d5u);register_block(0x101652d5u,unitname);
 old_unitinfo=find_block(0x101652e9u);register_block(0x101652e9u,unitinfo);

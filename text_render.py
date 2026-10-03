@@ -8,7 +8,8 @@ FONT_DIR = Path(os.environ['SystemRoot']) / 'Fonts'
 # These installed font files were checked against all exported JP/KR/ZT text.
 LANGUAGE_FONTS = {1: ('msgothic.ttc', 'msjh.ttc', 'msyh.ttc', 'arial.ttf'),
                   2: ('malgun.ttf',),
-                  9: ('msjh.ttc', 'msyh.ttc', 'mingliu.ttc', 'arial.ttf')}
+                  9: ('msjh.ttc', 'msyh.ttc', 'mingliu.ttc', 'arial.ttf'),
+                  10: ('msyh.ttc', 'msjh.ttc', 'mingliu.ttc', 'arial.ttf')}
 KOREAN_FALLBACK = frozenset('\u2010\u30fb')
 
 class FontLayout:

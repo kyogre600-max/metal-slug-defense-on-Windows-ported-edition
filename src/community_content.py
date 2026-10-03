@@ -10,6 +10,14 @@ ORIGINAL_UNITS=400
 LANGUAGES=frozenset(('EN','JP','KR','ES','PT','RU','FR','DE','IT','ZT','ZS'))
 COMMAND_LENGTHS=(2,2,2,2,2,1,3,5,2,2,3,5,5,2,3,1,1,2,2,3,3,1,5,2)
 
+def ratio(value):
+    """解析整数或精确有理数倍率，保持既有注册表的整数格式。"""
+    if isinstance(value,int) and not isinstance(value,bool):value=(value,1)
+    if not isinstance(value,(list,tuple)) or len(value)!=2:raise ValueError('Invalid rational unit multiplier')
+    a,b=value
+    if any(not isinstance(v,int) or isinstance(v,bool) or not 0<v<=10000 for v in (a,b)) or a>100*b:raise ValueError('Invalid rational unit multiplier')
+    return a,b
+
 class CommunityContent:
     def __init__(self,p,root=None):
         self.p=p
@@ -24,20 +32,21 @@ class CommunityContent:
             if not isinstance(u['key'],str) or not u['key'] or '\0' in u['key']:raise ValueError('Invalid stable unit key')
             if u['id']!=UNIT_ID_BASE+i or u['key'] in keys:raise ValueError('Unstable or duplicate community unit identity')
             if not 0<u['base_id']<400:raise ValueError('Invalid original unit reference')
-            if not u.get('available_from_start'):raise ValueError('Unit unlock gate requires an explicit adapter')
+            if not u.get('available_from_start') and (not isinstance(u.get('shop_unlock_reference_id'),int) or not 0<=u['shop_unlock_reference_id']<512):raise ValueError('Invalid original shop unlock reference')
             if set(u['localization'])!=LANGUAGES:raise ValueError('All eleven unit localizations are required')
             if not 0<u['shop_price']<=32767 or not 0<u['ap']<=100000:raise ValueError('Unit price/AP outside supported range')
             if u['icon']['index']!=340+i:raise ValueError('Non-contiguous community icon identity')
             if u['icon']['page']!=1:raise ValueError('Community icons must use unit_icon_02')
-            if not 0<u['hp_multiplier']<=100:raise ValueError('HP multiplier outside supported range')
+            ratio(u['hp_multiplier'])
             if not isinstance(u['production_reference_id'],int) or not 0<u['production_reference_id']<400:raise ValueError('Invalid production reference unit')
             if u['faction'] not in range(5):raise ValueError('Invalid native faction filter')
             rect=u['icon']['rect'];anchor=u['icon']['anchor']
             if len(rect)!=4 or len(anchor)!=2 or any(not isinstance(v,int) or not -32768<=v<=32767 for v in [*rect,*anchor]):raise ValueError('Invalid icon geometry')
             if rect[0]<0 or rect[1]<0 or rect[2]<=0 or rect[3]<=0:raise ValueError('Invalid icon rectangle')
-            for key in ('production_interval_multiplier','special_damage_multiplier','attack_wait_multiplier'):
-                a,b=u.get(key,[1,1]) if key=='attack_wait_multiplier' else u[key]
-                if not isinstance(a,int) or not isinstance(b,int) or not 0<a<=10000 or not 0<b<=10000:raise ValueError('Invalid rational unit multiplier')
+            for key in ('production_interval_multiplier','special_damage_multiplier','attack_wait_multiplier',
+                        'damage_multiplier','move_speed_multiplier','attack_range_multiplier',
+                        'knockback_distance_multiplier','ballistic_range_multiplier'):
+                ratio(u.get(key,[1,1]))
             for text in u['localization'].values():
                 if not isinstance(text['name'],str) or not isinstance(text['description'],str) or not text['name'] or not text['description'] or '\0' in text['name']+text['description']:raise ValueError('Invalid unit text')
             for commands in u['animations'].values():
@@ -97,6 +106,10 @@ class CommunityContent:
             return self.original_host(a,size)
         p.host=host
         if not hasattr(p.uc.lib,'msd_community_unit_id_base') or p.uc.lib.msd_community_unit_id_base()!=UNIT_ID_BASE:raise RuntimeError('Native core lacks the separated community unit namespace')
+        extended=any(isinstance(u['hp_multiplier'],list) or any(key in u for key in
+            ('damage_multiplier','move_speed_multiplier','attack_range_multiplier','knockback_distance_multiplier','ballistic_range_multiplier')) for u in self.units)
+        if extended and (not hasattr(p.uc.lib,'msd_community_combat_profile_version') or p.uc.lib.msd_community_combat_profile_version()!=1):raise RuntimeError('Native core lacks rational combat profiles')
+        if any(not u['available_from_start'] for u in self.units) and (not hasattr(p.uc.lib,'msd_community_shop_gate_version') or p.uc.lib.msd_community_shop_gate_version()!=1):raise RuntimeError('Native core lacks original-shop unlock references')
         p.uc.lib.msd_enable_community_content()
         self.ready=False
 
@@ -130,7 +143,9 @@ class CommunityContent:
             uid=u['id'];bid=u['base_id'];row=bytearray(original[bid*0x390:(bid+1)*0x390])
             struct.pack_into('<I',row,0,uid)
             for off in (4,0xa8,0x12c,0x1b0,0x234,0x2b8):struct.pack_into('<i',row,off,u['ap'])
-            for off in (12,0xb0,0x134,0x1b8,0x23c,0x2c0):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*u['hp_multiplier'])
+            # 有理数生命值在原生等级插值完成后缩放，避免中间等级的重复取整。
+            if isinstance(u['hp_multiplier'],int):
+                for off in (12,0xb0,0x134,0x1b8,0x23c,0x2c0):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*u['hp_multiplier'])
             a,b=u['production_interval_multiplier'];ref=u['production_reference_id']
             for off in (8,0xac,0x130,0x1b4,0x238,0x2bc):
                 v=struct.unpack_from('<i',original,ref*0x390+off)[0];struct.pack_into('<i',row,off,(v*a+b-1)//b)
@@ -208,7 +223,15 @@ class CommunityContent:
         import community_maps
         stage_pointer,stage_count,mission_count=community_maps.install(self,info,db)
         fields=(0x434f4d32,n,self.records,UNIT_ID_BASE+n,423+n,imageptr,0,self.app,self.custom_list,self.deck_list,512,self.shop_catalog,259+n,self.alloc(battle_icons),self.icon_offsets,self.icon_scripts,stage_pointer,stage_count,mission_count)
-        p.write(HEADER,struct.pack('<19I',*fields));self.ready=True
+        profiles=bytearray()
+        for u in self.units:
+            values=[ratio(u['hp_multiplier']) if isinstance(u['hp_multiplier'],list) else (1,1)]
+            values.extend(ratio(u.get(key,[1,1])) for key in ('damage_multiplier','move_speed_multiplier',
+                'attack_range_multiplier','knockback_distance_multiplier','ballistic_range_multiplier'))
+            profiles+=struct.pack('<12I',*(v for pair in values for v in pair))
+        unlocks=struct.pack('<'+'I'*n,*(0xffffffff if u['available_from_start'] else u['shop_unlock_reference_id'] for u in self.units))
+        fields+= (self.alloc(profiles),1,p.symbols['_ZTV10BattleUnit']+8,p.symbols['_ZTV12BattleBullet']+8,self.alloc(unlocks))
+        p.write(HEADER,struct.pack('<24I',*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==original
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])

@@ -37,7 +37,45 @@ static uint32_t array_base(Context& c,uint32_t a,bool deck){
  return a;
 }
 static uint32_t image_base(Context& c,uint32_t a){return active(c)&&a==0x10922f28u?head(c,20):a;}
+// 有理数参数在原生等级插值完成后应用；既有单位的默认倍率为一。
+static uint32_t combat_profile(Context& c,uint32_t uid){
+ if(!record(c,uid)||head(c,80)!=1u||!head(c,76))return 0u;
+ return head(c,76)+(uid-U)*48u;
+}
+static bool shop_unlocked(Context& c,uint32_t entry,uint32_t app){
+ uint32_t table=head(c,92);if(!table)return true;
+ uint32_t index=(entry-head(c,8))/R,reference=rd<uint32_t>(c,table+index*4u);
+ if(reference==0xffffffffu)return true;
+ if(reference>=512u)return false;
+ return (rd<uint32_t>(c,app+0x4f20u+(reference/32u)*4u)&(1u<<(reference%32u)))!=0u;
+}
+static void scale_integer(Context& c,uint32_t address,uint32_t pair){
+ uint32_t a=rd<uint32_t>(c,pair),b=rd<uint32_t>(c,pair+4u);if(a==b||!b)return;
+ int64_t value=int64_t(rd<int32_t>(c,address))*a/b;
+ wr<int32_t>(c,address,int32_t(std::max<int64_t>(INT32_MIN,std::min<int64_t>(INT32_MAX,value))));
+}
+static void apply_combat_status(Context& c,uint32_t out){
+ uint32_t p=combat_profile(c,rd<uint32_t>(c,out));if(!p)return;
+ scale_integer(c,out+0xcu,p);
+ for(uint32_t off:{0x34u,0x58u,0x74u})scale_integer(c,out+off,p+8u);
+ uint32_t a=rd<uint32_t>(c,p+16u),b=rd<uint32_t>(c,p+20u);
+ if(a!=b&&b)wr<float>(c,out+0x14u,rd<float>(c,out+0x14u)*float(a)/float(b));
+ // 近距、远距攻击判定与三类弹体的目的距离分别缩放。
+ for(uint32_t off:{0x18u,0x1cu,0x40u,0x68u,0x84u})scale_integer(c,out+off,p+24u);
+}
 #define HOOK(NAME,PC,BODY) static Block old_##NAME;static void NAME(Context& c){BODY old_##NAME(c);}
+// 抛物线弹体保持垂直轨迹，水平位移按射程倍率缩放。
+// 受击滑行仅调整进入受击状态的载具水平位移。
+static void scale_vehicle_motion(Context& c){
+ uint32_t object=c.r[0],p=combat_profile(c,rd<uint32_t>(c,object+0x128u));if(!p)return;
+ uint32_t type=rd<uint32_t>(c,object),pair=0u;
+ if(type==head(c,84)&&rd<uint32_t>(c,object+0x7cu)==80u)pair=p+32u;
+ else if(type==head(c,88))pair=p+40u;
+ if(!pair)return;
+ uint32_t a=rd<uint32_t>(c,pair),b=rd<uint32_t>(c,pair+4u);if(a==b||!b)return;
+ for(uint32_t index:{1u,2u}){float x;std::memcpy(&x,&c.r[index],4);x=x*float(a)/float(b);std::memcpy(&c.r[index],&x,4);}
+}
+HOOK(vehicle_motion,0x101dde11u, scale_vehicle_motion(c);)
 HOOK(unitdata,0x101652a9u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+12));return;})
 HOOK(unitname,0x101652d5u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+0x30u+std::min(c.r[1],10u)*4u));return;})
 HOOK(unitinfo,0x101652e9u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+0x5cu+std::min(c.r[1],10u)*4u));return;})
@@ -64,8 +102,8 @@ HOOK(soldout,0x10165835u, uint32_t p=shop(c,c.r[0]);if(p){ret(c,int32_t(rd<uint3
 HOOK(shopdisplay,0x1016595fu, if(shop(c,c.r[0])){ret(c,0u);return;})
 HOOK(shopdiscount,0x1016596bu, if(shop(c,c.r[0])){ret(c,0u);return;})
 HOOK(discount,0x1020b459u, if(record(c,c.r[1])){ret(c,0u);return;})
-HOOK(shopavailable,0x102093f5u, if(shop(c,c.r[1])){ret(c,rd<uint32_t>(c,c.r[0]+0xb890u)==2u);return;})
-HOOK(shopenable,0x10167d8du, if(shop(c,c.r[1])){ret(c,1u);return;})
+HOOK(shopavailable,0x102093f5u, uint32_t p=shop(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,c.r[0]+0xb890u)==2u&&shop_unlocked(c,p,c.r[0]));return;})
+HOOK(shopenable,0x10167d8du, uint32_t p=shop(c,c.r[1]);if(p){ret(c,shop_unlocked(c,p,c.r[0]));return;})
 HOOK(setshopenable,0x10167da1u, if(shop(c,c.r[1])){ret(c,0u);return;})
 HOOK(getshopnew,0x10167dc9u, uint32_t p=shop(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+40));return;})
 HOOK(addshopnew,0x10167dddu, uint32_t p=shop(c,c.r[1]);if(p){wr<uint32_t>(c,p+40,1u);dirty(c);ret(c,0);return;})
@@ -85,6 +123,8 @@ HOOK(release_uid_boundary,0x101dcd31u, if(active(c)&&c.r[1]>=423u&&!record(c,c.r
 // retain a -1 child sentinel and cannot become an accidental real unit.
 HOOK(status_boundary,0x101cfbcdu, if(active(c)&&!real_unit(c,c.r[1])){uint32_t out=c.r[3];for(uint32_t i=0;i<0xecu;i+=4u)wr<uint32_t>(c,out+i,0u);wr<uint32_t>(c,out,c.r[1]);wr<uint32_t>(c,out+0xa0u,0xffffffffu);ret(c,0u);return;})
 extern "C" __declspec(dllexport) uint32_t msd_community_unit_id_base(){return U;}
+extern "C" __declspec(dllexport) uint32_t msd_community_combat_profile_version(){return 1u;}
+extern "C" __declspec(dllexport) uint32_t msd_community_shop_gate_version(){return 1u;}
 HOOK(create_params_boundary,0x101cfa99u, if(active(c)&&!real_unit(c,c.r[1])){for(uint32_t i=0;i<0x1cu;i+=4u)wr<uint32_t>(c,c.r[3]+i,0u);ret(c,0u);return;})
 HOOK(real_unit_factory_boundary,0x101d1421u, if(active(c)&&!real_unit(c,c.r[2])){ret(c,0u);return;})
 // Generated block overrides and registration are emitted by the build script.

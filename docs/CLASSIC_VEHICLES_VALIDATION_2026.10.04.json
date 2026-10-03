@@ -1,0 +1,1878 @@
+{
+  "status": "passed",
+  "date": "2026-10-04",
+  "scope": "local stable edition",
+  "core_sha256": "38ebc595ade6cb3c2e78c74cceb502ba34ee1f48ec4586bdc92b6a7f1c34bd9e",
+  "registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+  "verification_revisions": {
+    "integration": {
+      "tested_registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+      "coverage": "current registry"
+    },
+    "shop_ui": {
+      "tested_registry_sha256": "adb360020049b52fb73dbb7a8bb04970ceb01be9787177fb82456c277bfcc314",
+      "coverage": "unchanged configuration; prior verification"
+    },
+    "deployment": {
+      "tested_registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+      "coverage": "current registry"
+    },
+    "installed_package": {
+      "tested_registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+      "coverage": "current registry"
+    },
+    "installed_github": {
+      "tested_registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+      "coverage": "current registry"
+    }
+  },
+  "baseline_core_sha256": "bafb7a57b34e7814c038f2fda15df6991ab43cceb1084b979c3fb2fd48d8bc12",
+  "units": [
+    {
+      "id": 1027,
+      "key": "s1xlv.di_cokka_mk2",
+      "base_id": 3,
+      "faction": 1,
+      "ap": 110,
+      "shop_price": 50,
+      "shop_unlock_reference_id": 64,
+      "hp_multiplier": [
+        4,
+        5
+      ],
+      "damage_multiplier": [
+        3,
+        2
+      ],
+      "move_speed_multiplier": [
+        5,
+        4
+      ],
+      "production_interval_multiplier": [
+        9,
+        10
+      ],
+      "attack_range_multiplier": [
+        6,
+        5
+      ],
+      "knockback_distance_multiplier": [
+        1,
+        1
+      ],
+      "ballistic_range_multiplier": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": 1028,
+      "key": "s1xlv.di_cokka_mk3",
+      "base_id": 3,
+      "faction": 1,
+      "ap": 180,
+      "shop_price": 50,
+      "shop_unlock_reference_id": 64,
+      "hp_multiplier": [
+        2,
+        1
+      ],
+      "damage_multiplier": [
+        1,
+        1
+      ],
+      "move_speed_multiplier": [
+        4,
+        5
+      ],
+      "production_interval_multiplier": [
+        6,
+        5
+      ],
+      "attack_range_multiplier": [
+        1,
+        1
+      ],
+      "knockback_distance_multiplier": [
+        1,
+        4
+      ],
+      "ballistic_range_multiplier": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": 1029,
+      "key": "s1xlv.girida_o_mk2",
+      "base_id": 51,
+      "faction": 1,
+      "ap": 110,
+      "shop_price": 50,
+      "shop_unlock_reference_id": 64,
+      "hp_multiplier": [
+        3,
+        2
+      ],
+      "damage_multiplier": [
+        3,
+        2
+      ],
+      "move_speed_multiplier": [
+        4,
+        5
+      ],
+      "production_interval_multiplier": [
+        6,
+        5
+      ],
+      "attack_range_multiplier": [
+        3,
+        2
+      ],
+      "knockback_distance_multiplier": [
+        1,
+        8
+      ],
+      "ballistic_range_multiplier": [
+        3,
+        2
+      ]
+    }
+  ],
+  "original_and_existing_status_regression": {
+    "units": 403,
+    "levels": [
+      1,
+      20,
+      40
+    ],
+    "comparisons": 1209
+  },
+  "all_40_levels_verified": true,
+  "stats": [
+    {
+      "id": 1027,
+      "level": 1,
+      "hp": 1120,
+      "normal_damage": 450,
+      "special_damage": 450,
+      "speed": 2.75,
+      "attack_distance": 384,
+      "normal_projectile_distance": 420,
+      "special_projectile_distance": 504,
+      "ap": 110,
+      "production_interval": 675
+    },
+    {
+      "id": 1027,
+      "level": 20,
+      "hp": 2240,
+      "normal_damage": 900,
+      "special_damage": 900,
+      "speed": 2.75,
+      "attack_distance": 384,
+      "normal_projectile_distance": 420,
+      "special_projectile_distance": 504,
+      "ap": 110,
+      "production_interval": 675
+    },
+    {
+      "id": 1027,
+      "level": 40,
+      "hp": 3360,
+      "normal_damage": 1350,
+      "special_damage": 1350,
+      "speed": 2.75,
+      "attack_distance": 384,
+      "normal_projectile_distance": 420,
+      "special_projectile_distance": 504,
+      "ap": 110,
+      "production_interval": 675
+    },
+    {
+      "id": 1028,
+      "level": 1,
+      "hp": 2800,
+      "normal_damage": 300,
+      "special_damage": 300,
+      "speed": 1.7599999904632568,
+      "attack_distance": 320,
+      "normal_projectile_distance": 350,
+      "special_projectile_distance": 420,
+      "ap": 180,
+      "production_interval": 900
+    },
+    {
+      "id": 1028,
+      "level": 20,
+      "hp": 5600,
+      "normal_damage": 600,
+      "special_damage": 600,
+      "speed": 1.7599999904632568,
+      "attack_distance": 320,
+      "normal_projectile_distance": 350,
+      "special_projectile_distance": 420,
+      "ap": 180,
+      "production_interval": 900
+    },
+    {
+      "id": 1028,
+      "level": 40,
+      "hp": 8400,
+      "normal_damage": 900,
+      "special_damage": 900,
+      "speed": 1.7599999904632568,
+      "attack_distance": 320,
+      "normal_projectile_distance": 350,
+      "special_projectile_distance": 420,
+      "ap": 180,
+      "production_interval": 900
+    },
+    {
+      "id": 1029,
+      "level": 1,
+      "hp": 2100,
+      "normal_damage": 450,
+      "special_damage": 450,
+      "speed": 2.240000009536743,
+      "attack_distance": 420,
+      "normal_projectile_distance": 0,
+      "special_projectile_distance": 0,
+      "ap": 110,
+      "production_interval": 840
+    },
+    {
+      "id": 1029,
+      "level": 20,
+      "hp": 4200,
+      "normal_damage": 900,
+      "special_damage": 750,
+      "speed": 2.240000009536743,
+      "attack_distance": 420,
+      "normal_projectile_distance": 0,
+      "special_projectile_distance": 0,
+      "ap": 110,
+      "production_interval": 840
+    },
+    {
+      "id": 1029,
+      "level": 40,
+      "hp": 6300,
+      "normal_damage": 1350,
+      "special_damage": 1050,
+      "speed": 2.240000009536743,
+      "attack_distance": 420,
+      "normal_projectile_distance": 0,
+      "special_projectile_distance": 0,
+      "ap": 110,
+      "production_interval": 840
+    }
+  ],
+  "motion": [
+    {
+      "id": 1027,
+      "team": 0,
+      "state": 20,
+      "original_displacement": 88.00048828125,
+      "actual_displacement": 110.0,
+      "ratio": [
+        5,
+        4
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1027,
+      "team": 0,
+      "state": 80,
+      "original_displacement": -128.0,
+      "actual_displacement": -128.0,
+      "ratio": [
+        1,
+        1
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1027,
+      "team": 1,
+      "state": 20,
+      "original_displacement": -88.00048828125,
+      "actual_displacement": -110.0,
+      "ratio": [
+        5,
+        4
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1027,
+      "team": 1,
+      "state": 80,
+      "original_displacement": 128.0,
+      "actual_displacement": 128.0,
+      "ratio": [
+        1,
+        1
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1028,
+      "team": 0,
+      "state": 20,
+      "original_displacement": 88.00048828125,
+      "actual_displacement": 70.400390625,
+      "ratio": [
+        4,
+        5
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1028,
+      "team": 0,
+      "state": 80,
+      "original_displacement": -128.0,
+      "actual_displacement": -32.0,
+      "ratio": [
+        1,
+        4
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1028,
+      "team": 1,
+      "state": 20,
+      "original_displacement": -88.00048828125,
+      "actual_displacement": -70.400390625,
+      "ratio": [
+        4,
+        5
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1028,
+      "team": 1,
+      "state": 80,
+      "original_displacement": 128.0,
+      "actual_displacement": 32.0,
+      "ratio": [
+        1,
+        4
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1029,
+      "team": 0,
+      "state": 20,
+      "original_displacement": 111.99951171875,
+      "actual_displacement": 89.599609375,
+      "ratio": [
+        4,
+        5
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1029,
+      "team": 0,
+      "state": 80,
+      "original_displacement": -95.4000244140625,
+      "actual_displacement": -11.92498779296875,
+      "ratio": [
+        1,
+        8
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1029,
+      "team": 1,
+      "state": 20,
+      "original_displacement": -111.99951171875,
+      "actual_displacement": -89.599609375,
+      "ratio": [
+        4,
+        5
+      ],
+      "samples": 41
+    },
+    {
+      "id": 1029,
+      "team": 1,
+      "state": 80,
+      "original_displacement": 95.4000244140625,
+      "actual_displacement": 11.92498779296875,
+      "ratio": [
+        1,
+        8
+      ],
+      "samples": 41
+    }
+  ],
+  "attacks": [
+    {
+      "id": 3,
+      "state": 40,
+      "shots": 1,
+      "damage": [
+        1260
+      ],
+      "ticks": [
+        24
+      ],
+      "animation_duration": 47
+    },
+    {
+      "id": 3,
+      "state": 50,
+      "shots": 3,
+      "damage": [
+        1260,
+        1260,
+        1260
+      ],
+      "ticks": [
+        16,
+        22,
+        28
+      ],
+      "animation_duration": 39
+    },
+    {
+      "id": 51,
+      "state": 40,
+      "shots": 1,
+      "damage": [
+        1260
+      ],
+      "ticks": [
+        9
+      ],
+      "animation_duration": 29
+    },
+    {
+      "id": 51,
+      "state": 50,
+      "shots": 3,
+      "damage": [
+        980,
+        980,
+        980
+      ],
+      "ticks": [
+        1,
+        15,
+        29
+      ],
+      "animation_duration": 45
+    },
+    {
+      "id": 1027,
+      "state": 40,
+      "shots": 1,
+      "damage": [
+        1890
+      ],
+      "ticks": [
+        24
+      ],
+      "animation_duration": 47
+    },
+    {
+      "id": 1027,
+      "state": 50,
+      "shots": 3,
+      "damage": [
+        1890,
+        1890,
+        1890
+      ],
+      "ticks": [
+        16,
+        22,
+        28
+      ],
+      "animation_duration": 39
+    },
+    {
+      "id": 1028,
+      "state": 40,
+      "shots": 1,
+      "damage": [
+        1260
+      ],
+      "ticks": [
+        24
+      ],
+      "animation_duration": 47
+    },
+    {
+      "id": 1028,
+      "state": 50,
+      "shots": 3,
+      "damage": [
+        1260,
+        1260,
+        1260
+      ],
+      "ticks": [
+        16,
+        22,
+        28
+      ],
+      "animation_duration": 39
+    },
+    {
+      "id": 1029,
+      "state": 40,
+      "shots": 1,
+      "damage": [
+        1890
+      ],
+      "ticks": [
+        9
+      ],
+      "animation_duration": 29
+    },
+    {
+      "id": 1029,
+      "state": 50,
+      "shots": 3,
+      "damage": [
+        1470,
+        1470,
+        1470
+      ],
+      "ticks": [
+        1,
+        15,
+        29
+      ],
+      "animation_duration": 45
+    }
+  ],
+  "ballistic_trajectories": [
+    {
+      "state": 40,
+      "samples": [
+        {
+          "tick": 0,
+          "original_x_displacement": 9.0,
+          "actual_x_displacement": 13.5,
+          "y": 254.0
+        },
+        {
+          "tick": 1,
+          "original_x_displacement": 18.0,
+          "actual_x_displacement": 27.0,
+          "y": 252.1999969482422
+        },
+        {
+          "tick": 2,
+          "original_x_displacement": 27.0,
+          "actual_x_displacement": 40.5,
+          "y": 250.59999084472656
+        },
+        {
+          "tick": 3,
+          "original_x_displacement": 36.0,
+          "actual_x_displacement": 54.0,
+          "y": 249.1999969482422
+        },
+        {
+          "tick": 4,
+          "original_x_displacement": 45.0,
+          "actual_x_displacement": 67.5,
+          "y": 248.0
+        },
+        {
+          "tick": 5,
+          "original_x_displacement": 54.0,
+          "actual_x_displacement": 81.0,
+          "y": 247.0
+        },
+        {
+          "tick": 6,
+          "original_x_displacement": 63.0,
+          "actual_x_displacement": 94.5,
+          "y": 246.1999969482422
+        },
+        {
+          "tick": 7,
+          "original_x_displacement": 72.0,
+          "actual_x_displacement": 108.0,
+          "y": 245.59999084472656
+        },
+        {
+          "tick": 8,
+          "original_x_displacement": 81.0,
+          "actual_x_displacement": 121.5,
+          "y": 245.1999969482422
+        },
+        {
+          "tick": 9,
+          "original_x_displacement": 90.0,
+          "actual_x_displacement": 135.0,
+          "y": 245.0
+        },
+        {
+          "tick": 10,
+          "original_x_displacement": 99.0,
+          "actual_x_displacement": 148.5,
+          "y": 245.0
+        },
+        {
+          "tick": 11,
+          "original_x_displacement": 108.0,
+          "actual_x_displacement": 162.0,
+          "y": 245.1999969482422
+        },
+        {
+          "tick": 12,
+          "original_x_displacement": 117.0,
+          "actual_x_displacement": 175.5,
+          "y": 245.59999084472656
+        },
+        {
+          "tick": 13,
+          "original_x_displacement": 126.0,
+          "actual_x_displacement": 189.0,
+          "y": 246.1999969482422
+        },
+        {
+          "tick": 14,
+          "original_x_displacement": 135.0,
+          "actual_x_displacement": 202.5,
+          "y": 247.0
+        },
+        {
+          "tick": 15,
+          "original_x_displacement": 144.0,
+          "actual_x_displacement": 216.0,
+          "y": 248.0
+        },
+        {
+          "tick": 16,
+          "original_x_displacement": 153.0,
+          "actual_x_displacement": 229.5,
+          "y": 249.1999969482422
+        },
+        {
+          "tick": 17,
+          "original_x_displacement": 162.0,
+          "actual_x_displacement": 243.0,
+          "y": 250.59999084472656
+        },
+        {
+          "tick": 18,
+          "original_x_displacement": 171.0,
+          "actual_x_displacement": 256.5,
+          "y": 252.1999969482422
+        },
+        {
+          "tick": 19,
+          "original_x_displacement": 180.0,
+          "actual_x_displacement": 270.0,
+          "y": 254.0
+        },
+        {
+          "tick": 20,
+          "original_x_displacement": 189.0,
+          "actual_x_displacement": 283.5,
+          "y": 256.0
+        },
+        {
+          "tick": 21,
+          "original_x_displacement": 198.0,
+          "actual_x_displacement": 297.0,
+          "y": 258.20001220703125
+        },
+        {
+          "tick": 22,
+          "original_x_displacement": 207.0,
+          "actual_x_displacement": 310.5,
+          "y": 260.6000061035156
+        },
+        {
+          "tick": 23,
+          "original_x_displacement": 216.0,
+          "actual_x_displacement": 324.0,
+          "y": 263.20001220703125
+        },
+        {
+          "tick": 24,
+          "original_x_displacement": 225.0,
+          "actual_x_displacement": 337.5,
+          "y": 266.0
+        },
+        {
+          "tick": 25,
+          "original_x_displacement": 234.0,
+          "actual_x_displacement": 351.0,
+          "y": 269.0
+        },
+        {
+          "tick": 26,
+          "original_x_displacement": 243.0,
+          "actual_x_displacement": 364.5,
+          "y": 272.20001220703125
+        },
+        {
+          "tick": 27,
+          "original_x_displacement": 252.0,
+          "actual_x_displacement": 378.0,
+          "y": 275.6000061035156
+        },
+        {
+          "tick": 28,
+          "original_x_displacement": 261.0,
+          "actual_x_displacement": 391.5,
+          "y": 279.20001220703125
+        },
+        {
+          "tick": 29,
+          "original_x_displacement": 270.0,
+          "actual_x_displacement": 405.0,
+          "y": 283.0
+        },
+        {
+          "tick": 30,
+          "original_x_displacement": 279.0,
+          "actual_x_displacement": 418.5,
+          "y": 287.0
+        },
+        {
+          "tick": 31,
+          "original_x_displacement": 288.0,
+          "actual_x_displacement": 432.0,
+          "y": 291.20001220703125
+        },
+        {
+          "tick": 32,
+          "original_x_displacement": 297.0,
+          "actual_x_displacement": 445.5,
+          "y": 295.6000061035156
+        },
+        {
+          "tick": 33,
+          "original_x_displacement": 306.0,
+          "actual_x_displacement": 459.0,
+          "y": 300.20001220703125
+        },
+        {
+          "tick": 34,
+          "original_x_displacement": 315.0,
+          "actual_x_displacement": 472.5,
+          "y": 305.0
+        },
+        {
+          "tick": 35,
+          "original_x_displacement": 324.0,
+          "actual_x_displacement": 486.0,
+          "y": 310.0
+        },
+        {
+          "tick": 36,
+          "original_x_displacement": 333.0,
+          "actual_x_displacement": 499.5,
+          "y": 315.20001220703125
+        },
+        {
+          "tick": 37,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 320.6000061035156
+        },
+        {
+          "tick": 38,
+          "original_x_displacement": 351.0,
+          "actual_x_displacement": 526.5,
+          "y": 326.20001220703125
+        },
+        {
+          "tick": 39,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 40,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 41,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 42,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 43,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 44,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        }
+      ]
+    },
+    {
+      "state": 50,
+      "samples": [
+        {
+          "tick": 0,
+          "original_x_displacement": 9.0,
+          "actual_x_displacement": 13.5,
+          "y": 254.0
+        },
+        {
+          "tick": 1,
+          "original_x_displacement": 18.0,
+          "actual_x_displacement": 27.0,
+          "y": 252.1999969482422
+        },
+        {
+          "tick": 2,
+          "original_x_displacement": 27.0,
+          "actual_x_displacement": 40.5,
+          "y": 250.59999084472656
+        },
+        {
+          "tick": 3,
+          "original_x_displacement": 36.0,
+          "actual_x_displacement": 54.0,
+          "y": 249.1999969482422
+        },
+        {
+          "tick": 4,
+          "original_x_displacement": 45.0,
+          "actual_x_displacement": 67.5,
+          "y": 248.0
+        },
+        {
+          "tick": 5,
+          "original_x_displacement": 54.0,
+          "actual_x_displacement": 81.0,
+          "y": 247.0
+        },
+        {
+          "tick": 6,
+          "original_x_displacement": 63.0,
+          "actual_x_displacement": 94.5,
+          "y": 246.1999969482422
+        },
+        {
+          "tick": 7,
+          "original_x_displacement": 72.0,
+          "actual_x_displacement": 108.0,
+          "y": 245.59999084472656
+        },
+        {
+          "tick": 8,
+          "original_x_displacement": 81.0,
+          "actual_x_displacement": 121.5,
+          "y": 245.1999969482422
+        },
+        {
+          "tick": 9,
+          "original_x_displacement": 90.0,
+          "actual_x_displacement": 135.0,
+          "y": 245.0
+        },
+        {
+          "tick": 10,
+          "original_x_displacement": 99.0,
+          "actual_x_displacement": 148.5,
+          "y": 245.0
+        },
+        {
+          "tick": 11,
+          "original_x_displacement": 108.0,
+          "actual_x_displacement": 162.0,
+          "y": 245.1999969482422
+        },
+        {
+          "tick": 12,
+          "original_x_displacement": 117.0,
+          "actual_x_displacement": 175.5,
+          "y": 245.59999084472656
+        },
+        {
+          "tick": 13,
+          "original_x_displacement": 126.0,
+          "actual_x_displacement": 189.0,
+          "y": 246.1999969482422
+        },
+        {
+          "tick": 14,
+          "original_x_displacement": 135.0,
+          "actual_x_displacement": 202.5,
+          "y": 247.0
+        },
+        {
+          "tick": 15,
+          "original_x_displacement": 144.0,
+          "actual_x_displacement": 216.0,
+          "y": 248.0
+        },
+        {
+          "tick": 16,
+          "original_x_displacement": 153.0,
+          "actual_x_displacement": 229.5,
+          "y": 249.1999969482422
+        },
+        {
+          "tick": 17,
+          "original_x_displacement": 162.0,
+          "actual_x_displacement": 243.0,
+          "y": 250.59999084472656
+        },
+        {
+          "tick": 18,
+          "original_x_displacement": 171.0,
+          "actual_x_displacement": 256.5,
+          "y": 252.1999969482422
+        },
+        {
+          "tick": 19,
+          "original_x_displacement": 180.0,
+          "actual_x_displacement": 270.0,
+          "y": 254.0
+        },
+        {
+          "tick": 20,
+          "original_x_displacement": 189.0,
+          "actual_x_displacement": 283.5,
+          "y": 256.0
+        },
+        {
+          "tick": 21,
+          "original_x_displacement": 198.0,
+          "actual_x_displacement": 297.0,
+          "y": 258.20001220703125
+        },
+        {
+          "tick": 22,
+          "original_x_displacement": 207.0,
+          "actual_x_displacement": 310.5,
+          "y": 260.6000061035156
+        },
+        {
+          "tick": 23,
+          "original_x_displacement": 216.0,
+          "actual_x_displacement": 324.0,
+          "y": 263.20001220703125
+        },
+        {
+          "tick": 24,
+          "original_x_displacement": 225.0,
+          "actual_x_displacement": 337.5,
+          "y": 266.0
+        },
+        {
+          "tick": 25,
+          "original_x_displacement": 234.0,
+          "actual_x_displacement": 351.0,
+          "y": 269.0
+        },
+        {
+          "tick": 26,
+          "original_x_displacement": 243.0,
+          "actual_x_displacement": 364.5,
+          "y": 272.20001220703125
+        },
+        {
+          "tick": 27,
+          "original_x_displacement": 252.0,
+          "actual_x_displacement": 378.0,
+          "y": 275.6000061035156
+        },
+        {
+          "tick": 28,
+          "original_x_displacement": 261.0,
+          "actual_x_displacement": 391.5,
+          "y": 279.20001220703125
+        },
+        {
+          "tick": 29,
+          "original_x_displacement": 270.0,
+          "actual_x_displacement": 405.0,
+          "y": 283.0
+        },
+        {
+          "tick": 30,
+          "original_x_displacement": 279.0,
+          "actual_x_displacement": 418.5,
+          "y": 287.0
+        },
+        {
+          "tick": 31,
+          "original_x_displacement": 288.0,
+          "actual_x_displacement": 432.0,
+          "y": 291.20001220703125
+        },
+        {
+          "tick": 32,
+          "original_x_displacement": 297.0,
+          "actual_x_displacement": 445.5,
+          "y": 295.6000061035156
+        },
+        {
+          "tick": 33,
+          "original_x_displacement": 306.0,
+          "actual_x_displacement": 459.0,
+          "y": 300.20001220703125
+        },
+        {
+          "tick": 34,
+          "original_x_displacement": 315.0,
+          "actual_x_displacement": 472.5,
+          "y": 305.0
+        },
+        {
+          "tick": 35,
+          "original_x_displacement": 324.0,
+          "actual_x_displacement": 486.0,
+          "y": 310.0
+        },
+        {
+          "tick": 36,
+          "original_x_displacement": 333.0,
+          "actual_x_displacement": 499.5,
+          "y": 315.20001220703125
+        },
+        {
+          "tick": 37,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 320.6000061035156
+        },
+        {
+          "tick": 38,
+          "original_x_displacement": 351.0,
+          "actual_x_displacement": 526.5,
+          "y": 326.20001220703125
+        },
+        {
+          "tick": 39,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 40,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 41,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 42,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 43,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        },
+        {
+          "tick": 44,
+          "original_x_displacement": 342.0,
+          "actual_x_displacement": 513.0,
+          "y": 338.0
+        }
+      ]
+    }
+  ],
+  "unlock_gate": {
+    "original_shop_id": 64,
+    "locked_custom_shop_ids": [
+      515,
+      516,
+      517
+    ],
+    "after_original_unlock": "all three enabled",
+    "faction": 1
+  },
+  "purchases": [
+    {
+      "id": 1027,
+      "price": 50,
+      "insufficient_49": "passed",
+      "native_purchase_touch_path": "passed",
+      "level": 1,
+      "remaining_medals": 0
+    },
+    {
+      "id": 1028,
+      "price": 50,
+      "insufficient_49": "passed",
+      "native_purchase_touch_path": "passed",
+      "level": 1,
+      "remaining_medals": 0
+    },
+    {
+      "id": 1029,
+      "price": 50,
+      "insufficient_49": "passed",
+      "native_purchase_touch_path": "passed",
+      "level": 1,
+      "remaining_medals": 0
+    }
+  ],
+  "purchase_restart": "passed",
+  "three_deck_restart": "passed",
+  "native_description_layouts": [
+    {
+      "unit": 1027,
+      "language": 9,
+      "text": "普通攻擊：水平加農砲     特殊攻擊：水平加農砲3連發",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "y": 0,
+      "text_width": 572.0,
+      "right_edge": 572.0
+    },
+    {
+      "unit": 1027,
+      "language": 9,
+      "text": "為荒漠地形作戰設計的基 · 寇卡坦克。",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "y": 30,
+      "text_width": 402.0,
+      "right_edge": 402.0
+    },
+    {
+      "unit": 1027,
+      "language": 9,
+      "text": "輕量化的裝甲使其速度與攻擊力更高。",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "y": 60,
+      "text_width": 408.0,
+      "right_edge": 408.0
+    },
+    {
+      "unit": 1028,
+      "language": 9,
+      "text": "普通攻擊：水平加農砲     特殊攻擊：水平加農砲3連發",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "y": 0,
+      "text_width": 572.0,
+      "right_edge": 572.0
+    },
+    {
+      "unit": 1028,
+      "language": 9,
+      "text": "為雪原地形作戰設計的基 · 寇卡坦克。",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "y": 30,
+      "text_width": 402.0,
+      "right_edge": 402.0
+    },
+    {
+      "unit": 1028,
+      "language": 9,
+      "text": "更慢的速度使其有更強大的裝甲。",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "y": 60,
+      "text_width": 360.0,
+      "right_edge": 360.0
+    },
+    {
+      "unit": 1029,
+      "language": 9,
+      "text": "普通攻擊：戰車砲     特殊攻擊：戰車砲連擊",
+      "font_size": 24,
+      "logical_width": 512,
+      "x": 0,
+      "y": 0,
+      "text_width": 462.0,
+      "right_edge": 462.0
+    },
+    {
+      "unit": 1029,
+      "language": 9,
+      "text": "為山地地形作戰設計的吉利塔 · O。",
+      "font_size": 24,
+      "logical_width": 512,
+      "x": 0,
+      "y": 30,
+      "text_width": 374.0,
+      "right_edge": 374.0
+    },
+    {
+      "unit": 1029,
+      "language": 9,
+      "text": "更慢的移動速度換來了更高的攻擊力與裝甲。",
+      "font_size": 24,
+      "logical_width": 512,
+      "x": 0,
+      "y": 60,
+      "text_width": 480.0,
+      "right_edge": 480.0
+    }
+  ],
+  "native_unit_name_layouts": [
+    {
+      "unit": 1027,
+      "text": "基 · 寇卡坦克 MK.II",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 552,
+      "text_width": 202.0,
+      "right_edge": 754.0
+    },
+    {
+      "unit": 1028,
+      "text": "基 · 寇卡坦克 MK.III",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 754,
+      "text_width": 209.0,
+      "right_edge": 963.0
+    },
+    {
+      "unit": 1029,
+      "text": "吉利塔 · O MK.II",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 0,
+      "text_width": 174.0,
+      "right_edge": 174.0
+    },
+    {
+      "unit": 1027,
+      "text": "基 · 寇卡坦克 MK.II",
+      "font_size": 24,
+      "logical_width": 256,
+      "x": 19,
+      "text_width": 202.0,
+      "right_edge": 221.0
+    },
+    {
+      "unit": 1028,
+      "text": "基 · 寇卡坦克 MK.III",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 552,
+      "text_width": 209.0,
+      "right_edge": 761.0
+    },
+    {
+      "unit": 1029,
+      "text": "吉利塔 · O MK.II",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 761,
+      "text_width": 174.0,
+      "right_edge": 935.0
+    },
+    {
+      "unit": 1028,
+      "text": "基 · 寇卡坦克 MK.III",
+      "font_size": 24,
+      "logical_width": 256,
+      "x": 16,
+      "text_width": 209.0,
+      "right_edge": 225.0
+    },
+    {
+      "unit": 1029,
+      "text": "吉利塔 · O MK.II",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 552,
+      "text_width": 174.0,
+      "right_edge": 726.0
+    },
+    {
+      "unit": 1029,
+      "text": "吉利塔 · O MK.II",
+      "font_size": 24,
+      "logical_width": 256,
+      "x": 33,
+      "text_width": 174.0,
+      "right_edge": 207.0
+    },
+    {
+      "unit": 1027,
+      "text": "基 · 寇卡坦克 MK.II",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 264,
+      "text_width": 202.0,
+      "right_edge": 466.0
+    },
+    {
+      "unit": 1028,
+      "text": "基 · 寇卡坦克 MK.III",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 466,
+      "text_width": 209.0,
+      "right_edge": 675.0
+    },
+    {
+      "unit": 1029,
+      "text": "吉利塔 · O MK.II",
+      "font_size": 24,
+      "logical_width": 1024,
+      "x": 675,
+      "text_width": 174.0,
+      "right_edge": 849.0
+    }
+  ],
+  "static_font_measurements": [
+    {
+      "unit": 1027,
+      "language": "EN",
+      "font_size": 24,
+      "measured_widths": [
+        621.875,
+        538.984375,
+        475.0,
+        103.984375
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "JP",
+      "font_size": 24,
+      "measured_widths": [
+        648.0,
+        480.0,
+        648.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "KR",
+      "font_size": 24,
+      "measured_widths": [
+        543.0,
+        940.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "ES",
+      "font_size": 24,
+      "measured_widths": [
+        668.921875,
+        580.0,
+        547.0,
+        66.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "PT",
+      "font_size": 24,
+      "measured_widths": [
+        735.875,
+        521.984375,
+        596.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "RU",
+      "font_size": 24,
+      "measured_widths": [
+        687.0,
+        637.0,
+        527.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "FR",
+      "font_size": 24,
+      "measured_widths": [
+        609.796875,
+        587.0,
+        563.0,
+        40.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "DE",
+      "font_size": 24,
+      "measured_widths": [
+        621.875,
+        495.0,
+        536.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "IT",
+      "font_size": 24,
+      "measured_widths": [
+        638.890625,
+        531.0,
+        562.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "ZT",
+      "font_size": 24,
+      "measured_widths": [
+        572.0,
+        402.0,
+        408.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1027,
+      "language": "ZS",
+      "font_size": 24,
+      "measured_widths": [
+        444.0,
+        310.0,
+        306.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "EN",
+      "font_size": 24,
+      "measured_widths": [
+        621.875,
+        570.984375,
+        440.984375
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "JP",
+      "font_size": 24,
+      "measured_widths": [
+        648.0,
+        480.0,
+        432.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "KR",
+      "font_size": 24,
+      "measured_widths": [
+        543.0,
+        836.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "ES",
+      "font_size": 24,
+      "measured_widths": [
+        668.921875,
+        552.0,
+        548.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "PT",
+      "font_size": 24,
+      "measured_widths": [
+        735.875,
+        493.984375,
+        497.0,
+        110.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "RU",
+      "font_size": 24,
+      "measured_widths": [
+        687.0,
+        623.0,
+        563.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "FR",
+      "font_size": 24,
+      "measured_widths": [
+        609.796875,
+        565.0,
+        463.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "DE",
+      "font_size": 24,
+      "measured_widths": [
+        621.875,
+        504.0,
+        560.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "IT",
+      "font_size": 24,
+      "measured_widths": [
+        638.890625,
+        520.0,
+        545.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "ZT",
+      "font_size": 24,
+      "measured_widths": [
+        572.0,
+        402.0,
+        360.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1028,
+      "language": "ZS",
+      "font_size": 24,
+      "measured_widths": [
+        444.0,
+        310.0,
+        270.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "EN",
+      "font_size": 24,
+      "measured_widths": [
+        745.78125,
+        556.984375,
+        597.984375
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "JP",
+      "font_size": 24,
+      "measured_widths": [
+        492.0,
+        444.0,
+        528.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "KR",
+      "font_size": 24,
+      "measured_widths": [
+        474.0,
+        902.984375
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "ES",
+      "font_size": 24,
+      "measured_widths": [
+        806.921875,
+        556.0,
+        525.0,
+        87.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "PT",
+      "font_size": 24,
+      "measured_widths": [
+        802.78125,
+        564.984375,
+        502.0,
+        115.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "RU",
+      "font_size": 24,
+      "measured_widths": [
+        768.0,
+        624.0,
+        523.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "FR",
+      "font_size": 24,
+      "measured_widths": [
+        746.75,
+        556.0,
+        541.0,
+        186.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "DE",
+      "font_size": 24,
+      "measured_widths": [
+        745.78125,
+        501.0,
+        548.0,
+        196.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "IT",
+      "font_size": 24,
+      "measured_widths": [
+        802.796875,
+        537.0,
+        515.0,
+        175.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "ZT",
+      "font_size": 24,
+      "measured_widths": [
+        462.0,
+        374.0,
+        480.0
+      ],
+      "native_panel_texture_width": 1024
+    },
+    {
+      "unit": 1029,
+      "language": "ZS",
+      "font_size": 24,
+      "measured_widths": [
+        359.0,
+        293.0,
+        360.0
+      ],
+      "native_panel_texture_width": 1024
+    }
+  ],
+  "deployment": [
+    {
+      "id": 1027,
+      "slot": 1,
+      "ap_cost": 110,
+      "ap_before": 1001,
+      "ap_after": 891,
+      "production_interval": 321,
+      "cooldown_after_creation": 321,
+      "immediate_repeat": "blocked by production cooldown"
+    },
+    {
+      "id": 1028,
+      "slot": 2,
+      "ap_cost": 180,
+      "ap_before": 891,
+      "ap_after": 711,
+      "production_interval": 429,
+      "cooldown_after_creation": 429,
+      "immediate_repeat": "blocked by production cooldown"
+    },
+    {
+      "id": 1029,
+      "slot": 3,
+      "ap_cost": 110,
+      "ap_before": 711,
+      "ap_after": 601,
+      "production_interval": 400,
+      "cooldown_after_creation": 400,
+      "immediate_repeat": "blocked by production cooldown"
+    }
+  ],
+  "battle_ready_icon_palette_hits": [
+    {
+      "id": 1027,
+      "palette_pixel_hits": 5217
+    },
+    {
+      "id": 1028,
+      "palette_pixel_hits": 288
+    },
+    {
+      "id": 1029,
+      "palette_pixel_hits": 3015
+    }
+  ],
+  "installed_target_checks": {
+    "installed_package": "passed",
+    "installed_github": "passed"
+  },
+  "artwork_checks": [
+    {
+      "label": "黄色基寇卡",
+      "sha256": "68b006ba976c8138b449d84144a1716102305d79d3d1b5bf13f9c0886e74e1ee",
+      "rectangles_checked": 61,
+      "alpha_exact": true,
+      "material_mapping_exact": true,
+      "icon_alpha_exact": true
+    },
+    {
+      "label": "浅灰白基寇卡",
+      "sha256": "1745f73f18ccff14dbaed3f9976e916c97527e5c7eef4ac00a443349105e5059",
+      "rectangles_checked": 61,
+      "alpha_exact": true,
+      "material_mapping_exact": true,
+      "icon_alpha_exact": true
+    },
+    {
+      "label": "枪灰色吉利塔",
+      "sha256": "f69e868ce00b7ec375d7a4209d2a423d82a82b7b6b80e3e74dd33e5d0f8beda8",
+      "rectangles_checked": 94,
+      "alpha_exact": true,
+      "material_mapping_exact": true,
+      "icon_alpha_exact": true
+    }
+  ],
+  "original_and_existing_units_preserved": true,
+  "existing_player_saves_unchanged": true,
+  "initial_seed_unchanged": true,
+  "test_writes_confined_to_private_fixtures": true,
+  "beta_deployed": false,
+  "remote_published": false,
+  "captures": {
+    "three_vehicles_battle.png": {
+      "sha256": "93b3a0251f50e1d321fd2282b62e8fdc486539a0050b552937b6348ed84deab3",
+      "bytes": 236438
+    },
+    "three_vehicles_ready_icons.png": {
+      "sha256": "1d55f8c752f0eb80a0a8ea25c108a446aa3fc32d58ff6f8a59b8745eb4a47e4e",
+      "bytes": 226242
+    },
+    "description_1027_ZT.png": {
+      "sha256": "66fb6ed79ec35ae5fdf98986c44b3326f2bf7a91eb4b12858898935e0c5a440f",
+      "bytes": 329272
+    },
+    "description_1028_ZT.png": {
+      "sha256": "c8a2b496f322d440bf98df981f00a7def7fcd4ba218a44352e5b2f977d276cb5",
+      "bytes": 327138
+    },
+    "description_1029_ZT.png": {
+      "sha256": "7e48d885dada9242323130aee120d38b6f9b380c53a04a54c4d7eb4e04548373",
+      "bytes": 328526
+    }
+  },
+  "limitations": [
+    "原版配色依据为公开精灵参考素材，未独立提取并认证 Metal Slug 1 ROM 调色盘。",
+    "原生详情界面截图覆盖繁体中文；十一种语言完成原生文本返回值和静态字体宽度检查。",
+    "战斗验证覆盖受控场景中的参数、运动和攻击；全关卡通关、性能及长期稳定性尚待专项验证。"
+  ],
+  "hp_revision": {
+    "key": "s1xlv.girida_o_mk2",
+    "id": 1029,
+    "field": "hp_multiplier",
+    "previous_value": [
+      2,
+      1
+    ],
+    "value": [
+      3,
+      2
+    ],
+    "previous_registry_sha256": "adb360020049b52fb73dbb7a8bb04970ceb01be9787177fb82456c277bfcc314",
+    "registry_sha256": "85d94b8be5e95050efa755ab3c8259a1ce269d7422fbf7e3bdf94ad447628a80",
+    "other_registry_fields_unchanged": true,
+    "core_unchanged": true
+  },
+  "ap_revision": {
+    "changes": [
+      {
+        "key": "s1xlv.di_cokka_mk3",
+        "field": "ap",
+        "previous_value": 100,
+        "value": 180
+      },
+      {
+        "key": "s1xlv.girida_o_mk2",
+        "field": "ap",
+        "previous_value": 80,
+        "value": 110
+      }
+    ],
+    "previous_registry_sha256": "85d94b8be5e95050efa755ab3c8259a1ce269d7422fbf7e3bdf94ad447628a80",
+    "registry_sha256": "46f131dd644af8428bb83d30825c81ba4d2ec54d2c156566824a5f4cc066537a",
+    "other_registry_fields_unchanged": true,
+    "core_unchanged": true
+  }
+}

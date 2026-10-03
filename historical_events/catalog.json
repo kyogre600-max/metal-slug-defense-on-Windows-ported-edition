@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "deployment_status": "isolated_playable_preview",
+  "runtime_event_selector_deployed": true,
+  "source_archive_url": "https://archive.org/details/metal-slug-defense",
+  "events": [
+    {
+      "event_key": "anniversary_2015",
+      "title_zh": "一周年",
+      "source_version": "1.24",
+      "stage_count": 16,
+      "data_path": "restoration_data/anniversary_2015.json",
+      "controller": "rescue",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "msd_max_2015",
+      "title_zh": "MSD MAX",
+      "source_version": "1.30",
+      "stage_count": 18,
+      "data_path": "restoration_data/msd_max_2015.json",
+      "controller": "rescue",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "midsummer_horror_2015",
+      "title_zh": "盛夏恐怖夜",
+      "source_version": "1.31",
+      "stage_count": 15,
+      "data_path": "restoration_data/midsummer_horror_2015.json",
+      "controller": "rescue",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "sleeping_gigantic_weapon_2015",
+      "title_zh": "沉睡的巨大兵器",
+      "source_version": "1.33",
+      "stage_count": 21,
+      "data_path": "restoration_data/sleeping_gigantic_weapon_2015.json",
+      "controller": "parts",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "battle_cats_2015",
+      "title_zh": "猫咪大战争联动",
+      "source_version": "1.35",
+      "stage_count": 31,
+      "data_path": "restoration_data/battle_cats_2015.json",
+      "controller": "collaboration_rescue",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "halloween_2015",
+      "title_zh": "万圣节区域",
+      "source_version": "1.36",
+      "stage_count": 5,
+      "data_path": "restoration_data/halloween_2015.json",
+      "controller": "clear_reward",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "treasure_recovery_2015",
+      "title_zh": "秘宝夺还大作战（含阿玛迪斯扩展）",
+      "source_version": "1.38",
+      "stage_count": 21,
+      "data_path": "restoration_data/treasure_recovery_2015.json",
+      "controller": "legacy_survival",
+      "currency": "treasure_coins",
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "melty_christmas_2015",
+      "title_zh": "战场圣诞",
+      "source_version": "1.39",
+      "stage_count": 20,
+      "data_path": "restoration_data/melty_christmas_2015.json",
+      "controller": "legacy_survival",
+      "currency": "christmas_points",
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "kof_black_noah_2016",
+      "title_zh": "黑色诺亚袭来",
+      "source_version": "1.40",
+      "stage_count": 5,
+      "data_path": "restoration_data/kof_black_noah_2016.json",
+      "controller": "invitation",
+      "currency": null,
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    },
+    {
+      "event_key": "cooperation_2016_current",
+      "title_zh": "当前合作活动",
+      "source_version": "current_mod_1.46.0",
+      "stage_count": 24,
+      "data_path": "restoration_data/cooperation_2016_current.json",
+      "controller": "current_cooperation",
+      "currency": "cooperation_points",
+      "runtime_validation": "first-stage execution, resource initialization, Deck return, controller and restart passed"
+    }
+  ],
+  "planned_ui_flow": [
+    "SORTIE",
+    "EVENT selector in Mission style",
+    "selected Event BASE with instructor NPC",
+    "battle/shop/tasks/Deck"
+  ],
+  "identity": {
+    "event": "stable event_key",
+    "stage": [
+      "event_key",
+      "local_stage_key"
+    ],
+    "shop": [
+      "event_key",
+      "product_key"
+    ],
+    "native_runtime_ids": "Historical IDs are bound only while their Event is selected; original tables are restored on leaving the Event."
+  },
+  "storage": {
+    "shared": [
+      "unit_ownership",
+      "medals",
+      "msp"
+    ],
+    "per_event": [
+      "currency",
+      "stage_progress",
+      "captures",
+      "parts",
+      "reward_claims",
+      "shop_inventory"
+    ]
+  },
+  "startup": "title/main menu; selecting Event never creates a battle continuation record"
+}

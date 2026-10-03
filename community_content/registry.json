@@ -7715,6 +7715,324 @@
           "description": "普通攻击：火箭炮4连射     特殊攻击：突击\n从未来而来的重装B型。\n就算是未来其可动性也依然无人能及。"
         }
       }
+    },
+    {
+      "key": "s1xlv.di_cokka_mk2",
+      "id": 1027,
+      "base_id": 3,
+      "faction": 1,
+      "identity": "Rebel Army",
+      "shop_price": 50,
+      "available_from_start": false,
+      "shop_unlock_reference_id": 64,
+      "ap": 110,
+      "hp_multiplier": [
+        4,
+        5
+      ],
+      "special_damage_multiplier": [
+        1,
+        1
+      ],
+      "damage_multiplier": [
+        3,
+        2
+      ],
+      "move_speed_multiplier": [
+        5,
+        4
+      ],
+      "production_reference_id": 3,
+      "production_interval_multiplier": [
+        9,
+        10
+      ],
+      "attack_range_multiplier": [
+        6,
+        5
+      ],
+      "knockback_distance_multiplier": [
+        1,
+        1
+      ],
+      "ballistic_range_multiplier": [
+        1,
+        1
+      ],
+      "texture": "di_cokka_yellow.obm",
+      "icon": {
+        "index": 343,
+        "page": 1,
+        "rect": [
+          1024,
+          192,
+          40,
+          39
+        ],
+        "anchor": [
+          -5,
+          -6
+        ]
+      },
+      "animations": {},
+      "localization": {
+        "EN": {
+          "name": "DI-COKKA MK.II",
+          "description": "STAND. ATK : H-Cannon   SPEC. ATK : 3-Shot H-Cannon\nA Di-Cokka tank designed for desert operations. Its\nlightweight armor provides greater speed and\nfirepower."
+        },
+        "JP": {
+          "name": "ジィ・コッカ MK.II",
+          "description": "通常攻撃：水平キャノン     特殊攻撃：水平キャノン3連射\n砂漠での作戦用に設計されたジィ・コッカ。\n軽量化した装甲により、移動速度と攻撃力が向上している。"
+        },
+        "KR": {
+          "name": "디-코카 MK.II",
+          "description": "일반 공격: 수평 캐논   특수 공격: 수평 캐논 3연사 \n사막 작전용으로 설계된 디-코카 전차. 경량 장갑으로 이동 속도와 공격력이 향상되었다."
+        },
+        "ES": {
+          "name": "DI-COKKA MK.II",
+          "description": "ATQ. ESTÁND. : Cañón-H   ATQ ESPEC. : Cañón-H de 3 tiros\nDi-Cokka diseñado para operaciones en el desierto. Su\nblindaje ligero aumenta la velocidad y la potencia de\nfuego."
+        },
+        "PT": {
+          "name": "DI-COKKA MK.II",
+          "description": "ATQ. PADR. : Canhão Horiz.    ATQ. ESPEC. : Canhão H. de 3 Tiros\nDi-Cokka projetado para operações no deserto. A\nblindagem leve aumenta a velocidade e o poder de fogo."
+        },
+        "RU": {
+          "name": "ДИ-КОККА MK.II",
+          "description": "СТАНД. АТАК: Х-Пушка   СПЕЦ. АТАК: 3-Ударная Х-Пушка\nТанк Ди-Кокка для действий в пустыне. Облегчённая\nброня повышает скорость и огневую мощь."
+        },
+        "FR": {
+          "name": "DI-COKKA MK.II",
+          "description": "ATT. STAND : Canon-H   ATT. SPÉ : Canon-H à 3 coups\nDi-Cokka conçu pour les opérations dans le désert. Son\nblindage léger augmente la vitesse et la puissance de\nfeu."
+        },
+        "DE": {
+          "name": "DI-COKKA MK.II",
+          "description": "STAND. ATK : H-Cannon   SPEC. ATK : 3-Shot H-Cannon\nDi-Cokka für Einsätze in der Wüste. Die leichte\nPanzerung erhöht Geschwindigkeit und Feuerkraft."
+        },
+        "IT": {
+          "name": "DI-COKKA MK.II",
+          "description": "ATC STAND.: H-Cannone   ATC SPEC.: Cannone H 3-Colpi\nDi-Cokka progettato per operazioni nel deserto. La\ncorazza leggera aumenta velocità e potenza di fuoco."
+        },
+        "ZT": {
+          "name": "基 · 寇卡坦克 MK.II",
+          "description": "普通攻擊：水平加農砲     特殊攻擊：水平加農砲3連發\n為荒漠地形作戰設計的基 · 寇卡坦克。\n輕量化的裝甲使其速度與攻擊力更高。"
+        },
+        "ZS": {
+          "name": "基 · 寇卡坦克 MK.II",
+          "description": "普通攻击：水平加农炮     特殊攻击：水平加农炮3连发\n为荒漠地形作战设计的基 · 寇卡坦克。\n轻量化的装甲使其速度与攻击力更高。"
+        }
+      }
+    },
+    {
+      "key": "s1xlv.di_cokka_mk3",
+      "id": 1028,
+      "base_id": 3,
+      "faction": 1,
+      "identity": "Rebel Army",
+      "shop_price": 50,
+      "available_from_start": false,
+      "shop_unlock_reference_id": 64,
+      "ap": 180,
+      "hp_multiplier": [
+        2,
+        1
+      ],
+      "special_damage_multiplier": [
+        1,
+        1
+      ],
+      "damage_multiplier": [
+        1,
+        1
+      ],
+      "move_speed_multiplier": [
+        4,
+        5
+      ],
+      "production_reference_id": 3,
+      "production_interval_multiplier": [
+        6,
+        5
+      ],
+      "attack_range_multiplier": [
+        1,
+        1
+      ],
+      "knockback_distance_multiplier": [
+        1,
+        4
+      ],
+      "ballistic_range_multiplier": [
+        1,
+        1
+      ],
+      "texture": "di_cokka_light.obm",
+      "icon": {
+        "index": 344,
+        "page": 1,
+        "rect": [
+          1024,
+          256,
+          40,
+          39
+        ],
+        "anchor": [
+          -5,
+          -6
+        ]
+      },
+      "animations": {},
+      "localization": {
+        "EN": {
+          "name": "DI-COKKA MK.III",
+          "description": "STAND. ATK : H-Cannon   SPEC. ATK : 3-Shot H-Cannon\nA Di-Cokka tank designed for snowfield operations. Its\nslower movement permits stronger armor."
+        },
+        "JP": {
+          "name": "ジィ・コッカ MK.III",
+          "description": "通常攻撃：水平キャノン     特殊攻撃：水平キャノン3連射\n雪原での作戦用に設計されたジィ・コッカ。\n移動速度を抑え、装甲を強化している。"
+        },
+        "KR": {
+          "name": "디-코카 MK.III",
+          "description": "일반 공격: 수평 캐논   특수 공격: 수평 캐논 3연사 \n설원 작전용으로 설계된 디-코카 전차. 이동 속도를 낮추고 장갑을 강화하였다."
+        },
+        "ES": {
+          "name": "DI-COKKA MK.III",
+          "description": "ATQ. ESTÁND. : Cañón-H   ATQ ESPEC. : Cañón-H de 3 tiros\nDi-Cokka diseñado para operaciones en la nieve. Su\nmenor velocidad permite un blindaje más resistente."
+        },
+        "PT": {
+          "name": "DI-COKKA MK.III",
+          "description": "ATQ. PADR. : Canhão Horiz.    ATQ. ESPEC. : Canhão H. de 3 Tiros\nDi-Cokka projetado para operações na neve. A\nvelocidade menor permite uma blindagem mais\nresistente."
+        },
+        "RU": {
+          "name": "ДИ-КОККА MK.III",
+          "description": "СТАНД. АТАК: Х-Пушка   СПЕЦ. АТАК: 3-Ударная Х-Пушка\nТанк Ди-Кокка для действий на снежной местности.\nСнижение скорости позволяет усилить броню."
+        },
+        "FR": {
+          "name": "DI-COKKA MK.III",
+          "description": "ATT. STAND : Canon-H   ATT. SPÉ : Canon-H à 3 coups\nDi-Cokka conçu pour les opérations dans la neige. Sa\nvitesse réduite permet un blindage renforcé."
+        },
+        "DE": {
+          "name": "DI-COKKA MK.III",
+          "description": "STAND. ATK : H-Cannon   SPEC. ATK : 3-Shot H-Cannon\nDi-Cokka für Einsätze im Schnee. Die geringere\nGeschwindigkeit ermöglicht eine stärkere Panzerung."
+        },
+        "IT": {
+          "name": "DI-COKKA MK.III",
+          "description": "ATC STAND.: H-Cannone   ATC SPEC.: Cannone H 3-Colpi\nDi-Cokka progettato per operazioni sulla neve. La\nvelocità ridotta permette una corazza più resistente."
+        },
+        "ZT": {
+          "name": "基 · 寇卡坦克 MK.III",
+          "description": "普通攻擊：水平加農砲     特殊攻擊：水平加農砲3連發\n為雪原地形作戰設計的基 · 寇卡坦克。\n更慢的速度使其有更強大的裝甲。"
+        },
+        "ZS": {
+          "name": "基 · 寇卡坦克 MK.III",
+          "description": "普通攻击：水平加农炮     特殊攻击：水平加农炮3连发\n为雪原地形作战设计的基 · 寇卡坦克。\n更慢的速度使其有更强大的装甲。"
+        }
+      }
+    },
+    {
+      "key": "s1xlv.girida_o_mk2",
+      "id": 1029,
+      "base_id": 51,
+      "faction": 1,
+      "identity": "Rebel Army",
+      "shop_price": 50,
+      "available_from_start": false,
+      "shop_unlock_reference_id": 64,
+      "ap": 110,
+      "hp_multiplier": [
+        3,
+        2
+      ],
+      "special_damage_multiplier": [
+        1,
+        1
+      ],
+      "damage_multiplier": [
+        3,
+        2
+      ],
+      "move_speed_multiplier": [
+        4,
+        5
+      ],
+      "production_reference_id": 51,
+      "production_interval_multiplier": [
+        6,
+        5
+      ],
+      "attack_range_multiplier": [
+        3,
+        2
+      ],
+      "knockback_distance_multiplier": [
+        1,
+        8
+      ],
+      "ballistic_range_multiplier": [
+        3,
+        2
+      ],
+      "texture": "girida_o_gunmetal.obm",
+      "icon": {
+        "index": 345,
+        "page": 1,
+        "rect": [
+          1024,
+          320,
+          44,
+          41
+        ],
+        "anchor": [
+          -5,
+          -4
+        ]
+      },
+      "animations": {},
+      "localization": {
+        "EN": {
+          "name": "GIRIDA-O MK.II",
+          "description": "STAND. ATK : Tank Cannon     SPEC. ATK : Rapid-Fire Tank Cannon\nA Girida-O designed for mountain operations. Slower\nmovement permits greater firepower and stronger armor."
+        },
+        "JP": {
+          "name": "ギリダ・O MK.II",
+          "description": "通常攻撃：戦車砲     特殊攻撃：戦車砲連射\n山岳での作戦用に設計されたギリダ・O。\n移動速度を抑え、攻撃力と装甲を強化している。"
+        },
+        "KR": {
+          "name": "기리다-O MK.II",
+          "description": "일반 공격: 전차포     특수 공격: 전차포 연사\n산악 작전용으로 설계된 기리다-O. 이동 속도를 낮추고 공격력과 장갑을 강화하였다."
+        },
+        "ES": {
+          "name": "GIRIDA-O MK.II",
+          "description": "ATQ ESTÁND. : Cañón tanque ATQ ESPEC. : Cañón tanque disparo rápido\nGirida-O diseñado para operaciones de montaña. Su\nmenor velocidad permite más potencia de fuego y\nblindaje."
+        },
+        "PT": {
+          "name": "GIRIDA-O MK.II",
+          "description": "ATQ. PADR. : Canhão de Tanque   ATQ. ESPEC. : Canhão de T. Tiro Ráp.\nGirida-O projetado para operações nas montanhas. A\nvelocidade menor permite mais poder de fogo e\nblindagem."
+        },
+        "RU": {
+          "name": "ГИРИДА-О MK.II",
+          "description": "СТАНД. АТАК: Танк.Пушка   СПЕЦ. АТАК: Быстростр. Танк.Пушка\nГирида-О для действий в горах. Снижение скорости\nпозволяет усилить огневую мощь и броню."
+        },
+        "FR": {
+          "name": "GIRIDA-O MK.II",
+          "description": "ATT. STAND : Canon de Tank   ATT. SPÉ : Canon de tank à tir rapide\nGirida-O conçu pour les opérations en montagne. Sa\nvitesse réduite permet de renforcer le blindage et la\npuissance de feu."
+        },
+        "DE": {
+          "name": "GIRIDA-O MK.II",
+          "description": "STAND. ATK : Tank Cannon     SPEC. ATK : Rapid-Fire Tank Cannon\nGirida-O für Einsätze im Gebirge. Die geringere\nGeschwindigkeit ermöglicht stärkere Panzerung und\nhöhere Feuerkraft."
+        },
+        "IT": {
+          "name": "GIRIDA-O MK.II",
+          "description": "ATC STAND.: Cannone Tank   ATC SPEC.: Cannone Tank a Fuoco Rapido\nGirida-O progettato per operazioni in montagna. La\nvelocità ridotta permette di aumentare potenza di\nfuoco e corazza."
+        },
+        "ZT": {
+          "name": "吉利塔 · O MK.II",
+          "description": "普通攻擊：戰車砲     特殊攻擊：戰車砲連擊\n為山地地形作戰設計的吉利塔 · O。\n更慢的移動速度換來了更高的攻擊力與裝甲。"
+        },
+        "ZS": {
+          "name": "吉利塔 · O MK.II",
+          "description": "普通攻击：战车炮     特殊攻击：战车炮连击\n为山地地形作战设计的吉利塔 · O。\n更慢的移动速度换来了更高的攻击力与装甲。"
+        }
+      }
     }
   ],
   "assets": {
@@ -7722,7 +8040,10 @@
     "future_m15a_out1.obm": "38e0d348c382ca2cde8c316cd08ff7db959f9684d31f81cb1e704cf3bb0be290",
     "future_m15a_out2.obm": "1d76aeb5dcc94a2afc147b6cde024821b65d07aae625b66ca086c5685d59af88",
     "sarubia_future.obm": "e09f6a336cb40bea757e90a240a7c1e6d2a64f98b5937be461a897453460a980",
-    "unit_icon_02.obm": "cc2d1a353dd5fc2a5bd374a5240c7875d6384d3f2d12d63d9667eaa76e2edd67"
+    "unit_icon_02.obm": "1b9beee8c8c855a605154fa507662d9bd3384ced480a4b776c36303e455ffb43",
+    "di_cokka_yellow.obm": "68b006ba976c8138b449d84144a1716102305d79d3d1b5bf13f9c0886e74e1ee",
+    "di_cokka_light.obm": "1745f73f18ccff14dbaed3f9976e916c97527e5c7eef4ac00a443349105e5059",
+    "girida_o_gunmetal.obm": "f69e868ce00b7ec375d7a4209d2a423d82a82b7b6b80e3e74dd33e5d0f8beda8"
   },
   "unit_id_base": 1024
 }
