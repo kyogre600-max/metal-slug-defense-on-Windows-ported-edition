@@ -41,7 +41,7 @@ Mouse controls remain available. Deployment and special attacks follow the game'
 
 ### Run
 
-Download the Windows package from [Releases](https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition/releases), extract the complete archive, and run **MSD WINDOWS S1XLV.exe**. Windows 10/11 x64 is required; the runtime is bundled.
+Open the [project page](https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition), click the green **Code** button, and select **Download ZIP**. Extract the entire archive, open the extracted project folder, and run **MSD WINDOWS S1XLV.exe**. Windows 10/11 x64 is required; the runtime is bundled.
 
 The package starts with an initial save. Units can be purchased with medals, and the original daily and event reward paths are preserved. Save files are created in `play_save/`; existing personal progress is excluded from the distributed package. Full campaign coverage and long-term stability remain under evaluation.
 
@@ -88,7 +88,7 @@ To update an existing installation, close the game, back up `play_save/`, extrac
 
 ### 运行方法
 
-从 [Releases](https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition/releases) 下载 Windows 运行包，完整解压后启动 **MSD WINDOWS S1XLV.exe**。适用于 Windows 10/11 x64，运行依赖已随包提供。
+在[项目主页](https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition)点击绿色 **Code** 按钮，选择 **Download ZIP** 下载压缩包。完整解压后，打开解压得到的项目文件夹，启动 **MSD WINDOWS S1XLV.exe**。适用于 Windows 10/11 x64，运行依赖已随包提供。
 
 分发包采用初始存档，玩家可以使用勋章购买单位；原版每日奖励、活动奖励及对应解锁流程均保留。个人进度保存在 `play_save/`，分发包不包含已有个人进度。全关卡覆盖与长期运行稳定性仍需持续验证。
 
