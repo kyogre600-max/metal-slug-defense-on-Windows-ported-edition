@@ -35,8 +35,8 @@ class CommunityContent:
             rect=u['icon']['rect'];anchor=u['icon']['anchor']
             if len(rect)!=4 or len(anchor)!=2 or any(not isinstance(v,int) or not -32768<=v<=32767 for v in [*rect,*anchor]):raise ValueError('Invalid icon geometry')
             if rect[0]<0 or rect[1]<0 or rect[2]<=0 or rect[3]<=0:raise ValueError('Invalid icon rectangle')
-            for key in ('production_interval_multiplier','special_damage_multiplier'):
-                a,b=u[key]
+            for key in ('production_interval_multiplier','special_damage_multiplier','attack_wait_multiplier'):
+                a,b=u.get(key,[1,1]) if key=='attack_wait_multiplier' else u[key]
                 if not isinstance(a,int) or not isinstance(b,int) or not 0<a<=10000 or not 0<b<=10000:raise ValueError('Invalid rational unit multiplier')
             for text in u['localization'].values():
                 if not isinstance(text['name'],str) or not isinstance(text['description'],str) or not text['name'] or not text['description'] or '\0' in text['name']+text['description']:raise ValueError('Invalid unit text')
@@ -136,6 +136,14 @@ class CommunityContent:
                 v=struct.unpack_from('<i',original,ref*0x390+off)[0];struct.pack_into('<i',row,off,(v*a+b-1)//b)
             a,b=u['special_damage_multiplier']
             for off in (0x74,0xfc,0x180,0x204,0x288,0x30c):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*a//b)
+            # Native status IDs 24/31 map to status words 27/34.
+            # These six anchors match getUnitStatus's level interpolation.
+            # Production time and the special-readiness timer remain separate.
+            a,b=u.get('attack_wait_multiplier',[1,1])
+            for off in (0x6c,0xf8,0x17c,0x200,0x284,0x308,
+                        0x88,0x110,0x194,0x218,0x29c,0x320):
+                value=struct.unpack_from('<i',row,off)[0]
+                struct.pack_into('<i',row,off,(value*a+b-1)//b)
             struct.pack_into('<i',row,0x378,u['faction']);rows+=row
             action_rows+=p.read(actions+bid*4,4)
             descriptor=p.word(table+bid*8);header=bytearray(p.read(descriptor,32))
