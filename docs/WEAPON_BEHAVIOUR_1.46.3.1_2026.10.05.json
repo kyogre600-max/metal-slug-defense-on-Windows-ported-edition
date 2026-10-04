@@ -1,0 +1,322 @@
+{
+  "status": "passed",
+  "version": "1.46.3.1",
+  "before_core": "303c315f40451c50b9686a49535459c5eca152d7b0c01ae62936385c4cfbf3c8",
+  "core_sha256": "2574adc112b59355f1f43161ba8060318e073df3b05795f87914929e7c0eff7e",
+  "units": [
+    {
+      "id": 16,
+      "name": "马可",
+      "defect_reproduced": true,
+      "old_damage": 588,
+      "current_damage": 336,
+      "action": "0x109606c4",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 17,
+      "name": "塔玛",
+      "defect_reproduced": true,
+      "old_damage": 588,
+      "current_damage": 2100,
+      "action": "bulletAction_Tarma",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 18,
+      "name": "英里",
+      "defect_reproduced": true,
+      "old_damage": 588,
+      "current_damage": 134,
+      "action": "bulletAction_Eri",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 19,
+      "name": "菲欧",
+      "defect_reproduced": true,
+      "old_damage": 588,
+      "current_damage": 1344,
+      "action": "bulletAction_Fio",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 96,
+      "name": "胖马可",
+      "defect_reproduced": true,
+      "old_damage": 672,
+      "current_damage": 378,
+      "action": "bulletAction_FatMarco",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 97,
+      "name": "胖塔玛",
+      "defect_reproduced": true,
+      "old_damage": 672,
+      "current_damage": 2940,
+      "action": "bulletAction_FatTarma",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 98,
+      "name": "胖英里",
+      "defect_reproduced": false,
+      "old_damage": 67,
+      "current_damage": 67,
+      "action": "bulletAction_FatEri",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 99,
+      "name": "胖菲欧",
+      "defect_reproduced": true,
+      "old_damage": 630,
+      "current_damage": 1680,
+      "action": "bulletAction_FatFio",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 344,
+      "name": "圣诞英里",
+      "defect_reproduced": true,
+      "old_damage": 1176,
+      "current_damage": 252,
+      "action": "bulletAction_XmasEri",
+      "native_special_parameters_matched": true
+    },
+    {
+      "id": 362,
+      "name": "圣诞菲欧",
+      "defect_reproduced": true,
+      "old_damage": 1176,
+      "current_damage": 4200,
+      "action": "bulletAction_XmasFio",
+      "native_special_parameters_matched": true
+    }
+  ],
+  "unchanged_parameter_rows": 1239,
+  "weapon_sequences": 240,
+  "native_collision_layouts": 180,
+  "full_host_shotgun_layouts": 36,
+  "levels": [
+    1,
+    20,
+    40
+  ],
+  "teams": [
+    0,
+    1
+  ],
+  "initial_attacks_and_manual_specials_preserved": true,
+  "special_counter_preserved_in_retained_attacks": true,
+  "base_test": "Two non-invulnerable enemies before a base receive native spread damage; bases receive the same native special damage.",
+  "limitations": [
+    "Bounded native combat fixtures; full campaign and long-term operation were not tested.",
+    "High-HP base fixtures involve native floating-point rounding; comparisons use matching native special results."
+  ],
+  "installed_runtime_checks": {
+    "installed_weapons_formal.json": {
+      "status": "passed",
+      "target": "F:\\egg\\github\\metal-slug-defense-on-Windows-ported-edition",
+      "host": "F:\\egg\\github\\metal-slug-defense-on-Windows-ported-edition\\event_trial_launcher.py",
+      "core": {
+        "library": "MSD_Core.dll",
+        "sha256": "2574adc112b59355f1f43161ba8060318e073df3b05795f87914929e7c0eff7e"
+      },
+      "profiles": [
+        {
+          "preset": "initial",
+          "frames": 215,
+          "error": null,
+          "save_committed": true,
+          "save_root": "F:\\egg\\research\\metal_slug_defense\\content_work\\formal_tarma_shotgun_fix_20261005\\installed_weapons_formal_1791135837526930300\\private_initial",
+          "owned_original_units": 2,
+          "owned_community_units": 0,
+          "world_counts": [
+            50,
+            50
+          ],
+          "hidden_world_interface": true,
+          "network_default_disconnected": true,
+          "restart_frames": 215
+        },
+        {
+          "preset": "max",
+          "frames": 215,
+          "error": null,
+          "save_committed": true,
+          "save_root": "F:\\egg\\research\\metal_slug_defense\\content_work\\formal_tarma_shotgun_fix_20261005\\installed_weapons_formal_1791135837526930300\\private_max",
+          "owned_original_units": 400,
+          "owned_community_units": 13,
+          "world_counts": [
+            50,
+            50
+          ],
+          "hidden_world_interface": true,
+          "network_default_disconnected": true,
+          "restart_frames": 215
+        }
+      ]
+    },
+    "installed_weapons_local.json": {
+      "status": "passed",
+      "target": "F:\\egg\\research\\metal_slug_defense\\windows_native\\dist\\MSD_Windows",
+      "host": "F:\\egg\\research\\metal_slug_defense\\windows_native\\dist\\MSD_Windows\\event_trial_launcher.py",
+      "core": {
+        "library": "MSD_Core_Release_1_46_3_1_Weapons_r4_20261005.dll",
+        "sha256": "2574adc112b59355f1f43161ba8060318e073df3b05795f87914929e7c0eff7e"
+      },
+      "profiles": [
+        {
+          "preset": "initial",
+          "frames": 215,
+          "error": null,
+          "save_committed": true,
+          "save_root": "F:\\egg\\research\\metal_slug_defense\\content_work\\formal_tarma_shotgun_fix_20261005\\installed_weapons_local_1791135838054048400\\private_initial",
+          "owned_original_units": 2,
+          "owned_community_units": 0,
+          "world_counts": [
+            50,
+            50
+          ],
+          "hidden_world_interface": true,
+          "network_default_disconnected": true,
+          "restart_frames": 215
+        },
+        {
+          "preset": "max",
+          "frames": 215,
+          "error": null,
+          "save_committed": true,
+          "save_root": "F:\\egg\\research\\metal_slug_defense\\content_work\\formal_tarma_shotgun_fix_20261005\\installed_weapons_local_1791135838054048400\\private_max",
+          "owned_original_units": 400,
+          "owned_community_units": 13,
+          "world_counts": [
+            50,
+            50
+          ],
+          "hidden_world_interface": true,
+          "network_default_disconnected": true,
+          "restart_frames": 215
+        }
+      ]
+    },
+    "max_entry_verification.json": {
+      "status": "passed",
+      "target": "F:\\egg\\research\\metal_slug_defense\\windows_native\\dist\\MSD_Windows",
+      "launcher": "max_level_launcher.py",
+      "version": "1.46.3.1",
+      "frames": 215,
+      "core": {
+        "library": "MSD_Core_Release_1_46_3_1_Weapons_r4_20261005.dll",
+        "sha256": "2574adc112b59355f1f43161ba8060318e073df3b05795f87914929e7c0eff7e"
+      },
+      "save_root": "F:\\egg\\research\\metal_slug_defense\\content_work\\formal_tarma_shotgun_fix_20261005\\max_entry_1791135871483915300\\play_save_max_level",
+      "personal_save_used": false
+    }
+  },
+  "personal_save_files_checked": 75,
+  "personal_save_changes": [],
+  "beta_files_checked": 2009,
+  "beta_changes": [],
+  "movement_art": {
+    "scope": "original four protagonists; extraction only",
+    "rectangles": 791,
+    "animations": 124,
+    "supplementary_named_atlases": 8,
+    "finding": "No complete advance animation holding the special weapon was identified for the four ordinary protagonists.",
+    "walking_scripts": [
+      1,
+      7
+    ],
+    "special_weapon_attack_script": 10,
+    "units": {
+      "16": {
+        "name": "Marco",
+        "images": [
+          "marco_out.obm"
+        ],
+        "rectangles": 107,
+        "animations": 27,
+        "source_sha256": {
+          "marco_out.obm": "6668763afe125cd660ab72af6eeef0e876b09b5f6bafa9a4c486b7d7a221a4f1"
+        }
+      },
+      "17": {
+        "name": "Tarma",
+        "images": [
+          "tarma_out.obm"
+        ],
+        "rectangles": 123,
+        "animations": 26,
+        "source_sha256": {
+          "tarma_out.obm": "e7e2c8468064f00bc61af8fe8182a1a7dbef8d797e8836bfae07c439ff513ec4"
+        }
+      },
+      "18": {
+        "name": "Eri",
+        "images": [
+          "eri_out.obm",
+          "0C1_1_out.obm",
+          "0C3_2_out.obm"
+        ],
+        "rectangles": 253,
+        "animations": 33,
+        "source_sha256": {
+          "eri_out.obm": "1c8f66e252330ff181f02200512fc9e1b9d881b8305f5a3e39272ab356819213",
+          "0C1_1_out.obm": "692514d0246350e271540326e73bfc6e64e3c47bf496254b7428c85796867209",
+          "0C3_2_out.obm": "69bfe03d19b54f1016836c9b422ecc8326c481c9edc497b5f2f3c9320c148bca"
+        }
+      },
+      "19": {
+        "name": "Fio",
+        "images": [
+          "fio_out.obm",
+          "fio_eff.obm",
+          "0C1_2_2_out.obm",
+          "0C4_3_out.obm"
+        ],
+        "rectangles": 308,
+        "animations": 38,
+        "source_sha256": {
+          "fio_out.obm": "27c46b109a440ff8f5be4e284510bb8e477cc2b4d7b5015c2f728a0ecd5abf0a",
+          "fio_eff.obm": "82f9974166137cdff8af274191ab7166997029ffaa0f0c38c3487da4a1503565",
+          "0C1_2_2_out.obm": "692514d0246350e271540326e73bfc6e64e3c47bf496254b7428c85796867209",
+          "0C4_3_out.obm": "e2886cd3f590a616ac7cafb74c1809ca0399426f210ea4d7fcac5bc9ee317b92"
+        }
+      }
+    }
+  },
+  "deployment": {
+    "status": "deployed",
+    "source": "F:\\egg\\github\\metal-slug-defense-on-Windows-ported-edition",
+    "target": "F:\\egg\\research\\metal_slug_defense\\windows_native\\dist\\MSD_Windows",
+    "core_sha256": "2574adc112b59355f1f43161ba8060318e073df3b05795f87914929e7c0eff7e",
+    "files": [
+      "README.md",
+      "docs/WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.md",
+      "docs/weapon_art_1_46_3_1/movement_comparison.png",
+      "docs/VALIDATION_1.46.3.1_2026.10.05.md",
+      "docs/VALIDATION_1.46.3.1_2026.10.05.json",
+      "build/MSD_Core_Release_1_46_3_1_Weapons_r4_20261005.dll",
+      "core_runtime.json",
+      "docs/WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.json"
+    ],
+    "source_changes": [
+      "src/aot_runtime.cpp",
+      "src/generated/blocks_016.cpp",
+      "src/core_runtime.json",
+      "build/MSD_Core.dll",
+      "core_runtime.json"
+    ]
+  },
+  "git": {
+    "head": "c8fd9a14e0a56ce3881a5cc373e82cf20bf45903",
+    "head_at_deployment": "be004168d64687c1db03061da97a07231986e51d",
+    "agent_committed": false,
+    "agent_pushed": false,
+    "remote_checked": false,
+    "publishing": "User operates GitHub Desktop."
+  }
+}
