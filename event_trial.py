@@ -110,13 +110,18 @@ class EventTrial:
         if self.active_battle:raise RuntimeError('Cannot switch Event during battle')
         self.native_map.disable()
         self.native_selector.disable()
-        p.put(HEADER+8,0);self.native_shop_active=False
+        for offset in (8,12,16,20,24,28,44):p.put(HEADER+offset,0)
+        self.native_shop_active=False
         for i,raw in enumerate(self.original_groups):p.write(self.groups+i*8,raw)
         p.write(self.db+0x20,self.original_survival)
         if self.original_currency is None:
             self.original_currency=self.progress.setdefault('baseline_survival_currency',p.call('_ZN7AppMain24GetSurvivalPointSaveDataEv',self.app))
             self.dirty=True;self.flush()
         self.selected=key;d=self.data[key];t=self.tables[key]
+        shop=self.shop_tables.get(key)
+        if shop:
+            for offset,name in ((12,'catalog'),(16,'count'),(20,'records'),(24,'count')):p.put(HEADER+offset,shop[name])
+        p.put(HEADER+36,self.app)
         group=d['stages'][0]['group']
         p.write(self.groups+group*8,struct.pack('<II',t['missions'],t['count']))
         if 'ex' in t:p.write(self.db+0x20,struct.pack('<4I',t['ex'],t['ex_count'],t['drops'],t['drop_count']))
@@ -311,30 +316,32 @@ class EventTrial:
             return
         self.overlay=page;self.page=0;self.last_message='';self.revision+=1;self.image=None
     def open_native_shop(self,immediate=False):
+        if not self.has_shop():return False
         if not immediate:return self.transition(lambda:self.open_native_shop(True))
         p=self.p;app=self.app;self.overlay=None;self.native_shop_active=True
         self.shop_map_return=self.native_map.active
         t=self.shop_tables.get(self.selected)
-        if t:
-            for i,r in enumerate(self.shop_rows()):p.put(t['records']+i*64+16,self.state()['purchase_counts'].get(str(r['id']),0))
-            p.put(HEADER+12,t['catalog']);p.put(HEADER+16,t['count']);p.put(HEADER+20,t['records']);p.put(HEADER+24,t['count'])
-            p.put(HEADER+36,app);p.put(HEADER+8,1)
-            mode=6
-            p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',app,self.state()['currency'])
-        else:
-            p.put(HEADER+8,2);p.put(HEADER+36,app);mode=2
+        for i,r in enumerate(self.shop_rows()):p.put(t['records']+i*64+16,self.state()['purchase_counts'].get(str(r['id']),0))
+        p.put(HEADER+12,t['catalog']);p.put(HEADER+16,t['count']);p.put(HEADER+20,t['records']);p.put(HEADER+24,t['count'])
+        p.put(HEADER+28,0);p.put(HEADER+44,0);p.put(HEADER+36,app);p.put(HEADER+8,1)
+        mode=6
+        p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',app,self.state()['currency'])
         p.call('_ZN7AppMain12SceneEndFuncEi',app,p.word(app+0x22bc))
         p.put(app+0xb890,mode)
         p.call('_ZN7AppMain15SC_MenuShopInitEv',app)
-        p.log('HISTORICAL_NATIVE_SHOP',self.selected,mode,t['count'] if t else 'unit catalog')
+        p.log('HISTORICAL_NATIVE_SHOP',self.selected,mode,t['count'])
+        return True
     def close_native_shop(self,immediate=False):
         if not immediate:return self.transition(lambda:self.close_native_shop(True))
-        p=self.p;p.put(HEADER+8,0);self.native_shop_active=False
+        p=self.p
+        for offset in (8,28,44):p.put(HEADER+offset,0)
+        self.native_shop_active=False
         p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
         if getattr(self,'shop_map_return',False):
             p.call('_ZN7AppMain11ChangeExeSTEi',self.app,32)
         else:p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
     def native_shop_purchase(self,sid):
+        if not self.has_shop() or not self.native_shop_active:return False
         p=self.p;row=next((r for r in self.shop_rows() if r['id']==sid),None)
         if row is None:raise ValueError('Purchase outside the selected Event catalog')
         if row['type']==2 and p.call('_ZN7AppMain20GetUnitLevelSaveDataE6UnitID',self.app,row['unit_id'])!=0xffffffff:
@@ -441,6 +448,9 @@ class EventTrial:
             elif self.overlay=='events':self.leave()
             else:self.overlay=None;self.revision+=1
     def shop_rows(self):return self.data[self.selected].get('shop',{}).get('rows',[])
+    def has_shop(self):
+        table=self.shop_tables.get(self.selected)
+        return bool(table and table['count'] and table['catalog'] and table['records'])
     def buy(self,index):
         p=self.p;row=self.shop_rows()[index];state=self.state()
         if row['type']==2 and p.call('_ZN7AppMain20GetUnitLevelSaveDataE6UnitID',self.app,row['unit_id'])!=0xffffffff:
@@ -473,7 +483,7 @@ class EventTrial:
                 draw.text((16,12),title,font=self.fonts[22],fill='#f1e4b3')
                 state=self.state();wins=sum(v.get('wins',0)>0 for v in state['stages'].values())
                 draw.text((16,57),f"已通关 {wins} / {len(self.data[self.selected]['stages'])}",font=self.fonts[22],fill='white')
-                draw.text((16,96),f"活动货币：{state['currency']}" if self.data[self.selected]['currency'] else '历史活动 · 满级存档测试',font=self.fonts[22],fill='#bce9e5')
+                draw.text((16,96),f"活动货币：{state['currency']}" if self.data[self.selected]['currency'] else '历史活动 · 单人关卡',font=self.fonts[22],fill='#bce9e5')
                 draw.rectangle((410,120,566,166),fill='#353c32',outline='#b1b7a4',width=2)
                 draw.text((421,133),'EVENT SELECT',font=self.fonts[18],fill='white')
                 self.rect=(560,125,580,180)
@@ -527,7 +537,7 @@ class EventTrial:
                     draw.text((90,230),f"已通关 {wins} / {len(self.data[self.selected]['stages'])}",font=self.fonts[34],fill='white')
                     draw.text((90,310),'捕虏、零件及限时任务奖励正在适配。',font=self.fonts[26],fill='#e2c677')
                 elif page=='cooperation':
-                    draw.text((90,230),'当前测试版可进行全部已登记活动的单人战斗。',font=self.fonts[26],fill='white')
+                    draw.text((90,230),'当前版本支持全部已登记活动的单人战斗。',font=self.fonts[26],fill='white')
                     draw.text((90,305),'原版在线合作服务尚未恢复。',font=self.fonts[26],fill='#e2c677')
                 button((45,625,210,62),'BACK',('close',))
                 if self.last_message:draw.text((640,605),self.last_message,font=self.fonts[22],fill='#ffd385',anchor='mm')

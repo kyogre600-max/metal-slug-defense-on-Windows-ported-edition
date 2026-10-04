@@ -34,6 +34,8 @@ class Player:
         self.minimized=False
         self.capture_requested=False
         self.saved=False
+        self.status_write_failures=0
+        self.status_write_error=None
         self.guest_root=ROOT/('ui_test_guest' if self_test else 'play_save')
         self.status_file=ROOT/('ui_test_status.json' if self_test else 'player_status.json')
         self.log_name='ui_test.log' if self_test else 'player.log'
@@ -161,6 +163,8 @@ class Player:
         if action==glfw.PRESS and key==glfw.KEY_F9:self.mute_requested=True
         if action==glfw.PRESS and key==glfw.KEY_F6 and self.ready:
             self.events.put(('content_menu','worlds'))
+        if key==glfw.KEY_ESCAPE and self.ready and not mods&(glfw.MOD_SHIFT|glfw.MOD_CONTROL|glfw.MOD_ALT|glfw.MOD_SUPER):
+            self.events.put(('back',))
 
     def game_thread(self):
         p=None;pacer=None
@@ -199,6 +203,9 @@ class Player:
                             self.last_unit_result=p.battle_key_action(event[1])
                         elif event[0]=='content_menu':
                             if event[1]=='worlds' and hasattr(p,'campaign'):p.campaign.open()
+                        elif event[0]=='back':
+                            p.log('WINDOW_BACK_REQUEST',p.frame)
+                            p.back()
                         else:
                             p.touch_event(*event)
                             p.log('WINDOW_TOUCH',*event)
@@ -256,11 +263,22 @@ class Player:
         data['game_viewport']=fit_rect(*self.framebuffer_size)
         data['last_key_event']=self.last_key_event
         data['last_unit_result']=self.last_unit_result
+        data['status_write_failures']=self.status_write_failures
+        data['status_write_error']=self.status_write_error
         if self.probe and hasattr(self.probe.uc,'library_path'):
             data['native_core']=str(self.probe.uc.library_path)
-        tmp=self.status_file.with_suffix('.tmp')
-        tmp.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
-        os.replace(tmp,self.status_file)
+        tmp=self.status_file.with_name(self.status_file.name+f'.{os.getpid()}.tmp')
+        try:
+            tmp.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+            os.replace(tmp,self.status_file)
+        except OSError as error:
+            # 状态报告属于诊断输出；文件锁冲突保留已有报告，由下一周期再次写入。
+            self.status_write_failures+=1
+            self.status_write_error=str(error)
+            try:tmp.unlink(missing_ok=True)
+            except OSError:pass
+            return False
+        return True
 
     def run(self):
         if not self.acquire_instance():return 0
@@ -317,6 +335,12 @@ class Player:
                 ctypes.windll.user32.MessageBoxW(None,'游戏运行已停止。已提交的存档仍保留。\n\n错误记录：'+str(ROOT/'player_error.log'),TITLE,0x10)
             return 1 if self.error else 0
         finally:
+            # 所有退出路径均等待渲染线程结束，再释放其使用的窗口与图形上下文。
+            self.stop.set()
+            if self.worker and self.worker.is_alive():
+                if self.window:glfw.hide_window(self.window)
+                while self.worker.is_alive():
+                    glfw.poll_events();self.worker.join(0.05)
             if self.window:glfw.destroy_window(self.window)
             glfw.terminate()
             if self.mutex:

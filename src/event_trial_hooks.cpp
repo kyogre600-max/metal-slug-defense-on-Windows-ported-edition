@@ -12,8 +12,20 @@ static void no_event_continuation(Context& c){
     if(active(c))c.r[1]=0u;
     original_continue(c);
 }
+static bool event_shop(Context& c){
+    if(!active(c)||rd<uint32_t>(c,H+8)!=1u||!rd<uint32_t>(c,H+16)||!rd<uint32_t>(c,H+24))return false;
+    uint32_t app=rd<uint32_t>(c,H+36);
+    return app&&rd<uint32_t>(c,app+0xb890)==6u;
+}
+static bool hidden_shop(Context& c){
+    if(!active(c)||rd<uint32_t>(c,H+16))return false;
+    uint32_t app=rd<uint32_t>(c,H+36);
+    if(!app)return false;
+    uint32_t scene=rd<uint32_t>(c,app+0x22bc);
+    return scene==67u||(scene==34u&&rd<uint32_t>(c,H+80));
+}
 static uint32_t shop_record(Context& c,uint32_t sid){
-    if(!active(c)||rd<uint32_t>(c,H+8)!=1u)return 0;
+    if(!event_shop(c))return 0;
     uint32_t base=rd<uint32_t>(c,H+20),count=rd<uint32_t>(c,H+24);
     for(uint32_t i=0;i<count;i++)if(rd<uint32_t>(c,base+i*64)==sid)return base+i*64;
     return 0;
@@ -34,8 +46,8 @@ SHOP_HOOK(main_menu_reset,0x10204051u,{
 })
 SHOP_HOOK(shop_data,0x101655c9u,uint32_t row=shop_record(c,c.r[0]);if(row){ret(c,rd<uint32_t>(c,row+4));return;})
 SHOP_HOOK(shop_coin_price,0x10165977u,uint32_t row=shop_record(c,c.r[0]);if(row){ret(c,rd<uint32_t>(c,row+8));return;})
-SHOP_HOOK(shop_standard_price,0x101656c5u,if(active(c)&&rd<uint32_t>(c,H+8)){ret(c,1u);return;})
-SHOP_HOOK(shop_discount,0x1016596bu,if(active(c)&&rd<uint32_t>(c,H+8)){ret(c,0u);return;})
+SHOP_HOOK(shop_standard_price,0x101656c5u,uint32_t row=shop_record(c,c.r[0]);if(row){ret(c,rd<uint32_t>(c,row+8));return;})
+SHOP_HOOK(shop_discount,0x1016596bu,if(shop_record(c,c.r[0])){ret(c,0u);return;})
 SHOP_HOOK(shop_maximum,0x10165709u,uint32_t row=shop_record(c,c.r[0]);if(row){ret(c,rd<uint32_t>(c,row+12));return;})
 SHOP_HOOK(shop_stock,0x10165749u,uint32_t row=shop_record(c,c.r[0]);if(row&&rd<uint32_t>(c,row+20)==3){ret(c,rd<uint32_t>(c,row+16));return;})
 // Medal packs listed in an Event catalog have an Event-local one-time stock.
@@ -49,10 +61,12 @@ SHOP_HOOK(shop_catalog_count,0x1020c095u,if(active(c)&&rd<uint32_t>(c,H+8)==1u){
     c.r[2]=0x22;c.r[3]=rd<uint32_t>(c,c.r[6]+0x24);wr<uint32_t>(c,c.r[3]+0x50,c.r[2]);
     c.pc=0x1020c0cdu;return;
 })
-SHOP_HOOK(shop_buy_request,0x1020b475u,if(active(c)&&rd<uint32_t>(c,H+8)==1u&&!rd<uint32_t>(c,H+44)){
+SHOP_HOOK(shop_buy_request,0x1020b475u,if(event_shop(c)&&!rd<uint32_t>(c,H+44)){
     uint32_t app=rd<uint32_t>(c,H+36);uint32_t index=rd<uint32_t>(c,app+0xb894);
     uint32_t panel=rd<uint32_t>(c,app+0x3380+index*4);
-    wr<uint32_t>(c,H+28,rd<uint32_t>(c,panel+0x224)+1);ret(c,0);return;
+    uint32_t sid=rd<uint32_t>(c,panel+0x224);
+    if(shop_record(c,sid))wr<uint32_t>(c,H+28,sid+1);
+    ret(c,0);return;
 })
 SHOP_HOOK(shop_medal_counter,0x10167ac5u,if(active(c)&&rd<uint32_t>(c,H+8)&&rd<uint32_t>(c,H+44)){
     uint32_t row=shop_record(c,rd<uint32_t>(c,H+44)-1);
@@ -222,8 +236,22 @@ SHOP_HOOK(map_prisoner_init,0x102130e1u,if(event_map(c)){
 })
 // The POW cockpit button uses picture 117. Disable its native input callback
 // and drawing when the selected Event world has no POW rewards.
-SHOP_HOOK(map_prisoner_button_input,0x101ff4e9u,if(event_map(c)&&!rd<uint32_t>(c,H+176)&&rd<uint32_t>(c,c.r[0]+0x50)==117u){ret(c,0u);return;})
-SHOP_HOOK(map_prisoner_button_draw,0x102003bdu,if(event_map(c)&&!rd<uint32_t>(c,H+176)&&rd<uint32_t>(c,c.r[0]+0x50)==117u){ret(c,0u);return;})
+// 无商店活动的 SHOP 图标 33 与基地面板 4 同时停用绘制及输入。
+SHOP_HOOK(map_prisoner_button_input,0x101ff4e9u,{
+    uint32_t task=c.r[0];uint32_t id=rd<uint32_t>(c,task+0x50);
+    if(id==33u&&hidden_shop(c)){wr<uint32_t>(c,task+0x7c,rd<uint32_t>(c,task+0x7c)|0xa0u);ret(c,0u);return;}
+    if(event_map(c)&&!rd<uint32_t>(c,H+176)&&id==117u){ret(c,0u);return;}
+})
+SHOP_HOOK(map_prisoner_button_draw,0x102003bdu,{
+    uint32_t id=rd<uint32_t>(c,c.r[0]+0x50);
+    if((id==33u&&hidden_shop(c))||(event_map(c)&&!rd<uint32_t>(c,H+176)&&id==117u)){ret(c,0u);return;}
+})
+SHOP_HOOK(base_shop_panel,0x1021d63du,{
+    uint32_t task=c.r[0];
+    if(hidden_shop(c)&&rd<uint32_t>(c,task+0x50)==4u){
+        wr<uint32_t>(c,task+0x7c,rd<uint32_t>(c,task+0x7c)|0xa0u);ret(c,0u);return;
+    }
+})
 SHOP_HOOK(map_stage_new,0x10167ff1u,if(event_map(c)){ret(c,0);return;})
 SHOP_HOOK(map_stage_new_delete,0x1016807du,if(event_map(c)){ret(c,0);return;})
 SHOP_HOOK(map_area_new,0x10168659u,if(event_map(c)){ret(c,0);return;})
@@ -271,6 +299,7 @@ extern "C" __declspec(dllexport) void msd_enable_historical_event_hooks(){
     INSTALL(map_prisoner_init,0x102130e1u);
     INSTALL(map_prisoner_button_input,0x101ff4e9u);
     INSTALL(map_prisoner_button_draw,0x102003bdu);
+    INSTALL(base_shop_panel,0x1021d63du);
     INSTALL(map_world_init,0x10215009u);INSTALL(map_bgm,0x101663c1u);
     INSTALL(map_background,0x102146cdu);
     INSTALL(cat_world_draw,0x10213b35u);

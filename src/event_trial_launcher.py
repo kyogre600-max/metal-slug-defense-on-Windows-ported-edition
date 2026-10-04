@@ -29,6 +29,8 @@ class TrialProbe(OriginalProbe):
         community=self.saves/'community_progress.json'
         if not community.exists():shutil.copyfile(seed,community)
         super().initialize()
+        from world_level_rules import WorldLevelRules
+        self.world_level_rules=WorldLevelRules(self)
         self.event_trial=EventTrial(self,ROOT)
         from community_campaign import CommunityCampaign
         self.campaign=CommunityCampaign(self,self.event_trial)
@@ -36,10 +38,32 @@ class TrialProbe(OriginalProbe):
         import hashlib
         self.online=OnlineClient(fingerprint(self.community.manifest,self.community.campaign_catalog,
                                             hashlib.sha256(self.uc.library_path.read_bytes()).hexdigest()))
+        from audio_options import AudioOptions
+        self.audio_options=AudioOptions(self)
     def step_frame(self):
         super().step_frame()
         self.event_trial.update()
         self.campaign.update()
+        self.audio_options.update()
+    def back(self):
+        trial=self.event_trial;app=self.app_instance();scene=self.word(app+0x22bc)
+        if trial.transition_action is not None:return False
+        campaign=self.campaign
+        if campaign.opened:
+            if campaign.area is not None:campaign.area=None
+            elif campaign.world is not None:campaign.world=None
+            else:
+                campaign.opened=False
+                if campaign.active:
+                    campaign.clear_music();trial.leave(True);campaign.active=False;campaign.clear_runtime()
+            campaign.page=0
+            return True
+        if trial.overlay:trial.command('close');return True
+        if trial.native_selector.active:trial.native_selector.back();return True
+        if trial.native_map.active and not trial.active_battle and scene==34 and self.word(app+0x22dc) in (4,7,9):
+            trial.native_map.back();return True
+        if trial.native_shop_active and scene==39:trial.close_native_shop();return True
+        return super().back()
     def touch_event(self,action,x,y):
         if self.campaign.touch(action,x,y):return
         if self.event_trial.touch(action,x,y):return

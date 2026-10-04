@@ -2369,6 +2369,7 @@ static void b_1017e7c8(Context& c){
 {uint32_t a=(c.r[13]+0u+8u);wr<uint32_t>(c,a+0u,c.r[5]);}
 {uint32_t v=0u;nz(c,v);c.r[5]=v;}
 {uint32_t a=(c.r[13]+0u+12u);wr<uint32_t>(c,a+0u,c.r[5]);}
+{extern void msd_retained_fat_eri_laser(Context&);msd_retained_fat_eri_laser(c);}
 {c.r[14]=270002145u;c.pc=(269999214u|1u);return;}
 c.pc=270002145u;}
 static void b_1017e7e0(Context& c){

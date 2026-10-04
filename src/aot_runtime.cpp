@@ -49,6 +49,17 @@ void msd_retained_weapon_frame(Context& c){
     if(id==96u&&c.r[3]==0u)c.r[3]=198u;
     if(id==98u&&(c.r[3]==0u||c.r[3]==2u||c.r[3]==4u||c.r[3]==6u))c.r[3]=256u;
 }
+void msd_retained_fat_eri_laser(Context& c){
+    // 胖子英里保留的大激光使用原生激光参数组，涵盖伤害、间隔、射程和速度。
+    // 参数组仅作用于本次弹体生成；单位攻击状态、冷却及绝招计数保持原值。
+    uint32_t unit=c.r[4];
+    if(unit<0x12000000u||unit>=0x1e000000u||
+       rd<uint32_t>(c,unit)!=0x1092f710u||
+       rd<uint32_t>(c,unit+0x128u)!=98u||
+       rd<uint32_t>(c,unit+0x88u)!=40u||
+       !rd<uint32_t>(c,unit+0x324u))return;
+    wr<uint32_t>(c,c.r[13]+12u,50u);
+}
 // Recovered CLZSS::Decode algorithm, verified against the original function.
 // Keeping the dictionary loop in C++ avoids a block dispatch for every byte.
 static void native_lzss(Context& c){

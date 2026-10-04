@@ -924,6 +924,13 @@ class Probe:
         for action in (1,3):
             self.touch_event(action,x,y);self.frames(2)
 
+    def back(self):
+        """将返回请求提交至原生按键触发入口，由当前场景处理。"""
+        app=self.app_instance()
+        if not app:return False
+        self.call('_ZN7AppMain13SetKeyTriggerEi',app,0x1000)
+        return True
+
     def touch_event(self,action,x,y):
         # GLFW supplies positions on the full logical render surface. Native
         # TouchEvent subtracts its screen margin in reference-game units.
