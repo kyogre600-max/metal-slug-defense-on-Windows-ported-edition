@@ -20,6 +20,7 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 - Corrected Fat Eri's retained large laser to use native stationary laser parameters and bounded damage, preserving the large visual effect.
 - Events without a registered shop now hide SHOP in the base and map. Registered Event shops retain their catalog and exchange flow; ordinary unit shops retain native prices.
 - Improved status-report file-lock handling and rendering-thread cleanup on exit.
+- Added an optional all-units Lv1 profile with independent progress. All 399 original units and six registered community units are owned at Lv1; all nine native faction/base upgrades start at Lv1. Map progress follows the initial save and requires normal progression.
 - Release verification and its scope are recorded in [VALIDATION_1.46.2_2026.10.04.md](docs/VALIDATION_1.46.2_2026.10.04.md).
 
 ### Update 1.46.1
@@ -60,7 +61,15 @@ Open the [project page](https://github.com/sprievs7up/metal-slug-defense-on-Wind
 
 The package starts with an initial save. Units can be purchased with medals, and the original daily and event reward paths are preserved. Save files are created in `play_save/`; existing personal progress is excluded from the distributed package. Full campaign coverage and long-term stability remain under evaluation.
 
-To update an existing installation, close the game, back up `play_save/`, extract the new package into a separate folder, and copy the complete `play_save/` folder into it. The existing save format remains compatible; the initial seed is used only when no save exists.
+To update an existing installation, close the game, back up all existing `play_save*/` folders, extract the new package into a separate folder, and copy those complete save folders into it. The existing save format remains compatible; initial seeds are used only when the corresponding save does not exist.
+
+### Optional all-units Lv1 save
+
+Run **Start_MSD_All_Units_Level1.vbs** from the extracted game folder. This entry uses the same formal game core and creates an independent save in `play_save_all_units_level1/` on first launch. The normal EXE continues to use `play_save/`; an existing local maximum-level launcher retains its separate save.
+
+The preset owns all 399 original units and the six currently registered community units at **Lv1**. All nine upgrades under the native army/base customization menu also start at **Lv1**. Maps retain initial progress, no stages are cleared and no prisoners are collected; later stages and worlds require progression. Currency, items and the initial deck follow the formal initial save. World progression and faction-core level limits remain active.
+
+Subsequent launches preserve upgrades, map progress and settings. To use this profile in a new installation, copy its entire `play_save_all_units_level1/` folder. The preset files under `game_data/all_units_level1/` are distributed independently of personal saves.
 
 ### Content authoring and networking interfaces
 
@@ -88,6 +97,7 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 - 修复胖子英里强化普攻的大激光参数，恢复原生静止激光与受限伤害行为，保留大激光显示。
 - 未登记商店的 Event 隐藏基地与地图 SHOP；已登记商店保留目录与兑换流程，普通单位商店保留原生价格。
 - 修订状态报告文件锁异常处理及退出时的渲染线程释放顺序。
+- 增加“全兵种 Lv1”可替代存档：399 个原版兵种与 6 个已登记社区兵种初始均已拥有，等级均为 Lv1；“我方阵营”的 9 项强化均为 Lv1。地图保持初始进度，后续关卡按游戏规则自行解锁。
 - 发行核验与适用范围见 [VALIDATION_1.46.2_2026.10.04.md](docs/VALIDATION_1.46.2_2026.10.04.md)。
 
 ### 1.46.1 更新
@@ -128,7 +138,15 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 
 分发包采用初始存档，玩家可以使用勋章购买单位；原版每日奖励、活动奖励及对应解锁流程均保留。个人进度保存在 `play_save/`，分发包不包含已有个人进度。全关卡覆盖与长期运行稳定性仍需持续验证。
 
-更新已有安装时，请先关闭游戏并备份 `play_save/`，将新运行包解压至独立目录，再将完整的 `play_save/` 文件夹复制至该目录。现有存档格式保持兼容；初始种子仅在存档不存在时使用。
+更新已有安装时，请先关闭游戏并备份所有已有的 `play_save*/` 存档目录，将新运行包解压至独立目录，再将这些完整存档目录复制至该目录。现有存档格式保持兼容；初始种子仅在对应存档不存在时使用。
+
+### 全兵种 Lv1 可替代存档
+
+在解压后的游戏目录中启动 **Start_MSD_All_Units_Level1.vbs**。该入口使用同一正式版核心，首次启动时在 `play_save_all_units_level1/` 创建独立存档。普通 EXE 继续使用 `play_save/`；本地既有满级入口继续使用其独立存档。
+
+该预设包含全部 **399 个原版兵种及当前登记的 6 个社区兵种**，均已拥有且初始为 **Lv1**。“我方阵营”的 **9 项强化均为 Lv1**。地图采用初始进度，关卡均未通关、捕虏均未收集，后续关卡及世界按游戏规则逐步解锁。货币、道具及初始编队沿用正式版初始存档。世界进度与军队核等级上限继续生效。
+
+再次启动时保留已经完成的升级、地图进度及设置。迁移至新安装目录时，复制完整的 `play_save_all_units_level1/`。预设文件位于 `game_data/all_units_level1/`，发行文件与个人进度分别保存。
 
 ### 内容制作与联机预备接口
 

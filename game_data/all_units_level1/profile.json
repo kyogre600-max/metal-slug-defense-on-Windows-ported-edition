@@ -1,0 +1,175 @@
+{
+  "status": "verified_locally",
+  "version": "1.46.2",
+  "original_units": 399,
+  "community_units": 6,
+  "display_level": 1,
+  "customize_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "customize_display_level": 1,
+  "map_stage_records": 464,
+  "enabled_stages": [
+    {
+      "world_type": 0,
+      "world": 0,
+      "area": 0,
+      "stage": 0,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 1,
+      "world": 0,
+      "area": 0,
+      "stage": 0,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 1,
+      "world": 0,
+      "area": 0,
+      "stage": 1,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 1,
+      "world": 0,
+      "area": 0,
+      "stage": 2,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 1,
+      "world": 0,
+      "area": 0,
+      "stage": 3,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 2,
+      "world": 0,
+      "area": 0,
+      "stage": 0,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 3,
+      "world": 0,
+      "area": 0,
+      "stage": 0,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 3,
+      "world": 0,
+      "area": 0,
+      "stage": 1,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 3,
+      "world": 0,
+      "area": 0,
+      "stage": 2,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 3,
+      "world": 0,
+      "area": 0,
+      "stage": 3,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 4,
+      "world": 0,
+      "area": 0,
+      "stage": 0,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 4,
+      "world": 0,
+      "area": 0,
+      "stage": 1,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 4,
+      "world": 0,
+      "area": 0,
+      "stage": 2,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    },
+    {
+      "world_type": 4,
+      "world": 0,
+      "area": 0,
+      "stage": 3,
+      "enabled": true,
+      "cleared": false,
+      "prisoners": 0
+    }
+  ],
+  "cleared_stages": 0,
+  "prisoner_records": 0,
+  "map_progress_matches_formal_initial_seed": true,
+  "historical_event_progress_empty": true,
+  "currency_matches_formal_initial_seed": {
+    "medals": 0,
+    "msp": 0
+  },
+  "native_empty_slot_preserved": true,
+  "player_upgrade_limit": 10,
+  "core_sha256": "12293e55f50de159f3766a5685fc7931cac2f3c45f1ddc62af44f190ee8914d8",
+  "seed_sha256": "93ab66452a741c513b39517a97ab800c51ed9e18fa72a346b99523b3f0273274",
+  "community_seed_sha256": "296c229c3d687aa264e899df58a209c8cdd19e212bc3189ceca70416ff58f849",
+  "profile": "play_save_all_units_level1",
+  "launcher": "Start_MSD_All_Units_Level1.vbs",
+  "seed_only_on_first_launch": true,
+  "validation": {
+    "window_frames": 215,
+    "units_at_display_level1": 405,
+    "customize_projects_at_display_level1": 9,
+    "initial_stage_records": 464,
+    "cleared_stages": 0,
+    "prisoner_records": 0,
+    "mainline_enabled_stages": 1,
+    "upgrades_and_stage_unlocks_preserved_on_restart": true,
+    "seed_files_unchanged": true
+  }
+}

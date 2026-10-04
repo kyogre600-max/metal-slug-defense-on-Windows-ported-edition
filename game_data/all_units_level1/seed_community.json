@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "units": {
+    "s1xlv.sarubia_future": {
+      "id": 1024,
+      "level": 0,
+      "level_open": 10,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.m15a_future": {
+      "id": 1025,
+      "level": 0,
+      "level_open": 10,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.heavy_b_future": {
+      "id": 1026,
+      "level": 0,
+      "level_open": 10,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.di_cokka_mk2": {
+      "id": 1027,
+      "level": 0,
+      "level_open": 10,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.di_cokka_mk3": {
+      "id": 1028,
+      "level": 0,
+      "level_open": 10,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.girida_o_mk2": {
+      "id": 1029,
+      "level": 0,
+      "level_open": 10,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    }
+  }
+}
