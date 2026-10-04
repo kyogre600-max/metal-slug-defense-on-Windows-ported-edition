@@ -60,6 +60,22 @@ void msd_retained_fat_eri_laser(Context& c){
        !rd<uint32_t>(c,unit+0x324u))return;
     wr<uint32_t>(c,c.r[13]+12u,50u);
 }
+void msd_retained_weapon_params(Context& c){
+    // 公共弹体入口的第三个栈参数指定参数组；0 表示读取单位当前状态。
+    // 首次特攻后的远程普攻引用原生武器参数，保留近战与单位状态语义。
+    uint32_t unit=c.r[1];
+    if(unit<0x12000000u||unit>=0x1e000000u||
+       rd<uint32_t>(c,unit)!=0x1092f710u||
+       rd<uint32_t>(c,unit+0x88u)!=40u||
+       !rd<uint32_t>(c,unit+0x324u)||
+       rd<uint32_t>(c,c.r[13]+8u)!=0u)return;
+    switch(rd<uint32_t>(c,unit+0x128u)){
+        case 16u:case 96u:case 17u:case 97u:case 18u:case 98u:case 344u:
+        case 19u:case 99u:case 362u:break;
+        default:return;
+    }
+    wr<uint32_t>(c,c.r[13]+8u,50u);
+}
 // Recovered CLZSS::Decode algorithm, verified against the original function.
 // Keeping the dictionary loop in C++ avoids a block dispatch for every byte.
 static void native_lzss(Context& c){

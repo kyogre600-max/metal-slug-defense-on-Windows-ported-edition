@@ -89,5 +89,13 @@
   "original_max_entry_verified": true,
   "core_hashes_match": true,
   "beta_source_unchanged": true,
-  "release_file_count": 2150
+  "release_file_count": 2150,
+  "verification_revisions": [
+    {
+      "type": "retained_weapon_parameters",
+      "core_sha256": "2574adc112b59355f1f43161ba8060318e073df3b05795f87914929e7c0eff7e",
+      "report": "WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.json",
+      "status": "passed"
+    }
+  ]
 }

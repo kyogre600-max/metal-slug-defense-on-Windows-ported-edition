@@ -23,6 +23,7 @@ static void b_1017d7f2(Context& c){
 {uint32_t a=c.r[13];c.r[4]=rd<uint32_t>(c,a+0u);c.r[5]=rd<uint32_t>(c,a+4u);c.r[6]=rd<uint32_t>(c,a+8u);c.r[7]=rd<uint32_t>(c,a+12u);c.r[8]=rd<uint32_t>(c,a+16u);c.r[9]=rd<uint32_t>(c,a+20u);uint32_t newpc=rd<uint32_t>(c,a+24u);c.r[13]=a+28u;c.pc=newpc;return;}
 c.pc=269998077u;}
 static void b_1017d7fc(Context& c){
+{extern void msd_retained_weapon_params(Context&);msd_retained_weapon_params(c);}
 {uint32_t a=c.r[13]-36u;wr<uint32_t>(c,a+0u,c.r[4]);wr<uint32_t>(c,a+4u,c.r[5]);wr<uint32_t>(c,a+8u,c.r[6]);wr<uint32_t>(c,a+12u,c.r[7]);wr<uint32_t>(c,a+16u,c.r[8]);wr<uint32_t>(c,a+20u,c.r[9]);wr<uint32_t>(c,a+24u,c.r[10]);wr<uint32_t>(c,a+28u,c.r[11]);wr<uint32_t>(c,a+32u,c.r[14]);c.r[13]=a;}
 c.pc=269998081u;}
 static void b_1017d800(Context& c){

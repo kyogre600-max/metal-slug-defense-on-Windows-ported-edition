@@ -16,6 +16,8 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 - All seven units and their pack are purchasable from the initial profile, with no stage, faction-core, Event, or prerequisite-unit requirement. Existing profiles acquire the new units through the shop.
 - Paratrooper deployment, landing, and mortar assembly retain PF identity. Shop and Customize HP displays use the actual combat units.
 - The optional all-units Lv1 profile now includes all **13 playable community units** when first created. Existing profile progress is preserved.
+- Corrected retained machine-gun, shotgun, rocket, and laser parameters for Marco, Fat Marco, Tarma, Fat Tarma, Eri, Christmas Eri, Fio, Fat Fio, and Christmas Fio. Retained attacks now use their native special-weapon damage and hit behavior; Fat Eri's existing laser correction passed regression checks.
+- Weapon validation and original movement-asset findings are recorded in [the weapon report](docs/WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.md).
 - Release preparation and validation scope are recorded in [the 1.46.3.1 report](docs/VALIDATION_1.46.3.1_2026.10.05.md).
 
 ### Update 1.46.2
@@ -103,6 +105,8 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 - 七种单位及组合包均在初始状态开放购买，无关卡、军队核、活动进度或前置单位限制。已有存档通过商店获取新增兵种。
 - 伞兵投放、落地及迫击炮架设过程中保留 PF 身份；商店与强化属性面板读取实际作战单位的生命值。
 - 全兵种 Lv1 可替代存档首次创建时包含全部 **13 种可用社区单位**；已有独立存档保留进度。
+- 修复马可、胖马可、塔玛、胖塔玛、英里、圣诞英里、菲欧、胖菲欧及圣诞菲欧保留武器时的参数选择错误。后续远程普攻沿用各自原生特殊武器的伤害、范围及命中行为；胖英里的既有激光修订通过回归检查。
+- 武器验证及原始移动素材核查见 [专项记录](docs/WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.md)。
 - 发布准备与验证范围见 [1.46.3.1 验证记录](docs/VALIDATION_1.46.3.1_2026.10.05.md)。
 
 ### 1.46.2 更新
