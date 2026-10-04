@@ -8,6 +8,16 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+### Update 1.46.3.1
+
+- Added seven Regular Army infantry units: **Regular Army Shield Soldier**, **Regular Army Rifleman**, **Regular Army Bazooka Soldier**, **Regular Army Gatling Soldier**, **Regular Army Paratrooper**, **Regular Army Rocket Bomb Soldier**, and **Regular Army Mortar Soldier**.
+- Their uniforms use the existing Regular Army Soldier palette, and all seven belong to PF. AP is the Rebel counterpart's AP plus 5; HP is `floor(counterpart HP × 10 / 9)`. Attack damage, attack timing, movement, and production intervals retain the counterpart's behavior.
+- Shield Soldier, Rifleman, Bazooka Soldier, and Gatling Soldier cost **15 medals each**. Paratrooper, Rocket Bomb Soldier, and Mortar Soldier cost **45, 55, and 65 medals**, respectively. The **Regular Army Soldier Pack** contains all seven for **150 medals** and preserves the levels of units already owned.
+- All seven units and their pack are purchasable from the initial profile, with no stage, faction-core, Event, or prerequisite-unit requirement. Existing profiles acquire the new units through the shop.
+- Paratrooper deployment, landing, and mortar assembly retain PF identity. Shop and Customize HP displays use the actual combat units.
+- The optional all-units Lv1 profile now includes all **13 playable community units** when first created. Existing profile progress is preserved.
+- Release preparation and validation scope are recorded in [the 1.46.3.1 report](docs/VALIDATION_1.46.3.1_2026.10.05.md).
+
 ### Update 1.46.2
 
 - Added a selector for historical MSD Event missions.
@@ -67,7 +77,7 @@ To update an existing installation, close the game, back up all existing `play_s
 
 Run **Start_MSD_All_Units_Level1.vbs** from the extracted game folder. This entry uses the same formal game core and creates an independent save in `play_save_all_units_level1/` on first launch. The normal EXE continues to use `play_save/`; an existing local maximum-level launcher retains its separate save.
 
-The preset owns all 399 original units and the six currently registered community units at **Lv1**. All nine upgrades under the native army/base customization menu also start at **Lv1**. Maps retain initial progress, no stages are cleared and no prisoners are collected; later stages and worlds require progression. Currency, items and the initial deck follow the formal initial save. World progression and faction-core level limits remain active.
+The preset owns all 399 original units and the 13 currently registered playable community units at **Lv1**. All nine upgrades under the native army/base customization menu also start at **Lv1**. Maps retain initial progress, no stages are cleared and no prisoners are collected; later stages and worlds require progression. Currency, items and the initial deck follow the formal initial save. World progression and faction-core level limits remain active.
 
 Subsequent launches preserve upgrades, map progress and settings. To use this profile in a new installation, copy its entire `play_save_all_units_level1/` folder. The preset files under `game_data/all_units_level1/` are distributed independently of personal saves.
 
@@ -84,6 +94,16 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+### 1.46.3.1 更新
+
+- 新增七种正规军小兵：**正规军盾牌兵**、**正规军步枪兵**、**正规军反坦克兵**、**正规军加特林机枪兵**、**正规军伞兵**、**正规军冲天火箭弹兵**及**正规军迫击炮兵**。
+- 服装采用现有正规军士兵配色，全部归属 PF。AP 为对应叛军单位 AP 加 5；生命值按对应单位的精确倍率 **10/9** 计算并向下取整。攻击伤害、攻击时序、移动速度与生产间隔沿用对应单位的原生行为。
+- 盾牌兵、步枪兵、反坦克兵及加特林机枪兵各为 **15 勋章**；伞兵、冲天火箭弹兵及迫击炮兵依次为 **45、55、65 勋章**。**正规军士兵包**包含全部七种单位，售价 **150 勋章**，保留已拥有单位的等级。
+- 七种单位及组合包均在初始状态开放购买，无关卡、军队核、活动进度或前置单位限制。已有存档通过商店获取新增兵种。
+- 伞兵投放、落地及迫击炮架设过程中保留 PF 身份；商店与强化属性面板读取实际作战单位的生命值。
+- 全兵种 Lv1 可替代存档首次创建时包含全部 **13 种可用社区单位**；已有独立存档保留进度。
+- 发布准备与验证范围见 [1.46.3.1 验证记录](docs/VALIDATION_1.46.3.1_2026.10.05.md)。
 
 ### 1.46.2 更新
 
@@ -144,7 +164,7 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 
 在解压后的游戏目录中启动 **Start_MSD_All_Units_Level1.vbs**。该入口使用同一正式版核心，首次启动时在 `play_save_all_units_level1/` 创建独立存档。普通 EXE 继续使用 `play_save/`；本地既有满级入口继续使用其独立存档。
 
-该预设包含全部 **399 个原版兵种及当前登记的 6 个社区兵种**，均已拥有且初始为 **Lv1**。“我方阵营”的 **9 项强化均为 Lv1**。地图采用初始进度，关卡均未通关、捕虏均未收集，后续关卡及世界按游戏规则逐步解锁。货币、道具及初始编队沿用正式版初始存档。世界进度与军队核等级上限继续生效。
+该预设包含全部 **399 个原版兵种及当前登记的 13 个可用社区兵种**，均已拥有且初始为 **Lv1**。“我方阵营”的 **9 项强化均为 Lv1**。地图采用初始进度，关卡均未通关、捕虏均未收集，后续关卡及世界按游戏规则逐步解锁。货币、道具及初始编队沿用正式版初始存档。世界进度与军队核等级上限继续生效。
 
 再次启动时保留已经完成的升级、地图进度及设置。迁移至新安装目录时，复制完整的 `play_save_all_units_level1/`。预设文件位于 `game_data/all_units_level1/`，发行文件与个人进度分别保存。
 

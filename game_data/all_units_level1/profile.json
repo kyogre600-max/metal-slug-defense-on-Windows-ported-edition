@@ -1,8 +1,8 @@
 {
   "status": "verified_locally",
-  "version": "1.46.2",
+  "version": "1.46.3.1",
   "original_units": 399,
-  "community_units": 6,
+  "community_units": 13,
   "display_level": 1,
   "customize_ids": [
     0,
@@ -155,21 +155,31 @@
   },
   "native_empty_slot_preserved": true,
   "player_upgrade_limit": 10,
-  "core_sha256": "12293e55f50de159f3766a5685fc7931cac2f3c45f1ddc62af44f190ee8914d8",
+  "core_sha256": "303c315f40451c50b9686a49535459c5eca152d7b0c01ae62936385c4cfbf3c8",
   "seed_sha256": "93ab66452a741c513b39517a97ab800c51ed9e18fa72a346b99523b3f0273274",
-  "community_seed_sha256": "296c229c3d687aa264e899df58a209c8cdd19e212bc3189ceca70416ff58f849",
+  "community_seed_sha256": "bc8fd5a27406b0d4de733a8028057b1136e39fa72c22d3d9c252d775a9de98db",
   "profile": "play_save_all_units_level1",
   "launcher": "Start_MSD_All_Units_Level1.vbs",
   "seed_only_on_first_launch": true,
   "validation": {
+    "status": "passed",
+    "profile": "F:\\egg\\github\\metal-slug-defense-on-Windows-ported-edition\\verification\\all_units_level1_1791132490690765000\\guest",
+    "core": {
+      "library": "MSD_Core.dll",
+      "sha256": "303c315f40451c50b9686a49535459c5eca152d7b0c01ae62936385c4cfbf3c8"
+    },
     "window_frames": 215,
-    "units_at_display_level1": 405,
+    "units_at_display_level1": 412,
     "customize_projects_at_display_level1": 9,
     "initial_stage_records": 464,
     "cleared_stages": 0,
     "prisoner_records": 0,
     "mainline_enabled_stages": 1,
     "upgrades_and_stage_unlocks_preserved_on_restart": true,
-    "seed_files_unchanged": true
-  }
+    "seed_files_unchanged": true,
+    "personal_profile_not_created_by_validation": true,
+    "initial_player_level_cap": 10,
+    "validation_scope": "新预设原生读取、215 帧启动、隔离存档保存及重启；未追加全关卡或长期运行测试。"
+  },
+  "date": "2026-10-05"
 }

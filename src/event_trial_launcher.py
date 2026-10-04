@@ -75,7 +75,7 @@ class TrialProbe(OriginalProbe):
         super().close()
 player.Probe=TrialProbe
 def create_player(self_test=False,audio_mode=None,fullscreen=None):
-    player.TITLE='MSD WINDOWS S1XLV · 1.46.2'
+    player.TITLE='MSD WINDOWS S1XLV · 1.46.3.1'
     session=player.Player(self_test=self_test,audio_mode=audio_mode,fullscreen=fullscreen)
     session.guest_root=ROOT/('ui_test_guest' if self_test else config['profile'])
     session.status_file=ROOT/('ui_test_status.json' if self_test else 'event_trial_status.json')
@@ -84,7 +84,7 @@ def create_player(self_test=False,audio_mode=None,fullscreen=None):
     return session
 if __name__=='__main__':
     try:
-        parser=argparse.ArgumentParser(description='MSD WINDOWS S1XLV 1.46.2')
+        parser=argparse.ArgumentParser(description='MSD WINDOWS S1XLV 1.46.3.1')
         parser.add_argument('--self-test',action='store_true')
         parser.add_argument('--mute',action='store_true')
         parser.add_argument('--windowed',action='store_true')

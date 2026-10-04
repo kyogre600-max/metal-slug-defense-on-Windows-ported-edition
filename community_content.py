@@ -56,6 +56,22 @@ class CommunityContent:
                     if not isinstance(opcode,int) or not 0<=opcode<len(COMMAND_LENGTHS) or len(values)!=COMMAND_LENGTHS[opcode]-1:raise ValueError('Invalid animation command arity')
                     if any(not isinstance(v,int) or not -2147483648<=v<=2147483647 for v in values):raise ValueError('Invalid animation command value')
             keys.add(u['key'])
+        by_key={u['key']:u for u in self.units}
+        for u in self.units:
+            if not isinstance(u.get('internal_only',False),bool):raise ValueError('Invalid internal unit flag')
+            child=u.get('child_unit_key')
+            if child is not None and (child not in by_key or not by_key[child].get('internal_only') or child==u['key']):raise ValueError('Invalid internal child reference')
+            landing=u.get('landing_unit_key')
+            if landing is not None and (u['base_id']!=160 or landing not in by_key or by_key[landing].get('internal_only')):raise ValueError('Invalid paratrooper landing reference')
+        self.unit_pack=self.manifest.get('unit_pack')
+        if self.unit_pack:
+            pack=self.unit_pack
+            if pack.get('id')!=10 or pack.get('shop_id')!=512+MAX_UNITS:raise ValueError('Invalid community pack identity')
+            if not isinstance(pack.get('shop_price'),int) or not 0<pack['shop_price']<=32767:raise ValueError('Invalid community pack price')
+            if not 1<=len(pack.get('units',[]))<=7 or len(set(pack['units']))!=len(pack['units']):raise ValueError('Invalid community pack members')
+            if any(key not in by_key or by_key[key].get('internal_only') for key in pack['units']):raise ValueError('Invalid community pack unit')
+            if set(pack.get('localization',{}))!=LANGUAGES:raise ValueError('All eleven pack localizations are required')
+            if any(not isinstance(text.get(field),str) or not text[field] or '\0' in text[field] for text in pack['localization'].values() for field in ('name','description')):raise ValueError('Invalid pack text')
         self.assets={};self.asset_dimensions={}
         for name,digest in self.manifest['assets'].items():
             if Path(name).name!=name or not name.lower().endswith('.obm'):raise ValueError('Invalid content asset name')
@@ -112,6 +128,9 @@ class CommunityContent:
             ('damage_multiplier','move_speed_multiplier','attack_range_multiplier','knockback_distance_multiplier','ballistic_range_multiplier')) for u in self.units)
         if extended and (not hasattr(p.uc.lib,'msd_community_combat_profile_version') or p.uc.lib.msd_community_combat_profile_version()!=1):raise RuntimeError('Native core lacks rational combat profiles')
         if any(not u['available_from_start'] for u in self.units) and (not hasattr(p.uc.lib,'msd_community_shop_gate_version') or p.uc.lib.msd_community_shop_gate_version()!=1):raise RuntimeError('Native core lacks original-shop unlock references')
+        if self.unit_pack and (not hasattr(p.uc.lib,'msd_community_unit_pack_version') or p.uc.lib.msd_community_unit_pack_version()!=1):raise RuntimeError('Native core lacks community unit packs')
+        if any(u.get('landing_unit_key') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_paratrooper_landing_version') or p.uc.lib.msd_community_paratrooper_landing_version()!=1):raise RuntimeError('Native core lacks paratrooper landing references')
+        if any(u.get('child_unit_key') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_display_status_version') or p.uc.lib.msd_community_display_status_version()!=1):raise RuntimeError('Native core lacks child display status references')
         p.uc.lib.msd_enable_community_content()
         self.ready=False
 
@@ -162,6 +181,9 @@ class CommunityContent:
                 value=struct.unpack_from('<i',row,off)[0]
                 struct.pack_into('<i',row,off,(value*a+b-1)//b)
             struct.pack_into('<i',row,0x378,u['faction']);rows+=row
+            if u.get('child_unit_key'):
+                child=next(entry['id'] for entry in self.units if entry['key']==u['child_unit_key'])
+                struct.pack_into('<I',rows,len(rows)-0x390+0xa4,child)
             action_rows+=p.read(actions+bid*4,4)
             descriptor=p.word(table+bid*8);header=bytearray(p.read(descriptor,32))
             textures=u.get('textures',[u.get('texture')]);image_count=p.word(descriptor)
@@ -174,7 +196,8 @@ class CommunityContent:
                 scripts[int(key)]=self.alloc(struct.pack('<'+'i'*len(values),*values))
             struct.pack_into('<I',header,24,self.alloc(struct.pack('<'+'I'*count,*scripts)))
             images+=struct.pack('<II',self.alloc(header),p.word(table+bid*8+4))
-            menurow=next(p.read(menu+j*20,20) for j in range(320) if p.word(menu+j*20)==bid)
+            menu_bid=u.get('menu_reference_id',bid)
+            menurow=next(p.read(menu+j*20,20) for j in range(320) if p.word(menu+j*20)==menu_bid)
             menurow=bytearray(menurow);struct.pack_into('<II',menurow,0,uid,uid)
             struct.pack_into('<h',menurow,8,u['faction']);struct.pack_into('<h',menurow,10,u['icon']['index'])
             shoprow=bytearray(p.read(shopbase+23*32,32));struct.pack_into('<H',shoprow,0,512+i)
@@ -185,6 +208,7 @@ class CommunityContent:
             values=(uid,bid,512+i,self.alloc(menurow),self.alloc(shoprow),423+i,level&0xffffffff,opened,int(data.get('custom_time',0)),int(data.get('new',0)),int(data.get('shop_new',0)),u['shop_price'])
             struct.pack_into('<12I',records,i*RECORD_SIZE,*values)
             struct.pack_into('<I',records,i*RECORD_SIZE+0x88,int(data.get('deck_time',0)))
+            struct.pack_into('<I',records,i*RECORD_SIZE+0x8c,int(u.get('internal_only',False)))
             for code,text in u['localization'].items():
                 lang=language_order[p.symbols['strMenuUnitInfo'+code]]
                 for offset,field in ((0x30,'name'),(0x5c,'description')):struct.pack_into('<I',records,i*RECORD_SIZE+offset+lang*4,p.cstr(text[field]))
@@ -220,11 +244,26 @@ class CommunityContent:
         catalog_base=(p.word(0x1020bee4)+0x1020bba0)&0xffffffff
         self.catalog_source=catalog_base
         catalog=p.read(catalog_base+0x74,259*4)
-        self.shop_catalog=self.alloc(catalog+struct.pack('<'+'I'*n,*range(512,512+n)))
+        shop_ids=[512+i for i,u in enumerate(self.units) if not u.get('internal_only')]
+        pack_pointer=0
+        if self.unit_pack:
+            pack=self.unit_pack;shop_ids.append(pack['shop_id'])
+            raw=bytearray(p.read(shopbase+16*32,32))+bytearray(96)
+            struct.pack_into('<H',raw,0,pack['shop_id']);struct.pack_into('<I',raw,4,pack['id'])
+            struct.pack_into('<h',raw,16,pack['shop_price'])
+            member_ids=[next(u['id'] for u in self.units if u['key']==key) for key in pack['units']]
+            individual_price=sum(next(u['shop_price'] for u in self.units if u['key']==key) for key in pack['units'])
+            struct.pack_into('<h',raw,24,max(0,(individual_price-pack['shop_price'])*100//individual_price))
+            struct.pack_into('<II',raw,32,len(member_ids),self.alloc(struct.pack('<'+'I'*len(member_ids),*member_ids)))
+            for code,text in pack['localization'].items():
+                lang=language_order[p.symbols['strMenuUnitInfo'+code]]
+                for offset,field in ((40,'name'),(84,'description')):struct.pack_into('<I',raw,offset+lang*4,p.cstr(text[field]))
+            pack_pointer=self.alloc(raw)
+        self.shop_catalog=self.alloc(catalog+struct.pack('<'+'I'*len(shop_ids),*shop_ids))
         self.app=p.app_instance();self.custom_list=self.alloc(bytes(512*4));self.deck_list=self.alloc(bytes(512*4))
         import community_maps
         stage_pointer,stage_count,mission_count=community_maps.install(self,info,db)
-        fields=(0x434f4d32,n,self.records,UNIT_ID_BASE+n,423+n,imageptr,0,self.app,self.custom_list,self.deck_list,512,self.shop_catalog,259+n,self.alloc(battle_icons),self.icon_offsets,self.icon_scripts,stage_pointer,stage_count,mission_count)
+        fields=(0x434f4d32,n,self.records,UNIT_ID_BASE+n,423+n,imageptr,0,self.app,self.custom_list,self.deck_list,512,self.shop_catalog,259+len(shop_ids),self.alloc(battle_icons),self.icon_offsets,self.icon_scripts,stage_pointer,stage_count,mission_count)
         profiles=bytearray()
         for u in self.units:
             values=[ratio(u['hp_multiplier']) if isinstance(u['hp_multiplier'],list) else (1,1)]
@@ -233,7 +272,11 @@ class CommunityContent:
             profiles+=struct.pack('<12I',*(v for pair in values for v in pair))
         unlocks=struct.pack('<'+'I'*n,*(0xffffffff if u['available_from_start'] else u['shop_unlock_reference_id'] for u in self.units))
         fields+= (self.alloc(profiles),1,p.symbols['_ZTV10BattleUnit']+8,p.symbols['_ZTV12BattleBullet']+8,self.alloc(unlocks))
-        p.write(HEADER,struct.pack('<24I',*fields));self.ready=True
+        landing_ids={u['key']:u['id'] for u in self.units}
+        landings=struct.pack('<'+'I'*n,*(landing_ids[u['landing_unit_key']] if u.get('landing_unit_key') else 0 for u in self.units))
+        display_ids=struct.pack('<'+'I'*n,*(landing_ids[u['child_unit_key']] if u.get('child_unit_key') else u['id'] for u in self.units))
+        fields+=(pack_pointer,self.alloc(landings),self.alloc(display_ids))
+        p.write(HEADER,struct.pack('<27I',*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==original
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])

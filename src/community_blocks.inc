@@ -1698,4 +1698,11 @@ old_enemy_unit_enable=find_block(0x101c98fbu);register_block(0x101c98fbu,enemy_u
 old_enemy_special_policy=find_block(0x101c9da3u);register_block(0x101c9da3u,enemy_special_policy);
 old_extension_music=find_block(0x101c6625u);register_block(0x101c6625u,extension_music);
 old_extension_mission=find_block(0x101d09fdu);register_block(0x101d09fdu,extension_mission);
+old_pack_unit=find_block(0x101654b5u);register_block(0x101654b5u,pack_unit);
+old_pack_x=find_block(0x101654d1u);register_block(0x101654d1u,pack_x);
+old_pack_y=find_block(0x101654edu);register_block(0x101654edu,pack_y);
+old_pack_name=find_block(0x1016551du);register_block(0x1016551du,pack_name);
+old_pack_info=find_block(0x10165509u);register_block(0x10165509u,pack_info);
+old_paratrooper_landing=find_block(0x101de225u);register_block(0x101de225u,paratrooper_landing);
+old_menu_display_id=find_block(0x101652fdu);register_block(0x101652fdu,menu_display_id);
 }

@@ -1,0 +1,93 @@
+{
+  "status": "local_preparation_complete_remote_publication_pending",
+  "date": "2026-10-05",
+  "version": "1.46.3.1",
+  "core": {
+    "library": "MSD_Core.dll",
+    "sha256": "303c315f40451c50b9686a49535459c5eca152d7b0c01ae62936385c4cfbf3c8"
+  },
+  "units": [
+    {
+      "id": 1030,
+      "name": "正规军盾牌兵",
+      "base_id": 8,
+      "ap": 35,
+      "price": 15
+    },
+    {
+      "id": 1031,
+      "name": "正规军步枪兵",
+      "base_id": 42,
+      "ap": 40,
+      "price": 15
+    },
+    {
+      "id": 1032,
+      "name": "正规军反坦克兵",
+      "base_id": 45,
+      "ap": 35,
+      "price": 15
+    },
+    {
+      "id": 1033,
+      "name": "正规军加特林机枪兵",
+      "base_id": 48,
+      "ap": 45,
+      "price": 15
+    },
+    {
+      "id": 1034,
+      "name": "正规军伞兵",
+      "base_id": 159,
+      "ap": 45,
+      "price": 45
+    },
+    {
+      "id": 1035,
+      "name": "正规军冲天火箭弹兵",
+      "base_id": 162,
+      "ap": 40,
+      "price": 55
+    },
+    {
+      "id": 1036,
+      "name": "正规军迫击炮兵",
+      "base_id": 163,
+      "ap": 50,
+      "price": 65
+    }
+  ],
+  "pack_medals": 150,
+  "initially_purchasable": true,
+  "reports": {
+    "parameter_verification.json": "passed",
+    "shop_verification.json": "passed",
+    "combat_verification.json": "passed",
+    "ui_stats_verification.json": "passed",
+    "initial_access_verification.json": "passed",
+    "installed_repository.json": "passed",
+    "installed_local.json": "passed",
+    "profile_verification.json": "passed",
+    "max_entry_verification.json": "passed",
+    "extensions/runtime_verification.json": "passed"
+  },
+  "validation": {
+    "existing_unit_comparisons": 1218,
+    "new_unit_level_comparisons": 360,
+    "display_level_comparisons": 80,
+    "attack_comparisons": 14,
+    "all_units_level1_units": 412,
+    "existing_community_enemy_rosters": 6
+  },
+  "personal_saves_excluded_from_deployment": true,
+  "git_commit": false,
+  "remote_push": false,
+  "limitations": [
+    "Full-stage completion, long-duration stability, and additional hardware configurations require separate validation."
+  ],
+  "local_runtime_synchronized": true,
+  "original_max_entry_verified": true,
+  "core_hashes_match": true,
+  "beta_source_unchanged": true,
+  "release_file_count": 2150
+}

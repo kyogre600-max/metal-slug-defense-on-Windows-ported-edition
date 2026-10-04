@@ -54,6 +54,27 @@
       "new": 0,
       "shop_new": 0,
       "deck_time": 0
+    },
+    "s1xlv.pf_shield": {
+      "level": 0
+    },
+    "s1xlv.pf_rifle": {
+      "level": 0
+    },
+    "s1xlv.pf_bazooka": {
+      "level": 0
+    },
+    "s1xlv.pf_gatling": {
+      "level": 0
+    },
+    "s1xlv.pf_paratrooper": {
+      "level": 0
+    },
+    "s1xlv.pf_rocket_bomb": {
+      "level": 0
+    },
+    "s1xlv.pf_mortar": {
+      "level": 0
     }
   }
 }
