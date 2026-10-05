@@ -28,7 +28,7 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 - Fixed misaligned sprite pixels on **HEAVY B (Future)**.
 - Added independent music and sound-effects controls using native buttons in title options, main-menu options, and the battle pause menu. Settings are saved and remain stable when entering Customize and the other checked menu pages.
 - Added `Esc` for Back and battle pause/resume. Corrected the opening/ending movie button overlap and centered the main-menu option rows.
-- Player unit upgrade limits start at Lv10 and advance to Lv20 after all World 1 mainline stages are cleared. Clearing all World 2 mainline stages permits Lv35; Lv40 requires the matching faction core. Red timed stages are excluded. Existing higher unit levels are retained; the limits apply to subsequent upgrades. Native faction/base upgrades and enemy settings retain their established rules.
+- Player units use the original world's unlock state to determine the initial Lv10/Lv20 limit. The original medal transactions unlock Lv20→25, Lv25→30 and Lv30→35 for 30, 50 and 70 medals respectively; the matching faction core permits Lv40 after the Lv35 stage. Registered community units use the same rules, including future additions. Existing unit levels and completed unlock stages are retained. Details: [level unlock verification](docs/UNIT_LEVEL_UNLOCK_2026.10.05.md).
 - Corrected Fat Eri's retained large laser to use native stationary laser parameters and bounded damage, preserving the large visual effect.
 - Events without a registered shop now hide SHOP in the base and map. Registered Event shops retain their catalog and exchange flow; ordinary unit shops retain native prices.
 - Improved status-report file-lock handling and rendering-thread cleanup on exit.
@@ -117,7 +117,7 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 - 修复**未来重装 B 型**的像素错位问题。
 - 标题设置、主菜单设置与战斗暂停页增加音乐、音效独立开关，沿用原生按钮并保存设置。进入强化及其他已核验菜单时保留设置状态。
 - `Esc` 执行返回及战斗暂停、恢复；修复开幕与结尾动画按钮重叠，并将主菜单设置行居中对齐。
-- 玩家单位初始升级上限为 Lv10，世界 1 全部主线通关后开放 Lv20，世界 2 全部主线通关后开放 Lv35；持有对应军队核后开放 Lv40。红色限时关卡排除于通关条件。已有高等级保留，上限仅约束后续升级；原版阵营、基地强化与电脑单位规则保持原值。
+- 玩家单位依据原版世界开放状态确定初期 Lv10/Lv20 上限。Lv20→25、Lv25→30、Lv30→35 分别采用原生 30、50、70 勋章解锁交易；完成 Lv35 阶段并持有对应军队核心后开放 Lv40。当前及后续有效登记的社区单位适用相同规则，已有等级与已完成的解锁阶段保留。核验范围见[等级解锁修复记录](docs/UNIT_LEVEL_UNLOCK_2026.10.05.md)。
 - 修复胖子英里强化普攻的大激光参数，恢复原生静止激光与受限伤害行为，保留大激光显示。
 - 未登记商店的 Event 隐藏基地与地图 SHOP；已登记商店保留目录与兑换流程，普通单位商店保留原生价格。
 - 修订状态报告文件锁异常处理及退出时的渲染线程释放顺序。

@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "22406": {
+    "pageid": 22406,
+    "ns": 6,
+    "title": "File:MSC - Mummy.png",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 301032,
+      "width": 486,
+      "height": 670,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/9/98/MSC_-_Mummy.png/revision/latest?cb=20230121091102",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:MSC_-_Mummy.png",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=22406"
+     }
+    ]
+   }
+  }
+ }
+}

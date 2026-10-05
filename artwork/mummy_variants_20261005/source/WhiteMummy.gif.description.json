@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "20050": {
+    "pageid": 20050,
+    "ns": 6,
+    "title": "File:WhiteMummy.gif",
+    "revisions": [
+     {
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "*": ""
+       }
+      }
+     }
+    ]
+   }
+  }
+ }
+}

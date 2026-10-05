@@ -1,0 +1,24 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "2650": {
+    "pageid": 2650,
+    "ns": 6,
+    "title": "File:084.gif",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 16608,
+      "width": 37,
+      "height": 46,
+      "duration": 2.3999999999999995,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/a/a4/084.gif/revision/latest?cb=20090131195424",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:084.gif",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=2650"
+     }
+    ]
+   }
+  }
+ }
+}

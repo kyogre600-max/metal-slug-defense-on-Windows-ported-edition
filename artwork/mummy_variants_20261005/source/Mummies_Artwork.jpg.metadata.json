@@ -1,0 +1,26 @@
+{
+ "continue": {
+  "iistart": "2017-06-17T16:49:52Z",
+  "continue": "||"
+ },
+ "query": {
+  "pages": {
+   "9872": {
+    "pageid": 9872,
+    "ns": 6,
+    "title": "File:Mummies Artwork.jpg",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 431847,
+      "width": 5370,
+      "height": 4854,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/2/20/Mummies_Artwork.jpg/revision/latest?cb=20170723121456",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:Mummies_Artwork.jpg",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=9872"
+     }
+    ]
+   }
+  }
+ }
+}

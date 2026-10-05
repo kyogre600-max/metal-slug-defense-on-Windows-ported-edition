@@ -1,0 +1,24 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "4372": {
+    "pageid": 4372,
+    "ns": 6,
+    "title": "File:Fake Mummy.gif",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 1521,
+      "width": 28,
+      "height": 33,
+      "duration": 0.5,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/5/5e/Fake_Mummy.gif/revision/latest?cb=20101220224901",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:Fake_Mummy.gif",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=4372"
+     }
+    ]
+   }
+  }
+ }
+}

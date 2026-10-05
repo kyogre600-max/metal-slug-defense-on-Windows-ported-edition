@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-05",
+  "stage": "standalone_artwork",
+  "checks": {
+    "native_idle_matches_msx_source_pixels": true,
+    "gif_full_decode": [
+      {
+        "path": "previews\\green_mummy_body.gif",
+        "decoded_frames": 64,
+        "duration_ms": 6000
+      },
+      {
+        "path": "previews\\white_mummy_body.gif",
+        "decoded_frames": 64,
+        "duration_ms": 5900
+      }
+    ],
+    "indexed_palette_limit": [
+      {
+        "path": "sprites\\green_mummy_atlas_0.png",
+        "mode": "P",
+        "used_palette_indices": 59
+      },
+      {
+        "path": "sprites\\green_mummy_atlas_1.png",
+        "mode": "P",
+        "used_palette_indices": 16
+      },
+      {
+        "path": "sprites\\mummy_generator_mk2_atlas.png",
+        "mode": "P",
+        "used_palette_indices": 28
+      },
+      {
+        "path": "sprites\\white_mummy_atlas_0.png",
+        "mode": "P",
+        "used_palette_indices": 59
+      },
+      {
+        "path": "sprites\\white_mummy_atlas_1.png",
+        "mode": "P",
+        "used_palette_indices": 16
+      }
+    ],
+    "all_ordered_frame_rectangles_within_canvas": true,
+    "eyes_tongue_reference_match": "eye_tongue_verification_r1.json",
+    "mummy_ordered_sheet_cell": {
+      "size": [
+        160,
+        112
+      ],
+      "anchor": [
+        80,
+        96
+      ],
+      "native_relative_bounds": [
+        -68,
+        -63,
+        70,
+        15
+      ]
+    }
+  },
+  "units": {
+    "white_mummy": {
+      "atlas_paths": [
+        "sprites\\white_mummy_atlas_0.png",
+        "sprites\\white_mummy_atlas_1.png"
+      ],
+      "atlas_dimensions": [
+        [
+          512,
+          512
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "native_rect_count": 262,
+      "native_script_count": 27,
+      "ordered_frame_count": 240,
+      "changed_pixels_per_atlas": [
+        84158,
+        0
+      ],
+      "reference_pose_pixel_match": true,
+      "alpha_preserved": true,
+      "projectile_effects_preserved": true
+    },
+    "green_mummy": {
+      "atlas_paths": [
+        "sprites\\green_mummy_atlas_0.png",
+        "sprites\\green_mummy_atlas_1.png"
+      ],
+      "atlas_dimensions": [
+        [
+          512,
+          512
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "native_rect_count": 262,
+      "native_script_count": 27,
+      "ordered_frame_count": 240,
+      "changed_pixels_per_atlas": [
+        84158,
+        0
+      ],
+      "reference_pose_pixel_match": true,
+      "alpha_preserved": true,
+      "projectile_effects_preserved": true
+    },
+    "mummy_generator_mk2": {
+      "atlas_paths": [
+        "sprites/mummy_generator_mk2_atlas.png"
+      ],
+      "atlas_dimensions": [
+        [
+          256,
+          256
+        ]
+      ],
+      "native_rect_count": 56,
+      "native_script_count": 32,
+      "ordered_frame_count": 52,
+      "alpha_preserved": true,
+      "palette_reference": "source/Coffin.gif",
+      "mission4_palette_confirmation": "2026-10-05 用户明确确认采用该红褐色"
+    }
+  },
+  "sha256_performed": false,
+  "runtime_files_modified": false
+}

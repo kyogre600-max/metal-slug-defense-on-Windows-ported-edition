@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "3284": {
+    "pageid": 3284,
+    "ns": 6,
+    "title": "File:Coffin.gif",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 2808,
+      "width": 98,
+      "height": 111,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/7/7e/Coffin.gif/revision/latest?cb=20090504165940",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:Coffin.gif",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=3284"
+     }
+    ]
+   }
+  }
+ }
+}

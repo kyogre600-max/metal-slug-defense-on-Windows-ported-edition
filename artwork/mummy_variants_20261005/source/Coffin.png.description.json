@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "11184": {
+    "pageid": 11184,
+    "ns": 6,
+    "title": "File:Coffin.png",
+    "revisions": [
+     {
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "*": "== Summary ==\n[[Category:Sprites]]\n== Licensing ==\n{{Fairuse}}"
+       }
+      }
+     }
+    ]
+   }
+  }
+ }
+}

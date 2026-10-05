@@ -1,0 +1,367 @@
+{
+  "white_mummy": [
+    {
+      "original": [
+        16,
+        16,
+        8
+      ],
+      "target": [
+        16,
+        8,
+        0
+      ]
+    },
+    {
+      "original": [
+        74,
+        57,
+        16
+      ],
+      "target": [
+        56,
+        48,
+        24
+      ]
+    },
+    {
+      "original": [
+        106,
+        90,
+        49
+      ],
+      "target": [
+        96,
+        88,
+        64
+      ]
+    },
+    {
+      "original": [
+        148,
+        123,
+        74
+      ],
+      "target": [
+        168,
+        160,
+        128
+      ]
+    },
+    {
+      "original": [
+        213,
+        197,
+        139
+      ],
+      "target": [
+        240,
+        232,
+        200
+      ]
+    },
+    {
+      "original": [
+        255,
+        255,
+        238
+      ],
+      "target": [
+        248,
+        248,
+        248
+      ]
+    },
+    {
+      "original": [
+        82,
+        24,
+        0
+      ],
+      "target": [
+        80,
+        24,
+        72
+      ]
+    },
+    {
+      "original": [
+        123,
+        49,
+        8
+      ],
+      "target": [
+        120,
+        48,
+        96
+      ]
+    },
+    {
+      "original": [
+        172,
+        98,
+        0
+      ],
+      "target": [
+        168,
+        96,
+        152
+      ]
+    }
+  ],
+  "green_mummy": [
+    {
+      "original": [
+        16,
+        16,
+        8
+      ],
+      "target": [
+        0,
+        16,
+        0
+      ]
+    },
+    {
+      "original": [
+        74,
+        57,
+        16
+      ],
+      "target": [
+        40,
+        56,
+        0
+      ]
+    },
+    {
+      "original": [
+        106,
+        90,
+        49
+      ],
+      "target": [
+        96,
+        96,
+        32
+      ]
+    },
+    {
+      "original": [
+        148,
+        123,
+        74
+      ],
+      "target": [
+        136,
+        128,
+        40
+      ]
+    },
+    {
+      "original": [
+        213,
+        197,
+        139
+      ],
+      "target": [
+        216,
+        200,
+        104
+      ]
+    },
+    {
+      "original": [
+        255,
+        255,
+        238
+      ],
+      "target": [
+        240,
+        248,
+        232
+      ]
+    },
+    {
+      "original": [
+        82,
+        24,
+        0
+      ],
+      "target": [
+        80,
+        24,
+        0
+      ]
+    },
+    {
+      "original": [
+        123,
+        49,
+        8
+      ],
+      "target": [
+        120,
+        48,
+        8
+      ]
+    },
+    {
+      "original": [
+        172,
+        98,
+        0
+      ],
+      "target": [
+        168,
+        96,
+        0
+      ]
+    }
+  ],
+  "mummy_generator_mk2": [
+    {
+      "original": [
+        41,
+        0,
+        0
+      ],
+      "target": [
+        40,
+        0,
+        0
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        65,
+        32,
+        0
+      ],
+      "target": [
+        88,
+        8,
+        0
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        82,
+        49,
+        8
+      ],
+      "target": [
+        104,
+        24,
+        8
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        106,
+        65,
+        24
+      ],
+      "target": [
+        120,
+        48,
+        24
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        123,
+        74,
+        32
+      ],
+      "target": [
+        144,
+        48,
+        32
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        148,
+        90,
+        24
+      ],
+      "target": [
+        160,
+        72,
+        24
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        164,
+        106,
+        41
+      ],
+      "target": [
+        184,
+        80,
+        40
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        189,
+        139,
+        65
+      ],
+      "target": [
+        208,
+        112,
+        64
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        230,
+        189,
+        106
+      ],
+      "target": [
+        248,
+        160,
+        104
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        238,
+        230,
+        164
+      ],
+      "target": [
+        248,
+        200,
+        160
+      ],
+      "source": "Coffin.gif"
+    },
+    {
+      "original": [
+        41,
+        24,
+        0
+      ],
+      "target": [
+        88,
+        8,
+        0
+      ],
+      "source": "Coffin.gif"
+    }
+  ]
+}

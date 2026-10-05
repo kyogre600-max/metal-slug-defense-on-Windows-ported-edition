@@ -9,6 +9,11 @@ UNIT_ID_BASE=1024
 ORIGINAL_UNITS=400
 LANGUAGES=frozenset(('EN','JP','KR','ES','PT','RU','FR','DE','IT','ZT','ZS'))
 COMMAND_LENGTHS=(2,2,2,2,2,1,3,5,2,2,3,5,5,2,3,1,1,2,2,3,3,1,5,2)
+ANCHOR_INDEX={1:0,2:1,3:2,4:3,5:4,6:5,7:6,13:7,14:8,15:9,16:10,17:11,18:12,19:13,20:14,
+              22:15,23:16,24:17,25:18,26:19,27:20,29:21,30:22,31:23,32:24,33:25,34:26,35:27,36:28,38:29,39:30,40:31}
+
+def anchor_offsets(word):
+    return [word*4]+[(42+33*i+ANCHOR_INDEX[word])*4 for i in range(5)]
 
 def ratio(value):
     """解析整数或精确有理数倍率，保持既有注册表的整数格式。"""
@@ -45,8 +50,17 @@ class CommunityContent:
             if rect[0]<0 or rect[1]<0 or rect[2]<=0 or rect[3]<=0:raise ValueError('Invalid icon rectangle')
             for key in ('production_interval_multiplier','special_damage_multiplier','attack_wait_multiplier',
                         'damage_multiplier','move_speed_multiplier','attack_range_multiplier',
-                        'knockback_distance_multiplier','ballistic_range_multiplier'):
+                        'knockback_distance_multiplier','ballistic_range_multiplier',
+                        'knockback_threshold_multiplier','normal_projectile_distance_multiplier',
+                        'special_projectile_distance_multiplier','summon_interval_multiplier',
+                        'construction_time_multiplier'):
                 ratio(u.get(key,[1,1]))
+            for group,reference in u.get('attack_parameter_references',{}).items():
+                if group not in ('normal','special') or reference.get('group') not in ('normal','special') or not isinstance(reference.get('unit_id'),int) or not 0<reference['unit_id']<400:raise ValueError('Invalid attack parameter reference')
+            if 'shot_action_reference_id' in u and (u['base_id']!=61 or u['shot_action_reference_id']!=157):raise ValueError('Unsupported mummy projectile action reference')
+            if not isinstance(u.get('normal_attack_range_from_projectile',False),bool):raise ValueError('Invalid projectile attack-range flag')
+            for group,category in u.get('attack_range_categories',{}).items():
+                if group not in ('normal','special') or not isinstance(category,int) or isinstance(category,bool) or not 0<=category<=5:raise ValueError('Invalid native menu attack-range category')
             for text in u['localization'].values():
                 if not isinstance(text['name'],str) or not isinstance(text['description'],str) or not text['name'] or not text['description'] or '\0' in text['name']+text['description']:raise ValueError('Invalid unit text')
             for commands in u['animations'].values():
@@ -63,6 +77,10 @@ class CommunityContent:
             if child is not None and (child not in by_key or not by_key[child].get('internal_only') or child==u['key']):raise ValueError('Invalid internal child reference')
             landing=u.get('landing_unit_key')
             if landing is not None and (u['base_id']!=160 or landing not in by_key or by_key[landing].get('internal_only')):raise ValueError('Invalid paratrooper landing reference')
+            summoned=u.get('summoned_unit_key')
+            if summoned is not None and (u['base_id']!=64 or summoned not in by_key or summoned==u['key'] or by_key[summoned].get('internal_only')):raise ValueError('Invalid mummy gate summon reference')
+            preview=u.get('preview_unit_key')
+            if preview is not None and (preview!=child or preview not in by_key):raise ValueError('Invalid unit preview reference')
         self.unit_pack=self.manifest.get('unit_pack')
         if self.unit_pack:
             pack=self.unit_pack
@@ -76,7 +94,7 @@ class CommunityContent:
         for name,digest in self.manifest['assets'].items():
             if Path(name).name!=name or not name.lower().endswith('.obm'):raise ValueError('Invalid content asset name')
             raw=(self.root/name).read_bytes()
-            if hashlib.sha256(raw).hexdigest()!=digest:raise ValueError('Content asset checksum mismatch: '+name)
+            if digest is not None and hashlib.sha256(raw).hexdigest()!=digest:raise ValueError('Content asset checksum mismatch: '+name)
             if len(raw)<8 or raw[:2]!=b'OI':raise ValueError('Unsupported content texture header: '+name)
             width,height=struct.unpack_from('<HH',raw,4);kind,bits=raw[2:4]
             if kind==1 and bits==4:expected=8+64+(width*height+1)//2
@@ -86,12 +104,41 @@ class CommunityContent:
             if not 0<width<=8192 or not 0<height<=8192 or len(raw)!=expected:raise ValueError('Invalid content texture dimensions or byte count: '+name)
             self.asset_dimensions[name]=(width,height)
             self.assets[name]=raw
+        self.sprite_descriptors={}
         for u in self.units:
             for name in u.get('textures',[u.get('texture')]):
                 if name not in self.assets:raise ValueError('Unregistered unit texture')
             if 'unit_icon_02.obm' not in self.assets:raise ValueError('Missing community icon atlas')
             width,height=self.asset_dimensions['unit_icon_02.obm'];x,y,w,h=u['icon']['rect']
             if x+w>width or y+h>height:raise ValueError('Icon rectangle outside its atlas')
+            filename=u.get('sprite_descriptor')
+            if filename:
+                if Path(filename).name!=filename or not filename.endswith('.json'):raise ValueError('Invalid sprite descriptor path')
+                desc=json.loads((self.root/filename).read_text(encoding='utf-8'))
+                rects=desc['rects'];frames=desc['frames'];textures=u.get('textures',[u.get('texture')])
+                if not 1<=len(rects)<=8192 or not 1<=len(frames)<=65536 or not 1<=desc['script_count']<=256:raise ValueError('Invalid sprite descriptor capacity')
+                for x,y,w,h,ax,ay,flags,page in rects:
+                    if any(not isinstance(v,int) or not -32768<=v<=32767 for v in (x,y,w,h,ax,ay,flags,page)) or not 0<=page<len(textures):raise ValueError('Invalid sprite rectangle')
+                    width,height=self.asset_dimensions[textures[page]]
+                    if min(x,y,w,h)<0 or x+w>width or y+h>height:raise ValueError('Sprite rectangle outside its atlas')
+                starts=set();pos=0
+                while pos<len(frames):
+                    starts.add(pos);count=frames[pos]
+                    if not isinstance(count,int) or not 0<=count<=64 or pos+count>=len(frames) or any(not isinstance(v,int) or not 0<=v<len(rects) for v in frames[pos+1:pos+1+count]):raise ValueError('Invalid sprite frame')
+                    pos+=count+1
+                for key,commands in u['animations'].items():
+                    if not 0<=int(key)<desc['script_count']:raise ValueError('Animation index outside sprite descriptor')
+                    for cmd in commands:
+                        op,values=cmd['opcode'],cmd['values']
+                        if op==0 and values[0]!=-1 and values[0] not in starts:raise ValueError('Animation references invalid frame')
+                        if op in (10,11,12,22) and not 0<=values[0]<desc['script_count']:raise ValueError('Animation references invalid child script')
+                        if op in (3,4) and not -1<=values[0]<len(desc['hit_bounds' if op==3 else 'attack_bounds']):raise ValueError('Animation references invalid collision rectangle')
+                for field in ('hit_bounds','attack_bounds'):
+                    if not 1<=len(desc[field])<=256 or any(len(r)!=5 or any(not isinstance(v,int) or not -2147483648<=v<=2147483647 for v in r) for r in desc[field]):raise ValueError('Invalid sprite collision bounds')
+                self.sprite_descriptors[u['key']]=desc
+            if 'recovery_animation' in u:
+                value=u['recovery_animation']
+                if u['base_id']!=61 or not filename or not isinstance(value,int) or isinstance(value,bool) or not 0<=value<desc['script_count']:raise ValueError('Invalid mummy recovery animation')
         from campaign_catalog import merge_scenes
         merge_scenes(self)
         import community_maps
@@ -131,6 +178,7 @@ class CommunityContent:
         if self.unit_pack and (not hasattr(p.uc.lib,'msd_community_unit_pack_version') or p.uc.lib.msd_community_unit_pack_version()!=1):raise RuntimeError('Native core lacks community unit packs')
         if any(u.get('landing_unit_key') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_paratrooper_landing_version') or p.uc.lib.msd_community_paratrooper_landing_version()!=1):raise RuntimeError('Native core lacks paratrooper landing references')
         if any(u.get('child_unit_key') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_display_status_version') or p.uc.lib.msd_community_display_status_version()!=1):raise RuntimeError('Native core lacks child display status references')
+        if any('recovery_animation' in u for u in self.units) and (not hasattr(p.uc.lib,'msd_community_mummy_variant_version') or p.uc.lib.msd_community_mummy_variant_version()!=1):raise RuntimeError('Native core lacks mummy recovery and viewer adaptation')
         p.uc.lib.msd_enable_community_content()
         self.ready=False
 
@@ -164,12 +212,42 @@ class CommunityContent:
             uid=u['id'];bid=u['base_id'];row=bytearray(original[bid*0x390:(bid+1)*0x390])
             struct.pack_into('<I',row,0,uid)
             for off in (4,0xa8,0x12c,0x1b0,0x234,0x2b8):struct.pack_into('<i',row,off,u['ap'])
+            # 击毁 AP 返还（状态词 13）与 Wi-Fi 对战 RP（状态词 14）的六个等级锚点固定为本单位 AP 的 10%，向下取整（原版多数单位采用同一关系）。
+            for off in (0x34,0xc4,0x148,0x1cc,0x250,0x2d4,0x38,0xc8,0x14c,0x1d0,0x254,0x2d8):struct.pack_into('<i',row,off,u['ap']//10)
             # 有理数生命值在原生等级插值完成后缩放，避免中间等级的重复取整。
             if isinstance(u['hp_multiplier'],int):
                 for off in (12,0xb0,0x134,0x1b8,0x23c,0x2c0):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*u['hp_multiplier'])
             a,b=u['production_interval_multiplier'];ref=u['production_reference_id']
             for off in (8,0xac,0x130,0x1b4,0x238,0x2bc):
                 v=struct.unpack_from('<i',original,ref*0x390+off)[0];struct.pack_into('<i',row,off,(v*a+b-1)//b)
+            for group,reference in u.get('attack_parameter_references',{}).items():
+                target=22 if group=='normal' else 29;source=22 if reference['group']=='normal' else 29
+                for word in range(5):
+                    for dest,origin in zip(anchor_offsets(target+word),anchor_offsets(source+word)):
+                        row[dest:dest+4]=original[reference['unit_id']*0x390+origin:reference['unit_id']*0x390+origin+4]
+                attribute=28 if group=='normal' else 37;source_attribute=28 if reference['group']=='normal' else 37
+                row[attribute*4:attribute*4+4]=original[reference['unit_id']*0x390+source_attribute*4:reference['unit_id']*0x390+source_attribute*4+4]
+            for field,words in (('normal_projectile_distance_multiplier',(26,)),('special_projectile_distance_multiplier',(33,)),
+                                ('summon_interval_multiplier',(38,39)),('construction_time_multiplier',(38,))):
+                a,b=ratio(u.get(field,[1,1]))
+                for word in words:
+                    for off in anchor_offsets(word):
+                        value=struct.unpack_from('<i',row,off)[0]
+                        # 原生箱体在计量降至负值的 tick 召唤；后续间隔包含计量零值的一帧。
+                        if field=='summon_interval_multiplier' and word==39 and a!=b:
+                            scaled=((value+1)*a+b-1)//b-1
+                        else:scaled=(value*a+b-1)//b if 'time' in field or 'interval' in field else value*a//b
+                        struct.pack_into('<i',row,off,scaled)
+            if u.get('normal_attack_range_from_projectile'):
+                # 远距普通攻击的开火门槛采用已缩放的普通弹体目的距离。
+                for destination,source in zip(anchor_offsets(7),anchor_offsets(26)):
+                    row[destination:destination+4]=row[source:source+4]
+                # 原生距离元数据随普通及特殊弹体行程共同更新。
+                row[0x370:0x374]=row[26*4:27*4]
+                row[0x374:0x378]=row[33*4:34*4]
+            # SetUnitInfoParam 根据状态词 48/49 选择六档距离标签。
+            for group,category in u.get('attack_range_categories',{}).items():
+                struct.pack_into('<i',row,0x368 if group=='normal' else 0x36c,category)
             a,b=u['special_damage_multiplier']
             for off in (0x74,0xfc,0x180,0x204,0x288,0x30c):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*a//b)
             # Native status IDs 24/31 map to status words 27/34.
@@ -180,16 +258,43 @@ class CommunityContent:
                         0x88,0x110,0x194,0x218,0x29c,0x320):
                 value=struct.unpack_from('<i',row,off)[0]
                 struct.pack_into('<i',row,off,(value*a+b-1)//b)
+            # 击退门槛为状态词 4（原生插值后乘 100 作为击退计量）；六个等级锚点按倍率四舍五入。
+            # 非正值（原版 -1）表示每次受击均击退，计量不回填，该标记保持原值。
+            a,b=u.get('knockback_threshold_multiplier',[1,1])
+            for off in (0x10,0xb4,0x138,0x1bc,0x240,0x2c4):
+                value=struct.unpack_from('<i',row,off)[0]
+                if value>0:struct.pack_into('<i',row,off,(2*value*a+b)//(2*b))
             struct.pack_into('<i',row,0x378,u['faction']);rows+=row
-            if u.get('child_unit_key'):
-                child=next(entry['id'] for entry in self.units if entry['key']==u['child_unit_key'])
+            child_key=u.get('child_unit_key') or u.get('summoned_unit_key')
+            if child_key:
+                child=next(entry['id'] for entry in self.units if entry['key']==child_key)
                 struct.pack_into('<I',rows,len(rows)-0x390+0xa4,child)
-            action_rows+=p.read(actions+bid*4,4)
+            action=p.word(actions+bid*4)
+            if 'shot_action_reference_id' in u:
+                reference=p.word(actions+u['shot_action_reference_id']*4)
+                methods=bytearray(p.read(p.word(action),40))
+                methods[8:12]=p.read(p.word(reference)+8,4)
+                action=self.alloc(struct.pack('<I',self.alloc(methods)))
+            action_rows+=struct.pack('<I',action)
             descriptor=p.word(table+bid*8);header=bytearray(p.read(descriptor,32))
             textures=u.get('textures',[u.get('texture')]);image_count=p.word(descriptor)
-            if not 1<=image_count<=16 or len(textures)!=image_count:raise ValueError('Texture bindings must match the base unit atlas count')
+            desc=self.sprite_descriptors.get(u['key'])
+            if desc:image_count=len(textures)
+            if not 1<=image_count<=16 or len(textures)!=image_count:raise ValueError('Texture bindings must match the unit atlas count')
+            struct.pack_into('<I',header,0,image_count)
             struct.pack_into('<I',header,4,self.alloc(struct.pack('<'+'I'*image_count,*[p.cstr(t) for t in textures])))
             count=p.word(descriptor+28);scripts=list(struct.unpack('<'+'I'*count,p.read(p.word(descriptor+24),count*4)))
+            if desc:
+                raw_rects=b''.join(struct.pack('<8h',*r) for r in desc['rects'])
+                # 原生绘制函数按 uint32_t 读取帧条目；矩形描述符仍采用 int16_t。
+                raw_frames=struct.pack('<'+'I'*len(desc['frames']),*desc['frames'])
+                raw_hits=b''.join(struct.pack('<5i',*r) for r in desc['hit_bounds'])
+                raw_attacks=b''.join(struct.pack('<5i',*r) for r in desc['attack_bounds'])
+                blob=self.alloc(raw_rects+raw_frames+raw_hits+raw_attacks)
+                struct.pack_into('<4I',header,8,blob,blob+len(raw_rects),blob+len(raw_rects)+len(raw_frames),blob+len(raw_rects)+len(raw_frames)+len(raw_hits))
+                count=desc['script_count']
+                scripts=(scripts+[self.alloc(struct.pack('<i',5))]*max(0,count-len(scripts)))[:count]
+                struct.pack_into('<I',header,28,count)
             for key,commands in u['animations'].items():
                 if not 0<=int(key)<count:raise ValueError('Animation index outside base unit descriptor')
                 values=[v for cmd in commands for v in [cmd['opcode'],*cmd['values']]]
@@ -198,13 +303,17 @@ class CommunityContent:
             images+=struct.pack('<II',self.alloc(header),p.word(table+bid*8+4))
             menu_bid=u.get('menu_reference_id',bid)
             menurow=next(p.read(menu+j*20,20) for j in range(320) if p.word(menu+j*20)==menu_bid)
-            menurow=bytearray(menurow);struct.pack_into('<II',menurow,0,uid,uid)
+            # 原生修筑单位分别登记生产入口与完成箱体的界面预览标识。
+            preview_id=next(entry['id'] for entry in self.units if entry['key']==u['preview_unit_key']) if u.get('preview_unit_key') else uid
+            menurow=bytearray(menurow);struct.pack_into('<II',menurow,0,uid,preview_id)
             struct.pack_into('<h',menurow,8,u['faction']);struct.pack_into('<h',menurow,10,u['icon']['index'])
             shoprow=bytearray(p.read(shopbase+23*32,32));struct.pack_into('<H',shoprow,0,512+i)
             struct.pack_into('<I',shoprow,4,uid);struct.pack_into('<h',shoprow,16,u['shop_price'])
             data=self.progress['units'].get(u['key'],{})
-            level=int(data.get('level',-1));opened=int(data.get('level_open',40))
+            level=int(data.get('level',-1));opened=int(data.get('level_open',20))
             if not -1<=level<=39 or not 0<=opened<=40:raise ValueError('Invalid community unit progress')
+            # 原版初购保存上限为 20；兼容此前写入世界即时上限 10 的进度。
+            opened=max(20,opened)
             values=(uid,bid,512+i,self.alloc(menurow),self.alloc(shoprow),423+i,level&0xffffffff,opened,int(data.get('custom_time',0)),int(data.get('new',0)),int(data.get('shop_new',0)),u['shop_price'])
             struct.pack_into('<12I',records,i*RECORD_SIZE,*values)
             struct.pack_into('<I',records,i*RECORD_SIZE+0x88,int(data.get('deck_time',0)))
@@ -276,7 +385,9 @@ class CommunityContent:
         landings=struct.pack('<'+'I'*n,*(landing_ids[u['landing_unit_key']] if u.get('landing_unit_key') else 0 for u in self.units))
         display_ids=struct.pack('<'+'I'*n,*(landing_ids[u['child_unit_key']] if u.get('child_unit_key') else u['id'] for u in self.units))
         fields+=(pack_pointer,self.alloc(landings),self.alloc(display_ids))
-        p.write(HEADER,struct.pack('<27I',*fields));self.ready=True
+        recoveries=struct.pack('<'+'I'*n,*(u.get('recovery_animation',26) for u in self.units))
+        fields+=(self.alloc(recoveries),)
+        p.write(HEADER,struct.pack('<28I',*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==original
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])

@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-05",
+  "stage": "integrated_with_targeted_game_validation",
+  "implemented_in_game": true,
+  "units": {
+    "white_mummy": {
+      "name_zh": "白木乃伊",
+      "palette_source": "Metal Slug X",
+      "normal_attack": {
+        "projectile_reference": "普通木乃伊绝招弹球",
+        "projectile_count": 1,
+        "damage_multiplier": [
+          4,
+          5
+        ],
+        "rolling_distance_multiplier": [
+          3,
+          2
+        ]
+      },
+      "special_attack": {
+        "projectile_count": 3,
+        "interval_seconds_approximate": 0.33,
+        "projectile_reference": "本单位普通攻击弹球"
+      },
+      "ap": 80,
+      "production_cooldown": 700,
+      "level40_hp": 6000,
+      "production_cooldown_unit": "tick"
+    },
+    "green_mummy": {
+      "name_zh": "绿木乃伊",
+      "palette_source": "Metal Slug X",
+      "normal_attack": {
+        "spit_count": 1,
+        "insects_per_spit": 5,
+        "insect_behavior_reference": "悬挂木乃伊",
+        "emission_anchor_reference": "普通木乃伊吐出气体的坐标",
+        "emission_anchor": [
+          -8,
+          -31
+        ]
+      },
+      "special_attack": {
+        "spit_count": 3,
+        "insects_per_spit": 5,
+        "total_insect_count": 15,
+        "distance_multiplier": [
+          2,
+          1
+        ],
+        "interval_seconds": 0.3333333333333333,
+        "interval_ticks": 10
+      },
+      "ap": 90,
+      "production_cooldown": 630,
+      "level40_hp": 4200,
+      "production_cooldown_unit": "tick"
+    },
+    "mummy_generator_mk2": {
+      "name_zh": "木乃伊召唤箱 MKII",
+      "palette_reference": "source/Coffin.gif",
+      "palette_description": "用户确认的合金弹头 3 第四关红褐色",
+      "palette_confirmed_by_user": true,
+      "summoned_unit": "white_mummy",
+      "construction_time_multiplier": [
+        1,
+        1
+      ],
+      "ap": 220,
+      "production_cooldown": 1400,
+      "level40_hp": 10000,
+      "production_cooldown_unit": "tick",
+      "summon_interval_multiplier": [
+        5,
+        4
+      ]
+    }
+  },
+  "pending": [
+    "完整关卡与不同地形覆盖",
+    "通关解锁全流程与购买持久化专项验证"
+  ]
+}

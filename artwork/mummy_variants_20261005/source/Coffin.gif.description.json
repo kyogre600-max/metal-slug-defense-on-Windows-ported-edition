@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "3284": {
+    "pageid": 3284,
+    "ns": 6,
+    "title": "File:Coffin.gif",
+    "revisions": [
+     {
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "*": "\n[[Category:Sprites]]"
+       }
+      }
+     }
+    ]
+   }
+  }
+ }
+}

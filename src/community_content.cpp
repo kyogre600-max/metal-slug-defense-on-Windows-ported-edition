@@ -67,11 +67,13 @@ static void scale_integer(Context& c,uint32_t address,uint32_t pair){
 static void apply_combat_status(Context& c,uint32_t out){
  uint32_t p=combat_profile(c,rd<uint32_t>(c,out));if(!p)return;
  scale_integer(c,out+0xcu,p);
- for(uint32_t off:{0x34u,0x58u,0x74u})scale_integer(c,out+off,p+8u);
+ // 近距、普攻、绝招伤害分别为状态偏移 0x3c/0x58/0x74（词 15/22/29）；0x34（词 13）为被击毁时给予敌方的 AP，保持原值。
+ for(uint32_t off:{0x3cu,0x58u,0x74u})scale_integer(c,out+off,p+8u);
  uint32_t a=rd<uint32_t>(c,p+16u),b=rd<uint32_t>(c,p+20u);
  if(a!=b&&b)wr<float>(c,out+0x14u,rd<float>(c,out+0x14u)*float(a)/float(b));
  // 近距、远距攻击判定与三类弹体的目的距离分别缩放。
- for(uint32_t off:{0x18u,0x1cu,0x40u,0x68u,0x84u})scale_integer(c,out+off,p+24u);
+ // 近距弹体目的距离为 0x4c（词 19）；0x40（词 16）为近距击退力，保持原值。
+ for(uint32_t off:{0x18u,0x1cu,0x4cu,0x68u,0x84u})scale_integer(c,out+off,p+24u);
 }
 #define HOOK(NAME,PC,BODY) static Block old_##NAME;static void NAME(Context& c){BODY old_##NAME(c);}
 // 抛物线弹体保持垂直轨迹，水平位移按射程倍率缩放。
@@ -90,14 +92,14 @@ HOOK(vehicle_motion,0x101dde11u, scale_vehicle_motion(c);)
 HOOK(unitdata,0x101652a9u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+12));return;})
 HOOK(unitname,0x101652d5u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+0x30u+std::min(c.r[1],10u)*4u));return;})
 HOOK(unitinfo,0x101652e9u, uint32_t p=record(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+0x5cu+std::min(c.r[1],10u)*4u));return;})
-HOOK(maxlevel,0x1016533bu, if(active(c)&&real_unit(c,c.r[0])){ret(c,player_level_cap(c,head(c,28),c.r[0]));return;})
+HOOK(maxlevel,0x1016533bu, /* 原生世界开放数量与菜单数据共同决定免费基础上限。 */)
 HOOK(getlevel,0x10167af1u, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+0x8cu)?0xffffffffu:rd<uint32_t>(c,p+24));return;}if(active(c)&&c.r[1]>=400u){ret(c,0xffffffffu);return;})
 HOOK(setlevel,0x10167b5bu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+24,uint32_t(std::max(-1,std::min(39,int32_t(c.r[2])))));dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(addlevel,0x10167b0fu, if(limit_player_increment(c))return;uint32_t p=record(c,c.r[1]);if(p){int v=std::max(-1,std::min(39,int32_t(rd<uint32_t>(c,p+24))+int32_t(c.r[2])));wr<uint32_t>(c,p+24,uint32_t(v));dirty(c);ret(c,uint32_t(v));return;}if(active(c)&&c.r[1]>=400u){ret(c,0xffffffffu);return;})
 HOOK(getopen,0x10167ccbu, if(active(c)&&real_unit(c,c.r[1])){ret(c,reconcile_player_cap(c,c.r[0],c.r[1]));return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
-HOOK(isopen,0x10167cf3u, if(active(c)){ret(c,0u);return;})
-HOOK(setopen,0x10167d69u, if(active(c)&&real_unit(c,c.r[1]))c.r[2]=player_level_cap(c,c.r[0],c.r[1]);uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+28,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
-HOOK(addopen,0x10167d1du, if(active(c)&&real_unit(c,c.r[1])){ret(c,reconcile_player_cap(c,c.r[0],c.r[1]));return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
+HOOK(isopen,0x10167cf3u, if(active(c)&&real_unit(c,c.r[1])){ret(c,reconcile_player_cap(c,c.r[0],c.r[1])<=39u);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
+HOOK(setopen,0x10167d69u, if(active(c)&&real_unit(c,c.r[1]))c.r[2]=uint32_t(std::max(0,std::min(40,int32_t(c.r[2]))));uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+28,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
+HOOK(addopen,0x10167d1du, uint32_t p=record(c,c.r[1]);if(p){int32_t cap=std::max(0,std::min(40,int32_t(rd<uint32_t>(c,p+28u))+int32_t(c.r[2])));wr<uint32_t>(c,p+28u,uint32_t(cap));dirty(c);ret(c,uint32_t(cap));return;}if(active(c)&&c.r[1]>=400u){ret(c,40u);return;})
 HOOK(gettime,0x10167bafu, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+32));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(settime,0x10167bcfu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+32,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(getdecktime,0x10167c0du, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+0x88u));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
@@ -151,6 +153,38 @@ extern "C" __declspec(dllexport) uint32_t msd_community_paratrooper_landing_vers
 // 属性面板显示实际作战单位；其他调用保留购买与拥有状态的原生标识。
 HOOK(menu_display_id,0x101652fdu, if(record(c,c.r[0])&&c.r[14]==0x101ecd31u&&head(c,104)){ret(c,rd<uint32_t>(c,head(c,104)+(c.r[0]-U)*4u));return;})
 extern "C" __declspec(dllexport) uint32_t msd_community_display_status_version(){return 1u;}
+// 地面木乃伊与虫群共享原生动画编号；本体击退恢复使用登记的独立槽。
+HOOK(mummy_recovery,0x101de017u,
+ if(active(c)&&c.r[1]==26u&&rd<uint32_t>(c,c.r[0])==head(c,84)&&head(c,108)){
+  uint32_t uid=rd<uint32_t>(c,c.r[0]+0x128u);
+  if(record(c,uid))c.r[1]=rd<uint32_t>(c,head(c,108)+(uid-U)*4u);
+ })
+// 修筑单位的浏览模式沿用原版初始化位置与完成箱体选择流程。
+HOOK(mummy_viewer_setup,0x1020a665u,
+ uint32_t p=record(c,c.r[4]);
+ if(p&&rd<uint32_t>(c,p+4u)==77u&&head(c,104)&&rd<uint32_t>(c,head(c,104)+(c.r[4]-U)*4u)!=c.r[4]){
+  wr<uint32_t>(c,c.r[5]+176u,300u);wr<uint32_t>(c,c.r[5]+180u,400u);
+  c.pc=0x1020a9a7u;return;
+ })
+HOOK(mummy_viewer_child,0x1020a571u,
+ uint32_t p=record(c,c.r[0]);if(p&&rd<uint32_t>(c,p+4u)==77u)c.r[0]=77u;
+ )
+HOOK(mummy_viewer_update,0x1020b0edu,
+ uint32_t p=record(c,c.r[0]);if(p&&rd<uint32_t>(c,p+4u)==77u){
+  uint32_t object=c.r[4];uint32_t state=rd<uint32_t>(c,object+0x7cu);
+  if((state==10u||state==20u)&&rd<float>(c,object+0x8cu)<320.0f){
+   wr<uint32_t>(c,object+0x80u,20u);wr<uint32_t>(c,object+0x84u,20u);
+  }
+  c.r[0]=77u;
+ }
+ )
+HOOK(mummy_viewer_initial_state,0x1020ab2du,
+ uint32_t object=rd<uint32_t>(c,c.r[7]+24u);
+ if(object){uint32_t p=record(c,rd<uint32_t>(c,object+0x128u));
+  if(p&&rd<uint32_t>(c,p+4u)==77u){wr<uint32_t>(c,object+0x80u,20u);wr<uint32_t>(c,object+0x84u,20u);}
+ }
+ )
+extern "C" __declspec(dllexport) uint32_t msd_community_mummy_variant_version(){return 1u;}
 // 敌军名单沿用原生等级与标志计算，社区身份由运行注册表确认。
 HOOK(enemy_roster,0x101c9d07u,
  uint32_t row=rd<uint32_t>(c,c.r[3]+68u)+c.r[6]*c.r[5];

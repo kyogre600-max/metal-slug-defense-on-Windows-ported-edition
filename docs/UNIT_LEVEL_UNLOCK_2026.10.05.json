@@ -1,0 +1,209 @@
+{
+  "date": "2026-10-05",
+  "version": "1.46.3.1",
+  "status": "verified_formal_workspace",
+  "core": {
+    "library": "MSD_Core.dll",
+    "built_library": "MSD_Core_NativeLevelUnlock_r4_20261005.dll",
+    "bytes": 27091735,
+    "sha256_performed": false
+  },
+  "rules": {
+    "world_base_cap": "Original GetWorldMax and menu rows: 10/20/20",
+    "paid_stages": [
+      {
+        "from": 20,
+        "to": 25,
+        "medals": 30
+      },
+      {
+        "from": 25,
+        "to": 30,
+        "medals": 50
+      },
+      {
+        "from": 30,
+        "to": 35,
+        "medals": 70
+      }
+    ],
+    "matching_core_after_stage35_cap": 40,
+    "additional_medals_for_35_to_40": 0,
+    "new_and_legacy_low_saved_cap": 20,
+    "initial_effective_cap": 10,
+    "existing_levels_and_paid_stages_preserved": true,
+    "missing_next_world_entry_after_final_area_clear": "Recovered using the original SetAreaEnableSaveData",
+    "registered_and_future_community_units": "Runtime identity and faction; no fixed unit list"
+  },
+  "validation": {
+    "world_purchase_and_final_settlement": [
+      {
+        "world": 0,
+        "shop": 8,
+        "medals": 150,
+        "cleared": 67,
+        "purchased": {
+          "5": {
+            "maximum": 10,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 10,
+            "open": 20
+          }
+        },
+        "before_final_settlement": {
+          "5": {
+            "maximum": 10,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 10,
+            "open": 20
+          }
+        },
+        "completed": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        }
+      },
+      {
+        "world": 1,
+        "shop": 9,
+        "medals": 150,
+        "cleared": 67,
+        "purchased": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        },
+        "before_final_settlement": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        },
+        "completed": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        }
+      },
+      {
+        "world": 2,
+        "shop": 136,
+        "medals": 150,
+        "cleared": 67,
+        "purchased": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        },
+        "before_final_settlement": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        },
+        "completed": {
+          "5": {
+            "maximum": 20,
+            "open": 20
+          },
+          "1024": {
+            "maximum": 20,
+            "open": 20
+          }
+        }
+      }
+    ],
+    "current_rule_matrix_checks": 8773,
+    "future_unit_id": 1043,
+    "future_rule_matrix_checks": 8794,
+    "selectable_community_units": 16,
+    "ui_units": 17,
+    "paid_ui_transactions": 21,
+    "actual_level35_to40_steps": 85,
+    "core_purchase_before_and_after_stage35": "passed",
+    "current_and_future_unit_restart": "passed",
+    "legacy_cap10_migration": "passed",
+    "missing_world_entry_recovery_and_repeated_load": "passed",
+    "enemy_status_cases": 4190,
+    "enemy_fields": 247210,
+    "enemy_roster_entries": 60,
+    "enemy_differences": 0,
+    "active_startup_frames": 215,
+    "active_shop_units": [
+      1039,
+      1040,
+      1041
+    ],
+    "active_shop_frames_per_unit": 180,
+    "revision_scope": "R2/R3 full level tests; R4 retains identical level rules and includes the concurrent mummy viewer state correction, verified with the active configuration and actual shop drawing",
+    "evidence": [
+      "../verification/level_unlock_20261005/candidate_matrix_r2.json",
+      "../verification/level_unlock_20261005/future_matrix_r2.json",
+      "../verification/level_unlock_20261005/paid_ui_r3.json",
+      "../verification/level_unlock_20261005/paid_restart_r3.json",
+      "../verification/level_unlock_20261005/core_transaction_r2.json",
+      "../verification/level_unlock_20261005/future_core_transaction_r2.json",
+      "../verification/level_unlock_20261005/future_restart_r2.json",
+      "../verification/level_unlock_20261005/legacy_migration_r2.json",
+      "../verification/level_unlock_20261005/enemy_regression.json",
+      "../verification/level_unlock_20261005/world_recovery_r3.json",
+      "../verification/level_unlock_20261005/active_r4.json"
+    ],
+    "scope": "Isolated native purchase, settlement, upgrade, persistence, status and startup checks"
+  },
+  "deployment": {
+    "formal_workspace": "F:\\egg\\github\\metal-slug-defense-on-Windows-ported-edition",
+    "active_config": {
+      "library": "MSD_Core.dll"
+    },
+    "local_formal_runtime": "F:\\egg\\research\\metal_slug_defense\\windows_native\\dist\\MSD_Windows",
+    "local_formal_sync_by_this_task": "pending_user_confirmation_per_AGENTS_2.1",
+    "personal_save_written_by_this_task": false,
+    "beta_modified_by_this_task": false,
+    "git_staged_committed_pushed_by_this_task": false,
+    "proposed_files": [
+      "build/MSD_Core.dll",
+      "core_runtime.json",
+      "community_content.py",
+      "world_level_rules.py",
+      "community_campaign.py",
+      "README.md",
+      "docs/UNIT_LEVEL_UNLOCK_2026.10.05.md",
+      "docs/UNIT_LEVEL_UNLOCK_2026.10.05.json",
+      "docs/UNIT_LEVEL_RULES_1.46.2.json"
+    ]
+  }
+}

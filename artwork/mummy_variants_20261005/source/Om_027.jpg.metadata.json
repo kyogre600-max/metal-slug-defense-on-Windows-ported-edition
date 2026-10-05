@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "9896": {
+    "pageid": 9896,
+    "ns": 6,
+    "title": "File:Om 027.jpg",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 98532,
+      "width": 640,
+      "height": 480,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/4/4d/Om_027.jpg/revision/latest?cb=20160718084130",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:Om_027.jpg",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=9896"
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "4378": {
+    "pageid": 4378,
+    "ns": 0,
+    "title": "Mummy Generator",
+    "revisions": [
+     {
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "*": "{{Enemies Infobox\n| image = Om_027.jpg \n| caption = Concept art of the mummy  \n| name = Mummy Generator  \n| origin = Cursed stone  \n| attacks = Spawning mummies \n| factions = [[Mummy Army]]\n| health = Medium \n| firstgame = [[Metal Slug 2]] \n| lastgame = [[Metal Slug Attack]] \n| games = [[Metal Slug 2]]<br/>[[Metal Slug X]]<br/>[[Metal Slug 3]]<br/>[[Metal Slug Defense]]<br/>[[Metal Slug Attack]]\n| sprite = [[File:Coffin.gif]][[File:Coffin.png]]\n}}\n\nThe '''Mummy Generator''', also known as '''Mummy Gate''', is an [[Environmental Objects|environmental object]] introduced in ''[[Metal Slug 2]]''.\n\n== Information ==\nMummy Generators are usually found inside Egyptian-like locations. It resembles a phone booth with a \"MUMMY\" sign on top, and is connected to an underground morgue containing Mummies. Mummy Generators will endlessly spawn [[Mummies]] until it's destroyed. Some generators spawn [[Dog Mummy|Dog Mummies]].\n\nThe Mummy Generator appears in [[Metal Slug Defense|''Metal Slug Defense'']] purchasable for 120 medals. A few generators are found in a few levels as obstacles.\n\nA variant that spawn [[Mummy Cat|Mummy Cats]] appears in ''[[Metal Slug Attack]]'' as a Rare Boss unit for the \"Pharaoh Rebirth\" Extra Ops. Unit parts can be earned by playing through the second level of the Another Story \"Arabian Romance\".{{Enemies}}"
+       }
+      }
+     }
+    ]
+   }
+  }
+ }
+}

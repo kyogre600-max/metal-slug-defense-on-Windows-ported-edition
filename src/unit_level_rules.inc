@@ -1,17 +1,4 @@
-// beta 玩家升级限制同时依据普通世界主线进度和对应军队核库存。
-static constexpr uint32_t WORLD_H=0x1ffe9000u,WORLD_MAGIC=0x57474c31u;
-static uint32_t world_level_cap(Context& c,uint32_t app){
- if(rd<uint32_t>(c,WORLD_H)!=WORLD_MAGIC)return 40u;
- for(uint32_t world=0;world<2u;world++){
-  uint32_t bits=rd<uint32_t>(c,WORLD_H+4u+world*8u),count=rd<uint32_t>(c,WORLD_H+8u+world*8u);
-  if(!count)return world?20u:10u;
-  for(uint32_t i=0;i<count;i++){
-   uint32_t bit=rd<uint32_t>(c,bits+i*4u);
-   if(!(rd<uint32_t>(c,app+0x5140u+(bit/32u)*4u)&(1u<<(bit%32u))))return world?20u:10u;
-  }
- }
- return 40u;
-}
+// 玩家沿用原版世界开放判定及 20/25/30/35 级的持久化解锁阶段。
 static uint32_t player_level_address(uint32_t app,uint32_t uid){
  return app+(uid<300u?0x3e28u:0x86a8u)+uid*2u;
 }
@@ -22,8 +9,13 @@ static int32_t player_saved_level(Context& c,uint32_t app,uint32_t uid){
  uint32_t entry=record(c,uid);
  return entry?rd<int32_t>(c,entry+24u):rd<int16_t>(c,player_level_address(app,uid));
 }
+static uint32_t player_saved_cap(Context& c,uint32_t app,uint32_t uid){
+ uint32_t entry=record(c,uid);
+ int32_t value=entry?rd<int32_t>(c,entry+28u):rd<int16_t>(c,player_cap_address(app,uid));
+ return uint32_t(std::max(20,std::min(40,value)));
+}
 static bool player_has_faction_core(Context& c,uint32_t app,uint32_t uid){
- // BattleInfo's database includes the registered unit rows and their factions.
+ // 运行数据库包含当前及后续有效登记单位的阵营。
  uint32_t info=rd<uint32_t>(c,0x101cfa94u)+0x101cfa84u+4u;
  uint32_t db=rd<uint32_t>(c,info),rows=rd<uint32_t>(c,db+4u);
  if(uid>=rd<uint32_t>(c,db+8u))return false;
@@ -33,18 +25,33 @@ static bool player_has_faction_core(Context& c,uint32_t app,uint32_t uid){
  uint32_t item=rd<uint32_t>(c,shops+(289u+uint32_t(faction))*32u+4u);
  return rd<int16_t>(c,app+0x3decu+item*2u)>0;
 }
+static uint32_t player_open_cap(Context& c,uint32_t app,uint32_t uid){
+ uint32_t cap=player_saved_cap(c,app,uid);
+ // 核心提前或延后购买均适用；前置付费阶段继续保留。
+ if(cap>=35u)return player_has_faction_core(c,app,uid)?40u:35u;
+ return cap;
+}
+static uint32_t native_player_base_cap(Context& c,uint32_t uid){
+ // 在独立寄存器上下文中执行原生只读查询，保留调用方寄存器及标志。
+ Context query=c;
+ constexpr uint32_t done=0x10000001u;
+ query.r[0]=uid;query.r[14]=done;query.pc=0x1016533bu;query.error=0u;
+ for(uint32_t i=0;i<20000u&&query.pc!=done&&!query.error;i++){
+  Block block=find_block(query.pc);
+  if(!block){query.error=2u;query.error_address=query.pc;break;}
+  block(query);
+ }
+ if(query.error||query.pc!=done){c.error=query.error?query.error:2u;c.error_address=query.error_address;return 0u;}
+ return query.r[0];
+}
 static uint32_t player_level_cap(Context& c,uint32_t app,uint32_t uid){
- // 已有高等级保存值继续保留；世界上限用于约束后续升级。
- uint32_t core_cap=player_has_faction_core(c,app,uid)?40u:35u;
- return std::min(world_level_cap(c,app),core_cap);
+ uint32_t base=native_player_base_cap(c,uid);
+ return base<=10u?base:std::max(base,player_open_cap(c,app,uid));
 }
 static uint32_t reconcile_player_cap(Context& c,uint32_t app,uint32_t uid){
- uint32_t cap=player_level_cap(c,app,uid),entry=record(c,uid);
- if(entry){
-  if(rd<uint32_t>(c,entry+28u)!=cap){wr<uint32_t>(c,entry+28u,cap);dirty(c);}
- }else if(player_saved_level(c,app,uid)>=0){
-  wr<int16_t>(c,player_cap_address(app,uid),int16_t(cap));
- }
+ uint32_t cap=player_open_cap(c,app,uid),entry=record(c,uid);
+ // 社区核心权限按登记身份协调，覆盖原生购买回调的 400 条记录边界。
+ if(entry&&cap==40u&&rd<uint32_t>(c,entry+28u)!=40u){wr<uint32_t>(c,entry+28u,40u);dirty(c);}
  return cap;
 }
 static bool limit_player_increment(Context& c){
@@ -56,16 +63,29 @@ static bool limit_player_increment(Context& c){
 }
 extern "C" __declspec(dllexport) uint32_t msd_player_level_rules_version(){return 1u;}
 extern "C" __declspec(dllexport) uint32_t msd_world_level_rules_version(){return 1u;}
-static Block old_world_upgrade;
+extern "C" __declspec(dllexport) uint32_t msd_native_level_rules_version(){return 1u;}
+static Block old_world_upgrade,old_limit_break;
 static void world_upgrade(Context& c){
- if(active(c)&&rd<uint32_t>(c,WORLD_H)==WORLD_MAGIC){
-  uint32_t limit=world_level_cap(c,c.r[4]);
-  // 世界条件尚未满足时，保留原生单位页面并结束本次选择。
-  if(limit<35u&&int32_t(c.r[7])>=int32_t(limit)-1){c.pc=0x101ed2d1u;return;}
+ if(active(c)){
+  uint32_t uid=rd<uint32_t>(c,c.r[5]+0x224u);
+  if(real_unit(c,uid)){
+   uint32_t limit=player_level_cap(c,c.r[4],uid);
+   // 世界初期、无核心 Lv35 及最终 Lv40 边界均结束本次操作。
+   if((limit<=10u||limit>=35u)&&int32_t(c.r[7])>=int32_t(limit)-1){c.pc=0x101ed2d1u;return;}
+  }
  }
  old_world_upgrade(c);
+}
+static void limit_break(Context& c){
+ if(active(c)&&real_unit(c,c.r[1])){
+  uint32_t target=c.r[2]+5u;
+  if(target>40u||(target>35u&&!player_has_faction_core(c,c.r[0],c.r[1]))){ret(c,0u);return;}
+  c.r[2]=target;c.pc=0x10167d69u;return;
+ }
+ old_limit_break(c);
 }
 extern "C" __declspec(dllexport) void msd_enable_world_level_rules(){
  static bool installed=false;if(installed)return;installed=true;
  old_world_upgrade=find_block(0x101ed29fu);register_block(0x101ed29fu,world_upgrade);
+ old_limit_break=find_block(0x101eeae5u);register_block(0x101eeae5u,limit_break);
 }

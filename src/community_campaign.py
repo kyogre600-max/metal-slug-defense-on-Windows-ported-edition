@@ -208,7 +208,7 @@ class CommunityCampaign:
                         uid=self.catalog.unit_id(unit)
                         if p.call('_ZN7AppMain20GetUnitLevelSaveDataE6UnitID',app,uid)==0xffffffff:
                             p.call('_ZN7AppMain20SetUnitLevelSaveDataE6UnitIDi',app,uid,0)
-                            p.call('_ZN7AppMain24SetUnitLevelOpenSaveDataE6UnitIDi',app,uid,39)
+                            p.call('_ZN7AppMain24SetUnitLevelOpenSaveDataE6UnitIDi',app,uid,20)
                     saved['unit_rewards_claimed']=True
             p.call('_ZN7AppMain18AddMSPointSaveDataEi',app,earned)
             p.call('_ZN7AppMain26SetContinueStageIDSaveDataEi',app,0)

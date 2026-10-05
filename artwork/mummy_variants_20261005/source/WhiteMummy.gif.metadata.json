@@ -1,0 +1,24 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "20050": {
+    "pageid": 20050,
+    "ns": 6,
+    "title": "File:WhiteMummy.gif",
+    "imagerepository": "local",
+    "imageinfo": [
+     {
+      "size": 35951,
+      "width": 55,
+      "height": 46,
+      "duration": 2.5199999999999982,
+      "url": "https://static.wikia.nocookie.net/metalslug/images/2/20/WhiteMummy.gif/revision/latest?cb=20201001211247",
+      "descriptionurl": "https://metalslug.fandom.com/wiki/File:WhiteMummy.gif",
+      "descriptionshorturl": "https://metalslug.fandom.com/index.php?curid=20050"
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "pages": {
+   "2162": {
+    "pageid": 2162,
+    "ns": 0,
+    "title": "Mummies",
+    "revisions": [
+     {
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "*": "{{Enemies Infobox\n| image = MSC - Mummy.png\n| caption = \n| name = Mummies\n| origin = Ajirabia/Egypt\n| attacks = Unleashing a poisonous gas<br/>Spitting poisonous balls<br/>Spitting [[Chariot]]s\n| factions = [[Mummy Army]]\n| health = Medium\n| firstgame = ''[[Metal Slug 2]]''\n| lastgame = ''[[Metal Slug: Awakening]]''\n| games = ''[[Metal Slug 2]]<br/>[[Metal Slug X]]<br/>[[Metal Slug 3]]<br/>[[Metal Slug 4]]<br/>[[Metal Slug Defense]]<br/>[[Metal Slug Attack]]<br/>[[Metal Slug Infinity]]<br>[[Metal Slug: Awakening]]''\n| sprite = [[File:0023.gif]] [[File:Mummy_turningintodust.gif]]\n}}[[File:Mummyms2.gif]]\n\nThe '''Mummies''' are recurring enemies in the ''Metal Slug'' series.\n\n==Information==\nThese mummies serve as ancient guardians of the Ajirabian ruins and will attack anyone who disturbs their eternal slumber. These undead walk slowly across the area until they find a victim, upon which they project a purple gas from their lungs which mummify their victims. [[POW]]s are not infected by any type of mummies' attacks. If the player is [[Transformations|transformed]] into a mummy, their movement is slowed, firepower is brought down to a pistol with decreased fire rate, and there is a delay while throwing a grenade. A mummified player can be cured by finding a vial of holy water which are dropped by enemies, prisoners and treasure chests.\n\nIn ''Metal Slug X'' onward, [[Dog Mummy|Dog Mummies]] are introduced and work alongside regular Mummies. Dog Mummies can jump and have a longer attack range.\n\n== Mummy Types==\n\n{|\n|[[File:0023.gif|center]]\n|'''Regular Mummy''':\nWill attempt to shuffle towards their enemy and then breathe purple gas onto them. Anyone who comes into contact with the gas will become a victim to mummification. If a playable character comes into contact with the gas while in mummy form then they'll die. The easiest type to beat as the player only needs to duck and shoot.\n|-\n|[[File:WhiteMummy.gif|center]]\n|'''Poison Bullet Mummy''':\nVery similar to the Regular Mummy, except for their whiter color. Rather than exhaling poison, they instead spit out a bomb that will roll across the floor towards their opponent. These bombs contain mummification gas akin to the regular Mummy's breath.\n|-\n|[[File:0035.gif|center]]\n|'''Chariot Spitting Mummy''':\nThese Mummies remain stationary at all times and can be usually found on hard-to-reach platforms. Their method of attack is to spit out [[Chariot]]s that chase the player. These Chariot can be killed with any form of attack. This is the only type of Mummy that does not induce mummification; the Chariots kill the player instantly.\n|-\n|[[File:Mummy_Roped.gif|center]]\n|'''Hunged [sic] Mummy''':\nAlso called '''Bagworm Mummy''' or '''Bungee Mummy''', these Mummies are hanged from the ceiling and cannot move. They tend to hang over pits and are easy targets for grenades. In ''Metal Slug Defense'' and ''Metal Slug Attack'', it spits Chariots.\n|-\n|[[File:084.gif|center]] [[File:Fake_Mummy.gif|center]]\n|'''Fake Mummy''':\nThese are just humans wearing amusement park mascot costumes. They roar with exaggerated eye movement but don't attack, making them harmless. Once they are revealed, they will just sit scared. They only appear in [[Cadaverous|Mission 4]] of ''Metal Slug 4''.\n|}\n\n==Trivia ==\n*Mummies are the first supernatural enemies to appear in the ''Metal Slug'' series.\n*The Chariots the Mummies spit are based on the Carnivorous Scarabs from ''The Mummy'' film series.\n\n==Gallery ==\n<gallery>\nMummies_Artwork.jpg|Concept Art\n</gallery>\n{{Enemies}}\n\n[[Category:Metal Slug 2]]\n[[Category:Metal Slug 3]]\n[[Category:Metal Slug 4]]\n[[Category:Metal Slug Defense]]\n[[Category:Metal Slug Attack]]\n[[Category:Metal Slug Infinity]]"
+       }
+      }
+     }
+    ]
+   }
+  }
+ }
+}

@@ -8,6 +8,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--library',default='msd_aot.dll',help='Output DLL basename; a distinct filename supports updating a running installation')
     parser.add_argument('--no-activate',action='store_true',help='Build without replacing the active core configuration')
+    parser.add_argument('--no-sha256',action='store_true',help='Build without calculating SHA-256 or writing a digest')
     args=parser.parse_args();name=args.library
     if Path(name).name!=name or not name.lower().endswith('.dll'):raise ValueError('Invalid native DLL basename')
     out=ROOT/'build';out.mkdir(exist_ok=True)
@@ -33,8 +34,9 @@ def main():
     library=out/name
     command=[str(COMPILER),'-shared','-static-libgcc','-static-libstdc++','-o',str(library),*[str(p) for p in objects]]
     subprocess.run(command,check=True)
-    result={'compiler':str(COMPILER),'target':'Windows x64 PE DLL','library':name,'seconds':time.perf_counter()-started,'sha256':hashlib.sha256(library.read_bytes()).hexdigest(),'bytes':library.stat().st_size,'objects':len(objects)}
+    result={'compiler':str(COMPILER),'target':'Windows x64 PE DLL','library':name,'seconds':time.perf_counter()-started,'bytes':library.stat().st_size,'objects':len(objects)}
+    if not args.no_sha256:result['sha256']=hashlib.sha256(library.read_bytes()).hexdigest()
     (out/'build_result.json').write_text(json.dumps(result,indent=2))
-    if not args.no_activate:(ROOT/'core_runtime.json').write_text(json.dumps({'library':name,'sha256':result['sha256']},indent=2),encoding='utf-8')
+    if not args.no_activate:(ROOT/'core_runtime.json').write_text(json.dumps({'library':name,**({'sha256':result['sha256']} if 'sha256' in result else {})},indent=2),encoding='utf-8')
     print(json.dumps(result))
 if __name__=='__main__':main()

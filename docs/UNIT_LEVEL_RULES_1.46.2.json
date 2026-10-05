@@ -1,5 +1,7 @@
 {
   "version": "1.46.2",
+  "superseded_by": "UNIT_LEVEL_UNLOCK_2026.10.05.json",
+  "historical_scope": "The following rules and validation describe the earlier world-progress gate; the current player unlock rules are recorded in the superseding report.",
   "status": "verified_locally",
   "core": {
     "library": "MSD_Core.dll",
