@@ -8,6 +8,11 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+### Update 1.46.4
+
+- Updated the Windows display version, launcher titles, and EXE file/product versions to **1.46.4**.
+- This revision retains the current formal edition's content. Version metadata and launcher declarations have been checked; full campaign and long-term validation remain pending.
+
 ### Update 1.46.3.1
 
 - Added seven Regular Army infantry units: **Regular Army Shield Soldier**, **Regular Army Rifleman**, **Regular Army Bazooka Soldier**, **Regular Army Gatling Soldier**, **Regular Army Paratrooper**, **Regular Army Rocket Bomb Soldier**, and **Regular Army Mortar Soldier**.
@@ -96,6 +101,11 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+### 1.46.4 更新
+
+- Windows 显示版本、启动窗口标题及 EXE 文件版本与产品版本统一调整为 **1.46.4**。
+- 本次修订沿用当前正式版内容。版本元数据及启动入口声明已核对；完整关卡与长期运行验证仍待开展。
 
 ### 1.46.3.1 更新
 

@@ -55,8 +55,18 @@ class CommunityContent:
                         'special_projectile_distance_multiplier','summon_interval_multiplier',
                         'construction_time_multiplier'):
                 ratio(u.get(key,[1,1]))
+            ratio(u.get('special_cooldown_multiplier',[1,1]))
+            for word,value in u.get('status_word_values',{}).items():
+                if not word.isdigit() or int(word) not in ANCHOR_INDEX or int(word) in (1,2,3,4,5,13,14) or not isinstance(value,int) or isinstance(value,bool) or not -2147483648<=value<=2147483647:raise ValueError('Invalid absolute status word')
+            flame=u.get('flame_interrupt')
+            if flame is not None:
+                bullets=flame.get('ending_bullet_animations')
+                values=[flame.get('flame_start_tick'),flame.get('flame_ticks'),flame.get('alternate_knockback_animation'),flame.get('knockback_limit_per_special')]
+                if u['base_id']!=3 or not u.get('sprite_descriptor') or not isinstance(bullets,list) or len(bullets)!=4 or any(not isinstance(v,int) or isinstance(v,bool) or not 0<=v<256 for v in values+bullets) or not 6<=values[1]<=200 or values[3] not in (0,1):raise ValueError('Invalid flame interruption adapter')
             for group,reference in u.get('attack_parameter_references',{}).items():
                 if group not in ('normal','special') or reference.get('group') not in ('normal','special') or not isinstance(reference.get('unit_id'),int) or not 0<reference['unit_id']<400:raise ValueError('Invalid attack parameter reference')
+            for group,attribute in u.get('attack_attributes',{}).items():
+                if group not in ('normal','special') or not isinstance(attribute,int) or isinstance(attribute,bool) or attribute not in range(5):raise ValueError('Invalid native attack attribute')
             if 'shot_action_reference_id' in u and (u['base_id']!=61 or u['shot_action_reference_id']!=157):raise ValueError('Unsupported mummy projectile action reference')
             if not isinstance(u.get('normal_attack_range_from_projectile',False),bool):raise ValueError('Invalid projectile attack-range flag')
             for group,category in u.get('attack_range_categories',{}).items():
@@ -136,6 +146,8 @@ class CommunityContent:
                 for field in ('hit_bounds','attack_bounds'):
                     if not 1<=len(desc[field])<=256 or any(len(r)!=5 or any(not isinstance(v,int) or not -2147483648<=v<=2147483647 for v in r) for r in desc[field]):raise ValueError('Invalid sprite collision bounds')
                 self.sprite_descriptors[u['key']]=desc
+            flame=u.get('flame_interrupt')
+            if flame and (flame['alternate_knockback_animation']+5>desc['script_count'] or any(v>=desc['script_count'] for v in flame['ending_bullet_animations'])):raise ValueError('Flame interruption animation outside sprite descriptor')
             if 'recovery_animation' in u:
                 value=u['recovery_animation']
                 if u['base_id']!=61 or not filename or not isinstance(value,int) or isinstance(value,bool) or not 0<=value<desc['script_count']:raise ValueError('Invalid mummy recovery animation')
@@ -179,6 +191,7 @@ class CommunityContent:
         if any(u.get('landing_unit_key') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_paratrooper_landing_version') or p.uc.lib.msd_community_paratrooper_landing_version()!=1):raise RuntimeError('Native core lacks paratrooper landing references')
         if any(u.get('child_unit_key') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_display_status_version') or p.uc.lib.msd_community_display_status_version()!=1):raise RuntimeError('Native core lacks child display status references')
         if any('recovery_animation' in u for u in self.units) and (not hasattr(p.uc.lib,'msd_community_mummy_variant_version') or p.uc.lib.msd_community_mummy_variant_version()!=1):raise RuntimeError('Native core lacks mummy recovery and viewer adaptation')
+        if any(u.get('flame_interrupt') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_flame_interrupt_version') or p.uc.lib.msd_community_flame_interrupt_version()!=1):raise RuntimeError('Native core lacks the flame interruption adapter')
         p.uc.lib.msd_enable_community_content()
         self.ready=False
 
@@ -227,6 +240,9 @@ class CommunityContent:
                         row[dest:dest+4]=original[reference['unit_id']*0x390+origin:reference['unit_id']*0x390+origin+4]
                 attribute=28 if group=='normal' else 37;source_attribute=28 if reference['group']=='normal' else 37
                 row[attribute*4:attribute*4+4]=original[reference['unit_id']*0x390+source_attribute*4:reference['unit_id']*0x390+source_attribute*4+4]
+            # 原生攻击属性为非等级字段：普攻词 28、绝招词 37；1 表示火焰。
+            for group,attribute in u.get('attack_attributes',{}).items():
+                struct.pack_into('<i',row,(28 if group=='normal' else 37)*4,attribute)
             for field,words in (('normal_projectile_distance_multiplier',(26,)),('special_projectile_distance_multiplier',(33,)),
                                 ('summon_interval_multiplier',(38,39)),('construction_time_multiplier',(38,))):
                 a,b=ratio(u.get(field,[1,1]))
@@ -258,6 +274,15 @@ class CommunityContent:
                         0x88,0x110,0x194,0x218,0x29c,0x320):
                 value=struct.unpack_from('<i',row,off)[0]
                 struct.pack_into('<i',row,off,(value*a+b-1)//b)
+            # 绝招冷却：词 35（每次绝招后）与词 36（出击后首次）的六个等级锚点按倍率向上取整。
+            a,b=ratio(u.get('special_cooldown_multiplier',[1,1]))
+            for word in (35,36):
+                for off in anchor_offsets(word):
+                    value=struct.unpack_from('<i',row,off)[0]
+                    if value>0:struct.pack_into('<i',row,off,(value*a+b-1)//b)
+            # 登记的状态词绝对值写入六个等级锚点（例如开火距离及脚本控制弹体的速度与目的距离）。
+            for word,value in u.get('status_word_values',{}).items():
+                for off in anchor_offsets(int(word)):struct.pack_into('<i',row,off,value)
             # 击退门槛为状态词 4（原生插值后乘 100 作为击退计量）；六个等级锚点按倍率四舍五入。
             # 非正值（原版 -1）表示每次受击均击退，计量不回填，该标记保持原值。
             a,b=u.get('knockback_threshold_multiplier',[1,1])
@@ -387,7 +412,14 @@ class CommunityContent:
         fields+=(pack_pointer,self.alloc(landings),self.alloc(display_ids))
         recoveries=struct.pack('<'+'I'*n,*(u.get('recovery_animation',26) for u in self.units))
         fields+=(self.alloc(recoveries),)
-        p.write(HEADER,struct.pack('<28I',*fields));self.ready=True
+        # 喷火受击收尾与单次击退限制：每单位 8 词（标记、喷火起点与时长 tick、收尾受击槽起点、四个收尾弹体动画）。
+        flames=bytearray()
+        for u in self.units:
+            f=u.get('flame_interrupt')
+            if f:flames+=struct.pack('<8I',1|(2 if f['knockback_limit_per_special'] else 0),f['flame_start_tick'],f['flame_ticks'],f['alternate_knockback_animation'],*f['ending_bullet_animations'])
+            else:flames+=bytes(32)
+        fields+=(self.alloc(flames),)
+        p.write(HEADER,struct.pack('<%dI'%len(fields),*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==original
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])

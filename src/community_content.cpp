@@ -213,5 +213,83 @@ HOOK(extension_mission,0x101d09fdu,
   ret(c,0u);return;
  })
 extern "C" __declspec(dllexport) uint32_t msd_content_interface_version(){return 1u;}
+// KT-21 喷火受击收尾与单次击退限制（第 112 字节头字段：每单位 8 词）。
+// 词 0 标记（1 启用收尾，2 启用击退限制）；词 1 喷火在槽 10 内的起点 tick，词 2 喷火时长；词 3 收尾受击槽起点；词 4..7 收尾弹体动画。
+static uint32_t flame_entry(Context& c,uint32_t uid){
+ if(!record(c,uid)||!head(c,112))return 0u;
+ uint32_t e=head(c,112)+(uid-U)*32u;return rd<uint32_t>(c,e)?e:0u;
+}
+struct FlameMark{uint32_t target,target_id,owner,count;};
+static FlameMark flame_marks[1024];static uint32_t flame_mark_count=0;
+struct FlameOwner{uint32_t owner,count;};
+static FlameOwner flame_owners[128];static uint32_t flame_owner_count=0;
+static uint32_t flame_owner_key(Context& c,uint32_t object){return uint32_t(rd<uint16_t>(c,object+0x62u))|((rd<uint32_t>(c,object+0x70u)&0xffu)<<16);}
+static void flame_owner_store(uint32_t owner,uint32_t count){
+ for(uint32_t i=0;i<flame_owner_count;++i)if(flame_owners[i].owner==owner){flame_owners[i].count=count;return;}
+ if(flame_owner_count<128u)flame_owners[flame_owner_count++]={owner,count};
+}
+static bool flame_owner_count_of(uint32_t owner,uint32_t& count){
+ for(uint32_t i=0;i<flame_owner_count;++i)if(flame_owners[i].owner==owner){count=flame_owners[i].count;return true;}
+ return false;
+}
+// 原生 setAnimationID：喷火阶段转入受击动画 11 时，按已执行的喷火 tick 选择含收尾的受击槽。
+static void flame_interrupt_select(Context& c){
+ if(active(c)&&c.r[1]==11u&&rd<uint32_t>(c,c.r[0])==head(c,84)){
+  uint32_t object=c.r[0],e=flame_entry(c,rd<uint32_t>(c,object+0x128u));
+  if(e&&rd<uint32_t>(c,object+0x7cu)==80u&&rd<uint32_t>(c,object+0xc4u)==10u){
+   uint32_t frames=rd<uint32_t>(c,rd<uint32_t>(c,object+0x5cu)+0x3cu);
+   int32_t k=int32_t(frames)-1-int32_t(rd<uint32_t>(c,e+4u));
+   int32_t span=int32_t(rd<uint32_t>(c,e+8u));
+   if(k>=1&&k<span){uint32_t variant=k<=4?0u:k<=8?1u:k<=12?2u:k<span-5?3u:4u;c.r[1]=rd<uint32_t>(c,e+12u)+variant;}
+  }
+ }
+}
+HOOK(kt21_flame_interrupt,0x101de017u, flame_interrupt_select(c);)
+// addBulletImpl：受击收尾槽发射的弹体改用登记的收尾动画、绝招参数组，命中与落地不切换动画（贯穿，动画结束后消失）。
+static void flame_ending_bullet(Context& c){
+ uint32_t owner=c.r[1];
+ if(active(c)&&rd<uint32_t>(c,owner)==head(c,84)){
+  uint32_t e=flame_entry(c,rd<uint32_t>(c,owner+0x128u));
+  if(e){uint32_t animation=rd<uint32_t>(c,owner+0xc4u),base=rd<uint32_t>(c,e+12u);
+   if(animation>=base&&animation<base+4u){
+    uint32_t sp=c.r[13];
+    wr<uint32_t>(c,sp+8u,50u);wr<uint32_t>(c,sp+0xcu,rd<uint32_t>(c,e+16u+(animation-base)*4u));
+    wr<uint32_t>(c,sp+0x10u,0xfffffffeu);wr<uint32_t>(c,sp+0x14u,0xfffffffeu);
+    flame_owner_store(flame_owner_key(c,owner),rd<uint32_t>(c,owner+0x324u));
+   }
+  }
+ }
+}
+HOOK(kt21_flame_ending_bullet,0x1017d7fdu, flame_ending_bullet(c);)
+// BattleUnit::damage 击退计量扣除处：同一次绝招的喷火对同一目标最多造成一次击退。
+static void flame_knockback_limit(Context& c){
+ if(active(c)){
+  uint32_t attacker=c.r[5],target=c.r[4],vt=rd<uint32_t>(c,attacker);
+  uint32_t e=flame_entry(c,rd<uint32_t>(c,attacker+0x128u));
+  if(e&&(rd<uint32_t>(c,e)&2u)){
+   uint32_t owner=flame_owner_key(c,attacker),count=0u;bool flame=false;
+   if(vt==head(c,84)&&rd<uint32_t>(c,attacker+0x7cu)==50u){count=rd<uint32_t>(c,attacker+0x324u);flame_owner_store(owner,count);flame=true;}
+   else if(vt==head(c,88)){
+    uint32_t animation=rd<uint32_t>(c,attacker+0xc4u);
+    for(uint32_t i=0;i<4u;++i)if(animation==rd<uint32_t>(c,e+16u+i*4u))flame=flame_owner_count_of(owner,count);
+   }
+   if(flame){
+    uint32_t sp=c.r[13],target_id=flame_owner_key(c,target);bool seen=false;
+    for(uint32_t i=0;i<flame_mark_count&&!seen;++i){const FlameMark& m=flame_marks[i];seen=m.target==target&&m.target_id==target_id&&m.owner==owner&&m.count==count;}
+    int32_t gauge=int32_t(rd<uint32_t>(c,target+0x310u));
+    // 已被本次绝招击退的目标：计量为正时不扣除；计量非正（原生每次受击均击退的单位）时保持计量为 1。
+    if(seen)wr<int32_t>(c,sp+0x48u,gauge>0?0:gauge-1);
+    else if(gauge-int32_t(rd<uint32_t>(c,sp+0x48u))<=0){
+     if(flame_mark_count>=1024u)flame_mark_count=0u;
+     flame_marks[flame_mark_count++]={target,target_id,owner,count};
+    }
+   }
+  }
+ }
+}
+HOOK(kt21_flame_knockback_limit,0x101e0b5du, flame_knockback_limit(c);)
+// BattleObjectManager::initialize：战斗开始时清除上述记录。
+HOOK(kt21_flame_battle_reset,0x101e019du, flame_mark_count=0u;flame_owner_count=0u;)
+extern "C" __declspec(dllexport) uint32_t msd_community_flame_interrupt_version(){return 1u;}
 // Generated block overrides and registration are emitted by the build script.
 #include "community_blocks.inc"

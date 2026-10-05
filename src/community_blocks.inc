@@ -1710,4 +1710,8 @@ old_enemy_unit_enable=find_block(0x101c98fbu);register_block(0x101c98fbu,enemy_u
 old_enemy_special_policy=find_block(0x101c9da3u);register_block(0x101c9da3u,enemy_special_policy);
 old_extension_music=find_block(0x101c6625u);register_block(0x101c6625u,extension_music);
 old_extension_mission=find_block(0x101d09fdu);register_block(0x101d09fdu,extension_mission);
+old_kt21_flame_interrupt=find_block(0x101de017u);register_block(0x101de017u,kt21_flame_interrupt);
+old_kt21_flame_ending_bullet=find_block(0x1017d7fdu);register_block(0x1017d7fdu,kt21_flame_ending_bullet);
+old_kt21_flame_knockback_limit=find_block(0x101e0b5du);register_block(0x101e0b5du,kt21_flame_knockback_limit);
+old_kt21_flame_battle_reset=find_block(0x101e019du);register_block(0x101e019du,kt21_flame_battle_reset);
 }
