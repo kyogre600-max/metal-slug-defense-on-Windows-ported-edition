@@ -2,65 +2,45 @@
 
 ## English
 
-An unofficial Windows port based on the Android version of **Metal Slug Defense 1.46.0**. The game core is statically recompiled for Windows x64, with local adaptations for graphics, audio, input, and saving.
+This Windows port is based on the Android version of **Metal Slug Defense 1.46.0**. The game core is statically recompiled for Windows x64, with local adaptations for graphics, audio, input, and saving.
 
-This edition adds keyboard controls and a **16:9 layout** with expanded backgrounds and adjusted interface positions. Sprites retain their proportions, and the layout preserves the original visible content. Borderless fullscreen is enabled by default.
+This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds and adjusted interface positions preserve the original proportions and visible content. Borderless fullscreen is enabled by default.
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
-### Update 1.47.0
+**Update 1.47.0**
 
-- Updated the Windows display version, launcher titles, and EXE file/product versions to **1.47.0**.
-- Added an independent fully unlocked maximum-level profile, including all playable units, maximum army/base upgrades, and all prisoner effects from maps 1, 2, and 3.
-- Integrated LAB access through **F7** in non-battle screens for the formal launchers. Corrected post-battle Back/Esc navigation and manual deployment while only automatic specials are enabled. Validation scope is recorded in [the LAB fix report](docs/LAB_BUGFIX_2026.10.07.md).
-- Added the supplied **LAB** icon between **MEDAL** and **MISSION** in the main-menu navigation row. It opens LAB setup and retains the native button dimensions and scaling. Details: [LAB menu entry](docs/LAB_MENU_ENTRY_2026.10.07.md).
+- Added an independent fully unlocked maximum-level save profile, including all available units, maximum army and base upgrades, and all POW effects from Maps 1, 2, and 3.
+- Added LAB for extensively customizable battles, with available units determined by the player's unlock progress.
 
-### Update 1.46.4
+LAB documentation: [LAB fixes](docs/LAB_BUGFIX_2026.10.07.md), [LAB menu entry](docs/LAB_MENU_ENTRY_2026.10.07.md), and [LAB and title visuals](docs/LAB_VISUAL_TITLE_2026.10.07.md).
 
-- Updated the Windows display version, launcher titles, and EXE file/product versions to **1.46.4**.
-- This revision retains the current formal edition's content. Version metadata and launcher declarations have been checked; full campaign and long-term validation remain pending.
+**Update 1.46.4**
 
-### Update 1.46.3.1
+- Updated two distinct Mummy variants and the Mummy Summoning Box.
+
+**Update 1.46.3.1**
 
 - Added seven Regular Army infantry units: **Regular Army Shield Soldier**, **Regular Army Rifleman**, **Regular Army Bazooka Soldier**, **Regular Army Gatling Soldier**, **Regular Army Paratrooper**, **Regular Army Rocket Bomb Soldier**, and **Regular Army Mortar Soldier**.
-- Their uniforms use the existing Regular Army Soldier palette, and all seven belong to PF. AP is the Rebel counterpart's AP plus 5; HP is `floor(counterpart HP × 10 / 9)`. Attack damage, attack timing, movement, and production intervals retain the counterpart's behavior.
-- Shield Soldier, Rifleman, Bazooka Soldier, and Gatling Soldier cost **15 medals each**. Paratrooper, Rocket Bomb Soldier, and Mortar Soldier cost **45, 55, and 65 medals**, respectively. The **Regular Army Soldier Pack** contains all seven for **150 medals** and preserves the levels of units already owned.
-- All seven units and their pack are purchasable from the initial profile, with no stage, faction-core, Event, or prerequisite-unit requirement. Existing profiles acquire the new units through the shop.
-- Paratrooper deployment, landing, and mortar assembly retain PF identity. Shop and Customize HP displays use the actual combat units.
-- The optional all-units Lv1 profile now includes all **13 playable community units** when first created. Existing profile progress is preserved.
-- Corrected retained machine-gun, shotgun, rocket, and laser parameters for Marco, Fat Marco, Tarma, Fat Tarma, Eri, Christmas Eri, Fio, Fat Fio, and Christmas Fio. Retained attacks now use their native special-weapon damage and hit behavior; Fat Eri's existing laser correction passed regression checks.
-- Weapon validation and original movement-asset findings are recorded in [the weapon report](docs/WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.md).
-- Release preparation and validation scope are recorded in [the 1.46.3.1 report](docs/VALIDATION_1.46.3.1_2026.10.05.md).
+- Corrected parameter selection for retained weapons used by Marco, Fat Marco, Tarma, Fat Tarma, Eri, Christmas Eri, Fio, Fat Fio, and Christmas Fio. Subsequent ranged normal attacks use each character's native special-weapon damage, range, and hit behavior; Fat Eri's existing laser revision passed regression checks.
 
-### Update 1.46.2
+**Update 1.46.2**
 
 - Added a selector for historical MSD Event missions.
-- Enabled acquisition of Event units through the corresponding Event shops and prisoner rewards.
+- Enabled acquisition of Event units through the corresponding Event shops and POW rewards.
 - Added three units: **DI-COKKA MK.II**, **DI-COKKA MK.III**, and **GIRIDA-O MK.II**.
 - Fixed misaligned sprite pixels on **HEAVY B (Future)**.
-- Added independent music and sound-effects controls using native buttons in title options, main-menu options, and the battle pause menu. Settings are saved and remain stable when entering Customize and the other checked menu pages.
-- Added `Esc` for Back and battle pause/resume. Corrected the opening/ending movie button overlap and centered the main-menu option rows.
-- Player units use the original world's unlock state to determine the initial Lv10/Lv20 limit. The original medal transactions unlock Lv20→25, Lv25→30 and Lv30→35 for 30, 50 and 70 medals respectively; the matching faction core permits Lv40 after the Lv35 stage. Registered community units use the same rules, including future additions. Existing unit levels and completed unlock stages are retained. Details: [level unlock verification](docs/UNIT_LEVEL_UNLOCK_2026.10.05.md).
-- Corrected Fat Eri's retained large laser to use native stationary laser parameters and bounded damage, preserving the large visual effect.
+- Added independent music and sound-effects controls.
+- Restored native stationary-laser parameters and bounded damage for Fat Eri's enhanced normal attack, preserving the large-laser visuals.
 - Events without a registered shop now hide SHOP in the base and map. Registered Event shops retain their catalog and exchange flow; ordinary unit shops retain native prices.
-- Improved status-report file-lock handling and rendering-thread cleanup on exit.
-- Added an optional all-units Lv1 profile with independent progress. All 399 original units and six registered community units are owned at Lv1; all nine native faction/base upgrades start at Lv1. Map progress follows the initial save and requires normal progression.
-- Release verification and its scope are recorded in [VALIDATION_1.46.2_2026.10.04.md](docs/VALIDATION_1.46.2_2026.10.04.md).
+- Revised status-report file-lock exception handling and the rendering-thread release order on exit.
 
-### Update 1.46.1
+Level-unlock details: [level unlock verification](docs/UNIT_LEVEL_UNLOCK_2026.10.05.md).
 
-- Fixed the persistent sprite flickering and body-part misalignment affecting Sol Dae Rokker, including its enraged variant.
+**Update 1.46.1**
+
+- Fixed persistent sprite flickering and body-part misalignment affecting Sol Dae Rokker and its enraged variant.
 - Added three independent units: **NOP-03 SARUBIA (Future)**, **M-15A (Future)**, and **HEAVY B (Future)**.
-
-### Update 2026.10.02.1
-
-This release includes performance improvements targeting **30 FPS**, the Event deck-switch keyboard fix, and weapon behaviour changes for **ten units**: Marco, Tarma, Eri, Fio, Fat Marco, Fat Tarma, Fat Eri, Fat Fio, Christmas Eri, and Christmas Fio.
-
-These ten units start each deployment with a pistol. After the first special attack, their ordinary ranged attacks retain the strengthened weapon, bringing this aspect of their behaviour closer to Metal Slug Attack (MSA). Subsequent specials continue to follow the original readiness and cooldown rules. Each unit maintains its own weapon state, including corresponding passengers generated by the Regular Army Truck. Other MSA mechanics remain outside this change.
-
-The current source includes native optimizations for frequently used math, memory, graphics calls, texture conversion, and Vorbis decoding, with bounded asset/audio caches and 30 FPS presentation scheduling. Local validation at 2560×1440 measured approximately 30.00 FPS during 40- and 80-unit combat. Initial resource loading can still exceed the frame budget; performance across all missions and hardware remains under evaluation.
-
-Battle keyboard actions resolve the controller belonging to the currently visible battle panel on each invocation. Event deck switching and controller-index failure scenarios have been checked with isolated saves.
 
 ### Controls
 
@@ -115,60 +95,39 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
 
-### 1.47.0 更新
+**1.47.0 更新**
 
-- Windows 显示版本、启动窗口标题及 EXE 文件版本与产品版本统一调整为 **1.47.0**。
 - 新增全解锁满级独立存档入口，涵盖全部可用单位、满级我方阵营与基地强化，以及地图 1、2、3 的全部人质效果。
-- 正式版各入口接入非战斗界面的 **F7 LAB 准备界面**，修复战斗结束后 Back/Esc 返回与仅自动绝招时鼠标手动出兵的限制。验证范围见 [LAB 修复记录](docs/LAB_BUGFIX_2026.10.07.md)。
-- 主菜单底栏在 **MEDAL 与 MISSION 之间新增 LAB 图标**，采用用户提供的原生尺寸素材，点击打开 LAB 准备界面。布局与核验见 [LAB 菜单入口说明](docs/LAB_MENU_ENTRY_2026.10.07.md)。
-- LAB 图标共用原生按压青色边框、三灯高亮、菜单入场时序与闸门遮挡；标题使用用户提供的 **282×247 LOGO 原图及绿色边框**，直接保留原透明通道。TAP SCREEN 的图像隐藏，原生点击入口继续生效。实施与验证见 [LAB 与标题视觉修订](docs/LAB_VISUAL_TITLE_2026.10.07.md)。
+- 增加LAB 实验室功能，玩家现可以直接高度自定义对战内容（取决于你解锁的单位）
 
-### 1.46.4 更新
+LAB 功能说明：[LAB 修复记录](docs/LAB_BUGFIX_2026.10.07.md)、[LAB 菜单入口说明](docs/LAB_MENU_ENTRY_2026.10.07.md)、[LAB 与标题视觉修订](docs/LAB_VISUAL_TITLE_2026.10.07.md)。
 
-- Windows 显示版本、启动窗口标题及 EXE 文件版本与产品版本统一调整为 **1.46.4**。
-- 本次修订沿用当前正式版内容。版本元数据及启动入口声明已核对；完整关卡与长期运行验证仍待开展。
+**1.46.4 更新**
 
-### 1.46.3.1 更新
+- 更新两种不同的木乃伊以及木乃伊召唤箱
+
+**1.46.3.1 更新**
 
 - 新增七种正规军小兵：**正规军盾牌兵**、**正规军步枪兵**、**正规军反坦克兵**、**正规军加特林机枪兵**、**正规军伞兵**、**正规军冲天火箭弹兵**及**正规军迫击炮兵**。
-- 服装采用现有正规军士兵配色，全部归属 PF。AP 为对应叛军单位 AP 加 5；生命值按对应单位的精确倍率 **10/9** 计算并向下取整。攻击伤害、攻击时序、移动速度与生产间隔沿用对应单位的原生行为。
-- 盾牌兵、步枪兵、反坦克兵及加特林机枪兵各为 **15 勋章**；伞兵、冲天火箭弹兵及迫击炮兵依次为 **45、55、65 勋章**。**正规军士兵包**包含全部七种单位，售价 **150 勋章**，保留已拥有单位的等级。
-- 七种单位及组合包均在初始状态开放购买，无关卡、军队核、活动进度或前置单位限制。已有存档通过商店获取新增兵种。
-- 伞兵投放、落地及迫击炮架设过程中保留 PF 身份；商店与强化属性面板读取实际作战单位的生命值。
-- 全兵种 Lv1 可替代存档首次创建时包含全部 **13 种可用社区单位**；已有独立存档保留进度。
 - 修复马可、胖马可、塔玛、胖塔玛、英里、圣诞英里、菲欧、胖菲欧及圣诞菲欧保留武器时的参数选择错误。后续远程普攻沿用各自原生特殊武器的伤害、范围及命中行为；胖英里的既有激光修订通过回归检查。
-- 武器验证及原始移动素材核查见 [专项记录](docs/WEAPON_BEHAVIOUR_1.46.3.1_2026.10.05.md)。
-- 发布准备与验证范围见 [1.46.3.1 验证记录](docs/VALIDATION_1.46.3.1_2026.10.05.md)。
 
-### 1.46.2 更新
+**1.46.2 更新**
 
 - 新增 MSD 历史 Event 任务选择功能。
 - 支持通过对应 Event 商店及捕虏奖励获取活动单位。
 - 新增三个单位：**基 · 寇卡坦克 MK.II**、**基 · 寇卡坦克 MK.III**、**吉利塔 · O MK.II**。
 - 修复**未来重装 B 型**的像素错位问题。
-- 标题设置、主菜单设置与战斗暂停页增加音乐、音效独立开关，沿用原生按钮并保存设置。进入强化及其他已核验菜单时保留设置状态。
-- `Esc` 执行返回及战斗暂停、恢复；修复开幕与结尾动画按钮重叠，并将主菜单设置行居中对齐。
-- 玩家单位依据原版世界开放状态确定初期 Lv10/Lv20 上限。Lv20→25、Lv25→30、Lv30→35 分别采用原生 30、50、70 勋章解锁交易；完成 Lv35 阶段并持有对应军队核心后开放 Lv40。当前及后续有效登记的社区单位适用相同规则，已有等级与已完成的解锁阶段保留。核验范围见[等级解锁修复记录](docs/UNIT_LEVEL_UNLOCK_2026.10.05.md)。
+- 新增音乐、音效独立开关。
 - 修复胖子英里强化普攻的大激光参数，恢复原生静止激光与受限伤害行为，保留大激光显示。
 - 未登记商店的 Event 隐藏基地与地图 SHOP；已登记商店保留目录与兑换流程，普通单位商店保留原生价格。
 - 修订状态报告文件锁异常处理及退出时的渲染线程释放顺序。
-- 增加“全兵种 Lv1”可替代存档：399 个原版兵种与 6 个已登记社区兵种初始均已拥有，等级均为 Lv1；“我方阵营”的 9 项强化均为 Lv1。地图保持初始进度，后续关卡按游戏规则自行解锁。
-- 发行核验与适用范围见 [VALIDATION_1.46.2_2026.10.04.md](docs/VALIDATION_1.46.2_2026.10.04.md)。
 
-### 1.46.1 更新
+等级解锁规则见 [等级解锁修复记录](docs/UNIT_LEVEL_UNLOCK_2026.10.05.md)。
+
+**1.46.1 更新**
 
 - 修复索尔罗卡（Sol Dae Rokker）及其愤怒版持续出现的贴图闪烁与身体部件错位问题。
 - 新增三个独立单位：**爆竹红（未来）**、**M-15A 型（未来）**、**未来重装 B 型**。
-
-### 2026.10.02.1 更新
-
-本次发布包含以 **30 FPS** 为目标的性能优化、Event 切换阵容后的键盘绑定修复，以及 **十个单位** 的武器行为调整：马可、塔玛、英里、菲欧、胖马可、胖塔玛、胖英里、胖菲欧、圣诞英里、圣诞菲欧。
-
-上述十个单位每次出击均从手枪状态开始。首次发动绝招后，普通远程攻击保留对应强化武器，使这一行为更接近《合金弹头进攻》（Metal Slug Attack，MSA）；后续绝招继续遵循原版的就绪条件与冷却规则。武器状态按单位实例独立记录，正规军运兵车生成的对应乘员同样适用。此次调整的范围仅包含上述武器行为。
-
-当前源码加入高频数学、内存及图形调用、纹理转换与 Vorbis 解码的原生优化，并采用有容量限制的资源及音频缓存，以及 30 FPS 显示调度。本地 2560×1440 测试中，40 与 80 单位交战均达到平均约 30.00 FPS。首次资源加载仍可能超过单帧预算，全任务及不同硬件条件下的表现仍需持续验证。
-
-战斗快捷键在每次调用时解析当前可见战斗面板所属的控制器。Event 阵容切换及控制器索引失效情形已使用独立存档进行验证。
 
 ### 按键操作
 

@@ -144,6 +144,8 @@ float bitsf(uint32_t x){float f;std::memcpy(&f,&x,4);return f;}
 // 宿主在每帧 step 前清除 +4；原生按钮绘制时发布同帧父任务位移及透明度。
 // +8/+12 为 LAB 左上角原生坐标，+16/+20 为缩放，+24/+28 为相邻按钮任务，
 // +32 为透明度（0..255），+36 为输入就绪标记；入场、退场及稳定态共用六槽分配。
+// 主菜单 scene 28 的稳定子状态：1 MENU、2 OPTION、3 CUSTOMIZE、4 SHOP。
+// state 0 为入场等待，5/6 为离场闸门；上述过渡状态保持输入关闭。
 constexpr uint32_t MENU_H=0x1ffef000u,MENU_MAGIC=0x4c41424du;   // "LABM"
 constexpr uint32_t MENU_LAYOUT=0x101ff3fdu,MENU_BUTTON=0x101ff4e9u;
 constexpr uint32_t MENU_SLOTS[]={0x36d8u,0x36dcu,0x36e0u,0x36e4u,0x3718u};
@@ -196,8 +198,9 @@ void menu_button_draw(Context& c){
             wr<float>(c,MENU_H+8u,x);wr<float>(c,MENU_H+12u,y);
             wr<uint32_t>(c,MENU_H+32u,rd<uint32_t>(c,t+0xd4u));
             uint32_t app=rd<uint32_t>(c,MENU_H+44u);
+            uint32_t state=menu_pointer(app,0xc21eu)?rd<uint32_t>(c,app+0x22dcu):0u;
             bool ready=menu_pointer(app,0xc21eu) && rd<uint32_t>(c,app+0x22bcu)==28u &&
-                       rd<uint32_t>(c,app+0x22dcu)==1u && rd<uint8_t>(c,app+0xb178u) &&
+                       state>=1u && state<=4u && rd<uint8_t>(c,app+0xb178u) &&
                        !rd<uint8_t>(c,app+0xc21du) && !(rd<uint32_t>(c,t+0x80u)&3u) &&
                        !(rd<uint32_t>(c,t+0x7cu)&0xa0u);
             wr<uint32_t>(c,MENU_H+36u,ready?1u:0u);

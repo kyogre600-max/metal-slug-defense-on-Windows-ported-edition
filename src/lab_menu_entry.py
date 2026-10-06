@@ -4,6 +4,7 @@ from pathlib import Path
 MENU_HEADER = 0x1ffef000
 MENU_MAGIC = 0x4c41424d
 ICON_SIZE = (60, 48)
+MENU_INPUT_STATES = (1, 2, 3, 4)  # MENU、OPTION、CUSTOMIZE、SHOP 的稳定子状态。
 
 
 class LabMenuEntry:
@@ -64,7 +65,10 @@ class LabMenuEntry:
                 and p.word(app + 0x22bc) in (27, 28))
 
     def ready(self):
-        return self.visible() and self.p.word(MENU_HEADER + 36) == 1
+        app = self.p.app_instance()
+        return (self.visible() and self.p.word(app + 0x22bc) == 28
+                and self.p.word(app + 0x22dc) in MENU_INPUT_STATES
+                and self.p.word(MENU_HEADER + 36) == 1)
 
     def rectangle(self):
         """绘制与输入共用宿主逻辑坐标，原生边距及统一缩放共同作用。"""
