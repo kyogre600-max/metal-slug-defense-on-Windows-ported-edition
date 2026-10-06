@@ -7756,17 +7756,17 @@
       "base_id": 3,
       "faction": 1,
       "identity": "Rebel Army",
-      "shop_price": 50,
+      "shop_price": 30,
       "available_from_start": false,
       "shop_unlock_reference_id": 64,
       "ap": 110,
       "hp_multiplier": [
-        4,
-        5
+        19,
+        21
       ],
       "knockback_threshold_multiplier": [
-        4,
-        5
+        19,
+        21
       ],
       "special_damage_multiplier": [
         1,
@@ -7782,8 +7782,8 @@
       ],
       "production_reference_id": 3,
       "production_interval_multiplier": [
-        9,
-        10
+        4,
+        5
       ],
       "attack_range_multiplier": [
         6,
@@ -8935,8 +8935,8 @@
         1
       ],
       "damage_multiplier": [
-        4,
-        5
+        1,
+        2
       ],
       "move_speed_multiplier": [
         19,
@@ -9455,6 +9455,126 @@
             ]
           },
           {
+            "opcode": 0,
+            "values": [
+              62
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              66
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              70
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              74
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              78
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              82
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              86
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              90
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              94
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              98
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
             "opcode": 3,
             "values": [
               1
@@ -9563,6 +9683,126 @@
             "opcode": 0,
             "values": [
               58
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              62
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              66
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              70
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              74
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              78
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              82
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              86
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              90
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              94
+            ]
+          },
+          {
+            "opcode": 1,
+            "values": [
+              1
+            ]
+          },
+          {
+            "opcode": 0,
+            "values": [
+              98
             ]
           },
           {
@@ -10000,12 +10240,12 @@
         }
       },
       "normal_projectile_distance_multiplier": [
-        3,
-        2
+        6,
+        5
       ],
       "special_projectile_distance_multiplier": [
-        3,
-        2
+        6,
+        5
       ]
     },
     {
@@ -10036,8 +10276,8 @@
         1
       ],
       "damage_multiplier": [
-        1,
-        2
+        67,
+        200
       ],
       "move_speed_multiplier": [
         11,
@@ -21847,6 +22087,10 @@
       "summon_interval_multiplier": [
         5,
         4
+      ],
+      "summon_interval_additional_multiplier": [
+        3,
+        1
       ]
     },
     {
@@ -21855,7 +22099,7 @@
       "base_id": 3,
       "faction": 1,
       "identity": "Rebel Army",
-      "shop_price": 300,
+      "shop_price": 0,
       "available_from_start": false,
       "shop_unlock_reference_id": 136,
       "ap": 200,
@@ -27117,6 +27361,11 @@
           "name": "KT-21",
           "description": "ATC STAND.: Cannone   ATC SPEC.: Carica di Fuoco\nArma da combattimento dei primi progetti ribelli. A quanto\npare, il costo le impedì di diventare l'unità principale."
         }
+      },
+      "world_clear_reward": {
+        "world": 1,
+        "area": 11,
+        "world_type": 0
       }
     }
   ],

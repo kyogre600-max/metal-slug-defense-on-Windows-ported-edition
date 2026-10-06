@@ -37,3 +37,38 @@
 - 同步清单：依据用户既有自行测试与本地正式入口同步授权，从正式版仓库 src/build/MSD_Core_MummyR4_20261005.dll 同步至 dist/MSD_Windows/build/ 同名库，更新目标 core_runtime.json 的 library 并移除旧摘要字段；同时同步 community_content.py、community_content/registry.json、community_content/green_mummy_descriptor.json 和 docs/MUMMY_VARIANTS_2026.10.05.md。普通入口与 Start_MSD_Max_Level.vbs 共用修订。全部个人存档与运行中用户进程保留，正常退出并重新启动后加载修订。
 - 加载器同步采用 r4_runtime_files/community_content.py：木乃伊修复与正式版原文一致，社区进度的缺省开放值及协调代码保留目标目录既有语义，待确认的等级规则部署保持隔离。正式版原文及 src 镜像保持当前等级任务的实现。部署后使用目标目录实际宿主、MSD_Core_MummyR4_20261005.dll 与社区资源在独立 fixture 中重做上述受击、40 等级开火参数、自然攻击与三个单位各 360 帧浏览检查，全部通过；目标配置为 {"library":"MSD_Core_MummyR4_20261005.dll"}。
 - 证据入口：正式版 verification/mummy_variants_20261005/ 中 r4_behavior_formal.json、r4_viewer_ui_formal.json、r4_behavior_dist.json、r4_viewer_ui_dist.json、sprite_fix.json、r4_build.json 与 r4_deployment.json。修复前副本为 r4_before/，部署覆盖前副本为 r4_dist_before/。部署后检查状态由 r4_deployment.json 的 installed_verification 字段记录；记录为 passed 后，结论覆盖目标目录实际宿主、核心与资源的隔离加载。
+
+## 37.3 木乃伊平衡修订与 KT-21 第二世界免费奖励（2026-10-06）
+
+- 实施目标：正式版 Git 工作区；启动 HEAD 为 `2011e45`，显示版本保持 1.46.4。本轮保留 `src/build.py` 的既有 LAB 构建变化、全部 LAB 源码、配置、交接文档与候选 DLL。原生核心与核心配置保持原值，无重建、暂存、提交或推送；beta 与个人存档未纳入修改范围，未计算 SHA-256。
+- 白木乃伊 UID1039：普通及特殊攻击继续引用普通木乃伊 UID61 的绝招参数；伤害倍率 [4,5]→[1,2]，两组弹体距离倍率 [3,2]→[6,5]。目的距离与普通开火门槛 675→540，距离元数据共同更新；近距字段保持原值。特殊槽10仅将第一次、第二次发射后帧58的等待1→11 tick，发射时刻9/19/29→9/29/49，间隔10→20 tick，总动作71→91 tick；首发和第三次收尾保持原时序。普通动作仍为54 tick、单球，特殊仍为三球。满级每球1440→900，特殊三球合计2700。
+- 绿木乃伊 UID1040：现行伤害倍率 [1,2]→[67,200]，相对现行倍率乘67/100。Lv40 单虫180→120，普通五虫合计600，特殊十五虫合计1800；普通/特殊距离400/800、虫群数量、9/19/29 tick 时序、释放锚点与恢复动画保持原值。复制 UID157 的六个伤害锚点后继续采用 base61 的二次插值标记；UID157 本体采用线性插值，不能将其中间等级伤害直接作为地面绿木乃伊的基准。新整数伤害按未缩放插值值×67/200向下取整，七个中间等级相对“旧已取整伤害×67/100再取整”高1点，详见专项报告。
+- MKII 内部完成箱体 UID1042：既有召唤倍率 [5,4] 保留，追加 `summon_interval_additional_multiplier:[3,1]`。加载器在既有倍率之后处理词38/39的六个锚点；词38按当前计量乘3，词39按 `(当前计量+1)×3−1` 保留零值帧。Lv40 首次225→675 tick（7.5→22.5秒），后续实际间隔177→531 tick（5.9→17.7秒）；Lv1/10/20/30/40锚点精确三倍，十六个中间等级经原生插值取整后相对旧整数乘3存在+1/+2 tick差异。UID1041修筑计量20 tick及MKII出击生产冷却1400 tick保持原值。
+- KT-21 UID1043：价格300→0，登记 `world_clear_reward:{world:1,area:11,world_type:0}`，采用第二世界最终区域表世界全部小关通关的原生判定，与此前 MenuShopID136 的通关条件一致。该单位从商店目录排除，原生购买许可表写入512关闭购买。正常主菜单场景28中，满足条件且尚未拥有时自动授予Lv1并登记新单位标记；旧已通关存档进入主菜单时补领，既有拥有等级及开放阶段保持。LAB sandbox期间跳过奖励协调；正常社区保存流程持久化，不扣勋章。
+- 保持原值的手动参数：白木乃伊 HP[5,2]、门槛[5,2]、移速[19,20]、受击后退[1,1]、出击冷却[1,1]（700 tick）、AP80；绿木乃伊 HP[7,4]、门槛[7,4]、移速[11,10]、受击后退[1,1]、出击冷却[9,10]（630 tick）、AP90；MKII修筑入口 HP/门槛[1,1]，完成箱体 HP/门槛[20,9]，移速/后退[1,1]、出击冷却[2,1]（1400 tick）、AP220。上述单位特殊伤害追加倍率[1,1]保持。KT-21除获取方式外，AP200、HP[15,7]、门槛[4,1]、后退[99,200]、伤害[11,9]、特殊伤害[82,225]、移速[11,10]、出击冷却[1,1]及特殊冷却[3,2]保持原值。
+- 隔离验证：全部40等级状态值与保留参数、真实普通/特殊弹体数量与伤害、白色发射时刻9/29/49、绿色9/19/29、白色自然普通开火距离537、友敌两侧普通/特殊弹球完整轨迹、MKII原生修筑与三次实际召唤通过。白色目的距离为540，中心终点位移为±560（包含原生精灵边界）；两组弹球轨迹逐采样相同。KT-21未通关保持未拥有、商城双许可关闭、LAB跳过、免费Lv1持久化及已有等级保持通过。检查范围为独立fixture中的上述行为，完整关卡、所有地形及长期稳定性保持专项核验范围。
+- 本地同步状态：正式版与本地正式运行目录的隔离验证均通过；普通及原满级入口共用已同步的加载器与注册表。
+- 同步清单：从正式版 Git 工作区覆盖同步 `dist/MSD_Windows` 的 `community_content.py`、`src/community_content.py`、`community_content/registry.json`、`docs/MUMMY_VARIANTS_2026.10.05.md`、两份单位生成脚本及 `behavior_design.json`，共7个文件。目标配置保持 `{"library":"MSD_Core_KT21_r1_20261006.dll"}`。部署后采用目标目录实际加载器、注册表、APK、资源及配置核心在独立fixture复核木乃伊参数/行为与KT-21奖励，`mummy_balance_dist.json`、`world_reward_installed.json`均通过；宿主依赖与正式版逐字节核对一致。普通及原满级入口需正常退出、重新启动加载更新；个人存档与用户运行进程保留。
+- 证据：正式版 `verification/balance_mummy_kt21_20261006/` 内 `static_validation.json`、`baseline.json`、`current.json`、`mummy_balance.json`、`world_reward_formal.json`；修改前副本位于 `before/`。资源生成参数同步至 `artwork/mummy_variants_20261005/integrate_units.py`、`behavior_design.json` 与 `artwork/kt21_20261006/integrate_kt21.py`，本轮未执行资源重新生成，OBM/精灵图集保持原状。
+
+等级锚点的原生状态值（击退计量包含×100；-100对应原版每次受击均击退标记）：
+
+| 等级 | 白HP | 白击退计量 | 白每球伤害 | 绿HP | 绿击退计量 | 绿每虫伤害 | MKII箱体HP | 箱体击退计量 | 首次计量tick | 后续实际间隔tick |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 2000 | 2500 | 300 | 1400 | 1800 | 40 | 3333 | -100 | 900 | 756 |
+| 10 | 3000 | 2500 | 450 | 2100 | 1800 | 60 | 5000 | -100 | 825 | 681 |
+| 20 | 4000 | 2500 | 600 | 2800 | 1800 | 80 | 6666 | -100 | 750 | 606 |
+| 30 | 5000 | 2500 | 750 | 3500 | 1800 | 100 | 8333 | -100 | 675 | 531 |
+| 40 | 6000 | 2500 | 900 | 4200 | 1800 | 120 | 10000 | -100 | 675 | 531 |
+
+## 37.4 白木乃伊三连吐动画修复与基寇卡 MKII 售价（2026-10-06）
+
+- 用户要求优先修复白木乃伊三次吐出之间的动画卡帧，击退门槛审计后续步骤暂停；同轮追加基寇卡 MKII 勋章售价采用原版吉利塔价格。正式版启动 HEAD 为 `2011e45`，显示版本保持1.46.4；LAB现有文件及构建变化、核心DLL与配置、beta、个人存档保持原状态。
+- 原因：第45节将首次、第二次吐出后的原生帧58延长至11 tick，使该姿态连续显示约0.37秒。上一轮只核对弹体发射时刻与参数，未覆盖本体衔接帧的实际播放；本轮增加逐帧原生渲染检查。
+- 修复：白木乃伊UID1039特殊槽10的首两次发射后，按原生帧顺序播放58/62/66/70/74/78/82/86/90/94/98，每帧1 tick，再接原9 tick前摇。该11帧序列均匀压缩弯腰、舌部回收、闭嘴与双臂复位过程；第三次吐出后的原始21个收尾姿态及其时序完整保持。单姿态最长保持由11降至2 tick，发射仍为9/29/49 tick、间隔20 tick、总动作91 tick。普通槽8、弹球脚本、900伤害、540目的距离及普通触发距离保持原值；原始图集、帧几何、透明度与锚点未修改。生成器及behavior_design.json共同更新。
+- 售价：基寇卡MKII UID1027（s1xlv.di_cokka_mk2、MenuShop515）shop_price由50→30勋章；原版吉利塔UID51、MenuShop64的实际原生GetMenuShopPrice结果为30，数据字段为原生行+0x358→CreateParams+0x0c。原始ShopRow的占位字段不用于该类型单位的实际勋章价。基寇卡MKIII、吉利塔O MKII与全部其他单位售价保持本轮启动时现值，所有战斗参数及购买条件保持。
+- 验证：使用正式版实际宿主与MSD_Core.dll，在独立fixture内按p.step_frame推进，并逐帧采集实际GL战斗图像、本体帧索引、脚本游标与等待计量。旧配置两段帧58均持续11 tick；新配置两段11个衔接帧分别各1 tick，三发时刻、伤害、距离与总时长保持。普通攻击54 tick、第11 tick发射、逐帧动画状态与原基准一致。实际战斗截图对照已目视检查，原生对照GIF全部110帧解码通过。注册表结构检查限定1039槽10与1027售价，其他单位及售价保持；生成器产物与注册脚本一致。原生商城查询确认原版吉利塔与MKII均为30勋章。
+- 本地同步状态：正式版与本地正式运行目录的动画及售价检查均通过，普通及原满级入口已同步。
+- 同步清单：正式版工作区向dist/MSD_Windows覆盖community_content/registry.json、artwork/mummy_variants_20261005/integrate_units.py、behavior_design.json、docs/MUMMY_VARIANTS_2026.10.05.md及docs/CLASSIC_VEHICLES_2026.10.04.md，共5个文件。目标配置保持MSD_Core_KT21_r1_20261006.dll。部署后以目标目录实际加载器、核心、注册表及资源在独立fixture逐帧复核，after_installed.json与comparison_installed.json均通过；原生商城查询确认吉利塔及MKII均30勋章。旧基准对照保留本轮before.json。目标覆盖前副本为dist_before/，个人存档与用户进程未纳入修改。
+- 证据：正式版verification/white_mummy_animation_20261006内static_validation.json、before.json、after.json、comparison.json、white_special_compare.gif、white_recovery_contact.png与price_check/price_report.json；before/保留本轮修改前副本。原始姿态分析与候选预览另存analysis.json及bridge_candidates_contact.png，与原生战斗验证分别记录。
+- 本轮未重建DLL、计算SHA-256、暂存、提交或推送；运行中的用户游戏进程保持，重新启动后加载修订。验证范围限定上述参数与动画，完整关卡及不同地形表现保持专项范围。

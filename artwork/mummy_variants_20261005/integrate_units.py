@@ -69,7 +69,13 @@ def special_attack(green):
         anchor=green_emission_anchor() if green else (-8,-32)
         result += [command(22, slot, 2 if green else 0, *anchor) for slot in (range(42, 47) if green else (22,))]
         if burst < 2:
-            result += [command(23, 845), command(0, 58), command(1, 1)]
+            result += [command(23, 845)]
+            if green:
+                result += [command(0, 58), command(1, 1)]
+            else:
+                # 收嘴及双臂复位沿原生帧顺序压缩为11 tick，保持20 tick的发射间隔。
+                for frame in range(58, 100, 4):
+                    result += [command(0, frame), command(1, 1)]
         else:
             result += suffix
     return result
@@ -179,7 +185,7 @@ def main():
                 'ap':(80,90,220,220)[index], 'hp_multiplier':([5,2],[7,4],[1,1],[20,9])[index],
                 'knockback_threshold_multiplier':([5,2],[7,4],[1,1],[20,9])[index],
                 'production_reference_id':51, 'production_interval_multiplier':([1,1],[9,10],[2,1],[2,1])[index],
-                'special_damage_multiplier':[1,1], 'damage_multiplier':[4,5] if index==0 else [1,1],
+                'special_damage_multiplier':[1,1], 'damage_multiplier':([1,2],[67,200],[1,1],[1,1])[index],
                 'move_speed_multiplier':([19,20],[11,10],[1,1],[1,1])[index], 'attack_wait_multiplier':[1,1],
                 'attack_range_multiplier':[1,1], 'knockback_distance_multiplier':[1,1], 'ballistic_range_multiplier':[1,1],
                 'icon':copy.deepcopy(icons[min(index,2)]), 'animations':{}, 'localization':localizations(index==1,index>=2)}
@@ -190,8 +196,8 @@ def main():
                         attack_range_categories={'normal':4 if index==0 else 3,'special':4},
                         animations={'8':normal_attack(index==1),'10':special_attack(index==1)},
                         attack_parameter_references={'normal':{'unit_id':61 if index==0 else 157,'group':'special'},'special':{'unit_id':61 if index==0 else 157,'group':'special'}},
-                        normal_projectile_distance_multiplier=[3,2] if index==0 else [1,1],
-                        special_projectile_distance_multiplier=[3,2] if index==0 else [2,1])
+                        normal_projectile_distance_multiplier=[6,5] if index==0 else [1,1],
+                        special_projectile_distance_multiplier=[6,5] if index==0 else [2,1])
             if index==1:
                 unit.update(sprite_descriptor='green_mummy_descriptor.json',shot_action_reference_id=157,recovery_animation=47)
                 unit['textures'].append('mummy_variant_bugs.obm')
@@ -223,7 +229,7 @@ def main():
         elif index==2:
             unit.update(textures=['mummy_generator_builder.obm'],child_unit_key=KEYS[3],preview_unit_key=KEYS[3],construction_time_multiplier=[1,1])
         else:
-            unit.update(textures=['mummy_generator_mk2.obm'],menu_reference_id=77,internal_only=True,summoned_unit_key=KEYS[0],summon_interval_multiplier=[5,4])
+            unit.update(textures=['mummy_generator_mk2.obm'],menu_reference_id=77,internal_only=True,summoned_unit_key=KEYS[0],summon_interval_multiplier=[5,4],summon_interval_additional_multiplier=[3,1])
         units.append(unit)
     registry['units']=existing+units
     save_json(CONTENT / 'registry.json', registry)

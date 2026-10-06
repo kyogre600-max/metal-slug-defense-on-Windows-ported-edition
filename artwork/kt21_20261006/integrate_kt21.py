@@ -190,7 +190,8 @@ def main():
     save_json(CONTENT / DESCRIPTOR, desc)
     unit = {
         'key': KEY, 'id': 1043, 'base_id': 3, 'faction': 1, 'identity': 'Rebel Army',
-        'shop_price': 300, 'available_from_start': False, 'shop_unlock_reference_id': 136,
+        'shop_price': 0, 'available_from_start': False, 'shop_unlock_reference_id': 136,
+        'world_clear_reward': {'world': 1, 'area': 11, 'world_type': 0},
         'ap': 200, 'hp_multiplier': [15, 7],
         'knockback_threshold_multiplier': [4, 1],
         'production_reference_id': 59, 'production_interval_multiplier': [1, 1],

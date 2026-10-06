@@ -39,7 +39,17 @@ class CommunityContent:
             if not 0<u['base_id']<400:raise ValueError('Invalid original unit reference')
             if not u.get('available_from_start') and (not isinstance(u.get('shop_unlock_reference_id'),int) or not 0<=u['shop_unlock_reference_id']<512):raise ValueError('Invalid original shop unlock reference')
             if set(u['localization'])!=LANGUAGES:raise ValueError('All eleven unit localizations are required')
-            if not 0<u['shop_price']<=32767 or not 0<u['ap']<=100000:raise ValueError('Unit price/AP outside supported range')
+            reward=u.get('world_clear_reward')
+            if 'world_clear_reward' in u:
+                if (not isinstance(reward,dict) or set(reward)!=set(('world','area','world_type'))
+                        or any(not isinstance(value,int) or isinstance(value,bool) for value in reward.values())
+                        or not 0<=reward['world']<3 or not 0<=reward['area']<16
+                        or reward['world_type'] not in (0,1) or u.get('internal_only')
+                        or u.get('available_from_start') or u['shop_price']!=0):
+                    raise ValueError('Invalid native world-clear unit reward')
+            if (not isinstance(u['shop_price'],int) or isinstance(u['shop_price'],bool)
+                    or not (0<=u['shop_price']<=32767 if reward is not None else 0<u['shop_price']<=32767)
+                    or not 0<u['ap']<=100000):raise ValueError('Unit price/AP outside supported range')
             if u['icon']['index']!=340+i:raise ValueError('Non-contiguous community icon identity')
             if u['icon']['page']!=1:raise ValueError('Community icons must use unit_icon_02')
             ratio(u['hp_multiplier'])
@@ -53,7 +63,7 @@ class CommunityContent:
                         'knockback_distance_multiplier','ballistic_range_multiplier',
                         'knockback_threshold_multiplier','normal_projectile_distance_multiplier',
                         'special_projectile_distance_multiplier','summon_interval_multiplier',
-                        'construction_time_multiplier'):
+                        'construction_time_multiplier','summon_interval_additional_multiplier'):
                 ratio(u.get(key,[1,1]))
             ratio(u.get('special_cooldown_multiplier',[1,1]))
             for word,value in u.get('status_word_values',{}).items():
@@ -254,6 +264,14 @@ class CommunityContent:
                             scaled=((value+1)*a+b-1)//b-1
                         else:scaled=(value*a+b-1)//b if 'time' in field or 'interval' in field else value*a//b
                         struct.pack_into('<i',row,off,scaled)
+            if 'summon_interval_additional_multiplier' in u:
+                # 附加倍率作用于既有召唤与修筑倍率处理后的计量；后续间隔包含计量零值的一帧。
+                a,b=ratio(u['summon_interval_additional_multiplier'])
+                for word in (38,39):
+                    for off in anchor_offsets(word):
+                        value=struct.unpack_from('<i',row,off)[0]
+                        scaled=((value+1)*a+b-1)//b-1 if word==39 else (value*a+b-1)//b
+                        struct.pack_into('<i',row,off,scaled)
             if u.get('normal_attack_range_from_projectile'):
                 # 远距普通攻击的开火门槛采用已缩放的普通弹体目的距离。
                 for destination,source in zip(anchor_offsets(7),anchor_offsets(26)):
@@ -378,7 +396,7 @@ class CommunityContent:
         catalog_base=(p.word(0x1020bee4)+0x1020bba0)&0xffffffff
         self.catalog_source=catalog_base
         catalog=p.read(catalog_base+0x74,259*4)
-        shop_ids=[512+i for i,u in enumerate(self.units) if not u.get('internal_only')]
+        shop_ids=[512+i for i,u in enumerate(self.units) if not u.get('internal_only') and not u.get('world_clear_reward')]
         pack_pointer=0
         if self.unit_pack:
             pack=self.unit_pack;shop_ids.append(pack['shop_id'])
@@ -404,7 +422,8 @@ class CommunityContent:
             values.extend(ratio(u.get(key,[1,1])) for key in ('damage_multiplier','move_speed_multiplier',
                 'attack_range_multiplier','knockback_distance_multiplier','ballistic_range_multiplier'))
             profiles+=struct.pack('<12I',*(v for pair in values for v in pair))
-        unlocks=struct.pack('<'+'I'*n,*(0xffffffff if u['available_from_start'] else u['shop_unlock_reference_id'] for u in self.units))
+        # 原生商城许可对参考值 >=512 返回关闭；免费通关奖励同时从商城目录排除。
+        unlocks=struct.pack('<'+'I'*n,*(512 if u.get('world_clear_reward') else 0xffffffff if u['available_from_start'] else u['shop_unlock_reference_id'] for u in self.units))
         fields+= (self.alloc(profiles),1,p.symbols['_ZTV10BattleUnit']+8,p.symbols['_ZTV12BattleBullet']+8,self.alloc(unlocks))
         landing_ids={u['key']:u['id'] for u in self.units}
         landings=struct.pack('<'+'I'*n,*(landing_ids[u['landing_unit_key']] if u.get('landing_unit_key') else 0 for u in self.units))
@@ -424,8 +443,23 @@ class CommunityContent:
         assert p.read(p.word(db+4),400*0x390)==original
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])
 
+    def grant_world_clear_rewards(self):
+        p=self.p
+        # 奖励在已加载进度的常规菜单中协调；LAB 隔离期间保留社区进度。
+        if not self.ready or p.word(self.app+0x22bc)!=28 or getattr(getattr(p,'lab',None),'sandbox',False):return
+        for i,u in enumerate(self.units):
+            reward=u.get('world_clear_reward')
+            if reward is None or struct.unpack('<i',p.read(self.records+i*RECORD_SIZE+24,4))[0]!=-1:continue
+            if not p.call('_Z19IsAreaClearSaveDataii9WorldType',reward['world'],reward['area'],reward['world_type']):continue
+            p.call('_ZN7AppMain20SetUnitLevelSaveDataE6UnitIDi',self.app,u['id'],0)
+            # 既有开放阶段保留，等级上限及阵营核心权限由原生接口协调。
+            p.call('_ZN7AppMain24GetUnitLevelOpenSaveDataE6UnitID',self.app,u['id'])
+            p.call('_ZN7AppMain21AddUnitNewFlgSaveDataE6UnitID',self.app,u['id'])
+            p.log('COMMUNITY_WORLD_CLEAR_REWARD',u['key'],reward['world'],reward['area'],reward['world_type'])
+
     def flush(self):
         p=self.p
+        self.grant_world_clear_rewards()
         if self.ready and not self.deck_migration_done and p.word(self.app+0x22bc)==28:
             self.migrate_legacy_decks()
         if self.ready and not self.map_initial_choices_applied and p.word(self.app+0x22bc)==28:

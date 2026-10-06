@@ -14,7 +14,7 @@ def main():
     out=ROOT/'build';out.mkdir(exist_ok=True)
     if not (ROOT/'community_blocks.inc').is_file():
         raise FileNotFoundError('The generated community_blocks.inc snapshot is required')
-    sources=[ROOT/'aot_runtime.cpp',ROOT/'native_imports.cpp',ROOT/'native_audio.cpp',ROOT/'generated/dispatch.cpp',*sorted((ROOT/'generated').glob('blocks_*.cpp')),ROOT/'community_content.cpp',ROOT/'event_trial_hooks.cpp',ROOT/'audio_options.cpp']
+    sources=[ROOT/'aot_runtime.cpp',ROOT/'native_imports.cpp',ROOT/'native_audio.cpp',ROOT/'generated/dispatch.cpp',*sorted((ROOT/'generated').glob('blocks_*.cpp')),ROOT/'community_content.cpp',ROOT/'event_trial_hooks.cpp',ROOT/'audio_options.cpp',ROOT/'lab_hooks.cpp']
     started=time.perf_counter()
     def compile_one(src):
         obj=out/(src.stem+'.o');log=out/(src.stem+'.log')

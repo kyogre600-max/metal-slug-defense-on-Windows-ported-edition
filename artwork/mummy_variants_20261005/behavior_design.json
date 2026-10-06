@@ -10,18 +10,36 @@
         "projectile_reference": "普通木乃伊绝招弹球",
         "projectile_count": 1,
         "damage_multiplier": [
-          4,
-          5
+          1,
+          2
         ],
         "rolling_distance_multiplier": [
-          3,
-          2
-        ]
+          6,
+          5
+        ],
+        "attack_trigger_distance": 540
       },
       "special_attack": {
         "projectile_count": 3,
-        "interval_seconds_approximate": 0.33,
-        "projectile_reference": "本单位普通攻击弹球"
+        "interval_seconds_approximate": 0.6666666666666666,
+        "projectile_reference": "本单位普通攻击弹球",
+        "interval_ticks": 20,
+        "projectile_distance": 540,
+        "inter_spit_animation_frames": [
+          58,
+          62,
+          66,
+          70,
+          74,
+          78,
+          82,
+          86,
+          90,
+          94,
+          98
+        ],
+        "inter_spit_frame_ticks": 1,
+        "final_recovery": "完整原生特殊攻击收尾帧与时序"
       },
       "ap": 80,
       "production_cooldown": 700,
@@ -39,6 +57,10 @@
         "emission_anchor": [
           -8,
           -31
+        ],
+        "damage_multiplier": [
+          67,
+          200
         ]
       },
       "special_attack": {
@@ -50,7 +72,11 @@
           1
         ],
         "interval_seconds": 0.3333333333333333,
-        "interval_ticks": 10
+        "interval_ticks": 10,
+        "damage_multiplier": [
+          67,
+          200
+        ]
       },
       "ap": 90,
       "production_cooldown": 630,
@@ -74,11 +100,16 @@
       "summon_interval_multiplier": [
         5,
         4
+      ],
+      "summon_interval_additional_multiplier": [
+        3,
+        1
       ]
     }
   },
   "pending": [
     "完整关卡与不同地形覆盖",
     "通关解锁全流程与购买持久化专项验证"
-  ]
+  ],
+  "balance_revision_date": "2026-10-06"
 }
