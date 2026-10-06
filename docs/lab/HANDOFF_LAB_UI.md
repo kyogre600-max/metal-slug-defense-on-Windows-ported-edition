@@ -43,6 +43,30 @@
 - T7 自动出兵与自动绝招拆分（原生钩子，功能位 16）：`noukinAutoPlay` 中 0x1cc018（弹头车）、0x1cc04e（逐单位绝招检查）、0x1cc070（出兵决策）三处按头部 +0x30 禁用位跳过；宿主在任一开关开启时对该方 startAutoPlay。“自动出兵”含弹头车。验证（`shots/t7a`、`t7b`）：仅自动绝招时手动出的单位自动发动、无新增出兵；仅自动出兵时持续出兵、就绪绝招不发动。
 - 原生 AUTO 开启时该方出兵格显示为灰色（原版 AUTO 表现）。
 
+### 2.4 T8 准备界面与支援钩子（2026-10-06，核心 r8，钩子版本 5）
+- 支援钩子（原生，功能位 32）：0x1cc761 处弹头车发动按头部 +0x34（低字节我方、次字节敌方）选择效果；0 弹头车出击，1 除据点外全员 HP 回满（u+776 ← u+772），2 全员绝招立即可用（u+800 ← 0）；非弹头车效果累加 +0x38 计数供宿主提示。新增选项时同时扩展 `src/lab_hooks.cpp` apply_support 与 `lab.py` SUPPORT_OPTIONS。验证（`shots/t8_support`）：HP 回满不含据点，绝招就绪，未出弹头车，计数 2。
+- 准备界面（`lab_prep.py`，宿主自绘全屏面板）：F7 打开/关闭；Esc 返回上一页或关闭。内容：双方牌组各 10 格（点击选单位，±调整 Lv1–40，“全部等级”一括应用）、双方据点初始等级 0–10、地图（原生联机地图表 0x108fd730+48 起，读至非 4 位 StageID 为止）、双方支援、完全控制与四个 AI 开关、预设 A/B/C、战斗履历。设定写入 `lab_config.json`（新增 player_deck、player_base_level、enemy_base_level），预设与履历在 `lab_presets/`（preset_X.json、history.jsonl）。
+- 单位选择器：原版 1–399（排除原生名称带括号或为“-”的内部子单位，如“(沙包)”“(伞兵)”“(木乃伊召唤箱)”）与社区可选单位（用户确认内部子单位不可选择）；标签页：全部/社区/正规军/叛军/普特曼军/火星人/其他/联动（GetUnitAffiliation 0–5，依成员核对）。名称取 GetMenuUnitName(uid, app+0x3d64 当前语言)，原生只有 1–10 号语言（9 繁体中文，无简体），空名称回落英语（3）。用户确认保持原生繁体中文名称，不增加简体对照表。同一牌组内重复选择时两格互换（原生 entryUnit 会略过重复单位）。
+- 开战：player_deck 非空时以 BattleController::entryUnit 按槽位写入我方牌组与等级，取代 BattleStartSetUnit，不读存档等级；据点等级在首个对战帧以原生 actionKyotenLevelup 逐级提升（AP 上限、回复量、升级成本随之更新），随后还原扣除的 AP；完全控制开启时仍为据点 MAX。退出 LAB 与战斗结束后回到准备界面并追加一条履历（胜方由双方据点 HP 判定）；“重新开始”不经准备界面。
+- 用户实机反馈修订（同日）：
+  - 音效消失的根因（已验证）：原生 BattleStartAndCompleteEffectScene::update（MISSION COMPLETE）与 BattleFailedEffectScene::update（MISSION FAILED）经 FrameworkInstance::blockRequest 调用 Sound_AddRequestBlock，屏蔽音效请求（app+38656+216，实测完成演出中由 0 变为 3），原生由之后的 SC_BattleEnd → Sound_InitRequestBlock 解除。LAB 跳过 SC_BattleEnd，只要有一场战斗自然结束（据点被毁），之后每场音效都被屏蔽；指令退出不触发演出，故自动测试曾未复现。`leave()` 补做 Sound_InitRequestBlock 后，实测离开时屏蔽位回到 0。
+  - 准备界面改用原生素材（`lab_prep.py` PrepSkin）：menuparts.obm 标题栏、按钮（棕/米色/绿/红，九宫格缩放）、行框与 OK/BACK 图标按钮，popup.obm 面板，unit.obm 编组格（我方绿、敌方红、空格），单位头像取菜单表（+10 头像序号）→ ConvUnitIcon（页 0 unit_icon_01、页 1 unit_icon_02），社区单位取注册表 icon.rect（community_content/unit_icon_02.obm）；头像与格子同倍率最近邻缩放。履历页每场显示双方 10 个头像。截图：`shots/prep_skin/`。
+  - 用户第二轮反馈修订（`lab_ui.py` 新增，`lab_prep.py`、`lab_menu.py` 重写）：
+    - 界面文字随游戏语言（app+0x3d64：1 日语、9 繁体中文、10 简体中文，其余英语），超出宽度先缩小字号再截断；单位名称继续取 GetMenuUnitName（当前语言）。
+    - 按钮按下下移 2 像素并压暗，同一按钮上抬起时播放原生菜单音效（Sound_RequestPlayMenuSE：13 确定、8 关闭/返回，依原生调用频次判定）。
+    - 准备界面为独立全屏界面（pause_menu.obm 砖墙背景），打开时播放 MISSION BGM 135（SC_MissionMenuInit2 → Sound_RequestPlayBGMEx2），关闭准备界面时恢复进入 LAB 前正在播放的 BGM（F7 进入时读取 app+38656+212，即 Sound_PlayBGM 开始播放后保存的当前曲目；+208 为尚未处理的请求），读不到时才用地图 BGM 103。实测标题画面进入：100 → 135 → 返回后 100。
+    - 闸门（第三轮改为原生）：F7 进入、返回地图、开始战斗时，按 SetShutterClose/SetShutterOpen（0x2137b8/0x213804）相同步骤创建 4 个原生闸门任务（ShutterActionDataInit、CTaskSystem2D::AllDelete(app+0x3830,5)、清空 app+0x3820 槽、createMenuTask(app, app+0x3820, 动作表, 4)，动作表取两函数的 pc 相对常量，开闸为同表 +224），不调用末尾 ChangeNT(17/18)。LAB 每帧 CTaskSystem2D::Caller(app+0x3830,5) 推进（GT_Shutter 经 ActionSub2D 移动并以 RequestCommonSE 播放原生音效），再 GraphicsOpt::drawStack(app+124) 立即绘制，使闸门位于宿主界面之上；IsShutterActionEnd 判定结束，开闸结束后删除任务。开战时持续推进已合拢的闸门，场景进入 99/100 后停止，由 SC_BattleInit 的原生开闸接手。战斗自然结束（演出后约 75 帧）、菜单退出、F5、重新开始先调用原生 SetShutterClose，IsShutterClose 后离开战斗，再以原生开闸任务打开准备界面。截图：shots/nshut（地图上原生闸门）、nshut2（F7、Esc 返回、开战）、nshut3（开战衔接逐帧）。
+    - 修复：准备界面 Esc 曾在窗口线程直接调用原生音效，与游戏线程并发执行原生代码导致崩溃（AOT stopped，lr 位于 Sound_RequestPlaySE），现入队由游戏线程执行；fonts() 字体缓存失效使每次重绘约 110 ms（音频随之卡顿），修正后约 48 ms，按下反馈改为只叠加按钮区域的压暗小图、不重绘整个界面。
+    - ESC 菜单：pause_window.obm 米色面板 + menuparts 标题栏与按钮，半透明压暗，8 帧滑入/滑出，开/选择/关闭播放原生音效。
+    - 支援行移除（原生接口与 SUPPORT_OPTIONS 保留，加载时支援值归零，只有弹头车出击生效）。
+    - 双方各新增“随机”“清空”：随机候选为可选单位中具有原生头像者（无头像的空单位不进入），等级取该方“全部等级”。
+    - 优势设定：BattleObjectManager::createUnit（0x1df344）从 manager+72+(队伍×2+成员)×8 读取两个浮点数传给 createUnitStatus（含 0.2 常量），即里世界关卡强化级数；第一个为生命、第二个为攻击，各 ×(1+0.2×级数)。LAB 每帧写入双方值（0–10 级）。实测普通兵 Lv40 基础 540，我方生命 +3 级为 864；敌方 594 为原生 NPC 对手的 1.1 倍加成。
+    - 验证：`shots/prep2`（闸门、主界面、随机/清空、选择器）、`shots/battle2`（菜单、自然结束闸门、回到准备界面、履历胜方）、`shots/adv`（强化值与 HP）、`shots/shut`（宿主闸门合拢画面）。重新开始的闸门衔接与长时间对战未单独截图。
+  - 第二、三场 LAB 战斗后音效消失（初步修订，泄漏部分）：LAB 离开战斗时未经原生 SC_BattleEnd（SceneEndFunc 无战斗场景分支），SC_BattleInit 每场新建的菜单图片与 2D 任务不释放；`build_enemy_graphics` 新建的敌方出兵格对象也未释放。`leave()` 现按原生顺序补做 ClearMenuTask、CTaskSystem2D::AllDelete(app+0x3830,0,4)、RequestClear2D、Sound_StopBGM、Sound_InitRequestBlock，并按 ~BattlePlayerOperator 的方式释放敌方出兵格对象（每场 7 个），再 BattleEnd_ClearBattleMain。代码依据为静态调用分析；验证范围为两次进出战斗无错误、第二场正常开战，音效恢复待用户实机确认。
+  - 敌方按键出兵补播与我方相同的原生出兵音效 8；完全控制下出兵后保留 8 帧冷却显示再清零，双方格子均显示原生出兵反馈。原生 AUTO 开启时该方手动出兵被原生拒绝（双方相同）。
+  - 验证脚本改用 `verification/lab_ui_20261006/config/`（环境变量 MSD_LAB_CONFIG_DIR），不再改动仓库根目录的玩家 `lab_config.json`。
+- 验证（`shots/t8_prep`、`t8_finish`）：准备界面与选择器绘制、社区标签、选择与互换、全员 Lv40 实际写入（UnitInfo+0x14 = 39）、据点等级 2/1 生效、10 格全部出现在底栏、退出与击破敌方据点后回到准备界面、履历胜方判定、预设保存与读取。测试期间的 `lab_config.json` 已还原为测试前内容，测试生成的 `lab_presets/` 已删除。
+
 ### 2.2 r6 修订（2026-10-06 用户反馈）
 - 底栏两端增加底栏背景最外侧边缘块（源 x −88.89…−70，含 AP 框下方圆角），右端为镜像；缩放比改为按片段总宽占满屏宽计算（约 0.863），消除 AP 框左下/右下缺口与两侧空隙。
 - AP 数值框从第 0 遍中排除，我方、敌方各单独执行 `drawApBar`，裁剪到框体下沿（D 520），由底栏照原版压住下沿。敌方框保留水平翻转（文字带不翻转），取消红底。
@@ -86,3 +110,32 @@
 
 ## 4. 验收方式
 - 每项完成后：构建新 LAB 核心 → 启动 LAB → F12 截图对照设计文档的位置与颜色要求 → 检查 `lab_probe.jsonl` 与日志无异常 → 在普通关卡确认原版行为未变（LAB 头为 0 时钩子必须完全回落）。
+
+## 2.5 正式版统一入口与战后返回、自动绝招修复（2026-10-07）
+
+- 共用运行层移至 `lab_runtime.py`；`event_trial_launcher.py` 在完成 TrialProbe 定义后统一注册，普通、原满级、全解锁满级及全兵种 Lv1 入口均在非战斗界面支持 F7。`lab_launcher.py` 保留独立存档入口及现有 install_core/install/install_platform 接口。
+- 正式默认与独立 LAB 核心为 `MSD_Core_LAB_r9_20261007.dll`，原生钩子版本 6，文件 27124273 字节。根与 src 核心配置指向同名实际 DLL；显示版本保持 1.47.0。
+- 战后返回：四个原生闸门任务槽被原生释放时按过渡完成处理；宿主删除闸门任务同时写完成标记 app+0xc21c=1 并清闭合标记 app+0xc21d=0；恢复目标采用主菜单初始化27（稳态28）。修复准备页永久busy、普通页面触点仍被闭合标记阻止及返回目标31对应关卡地图的问题。返回请求统一在游戏线程处理，普通战斗99/100不打开准备覆盖层。
+- 自动绝招：新增 getAutoPlay 钩子，对关闭自动放兵的 LAB 控制器向手动输入/UI返回0，底层+1052保留1以驱动noukinAutoPlay；AP、冷却、人数许可沿用原生，LAB头0时回落。数字键、鼠标与两队绝招、关闭增兵及重新启用AUTO均专项核验。
+- 详细实施与条件见 `docs/LAB_BUGFIX_2026.10.07.md`；证据位于 `verification/lab_bugfix_20261007/auto/`、`verification/lab_navigation_20261007/` 与 `verification/lab_fixes_20261007/`。全部验证使用独立fixture，个人存档与玩家LAB设置保留；旧运行实例需正常退出并重新启动。
+
+## 2.6 主菜单 LAB 图标入口（2026-10-07）
+
+- 使用用户 `F:\egg\MSD_封面素材\lab.png` 的60×48 RGBA原图，发行至`custom_content/lab.png`，逐字节保持。主菜单底栏顺序为BACK、OPTION、SHOP、MEDAL、LAB、MISSION，点击LAB打开现有准备界面。
+- `lab_menu_entry.py`共用原生发布的几何完成绘制与点击；`lab_runtime.py`注册输入与逐帧生命周期。原生底栏钩子纳入六项分配，保留原按钮动效、NEW角标及原生命中，MISSION维持最右侧。
+- 当前核心为`MSD_Core_LAB_r10_20261007.dll`，27127611字节，LAB钩子7；独立菜单共享头0x1ffef000。LAB原生x700.8、y532，scale2；1280×720逻辑矩形887.4、598.5、135、108。
+- 证据与边界见`docs/LAB_MENU_ENTRY_2026.10.07.md`及`verification/lab_menu_icon_20261007/`。图标点击、返回及窗口/全屏命中在隔离存档中验证，既有F7、玩家存档和LAB设置保持。
+
+## 2.7 LAB 原生按压、入场与标题视觉修订（2026-10-07）
+
+- 当前核心统一为 `MSD_Core_LAB_r12_20261007.dll`，27,130,197 字节，钩子版本 8。r12 包含 r11 的全部视觉改动及第2.5节的分栏出兵格拖动修复；根目录与 src 的配置及 `lab_runtime.LAB_CORE` 均采用 r12，既有核心保留。
+- LAB 使用原生图像及 Graphics 队列，与 MEDAL 同帧父任务位移、alpha 和闸门层级一致；从场景27初始化采用六项布局，稳态28/1开放输入。按压共用原生转换项79青色边框和37三灯，原PNG/纹理/矩形60×48保持，GLES2采样配置为CLAMP_TO_EDGE与NEAREST。
+- `title_visuals.py` 导入用户282×247 LOGO原始RGBA，单矩形显示，无独立绿色底层；原透明背景、全部绿色描边、原生锚点及绘制缩放保持。禁止以全图绿色键清除边框。TAP SCREEN仅隐藏图集alpha，原生任务、几何及点击流程保持。
+- 实施、当前验证条件与同步清单见 `docs/LAB_VISUAL_TITLE_2026.10.07.md` 及 `verification/lab_visual_title_20261007/`。个人存档与LAB玩家设置保持，验证均使用独立fixture。
+
+### 2.5 分栏出兵格拖动修复（2026-10-07，核心 r12）
+- 现象：双方任一侧编入 4–5 个单位时，该侧出兵格无法左右拖动。
+- 原因：原生 BattlePlayerOperator::onUITouchMoved 在 0x1d7282 / 0x1d728c 两个入口块中以槽位数（controller+912）与可见格数（operator+12 为 0 时 5，否则 6）比较，不超过即放弃拖动；分栏后每侧只显示 3 格。
+- 修复（`src/lab_hooks.cpp` drag_check）：分栏模式下两个块执行期间，若槽位数为 4–6，临时把计数视为 7，块返回后还原；滚动范围仍由 operator+104（max_scroll，(槽位数−3)×格距）限定。钩子版本保持 8，`lab_runtime.py` 改为加载 `src/build/MSD_Core_LAB_r12_20261007.dll`（在含 r11 改动的当前源码上构建）。
+- 初次窗口验证（`verification/lab_ui_20261006/shots/drag2`、对照 `drag2_r11`）：我方 4 个单位、敌方 5 个单位，横向拖动后 r12 的滚动值分别为 118（上限 118）与 118（上限 236）；r11 同一操作两侧均保持 0。该次窗口记录限定上述 4/5 格条件。r12 钩子实际覆盖 4–6 格；7 格及以上沿用原生拖动判定。
+- 本轮同步前追加 64 项内存隔离检查：两个拖动块、槽位 3–10、operator 模式 0/1 与分栏开关；4–6 格分栏判定、实际计数恢复及其他条件与 r11 控制流一致均通过。5 组原生菜单几何核查通过；实窗复核与本地部署证据位于 `verification/lab_visual_title_20261007/`。

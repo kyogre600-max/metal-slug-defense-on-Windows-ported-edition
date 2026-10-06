@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "version": "1.47.0",
+  "profile": "play_save_all_unlocked_max_level",
+  "launcher": "Start_MSD_All_Unlocked_Max_Level.vbs",
+  "original_id_count": 399,
+  "community_selectable_count": 17,
+  "unit_display_level": 40,
+  "faction_cores": 6,
+  "base_projects": 9,
+  "base_display_level": 30,
+  "mainline_worlds": [
+    0,
+    1,
+    2
+  ],
+  "mainline_stage_count": 201,
+  "prisoner_reward_count": 48,
+  "prisoner_reward_rate": 100,
+  "seed_only_on_first_launch": true,
+  "historical_event_progress": "preserved_initial",
+  "currencies": {
+    "msp": 5000,
+    "medals": 25
+  },
+  "generation_date": "2026-10-07",
+  "verification": "verification/all_unlocked_max_level_20261007"
+}

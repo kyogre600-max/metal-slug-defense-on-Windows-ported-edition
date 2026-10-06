@@ -1,6 +1,6 @@
 // LAB 原生钩子（第 1 批）：敌方单位绝招等待条。
-// 仅在宿主写入 LAB 共享头（0x1ffeb000，魔数 LAB1）且对应功能位开启时生效；
-// 其他模式下全部回落至原生块，行为与原版一致。
+// 战斗钩子在宿主写入 LAB 共享头（0x1ffeb000，魔数 LAB1）且对应功能位开启时生效；
+// 主菜单六项布局使用独立共享头 0x1ffef000。未启用相应共享头时回落至原生块。
 //
 // 原生结构（BattlePlayerOperator::drawUI，0x1d7ca8 起）：
 //   0x1d8d26  BattleObjectManager::getInstance → 0x1d8d2a getTeamUnitList(r7=本方队伍, 0)
@@ -139,6 +139,96 @@ bool guest_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1=0,uint32_t a2=0,u
 }
 uint32_t fbits(float f){uint32_t x;std::memcpy(&x,&f,4);return x;}
 float bitsf(uint32_t x){float f;std::memcpy(&f,&x,4);return f;}
+
+// ---------- 主菜单 LAB 入口：共享头提供位置，原生底栏保留其按钮任务与输入流程 ----------
+// 宿主在每帧 step 前清除 +4；原生按钮绘制时发布同帧父任务位移及透明度。
+// +8/+12 为 LAB 左上角原生坐标，+16/+20 为缩放，+24/+28 为相邻按钮任务，
+// +32 为透明度（0..255），+36 为输入就绪标记；入场、退场及稳定态共用六槽分配。
+constexpr uint32_t MENU_H=0x1ffef000u,MENU_MAGIC=0x4c41424du;   // "LABM"
+constexpr uint32_t MENU_LAYOUT=0x101ff3fdu,MENU_BUTTON=0x101ff4e9u;
+constexpr uint32_t MENU_SLOTS[]={0x36d8u,0x36dcu,0x36e0u,0x36e4u,0x3718u};
+constexpr uint32_t MENU_IMAGES[]={30u,32u,33u,34u,119u};
+constexpr uint32_t MENU_INDICES[]={0u,1u,2u,3u,5u};
+Block old_menu_layout,old_menu_button_draw,old_menu_button_tail;
+bool menu_pointer(uint32_t p,uint32_t size){
+    return p>=0x10000000u && uint64_t(p)+size<=0x20000000ull;
+}
+void menu_layout(Context& c){
+    uint32_t app=c.r[0];
+    old_menu_layout(c);                                    // 保留原块的分配、寄存器与后续控制流
+    if(rd<uint32_t>(c,MENU_H)!=MENU_MAGIC)return;
+    wr<uint32_t>(c,MENU_H+4u,0u);
+    if(!menu_pointer(app,0xc21eu))return;
+    uint32_t scene=rd<uint32_t>(c,app+0x22bcu);
+    if(scene!=27u && scene!=28u)return;
+    uint32_t panels[5];
+    for(uint32_t i=0;i<5u;++i){
+        uint32_t t=rd<uint32_t>(c,app+MENU_SLOTS[i]);
+        if(!menu_pointer(t,0x1bcu) || rd<uint32_t>(c,t)!=MENU_BUTTON ||
+           rd<uint32_t>(c,t+0x50u)!=MENU_IMAGES[i] || rd<float>(c,t+0xfcu)!=140.0f)return;
+        panels[i]=t;
+    }
+    float margin=float(int32_t(rd<uint32_t>(c,app+0x3cu)));
+    float left=40.0f-margin;
+    float step=(float(rd<uint32_t>(c,app+0x34u))+2.0f*margin-200.0f)/5.0f;
+    float x=left+step*4.0f+rd<float>(c,panels[3]+0x9cu);
+    float y=rd<float>(c,panels[3]+0x88u)+rd<float>(c,panels[3]+0xa0u);
+    float sx=rd<float>(c,panels[3]+0xa8u),sy=rd<float>(c,panels[3]+0xacu);
+    if(!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(step) || step<=0.0f ||
+       !std::isfinite(sx) || !std::isfinite(sy) || sx<=0.0f || sy<=0.0f)return;
+    for(uint32_t i=0;i<5u;++i)wr<float>(c,panels[i]+0x84u,left+step*float(MENU_INDICES[i]));
+    wr<float>(c,MENU_H+8u,x);wr<float>(c,MENU_H+12u,y);
+    wr<float>(c,MENU_H+16u,sx);wr<float>(c,MENU_H+20u,sy);
+    wr<uint32_t>(c,MENU_H+24u,panels[3]);wr<uint32_t>(c,MENU_H+28u,panels[4]);
+    wr<float>(c,MENU_H+40u,left+step*4.0f);wr<uint32_t>(c,MENU_H+44u,app);
+}
+void menu_button_draw(Context& c){
+    uint32_t t=c.r[0];
+    if(rd<uint32_t>(c,MENU_H)==MENU_MAGIC && t==rd<uint32_t>(c,MENU_H+24u) &&
+       menu_pointer(t,0x1bcu) && !(rd<uint32_t>(c,t+0x80u)&2u) &&
+       !(rd<uint32_t>(c,t+0x7cu)&0x80u)){
+        uint32_t parent=rd<uint32_t>(c,t+0x1b8u);
+        if(menu_pointer(parent,0xd8u)){
+            // GT_CockpitButton 在更新时把父任务位移及 alpha 写入此任务。
+            // 绘制钩子读取该最终状态，使 LAB 与 MEDAL 的显示在同一帧一致。
+            float x=rd<float>(c,MENU_H+40u)+rd<float>(c,t+0x9cu);
+            float y=rd<float>(c,t+0x88u)+rd<float>(c,t+0xa0u);
+            wr<float>(c,MENU_H+8u,x);wr<float>(c,MENU_H+12u,y);
+            wr<uint32_t>(c,MENU_H+32u,rd<uint32_t>(c,t+0xd4u));
+            uint32_t app=rd<uint32_t>(c,MENU_H+44u);
+            bool ready=menu_pointer(app,0xc21eu) && rd<uint32_t>(c,app+0x22bcu)==28u &&
+                       rd<uint32_t>(c,app+0x22dcu)==1u && rd<uint8_t>(c,app+0xb178u) &&
+                       !rd<uint8_t>(c,app+0xc21du) && !(rd<uint32_t>(c,t+0x80u)&3u) &&
+                       !(rd<uint32_t>(c,t+0x7cu)&0xa0u);
+            wr<uint32_t>(c,MENU_H+36u,ready?1u:0u);
+            wr<uint32_t>(c,MENU_H+4u,1u);
+        }
+    }
+    old_menu_button_draw(c);
+}
+void menu_button_tail(Context& c){
+    uint32_t t=c.r[4],image=rd<uint32_t>(c,MENU_H+48u),app=rd<uint32_t>(c,MENU_H+44u);
+    if(rd<uint32_t>(c,MENU_H)==MENU_MAGIC && rd<uint32_t>(c,MENU_H+4u) &&
+       rd<uint32_t>(c,MENU_H+56u) && t==rd<uint32_t>(c,MENU_H+24u) &&
+       menu_pointer(image,56u) && menu_pointer(app,0x80u)){
+        uint32_t graphics=rd<uint32_t>(c,app+0x7cu);
+        bool pressed=rd<uint32_t>(c,MENU_H+52u) && rd<uint32_t>(c,MENU_H+36u);
+        uint32_t x=rd<uint32_t>(c,MENU_H+8u),y=rd<uint32_t>(c,MENU_H+12u);
+        guest_call(c,0x10137711u,graphics,rd<uint32_t>(c,t+0xd0u),rd<uint32_t>(c,t+0xd4u));
+        uint32_t item=79u;
+        if(pressed)guest_call(c,0x10200161u,app,t,x,y,&item,1u);
+        // 独立矩形在原生队列中与 MEDAL 同层。后续闸门绘制按原任务顺序覆盖底栏。
+        uint32_t rect=MENU_H+0x100u;
+        wr<int16_t>(c,rect+0u,0);wr<int16_t>(c,rect+2u,0);
+        wr<int16_t>(c,rect+4u,60);wr<int16_t>(c,rect+6u,48);
+        for(uint32_t o=8u;o<16u;o+=2u)wr<int16_t>(c,rect+o,0);
+        uint32_t stack[]={rect,rd<uint32_t>(c,t+0xa8u),rd<uint32_t>(c,t+0xacu),0u,0u};
+        guest_call(c,0x10136985u,graphics,image,x,y,stack,5u);
+        item=37u;
+        if(pressed)guest_call(c,0x10200161u,app,t,x,y,&item,1u);
+    }
+    old_menu_button_tail(c);
+}
 
 // ---------- 底栏分栏（T2，功能位 4） ----------
 // drawUI 的全部底栏绘制最终经由 Graphics::drawImageS(Image*, float m[6]{a,b,tx,c,d,ty}, u,v,w,h,…)、
@@ -509,7 +599,21 @@ template<int K> void ui_exit(Context& c){
 template<int... K> void install_ui_exits(std::integer_sequence<int,K...>){
     ((old_ui_exit[K]=find_block(UI_EXITS[K]),register_block(UI_EXITS[K],ui_exit<K>)),...);
 }
+// onUITouchMoved 的拖动条件（0x1d7282 / 0x1d728c 两个入口块内）：槽位数（controller+912）不超过可见格数
+// （operator+12 为 0 时 5，否则 6）即放弃拖动。分栏每侧只显示 3 格，4–6 个单位同样需要拖动；
+// 分栏时在这两个块执行期间把计数临时视为 7，块返回后立即还原。实际滚动范围由 operator+104（max_scroll）限定。
+Block old_drag_check_a,old_drag_check_b;
+template<Block* Old> void drag_check(Context& c){
+    uint32_t controller=split_enabled(c)?rd<uint32_t>(c,c.r[4]+24u):0u;
+    uint32_t count=controller?rd<uint32_t>(c,controller+912u):0u;
+    bool widen=controller && int32_t(count)>3 && int32_t(count)<=6;
+    if(widen)wr<uint32_t>(c,controller+912u,7u);
+    (*Old)(c);
+    if(widen)wr<uint32_t>(c,controller+912u,count);
+}
 void install_touch_hooks(){
+    old_drag_check_a=find_block(0x101d7283u);register_block(0x101d7283u,drag_check<&old_drag_check_a>);
+    old_drag_check_b=find_block(0x101d728du);register_block(0x101d728du,drag_check<&old_drag_check_b>);
     old_ui_began=find_block(0x101d7209u);register_block(0x101d7209u,ui_began);
     old_ui_moved=find_block(0x101d7265u);register_block(0x101d7265u,ui_moved);
     old_ui_ended=find_block(0x101d7315u);register_block(0x101d7315u,ui_ended);
@@ -574,7 +678,16 @@ uint32_t auto_disabled(Context& c,uint32_t controller){
     uint32_t bits=rd<uint32_t>(c,AUTO_DISABLE);
     return controller==rd<uint32_t>(c,ENEMY_CONTROLLER)?(bits>>2)&3u:bits&3u;   // 位 0 出兵，位 1 绝招
 }
-Block old_auto_slug,old_auto_special,old_auto_deploy;
+// getAutoPlay 的返回值参与底栏的手动出兵许可与格子显示。自动绝招单独开启时，
+// 底层 controller+1052 仍驱动 update 中的 noukinAutoPlay；对手动输入与 UI 返回关闭出兵 AUTO。
+// 自动出兵禁用位仅改变该查询结果，AP、生产冷却与人数上限继续由原生函数核查。
+Block old_auto_query,old_auto_slug,old_auto_special,old_auto_deploy;
+void auto_query(Context& c){                                  // 0x1cba34：r0=控制器
+    if(enabled(c,FLAG_AUTO_SPLIT) && (auto_disabled(c,c.r[0])&1u)){
+        c.r[0]=0u;c.pc=c.r[14];return;
+    }
+    old_auto_query(c);
+}
 void auto_slug(Context& c){                                    // 0x1cc018：r0=isUseMetasuraHou，r4=控制器
     if(enabled(c,FLAG_AUTO_SPLIT) && (auto_disabled(c,c.r[4])&1u)){c.pc=0x101cc02bu;return;}
     old_auto_slug(c);
@@ -635,6 +748,7 @@ void ap_bar_entry(Context& c){
 }
 void install_ui_hooks(){
     old_slug_action=find_block(0x101cc761u);register_block(0x101cc761u,slug_action);
+    old_auto_query=find_block(0x101cba35u);register_block(0x101cba35u,auto_query);
     old_auto_slug=find_block(0x101cc019u);register_block(0x101cc019u,auto_slug);
     old_auto_special=find_block(0x101cc04fu);register_block(0x101cc04fu,auto_special);
     old_auto_deploy=find_block(0x101cc071u);register_block(0x101cc071u,auto_deploy);
@@ -653,7 +767,7 @@ void install_ui_hooks(){
     install_touch_hooks();
 }
 }
-extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 4u;}
+extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 8u;}
 extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     static bool installed=false;
     if(installed)return;
@@ -664,5 +778,8 @@ extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     old_touch_list=find_block(0x101d764bu);register_block(0x101d764bu,touch_list);
     old_touch_loop_exit=find_block(0x101d76c9u);register_block(0x101d76c9u,touch_loop_exit);
     old_touch_activate=find_block(0x101d76d3u);register_block(0x101d76d3u,touch_activate);
+    old_menu_layout=find_block(MENU_LAYOUT);register_block(MENU_LAYOUT,menu_layout);
+    old_menu_button_draw=find_block(0x102003bdu);register_block(0x102003bdu,menu_button_draw);
+    old_menu_button_tail=find_block(0x1020047bu);register_block(0x1020047bu,menu_button_tail);
     install_ui_hooks();
 }

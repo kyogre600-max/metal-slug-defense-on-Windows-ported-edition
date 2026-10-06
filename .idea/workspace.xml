@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1aeda925-c51f-46dc-9729-e68e5e6295b8" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/src/build.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/build.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/lab/HANDOFF_LAB_UI.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/lab/HANDOFF_LAB_UI.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab_launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab_launcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab_probe.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/lab_probe.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lab_hooks.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/lab_hooks.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,22 +17,22 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="3KJN2ekNK8PQvyAunAvDp28LFp8" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -45,6 +50,7 @@
       <option name="presentableId" value="Default" />
       <updated>1791271505543</updated>
       <workItem from="1791271507283" duration="36000" />
+      <workItem from="1791293714910" duration="10000" />
     </task>
     <servers />
   </component>

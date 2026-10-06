@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "units": {
+    "s1xlv.sarubia_future": {
+      "id": 1024,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.m15a_future": {
+      "id": 1025,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.heavy_b_future": {
+      "id": 1026,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.di_cokka_mk2": {
+      "id": 1027,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.di_cokka_mk3": {
+      "id": 1028,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.girida_o_mk2": {
+      "id": 1029,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_shield": {
+      "id": 1030,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_rifle": {
+      "id": 1031,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_bazooka": {
+      "id": 1032,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_gatling": {
+      "id": 1033,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_paratrooper": {
+      "id": 1034,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_rocket_bomb": {
+      "id": 1035,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_mortar": {
+      "id": 1036,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_paratrooper_child": {
+      "id": 1037,
+      "level": -1,
+      "level_open": 20,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.pf_mortar_child": {
+      "id": 1038,
+      "level": -1,
+      "level_open": 20,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.white_mummy": {
+      "id": 1039,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.green_mummy": {
+      "id": 1040,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.mummy_generator_mk2": {
+      "id": 1041,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.mummy_generator_mk2_box": {
+      "id": 1042,
+      "level": -1,
+      "level_open": 20,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    },
+    "s1xlv.kt21": {
+      "id": 1043,
+      "level": 39,
+      "level_open": 40,
+      "custom_time": 0,
+      "new": 0,
+      "shop_new": 0,
+      "deck_time": 0
+    }
+  }
+}

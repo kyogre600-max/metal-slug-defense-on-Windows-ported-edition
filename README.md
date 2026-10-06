@@ -8,6 +8,13 @@ This edition adds keyboard controls and a **16:9 layout** with expanded backgrou
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+### Update 1.47.0
+
+- Updated the Windows display version, launcher titles, and EXE file/product versions to **1.47.0**.
+- Added an independent fully unlocked maximum-level profile, including all playable units, maximum army/base upgrades, and all prisoner effects from maps 1, 2, and 3.
+- Integrated LAB access through **F7** in non-battle screens for the formal launchers. Corrected post-battle Back/Esc navigation and manual deployment while only automatic specials are enabled. Validation scope is recorded in [the LAB fix report](docs/LAB_BUGFIX_2026.10.07.md).
+- Added the supplied **LAB** icon between **MEDAL** and **MISSION** in the main-menu navigation row. It opens LAB setup and retains the native button dimensions and scaling. Details: [LAB menu entry](docs/LAB_MENU_ENTRY_2026.10.07.md).
+
 ### Update 1.46.4
 
 - Updated the Windows display version, launcher titles, and EXE file/product versions to **1.46.4**.
@@ -88,6 +95,12 @@ The preset owns all 399 original units and the 13 currently registered playable 
 
 Subsequent launches preserve upgrades, map progress and settings. To use this profile in a new installation, copy its entire `play_save_all_units_level1/` folder. The preset files under `game_data/all_units_level1/` are distributed independently of personal saves.
 
+### Optional fully unlocked maximum-level save
+
+Run **Start_MSD_All_Unlocked_Max_Level.vbs**. On first launch, this entry creates `play_save_all_unlocked_max_level/` with all **399 original unit records (UnitIDs 1–399) and 17 playable community units at Lv40**, all **nine army/base upgrades at Lv30**, and all six faction cores owned. Maps 1, 2, and 3 have their stages unlocked and cleared, with all **48 area prisoner rewards at 100%**. Historical Event progress follows the initial profile.
+
+This entry shares the current formal core and preserves its independent progress on subsequent launches. Existing normal and maximum-level saves retain their own directories. To migrate this profile, copy the entire `play_save_all_unlocked_max_level/` folder. Preset files are distributed under `game_data/all_unlocked_max_level/`; implementation and validation scope are recorded in [the profile report](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md).
+
 ### Content authoring and networking interfaces
 
 Configurable worlds, registered community enemies, independent scenes and music are documented in [CONTENT_AUTHORING.md](docs/CONTENT_AUTHORING.md). The unfinished world selection interface is temporarily hidden, and `F6` does not open it. The default catalog is empty; the supplied example can be installed with the authoring tool for development.
@@ -101,6 +114,14 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+### 1.47.0 更新
+
+- Windows 显示版本、启动窗口标题及 EXE 文件版本与产品版本统一调整为 **1.47.0**。
+- 新增全解锁满级独立存档入口，涵盖全部可用单位、满级我方阵营与基地强化，以及地图 1、2、3 的全部人质效果。
+- 正式版各入口接入非战斗界面的 **F7 LAB 准备界面**，修复战斗结束后 Back/Esc 返回与仅自动绝招时鼠标手动出兵的限制。验证范围见 [LAB 修复记录](docs/LAB_BUGFIX_2026.10.07.md)。
+- 主菜单底栏在 **MEDAL 与 MISSION 之间新增 LAB 图标**，采用用户提供的原生尺寸素材，点击打开 LAB 准备界面。布局与核验见 [LAB 菜单入口说明](docs/LAB_MENU_ENTRY_2026.10.07.md)。
+- LAB 图标共用原生按压青色边框、三灯高亮、菜单入场时序与闸门遮挡；标题使用用户提供的 **282×247 LOGO 原图及绿色边框**，直接保留原透明通道。TAP SCREEN 的图像隐藏，原生点击入口继续生效。实施与验证见 [LAB 与标题视觉修订](docs/LAB_VISUAL_TITLE_2026.10.07.md)。
 
 ### 1.46.4 更新
 
@@ -181,6 +202,12 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 该预设包含全部 **399 个原版兵种及当前登记的 13 个可用社区兵种**，均已拥有且初始为 **Lv1**。“我方阵营”的 **9 项强化均为 Lv1**。地图采用初始进度，关卡均未通关、捕虏均未收集，后续关卡及世界按游戏规则逐步解锁。货币、道具及初始编队沿用正式版初始存档。世界进度与军队核等级上限继续生效。
 
 再次启动时保留已经完成的升级、地图进度及设置。迁移至新安装目录时，复制完整的 `play_save_all_units_level1/`。预设文件位于 `game_data/all_units_level1/`，发行文件与个人进度分别保存。
+
+### 全解锁满级独立存档
+
+启动 **Start_MSD_All_Unlocked_Max_Level.vbs**。首次启动时在 `play_save_all_unlocked_max_level/` 创建独立存档，包含全部 **399 个原版单位记录（UnitID 1–399）和 17 款可选社区单位，均为 Lv40**；“我方阵营”的 **九项基地强化均为 Lv30**，六阵营核心全部持有。地图 1、2、3 的关卡开放并完成通关，**48 项区域人质奖励效果均为 100%**。历史活动进度沿用初始预设。
+
+该入口共用当前正式版核心，后续启动保留该独立存档的游戏进度。既有普通入口和原满级入口继续使用各自存档目录。迁移时复制完整的 `play_save_all_unlocked_max_level/`；预设位于 `game_data/all_unlocked_max_level/`，实施与核验范围见 [独立预设说明](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md)。
 
 ### 内容制作与联机预备接口
 

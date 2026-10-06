@@ -1,19 +1,59 @@
 {
   "schema": 1,
-  "stage_id": 1011,
+  "stage_id": 1124,
   "enemy_deck": [
-    ["s1xlv.kt21", 40],
-    ["s1xlv.white_mummy", 40],
-    ["s1xlv.green_mummy", 40],
-    ["s1xlv.mummy_generator_mk2", 40],
-    ["s1xlv.pf_rifle", 40],
-    [3, 40],
-    [51, 40],
-    [59, 40],
-    [117, 40],
-    [6, 40]
+    [
+      83,
+      40
+    ],
+    [
+      82,
+      40
+    ],
+    [
+      84,
+      40
+    ],
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
   ],
-  "full_control": true,
-  "enemy_ai": false,
-  "player_ai": false
+  "player_deck": [
+    [
+      273,
+      40
+    ],
+    [
+      274,
+      40
+    ],
+    [
+      275,
+      40
+    ],
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "player_base_level": 10,
+  "enemy_base_level": 10,
+  "player_hp_boost": 0,
+  "player_atk_boost": 0,
+  "enemy_hp_boost": 0,
+  "enemy_atk_boost": 0,
+  "full_control": false,
+  "enemy_ai": true,
+  "player_ai": true,
+  "enemy_auto_special": false,
+  "player_auto_special": false,
+  "player_support": 0,
+  "enemy_support": 0
 }

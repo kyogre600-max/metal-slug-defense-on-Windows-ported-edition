@@ -762,6 +762,13 @@ class Probe:
                     self.put(self.errno,2);return 0
             path=self.path(requested); self.log('FILE_OPEN',str(path),mode)
             if any(k in mode for k in 'wa+') and not path.is_relative_to(self.guest_root): raise RuntimeError('Original asset write blocked')
+            if path.name=='title01.obm' and mode.startswith('r'):
+                from title_visuals import TitleVisuals
+                if not hasattr(self,'title_visuals'):
+                    self.title_visuals=TitleVisuals(self,getattr(self,'custom_content_root',ROOT/'custom_content'))
+                replacement=self.title_visuals.read_asset(path,mode,(RESOURCE_ROOT/PKG).resolve())
+                if replacement is not None:
+                    handle=self.alloc(16);self.handles[handle]=io.BytesIO(replacement);return handle
             if path.name.startswith('menu_news00') and mode.startswith('r'):
                 from custom_menu import MenuScreenOverride
                 if not hasattr(self,'menu_screen_override'):
