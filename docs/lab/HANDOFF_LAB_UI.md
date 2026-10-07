@@ -146,3 +146,20 @@
 - 原生就绪条件限定state1..4，保留闸门、cockpit与任务标记条件；lab_menu_entry.ready复核当前scene/state，阻止缓存许可在状态0/5/6继续接受触摸。主菜单及三个子页面共用现有坐标、按压青色边框、三灯、原生绘制层级与输入队列。
 - 当前核心为MSD_Core_LAB_r13_20261007.dll，27,130,197字节，hooks8；r12的drag_check原始源码片段逐字节保持，核心接口与共享头保持。准备界面未开战时Esc/Back返回原子页，开战与战后清理继续使用现有SceneEndFunc(28)及菜单27→28路径，页面类型沿用原生记录；SHOP开战样例返回state4，无新增页面快照。
 - 原生15项、宿主10项门槛检查通过；四页导航、返回后普通控件与子页面开战后的战后返回采用实际窗口独立fixture核查。证据与同步范围见docs/LAB_MENU_ENTRY_2026.10.07.md及verification/lab_submenu_fix_20261007/。用户存档、LAB设置、README已完成的重写及用户进程保持。
+
+## 2.9 双侧 AP 反馈与敌方提示横幅（2026-10-07，核心 r15）
+
+- 当前正式核心为 `MSD_Core_LAB_r15_20261007.dll`，27,134,094 字节，hooks9。根目录与 src 配置、普通及独立 LAB 入口统一加载该核心，保留 r12 拖动与 r13 菜单原生源码段。
+- 敌方升级复用完整原生 `playBaseLevelupAction`，金币初始化与 OKAY 声音26同步，人物动画1第36帧播放敬礼声音7。新增原 `clock` 导入的同步回调，继续调用宿主既有计时函数；原声音请求、声道、解码器与混音接口保持。
+- `createGrahics` 保留原 operator+208，宿主为敌方单独 new3116→BattleCoinAnimatorC2→initialize，保存至敌方图集字段+20。双方金币对象各自逐帧更新并在 AP 框及底栏之后绘制，敌方采用按钮中心镜像。退出时沿用原金币析构与 delete 流程。
+- 敌方 LV UP、MAX、ATTACK 使用独立六槽队列及原生入场/停留/退场状态机；图像、文字与水平动画整体按 `x'=960-x` 镜像。共享头+0x100保存十个 operator 横幅字段，+0x128就绪，+0x140保存六个28字节槽；宿主先 release 槽内+4 Sprite，再清+0x100..+0x1e8。
+- 主组57项、满级组30项、单帧推进26项运行检查通过，共113项；声音请求及混音活动/字节进度分别核验。基寇卡、马可、KT-21双侧普通攻击与绝招的62条请求及52.504秒实际PCM与r13逐条/逐字节一致，音频两组各21项及8项对照检查通过。
+- 详细范围、13项本地正式目录同步清单与证据见 `docs/LAB_AP_FEEDBACK_2026.10.07.md` 和 `verification/lab_ap_feedback_20261007/`。个人存档、LAB设置及预设保留，显示版本保持1.47.0；Git提交与发布由用户执行。
+
+## 2.10 敌方首次触发资源准备（2026-10-07，核心 r16）
+
+- 用户报告我方尚未升级时，敌方首次升级缺少人物、金币及提示。冷启动复现显示GFX/PANEL/BANNER均就绪、缓存406为空；完整升级动作先创建横幅，首次分配/文件加载在同步嵌套调用中止。r15原检查采用我方先升级，保留其顺序范围。
+- `build_enemy_graphics` 发布GFX_READY前，以顶层原生Factory.create(SpriteID2)创建并持有 `enemy_feedback_resource`。该Sprite的ImageIndex406参与原生600槽资源保留扫描，未调用AP动作、动画、横幅或声音。正常退出先释放实际横幅再释放此资源，abort及窗口关闭亦执行幂等释放。
+- 当前核心为 `MSD_Core_LAB_r16_20261007.dll`，27,134,094字节，hooks9。原生钩子及音频源码保持r15内容，宿主完成资源准备。证据位于 `verification/lab_ap_enemy_first_20261007/`，修订说明见 `docs/LAB_AP_FEEDBACK_2026.10.07.md`。
+- 新增97项检查通过：鼠标/键盘/延迟首升各19，首次ATTACK7，两轮重入27，abort清理6。每轮均无我方AP请求，敌方声音26/7各1并实际PCM消费；pin索引406在退出后恢复-1，重复释放幂等。
+- 按F:\egg\AGENTS.md第2.2、2.3节，同时同步dist/MSD_Windows及用户指定的metal-slug-defense-on-Windows-ported-edition-main运行副本，个人存档与LAB设置保留；显示版本保持1.47.0。

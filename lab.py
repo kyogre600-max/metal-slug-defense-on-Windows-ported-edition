@@ -64,6 +64,9 @@ LAB_ENEMY_GFX_READY = 0x3c       # 头部偏移：敌方出兵格图集已就绪
 LAB_ENEMY_GFX = 0x40             # 头部偏移：敌方 operator+188…+220（9 字）
 LAB_ENEMY_PANEL_READY = 0x6c     # 头部偏移：敌方出兵栏状态已初始化
 LAB_ENEMY_PANEL = 0x70           # 头部偏移：敌方 operator+24/32/96/100/104/112/116（7 字，+12 为滚动值）
+LAB_ENEMY_BANNER = 0x100         # 钩子版本 9：敌方横幅队列与播放状态（10 字）
+LAB_ENEMY_BANNER_READY = 0x128
+LAB_ENEMY_BANNER_SLOTS = 0x140   # 六个原生横幅槽，每槽 28 字节，+4 为 BattleSprite
 AURA_STRING = 0x103011c3       # BattleEffectRenderer 构造函数引用的 "aura.obm"（.rodata 0x3011c3）
 RESULT_SCENES = (110, 120)
 SAVE_RAM = 0x3d08              # app 偏移：主存档映像（与 event_trial.EventTrial.transaction 相同）
@@ -421,7 +424,10 @@ class Lab:
             if self.sandbox:
                 self.leave_sandbox()
         finally:
-            self.write_header(False)
+            try:
+                self.write_header(False)
+            finally:
+                self.release_enemy_feedback_resource()
 
     def read_enemy_deck(self):
         p = self.p
@@ -631,7 +637,8 @@ class Lab:
     def build_enemy_graphics(self, enemy):
         """底栏分栏的敌方出兵格图集。BattlePlayerOperator::createGrahics 以 operator+24 的控制器生成
         出兵格头像、成本数字等合成图（operator+188…+220，只新建不释放旧对象）；这里临时换入敌方控制器调用一次，
-        把结果交给原生钩子（头部 +0x40 起 9 字，+0x3c 置 1），随后还原我方的值。"""
+        把结果交给原生钩子（头部 +0x40 起 9 字，+0x3c 置 1），随后还原我方的值。
+        createGrahics 保留 +208，敌方金币按原生初始化流程单独构建。"""
         p = self.p
         _, scene = self.battle()
         operator = p.word(scene + 0x3c)
@@ -648,6 +655,14 @@ class Lab:
             p.put(operator + 24, controller)
             for o, value in zip(offsets, mine):
                 p.put(operator + o, value)
+        if self.native_hooks >= 9:
+            coin = p.call('_Znwj', 3116)
+            p.call('_ZN18BattleCoinAnimatorC2Ev', coin)
+            p.call('_ZN18BattleCoinAnimator10initializeEv', coin)
+            built[5] = coin
+            # 提示横幅共用 SpriteID2；顶层加载完整执行分配与文件导入，LAB 期间持有原生资源。
+            factory = p.call('_ZN19BattleSpriteFactory11getInstanceEv')
+            self.enemy_feedback_resource = p.call('_ZN19BattleSpriteFactory6createE8SpriteID', factory, 2)
         for i, value in enumerate(built):
             p.put(LAB_HEADER + LAB_ENEMY_GFX + 4 * i, value)
         p.put(LAB_HEADER + LAB_ENEMY_GFX_READY, 1)
@@ -660,6 +675,8 @@ class Lab:
         +188/+192/+196/+216 虚析构（vtable[1]），+200 delete[]，+204/+220 BattleSprite::release，
         +208 BattleCoinAnimator 析构后 delete；+212 原生不释放。须在 BattleEnd_ClearBattleMain 之前调用。"""
         p = self.p
+        self.release_enemy_banners()
+        self.release_enemy_feedback_resource()
         owned, self.enemy_gfx_owned = getattr(self, 'enemy_gfx_owned', {}), {}
         p.put(LAB_HEADER + LAB_ENEMY_GFX_READY, 0)
         for offset, obj in owned.items():
@@ -674,6 +691,31 @@ class Lab:
                 p.call('_ZdlPv', obj)
         if owned:
             self.record('enemy_graphics_released', fields={o: hex(v) for o, v in owned.items()})
+
+    def release_enemy_feedback_resource(self):
+        """释放 LAB 持有的横幅图像资源，允许原生工厂在后续清理中回收。"""
+        sprite = getattr(self, 'enemy_feedback_resource', 0)
+        self.enemy_feedback_resource = 0
+        if sprite:
+            self.p.call('_ZN12BattleSprite7releaseEv', sprite)
+
+    def release_enemy_banners(self):
+        """依原生横幅槽清理流程释放敌方 Sprite，清除固定共享区中的队列与播放状态。"""
+        if self.native_hooks < 9:
+            return
+        p = self.p
+        released = []
+        if p.word(LAB_HEADER + LAB_ENEMY_BANNER_READY) == 1:
+            for index in range(6):
+                slot = LAB_HEADER + LAB_ENEMY_BANNER_SLOTS + index * 28
+                sprite = p.word(slot + 4)
+                if sprite:
+                    p.call('_ZN12BattleSprite7releaseEv', sprite)
+                    p.put(slot + 4, 0)
+                    released.append(hex(sprite))
+        p.write(LAB_HEADER + LAB_ENEMY_BANNER, bytes(0xe8))
+        if released:
+            self.record('enemy_banners_released', sprites=released)
 
     def finish_network_wait(self, main):
         """联机战斗开场的 BattleSceneNetworkWait（场景类型 6）等待对端同步；LAB 无对端，
@@ -702,6 +744,7 @@ class Lab:
 
     def write_header(self, active):
         p = self.p
+        self.release_enemy_banners()
         p.put(LAB_HEADER + LAB_ENEMY_GFX_READY, 0)
         p.put(LAB_HEADER + LAB_ENEMY_PANEL_READY, 0)
         p.put(LAB_HEADER + LAB_SUPPORT_COUNT, 0)

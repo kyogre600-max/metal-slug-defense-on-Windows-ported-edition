@@ -253,9 +253,9 @@ constexpr Segment SEGMENTS[]={
     {-88.89f,-70,true,1,true}};
 constexpr int SEGMENT_COUNT=int(sizeof SEGMENTS/sizeof SEGMENTS[0]);
 constexpr float ARROW_SHIFT=-246.0f;                           // 滚动箭头（源 x 742）移到 3 格窗口右端
-struct Pass{bool active=false;float s=1,offx=0,offy=0;int clip[4]={0,0,0,0};int filter=0;bool cells=false;bool tinted=false;bool rotate=false;bool ap_button=false;bool apbar=false;bool no_apbar=false;bool mirror=false;bool mirror_sprite=false;uint32_t atlas=0;};
+struct Pass{bool active=false;float s=1,offx=0,offy=0;int clip[4]={0,0,0,0};int filter=0;bool cells=false;bool tinted=false;bool rotate=false;bool ap_button=false;bool apbar=false;bool no_apbar=false;bool mirror=false;bool mirror_sprite=false;bool coin_overlay=false;bool banner_overlay=false;float mirror_center=0;uint32_t atlas=0;};
 Pass pass;
-bool enemy_pass=false;
+bool enemy_pass=false,drawing_banner=false;
 float seg_dest[SEGMENT_COUNT];
 bool laid_out_once=false;
 void layout(){
@@ -340,6 +340,7 @@ template<uint32_t ENTRY> Block DrawHook<ENTRY>::old;
 template<uint32_t ENTRY> void DrawHook<ENTRY>::run(Context& c){
     graphics_ptr=c.r[0];
     if(pass.active){
+        if(pass.banner_overlay && !drawing_banner){c.pc=c.r[14];return;}
         if(!pass_filter(c,c.r[3])){c.pc=c.r[14];return;}
         float extra=(pass.cells && is_arrow(c))?ARROW_SHIFT*pass.s:0.0f;
         uint32_t m=c.r[2],dst=H+0x800u;
@@ -354,9 +355,10 @@ template<uint32_t ENTRY> void DrawHook<ENTRY>::run(Context& c){
         if(pass.ap_button && ty>=590.0f && ty<625.0f && c.r[3]!=fbits(210.0f))
             wr<uint32_t>(c,dst+8u,fbits(bitsf(rd<uint32_t>(c,dst+8u))+AP_DIGIT_SHIFT));
         // 敌方弹头车片段整体翻转（底部 “MAX” 字样除外）；敌方 AP 升级片段只翻转人物精灵（图集以外的图像）。
-        bool flip=(pass.mirror && !(ty>=590.0f && c.r[3]!=0u)) || (pass.mirror_sprite && c.r[1]!=pass.atlas);
+        bool flip=(pass.coin_overlay || pass.banner_overlay)?pass.mirror:
+                  (pass.mirror && !(ty>=590.0f && c.r[3]!=0u)) || (pass.mirror_sprite && c.r[1]!=pass.atlas);
         if(flip){
-            float cx=float(pass.clip[0])+float(pass.clip[2])*0.5f;
+            float cx=(pass.coin_overlay || pass.banner_overlay)?pass.mirror_center:float(pass.clip[0])+float(pass.clip[2])*0.5f;
             wr<uint32_t>(c,dst,fbits(-bitsf(rd<uint32_t>(c,dst))));
             wr<uint32_t>(c,dst+4u,fbits(-bitsf(rd<uint32_t>(c,dst+4u))));
             wr<uint32_t>(c,dst+8u,fbits(2.0f*cx-bitsf(rd<uint32_t>(c,dst+8u))));
@@ -378,11 +380,12 @@ template<uint32_t ENTRY> void DrawHook<ENTRY>::run(Context& c){
 Block old_fill;
 void fill_hook(Context& c){
     if(pass.active){
+        if(pass.banner_overlay && !drawing_banner){c.pc=c.r[14];return;}
         if(pass.filter==1){c.pc=c.r[14];return;}
         float s=pass.s;
         int x=int(std::lround(int32_t(c.r[1])*s+pass.offx)),y=int(std::lround(int32_t(c.r[2])*s+pass.offy));
         int w=int(std::lround(int32_t(c.r[3])*s)),h=int(std::lround(int32_t(rd<uint32_t>(c,c.r[13]))*s));
-        if(pass.mirror)x=pass.clip[0]*2+pass.clip[2]-(x+w);
+        if(pass.mirror)x=(pass.banner_overlay?int(2.0f*pass.mirror_center):pass.clip[0]*2+pass.clip[2])-(x+w);
         int x0=std::max(x,cur_clip[0]),y0=std::max(y,cur_clip[1]);
         int x1=std::min(x+w,cur_clip[0]+cur_clip[2]),y1=std::min(y+h,cur_clip[1]+cur_clip[3]);
         if(x1<=x0 || y1<=y0){c.pc=c.r[14];return;}
@@ -464,15 +467,40 @@ void swap_gfx(Context& c,uint32_t op){
         wr<uint32_t>(c,a,rd<uint32_t>(c,b));wr<uint32_t>(c,b,t);
     }
 }
-// 与 BattlePlayerOperator::update（0x1d6ae4…0x1d6b34）相同：升级动作（动画 1）播完且据点未满级时回到动画 0，
-// 然后推进一帧。敌方图集与出兵栏状态换入期间对 operator+204 执行；每帧一次。
-constexpr uint32_t SPRITE_GET_ANIMATION=0x101db8eau,SPRITE_IS_PLAYING=0x101db8f0u,SPRITE_CHANGE=0x101dc3eau,SPRITE_UPDATE=0x101dc4a6u;
+// 敌方横幅：十个交换字段保存六个槽指针、显示/滚入状态及优先标记，六个槽各 28 字节。
+// 原生 playTargetAction 分配槽内 +4 的 BattleSprite；宿主结束 LAB 时 release 后清除此区（hooks 9）。
+constexpr uint32_t BANNER_BASE=H+0x100u,BANNER_READY=H+0x128u,BANNER_SLOTS=H+0x140u;
+constexpr uint32_t BANNER_WORDS[]={120u,124u,128u,132u,136u,140u,144u,148u,152u,224u};
+constexpr uint32_t TARGET_ACTION=0x101d6fdcu,TARGET_UPDATE=0x101d6c48u;
+void ensure_enemy_banner(Context& c){
+    if(rd<uint32_t>(c,BANNER_READY)==1u)return;
+    for(uint32_t i=0;i<6u;++i){
+        uint32_t slot=BANNER_SLOTS+i*28u;
+        for(uint32_t j=0;j<28u;j+=4u)wr<uint32_t>(c,slot+j,0u);
+        wr<uint32_t>(c,BANNER_BASE+i*4u,slot);
+    }
+    for(uint32_t i=6u;i<10u;++i)wr<uint32_t>(c,BANNER_BASE+i*4u,0u);
+    wr<uint32_t>(c,BANNER_READY,1u);
+}
+void swap_banner(Context& c,uint32_t op){
+    for(uint32_t i=0;i<10u;++i){
+        uint32_t a=op+BANNER_WORDS[i],b=BANNER_BASE+i*4u,t=rd<uint32_t>(c,a);
+        wr<uint32_t>(c,a,rd<uint32_t>(c,b));wr<uint32_t>(c,b,t);
+    }
+}
+// 与 BattlePlayerOperator::update（0x1d6ae4…0x1d6b3c）一致：动画 1 的第 36 帧播放敬礼声音 7，
+// 升级动作播完且据点未满级时回到动画 0；随后依次推进人物和金币。敌方图集换入期间每帧执行一次。
+constexpr uint32_t SPRITE_GET_ANIMATION=0x101db8eau,SPRITE_GET_FRAME=0x101dbc0cu,SPRITE_IS_PLAYING=0x101db8f0u;
+constexpr uint32_t SPRITE_CHANGE=0x101dc3eau,SPRITE_UPDATE=0x101dc4a6u;
+constexpr uint32_t COIN_UPDATE=0x101d678cu,COIN_DRAW=0x101d6880u,SOUND_PLAY=0x1016c17au;
 constexpr uint32_t KYOTEN_LEVEL_MAX=0x101cbd78u;
 void tick_enemy_sprite(Context& c,uint32_t op){
     uint32_t sprite=rd<uint32_t>(c,op+204u),value=0;
     if(!sprite)return;
     guest_call(c,SPRITE_GET_ANIMATION,sprite,0,0,0,nullptr,0,&value);
     if(value==1u){
+        guest_call(c,SPRITE_GET_FRAME,sprite,0,0,0,nullptr,0,&value);
+        if(value==36u)guest_call(c,SOUND_PLAY,0u,7u,0u);
         guest_call(c,SPRITE_IS_PLAYING,sprite,0,0,0,nullptr,0,&value);
         if(!value){
             guest_call(c,KYOTEN_LEVEL_MAX,rd<uint32_t>(c,op+24u),0,0,0,nullptr,0,&value);
@@ -480,12 +508,16 @@ void tick_enemy_sprite(Context& c,uint32_t op){
         }
     }
     guest_call(c,SPRITE_UPDATE,sprite);
+    uint32_t coin=rd<uint32_t>(c,op+208u);
+    if(coin)guest_call(c,COIN_UPDATE,coin);
 }
 void run_pass(Context& c,uint32_t op,const Pass& p,uint32_t fn=DRAWUI){
     pass=p;
+    drawing_banner=false;
     std::memcpy(cur_clip,p.clip,sizeof cur_clip);
     guest_call(c,fn,op);
     pass.active=false;
+    drawing_banner=false;
 }
 
 Block old_drawui_entry;
@@ -497,6 +529,7 @@ void drawui_entry(Context& c){
     in_ui=true;
     if(!laid_out_once){layout();laid_out_once=true;}
     ensure_enemy_panel(c,op);
+    ensure_enemy_banner(c);
     uint32_t mine=rd<uint32_t>(c,op+24u);
     wr<uint32_t>(c,op+104u,max_scroll(c,op,mine));
     wr<uint32_t>(c,ENEMY_PANEL+16u,max_scroll(c,op,rd<uint32_t>(c,ENEMY_PANEL)));
@@ -548,6 +581,29 @@ void drawui_entry(Context& c){
         guest_call(c,0x101417dfu-1u,graphics_ptr,0xff1c1c1cu);                 // Graphics::setColor
         guest_call(c,G_FILL-1u,graphics_ptr,uint32_t(int(SCREEN_LEFT)-1),uint32_t(int(bottom)),uint32_t(int(SCREEN_RIGHT-SCREEN_LEFT)+2),stack,1);
         guest_call(c,0x101417dfu-1u,graphics_ptr,0xffffffffu);
+    }
+    // 原生 drawUI 在人物之后绘制金币（0x1d92f6）。分栏金币统一置于 AP 框及底栏之上，
+    // 使用对应 AP 按钮的变换并允许越过框体；各侧金币对象独立，敌方镜像中心采用其按钮中心。
+    for(int i=0;i<SEGMENT_COUNT;++i){
+        const Segment& g=SEGMENTS[i];
+        if(g.src0!=18.0f || (g.enemy && rd<uint32_t>(c,GFX_READY)!=1u))continue;
+        uint32_t coin=rd<uint32_t>(c,g.enemy?GFX_BASE+20u:op+208u);
+        if(!coin)continue;
+        Pass p;p.active=true;p.coin_overlay=true;p.s=SCALE;p.mirror=g.enemy;
+        p.offx=seg_dest[i]-SCALE*g.src0;p.offy=BAR_TOP*(1.0f-SCALE);
+        p.mirror_center=seg_dest[i]+SCALE*(g.src1-g.src0)*0.5f;
+        p.clip[0]=int(SCREEN_LEFT)-1;p.clip[1]=0;
+        p.clip[2]=int(SCREEN_RIGHT-SCREEN_LEFT)+2;p.clip[3]=int(BAR_BOTTOM);
+        run_pass(c,coin,p,COIN_DRAW);
+    }
+    if(rd<uint32_t>(c,GFX_READY)==1u){
+        Pass p;p.active=true;p.banner_overlay=true;p.mirror=true;
+        p.mirror_center=(SCREEN_LEFT+SCREEN_RIGHT)*0.5f;
+        p.clip[0]=int(SCREEN_LEFT)-1;p.clip[1]=0;
+        p.clip[2]=int(SCREEN_RIGHT-SCREEN_LEFT)+2;p.clip[3]=int(BAR_BOTTOM);
+        swap_panel(c,op);swap_gfx(c,op);swap_banner(c,op);
+        run_pass(c,op,p);
+        swap_banner(c,op);swap_gfx(c,op);swap_panel(c,op);
     }
     in_ui=false;
     c.pc=ret;
@@ -622,10 +678,10 @@ void install_touch_hooks(){
     old_ui_ended=find_block(0x101d7315u);register_block(0x101d7315u,ui_ended);
     install_ui_exits(std::make_integer_sequence<int,UI_EXIT_COUNT>{});
 }
-// 我方 AP 获得时的金币动画只属于我方，敌方各遍不绘制。
+// 分栏常规各遍统一跳过金币；两侧最后各执行一次金币覆盖层，保持原生框体与动效绘制顺序。
 Block old_coin_draw;
 void coin_draw(Context& c){
-    if(pass.active && enemy_pass){c.pc=c.r[14];return;}
+    if(pass.active && !pass.coin_overlay){c.pc=c.r[14];return;}
     old_coin_draw(c);
 }
 // ---------- 敌方 AP 按钮人物的动画（与我方相同的逻辑） ----------
@@ -635,7 +691,12 @@ void coin_draw(Context& c){
 // 敌方：在上述函数入口以敌方图集与出兵栏状态执行对应动作（敌方据点被毁 → Escape，我方据点被毁 → Win）。
 bool enemy_sprite_ready(Context& c){return split_enabled(c) && rd<uint32_t>(c,GFX_READY)==1u && rd<uint32_t>(c,ENEMY_PANEL_READY)==1u;}
 template<class F> void with_enemy(Context& c,uint32_t op,F action){
-    swap_panel(c,op);swap_gfx(c,op);action();swap_gfx(c,op);swap_panel(c,op);
+    // 敌方鼠标输入处理期间已换入该控制器，升级事件可在其返回前同步到达。
+    bool panel_swapped=rd<uint32_t>(c,op+24u)!=rd<uint32_t>(c,ENEMY_CONTROLLER);
+    if(panel_swapped)swap_panel(c,op);
+    ensure_enemy_banner(c);
+    swap_gfx(c,op);swap_banner(c,op);action();swap_banner(c,op);swap_gfx(c,op);
+    if(panel_swapped)swap_panel(c,op);
 }
 Block old_operator_update;
 void operator_update(Context& c){
@@ -643,7 +704,27 @@ void operator_update(Context& c){
     if(enemy_sprite_ready(c))with_enemy(c,op,[&]{tick_enemy_sprite(c,op);});
     old_operator_update(c);
 }
-constexpr uint32_t RUMI_LEVEL_MAX=0x101d7196u,RUMI_ESCAPE=0x101d71b2u,RUMI_WIN=0x101d71ceu;
+// BattleScene 逐帧调用 update_TargetAction；双方独立使用原生入场、45 tick 等待及退场状态机。
+Block old_target_update,old_banner_begin,old_banner_end,old_scene_slug;
+bool in_target_update=false;
+void target_update(Context& c){
+    uint32_t op=c.r[0];
+    if(!in_target_update && enemy_sprite_ready(c)){
+        in_target_update=true;
+        with_enemy(c,op,[&]{guest_call(c,TARGET_UPDATE,op);});
+        in_target_update=false;
+    }
+    old_target_update(c);
+}
+void banner_begin(Context& c){drawing_banner=true;old_banner_begin(c);}
+void banner_end(Context& c){drawing_banner=false;old_banner_end(c);}
+void scene_slug(Context& c){                                  // onEventMetasuraHou(scene, charge, team, member, bool)
+    uint32_t op=rd<uint32_t>(c,c.r[0]+60u);
+    if(enemy_sprite_ready(c) && c.r[2]==rd<uint32_t>(c,ENEMY_TEAM))
+        with_enemy(c,op,[&]{guest_call(c,TARGET_ACTION,op,7u,0u);}); // 原生 ATTACK 横幅
+    old_scene_slug(c);
+}
+constexpr uint32_t BASE_LEVELUP_ACTION=0x101d711cu,RUMI_LEVEL_MAX=0x101d7196u,RUMI_ESCAPE=0x101d71b2u,RUMI_WIN=0x101d71ceu;
 Block old_fever,old_levelup,old_base_dead;
 void scene_fever(Context& c){                                  // onEventFeverTimeStart(scene, team)
     uint32_t scene=c.r[0],op=rd<uint32_t>(c,scene+60u);
@@ -653,8 +734,9 @@ void scene_fever(Context& c){                                  // onEventFeverTi
 }
 void scene_levelup(Context& c){                                // onEventBaseLevelup(scene, team, level, member, bool)
     uint32_t scene=c.r[0],op=rd<uint32_t>(c,scene+60u);
-    if(enemy_sprite_ready(c) && c.r[1]==rd<uint32_t>(c,ENEMY_TEAM))
-        with_enemy(c,op,[&]{guest_call(c,SPRITE_CHANGE,rd<uint32_t>(c,op+204u),1u,1u);});   // playBaseLevelupAction 的精灵部分
+    if(enemy_sprite_ready(c) && c.r[1]==rd<uint32_t>(c,ENEMY_TEAM) && c.r[3]==rd<uint32_t>(c,ENEMY_MEMBER))
+        // 完整原生动作包含通知、人物动画 1、金币初始化和同 tick 的 OKAY 声音 26。
+        with_enemy(c,op,[&]{guest_call(c,BASE_LEVELUP_ACTION,op);});
     old_levelup(c);
 }
 void scene_base_dead(Context& c){                              // onEventBaseUnitDead(scene, ?, team)
@@ -756,6 +838,10 @@ void install_ui_hooks(){
     old_auto_special=find_block(0x101cc04fu);register_block(0x101cc04fu,auto_special);
     old_auto_deploy=find_block(0x101cc071u);register_block(0x101cc071u,auto_deploy);
     old_operator_update=find_block(0x101d6ae5u);register_block(0x101d6ae5u,operator_update);
+    old_target_update=find_block(TARGET_UPDATE|1u);register_block(TARGET_UPDATE|1u,target_update);
+    old_banner_begin=find_block(0x101d932fu);register_block(0x101d932fu,banner_begin);
+    old_banner_end=find_block(0x101d950fu);register_block(0x101d950fu,banner_end);
+    old_scene_slug=find_block(0x101d502fu);register_block(0x101d502fu,scene_slug);
     old_fever=find_block(0x101d5063u);register_block(0x101d5063u,scene_fever);
     old_levelup=find_block(0x101d5173u);register_block(0x101d5173u,scene_levelup);
     old_base_dead=find_block(0x101d5dfdu);register_block(0x101d5dfdu,scene_base_dead);
@@ -770,7 +856,7 @@ void install_ui_hooks(){
     install_touch_hooks();
 }
 }
-extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 8u;}
+extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 9u;}
 extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     static bool installed=false;
     if(installed)return;

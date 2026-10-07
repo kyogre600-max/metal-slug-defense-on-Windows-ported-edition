@@ -3,7 +3,7 @@ import ctypes as C
 import os
 from static_cpu import Context
 
-COMMON={'sin':1,'cos':2,'sinf':3,'cosf':4,'memset':5,'memcpy':6,'memmove':7,
+COMMON={'sin':1,'cos':2,'sinf':3,'cosf':4,'memset':5,'memcpy':6,'memmove':7,'clock':9,
         **{name:8 for name in ('pthread_mutex_init','pthread_mutex_lock','pthread_mutex_unlock',
                               'pthread_mutex_destroy','pthread_attr_init','pthread_attr_setdetachstate',
                               'pthread_attr_destroy','pthread_setname_np','pthread_detach','pthread_key_delete')}}
@@ -26,6 +26,10 @@ def bind(p, graphics=None):
         address=p.thunks.get(name)
         if address is None:continue
         function=C.cast(getattr(graphics.gl,name),C.c_void_p) if graphics else None
+        if not graphics and name=='clock':
+            # 保留宿主进程 CPU 时间的微秒语义；强引用覆盖同步客体调用的生命周期。
+            p._native_clock_callback=C.CFUNCTYPE(C.c_uint32)(lambda: p.clock('clock',[]) & 0xffffffff)
+            function=C.cast(p._native_clock_callback,C.c_void_p)
         if not fn(C.byref(p.uc.ctx),address,kind,function):raise RuntimeError('Native import binding failed: '+name)
         count+=1
     p.log('NATIVE_IMPORTS', 'graphics' if graphics else 'common', count)
@@ -34,3 +38,4 @@ def release(p):
     if hasattr(p.uc.lib,'msd_release_imports'):
         fn=p.uc.lib.msd_release_imports;fn.argtypes=[C.POINTER(Context)];fn.restype=None
         fn(C.byref(p.uc.ctx))
+    if hasattr(p,'_native_clock_callback'):del p._native_clock_callback

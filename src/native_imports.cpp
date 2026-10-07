@@ -57,6 +57,7 @@ bool msd_native_import(Context& c,uint32_t address,NativeImports* host){
         case 5:{auto dst=pointer(c,a,d);if(!c.error)std::memset(dst,b,d);c.r[0]=a;break;}
         case 6:case 7:{auto dst=pointer(c,a,d),src=pointer(c,b,d);if(!c.error)std::memmove(dst,src,d);c.r[0]=a;break;}
         case 8:c.r[0]=0;break; // Existing mutex/attribute host contracts.
+        case 9:c.r[0]=reinterpret_cast<uint32_t(*)()>(fn)();break; // Host process clock, including synchronous LAB sound requests.
         case 32:case 33:case 34:case 35:case 36:case 37:case 38:
             reinterpret_cast<void(*)(uint32_t)>(fn)(a);break;
         case 39:case 40:case 41:
