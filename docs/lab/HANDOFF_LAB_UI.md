@@ -229,3 +229,11 @@
 - 更正：单位 +0x62 为每个单位的实例编号，不是 UnitID。r20 验证脚本 `driver_value.py` 以 +0x62 匹配卡组 UnitID 统计出兵，只匹配到少数单位，其报告中的“出兵平均 AP”（第 2.14 节所列数值）不可靠；钩子内统计（+0x540 起）不受影响。onEventUnitCreate 出口块的 r0 不总是有效单位（开发初版据此记录，宿主读取无效地址导致随机 AOT 停止），已改为上述出口钩子。
 - 头部：段位块 +24 k×100、+28 L（位 0–11）| D（位 12–19）| S/10（位 20–31）；+0x700 场次编号（宿主每场开战递增，钩子据此清空记录）；+0x710 起每方 8 字（触发、投资升级、超时、暂停帧、最近 F、最近阈值、压力跳过、据点等级）；+0x750 起每方 4 字（出兵、变身继承、召唤、当前计入单位数）；+0x770 起每方 1 字（停滞兜底触发次数）。
 - 验证（`verification/lab_ai_invest_r21_20261007/`，加速模式，隔离存档 `verification/lab_ui_20261006/save`，混合牌组含工兵/沙包/木乃伊召唤箱工兵）：最终参数 9 次运行（7 段同段对战与 GOLD、PREDATOR 对 SILVER，各 240 秒）检查全部通过，达到开局目标后无停滞。同段对战升至 10 级用时：PREDATOR 44 秒、MASTER 49 秒、DIAMOND 49/64 秒、PLATINUM 75 秒、GOLD 138/156 秒；BRONZE 240 秒内到 7/9 级，ROOKIE 到 5/6 级；升级最大间隔 ROOKIE 约 57 秒、BRONZE 约 39 秒、GOLD 约 22 秒、PREDATOR 8 秒。SILVER 未触发投资，行为与 r20 相同。r19/r20 段位检查（等待区间、紧急阈值、建筑类出兵位置、开局目标）同时通过。`summarize.py` 汇总各次运行。实际对战手感待用户实机核验。
+
+## 2.16 战斗结束演出播放完毕后再合拢闸门（2026-10-08，宿主修订，核心保持 r21）
+
+- 用户报告：被敌方击败时 MISSION FAILED 演出未播放完即合拢闸门回到 LAB，要求 MISSION COMPLETE / FAILED 演出完全播放完毕后再合拢。
+- 原因：`Lab.update` 在战斗停止后满足“场景离开 100”或“停止计时满 75 帧”任一条件即调用 `finish`（原生 SetShutterClose）。实测（1-1，据点 HP 置 0，加速模式逐帧记录与截图）：战斗于置 0 后第 15 帧停止，原 75 帧计时在第 90 帧合拢，此时 FAILED 文字仍在入场；演出文字在第 130–140 帧退场，原生于第 155 帧（COMPLETE 为第 135 帧）自行由场景 100 进入 101。
+- 修订（`lab.py`）：以原生离开场景 100 作为演出结束点；停止计时改为 15 秒兜底（`RESULT_FALLBACK_FRAMES = 450`），仅在原生未离开场景时生效。
+- 验证（`verification/lab_result_anim_20261008/driver_result.py`，隔离存档 `verification/lab_ui_20261006/save/`）：FAILED 与 COMPLETE 各一场，`finish` 只调用一次，原因均为 `battle_finished_scene_101`（FAILED 第 155 帧、COMPLETE 第 135 帧），未触发兜底；合拢前截图显示文字完整入场与退场，合拢后准备界面正常打开（`runs/lose_48624/contact.png`、`runs/win_49972/contact.png`）。`--observe` 模式记录原生完整演出（`runs/lose_observe_47012`）。
+- 同步：两个运行目录的 `lab.py` 与提交 1.47.1（HEAD 7bdc26d）相同，工作区 `lab.py` 另含其他会话未完成的双人对战修改；同步文件为 HEAD 版本加本修订（与 HEAD 差异仅上述两处），见 `verification/lab_result_anim_20261008/sync_files/lab.py`，同步前副本在同目录 `dist_before/`、`user_install_before/`。同步文件未单独运行，行为验证基于工作区 `lab.py`（相同修改）。

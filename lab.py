@@ -97,6 +97,7 @@ AI_TIER_NAMES = tuple(t[0] for t in AI_TIERS)
 SE_EXTRA_PER_PORT = 8            # 原生 3 + 扩展 8 = 每方 11 个通道；CMediaManager 32 个播放槽，原生通道只在播放时占用
 AURA_STRING = 0x103011c3       # BattleEffectRenderer 构造函数引用的 "aura.obm"（.rodata 0x3011c3）
 RESULT_SCENES = (110, 120)
+RESULT_FALLBACK_FRAMES = 450     # 战斗停止后原生仍未离开场景 100 时的兜底（15 秒）；实测 FAILED 演出约 140 帧后离开
 SAVE_RAM = 0x3d08              # app 偏移：主存档映像（与 event_trial.EventTrial.transaction 相同）
 SAVE_RAM_SIZE = 0x5ab0
 PRESET_DIR = 'lab_presets'
@@ -607,8 +608,9 @@ class Lab:
             if not self.valid(main):
                 self.leave(f'battle_finished_scene_{scene}')
                 return
-            if not paused and (scene != SCENE_BATTLE or self.idle_frames >= 75):
-                # 原生 MISSION COMPLETE / FAILED 演出结束后合拢闸门，再回到准备界面。
+            if not paused and (scene != SCENE_BATTLE or self.idle_frames >= RESULT_FALLBACK_FRAMES):
+                # 原生 MISSION COMPLETE / FAILED 演出播放完毕后原生离开战斗场景（100→101），此时合拢闸门再回到准备界面；
+                # 停止计时仅作原生未离开场景时的兜底（此前 75 帧会在演出中途合拢）。
                 self.finish(f'battle_finished_scene_{scene}')
                 return
         elif scene in RESULT_SCENES and p.frame - self.started_frame > 5:
