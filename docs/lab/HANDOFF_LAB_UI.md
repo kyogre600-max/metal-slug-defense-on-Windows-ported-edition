@@ -163,3 +163,69 @@
 - 当前核心为 `MSD_Core_LAB_r16_20261007.dll`，27,134,094字节，hooks9。原生钩子及音频源码保持r15内容，宿主完成资源准备。证据位于 `verification/lab_ap_enemy_first_20261007/`，修订说明见 `docs/LAB_AP_FEEDBACK_2026.10.07.md`。
 - 新增97项检查通过：鼠标/键盘/延迟首升各19，首次ATTACK7，两轮重入27，abort清理6。每轮均无我方AP请求，敌方声音26/7各1并实际PCM消费；pin索引406在退出后恢复-1，重复释放幂等。
 - 按F:\egg\AGENTS.md第2.2、2.3节，同时同步dist/MSD_Windows及用户指定的metal-slug-defense-on-Windows-ported-edition-main运行副本，个人存档与LAB设置保留；显示版本保持1.47.0。
+
+## 2.11 准备界面顶栏与地图选择、复制对方、战后 BGM 与退出、双方音效通道（2026-10-07，核心 r17）
+
+- 顶栏：此前使用 ConvMenuParts 第 1 项 `(0,0,568,67)`（底部按钮栏底板）并以九宫格拉伸到 1280 宽。现改用原生各菜单顶栏第 0 项 `(0,68,568,51)`，按原生 2 倍（1280×720 画布上 2.25 倍，1278×115）等比放大并居中，不拉伸。顶栏高度由 67 改为 115，牌组、面板、选择单位与履历页面相应下移；OK/BACK 位于铆钉条上方。
+- 据点初始等级移到牌组标题行（`据点 < Lv > `）；每行新增“复制敌方 / 复制我方”，复制对方牌组的单位、格位与各格等级。
+- 地图：新增 `lab_stages.py`，运行时读取原生区域表（GetAreaNum/GetAreaData 以 0x902384 为基址，WorldType 0 的世界 w 位于第 w+3 行）。开放地图 1–3（世界 0–2，各 67 关）与里地图 1–3（世界 9–11，61/61/54 关），共 377 关，均有 Mission 记录。战斗 StageID 按 SC_BattleStart 关卡模式的 `(世界+1)×1000+(区域+1)×10+(小关+1)` 计算；Mission BGM 为 0 时 `setupResourceAll` 以同一 StageID 调用 GetStageBgmID，地图与音乐随 StageID 一致。缩略图按 LoadThumbnailImage（区域缩略图号→0x31d420 文件对→按语言的 ImageDataInfo）与 GT_InfoWindowDraw（drawPict 转换表 28、GetStageThumbnail 图块）读取，每关为 128×56 原生图块，界面 2 倍显示。面板为“世界 < >”“小关 < >”两个选择器，上方缩略图与“区域名 区域-小关”。
+- 敌方默认配兵：联机 GameMode 1 的敌方为 BattleControllerNetPlayer，不读取 Mission 敌军波次；捕虏（UnitID 116）与 UnitID 363 只在游戏类型 1/7 生成，LAB 为 2。运行核对：1055、1165、3165、12125 关关闭双方 AI 运行 15 秒，敌方队伍只有据点。
+- 战后 BGM：战斗结束后 `leave` 进入原生主菜单初始化（27→28），SC_MainMenuLoop 状态 0 在闸门结束时请求一次主菜单 BGM 101，覆盖准备界面的 135。准备界面打开且闸门静止时每帧核对当前 BGM，不是 135 时重新请求（`hold_bgm`）。
+- 退出：准备界面退出一律回到主菜单主画面（出击 / 强化 / Wi-Fi 对战）。已在场景 28 子状态 1 时恢复 BGM 101 并开闸；其他情况清零 `app+0xb168`（SC_MainMenuLoop 状态 0 据此进入 OPTION=1、CUSTOMIZE=3、SHOP=4 子画面），再 SceneEndFunc + ChangeExeST(27)，由 SC_MainMenuInit 的 SetShutterOpen 开闸。取代 2.8 节“未开战时 Esc/Back 返回原子页”的行为。
+- 音效通道（钩子版本 10，功能位 64）：原生每个端口每帧收 3 条请求（第 4 条按优先级淘汰），在 3 个 CAudioPresenter 间轮换，满时停止最早者。BattleObject::playSE 以对象 +0x70 选端口，我方为端口 0（通道 app+0x9b00..08），敌方为端口 1（app+0x9b18..20）。LAB 战斗中改为每端口每帧至多 24 条请求（同帧同 SoundID 合并），通道为原生 3 个加宿主建立的 8 个，每方 11 个；优先空闲通道，全部占用时停止最早开始者。扩展通道由宿主按 Sound_Create 的方式建立（operator new 0xb0 → CAudioPresenter(CMediaManager) → setInit → 音量属性 4），每进程一次，头部 +0x300 魔数 'LSE1'、+0x304 个数、+0x310/+0x330 指针、+0x380 统计。播放、停止、音量与缓冲释放沿用原生函数；Sound_Stop 标志 2、Sound_ChangeVolumeSE、bufferReleaseCheck 同时处理扩展通道。原生 Sound_Stop 没有处理 Sound_StopSE_2P 的 0x200 位（置位后保留），扩展通道与原生一致不据此停止。CMediaManager 有 32 个播放槽，通道只在播放期间登记；嵌套调用的导入仅 memset、pthread_mutex 与 clock，均由核心直接处理。非 LAB 战斗请求走原生路径。
+- 核心 `MSD_Core_LAB_r17_20261007.dll`，27,139,792 字节，hooks10；根目录与 src 配置、两份 `lab_runtime.py` 统一。最终核心 8 次隔离运行 69 项检查通过（地图 1–3、里地图 1/3 的普通与头目关；战场与 BGM 对应、只有据点、双方端口均播放且并发超过 3（满载时每方 11）、战后 BGM 135、退出到主菜单子状态 1 与 BGM 101、主菜单直接进出）。证据见 `verification/lab_prep_r17_20261007/`（`verification_summary.json`、`stage_dump.json`、`runs/`、`ui_shots/`）。听感、长时间对战与其他设备表现待用户实机核验。
+
+## 2.12 音效扩展音量修复与界面语言跟随（2026-10-07，核心 r18）
+
+- 用户报告 r17 中大量单位变为无声。原因：原生 `Sound_PlaySE` 两支都在 0x1c76f0 以 `vcvt.f32.s32` 把整数音量（app+0x9ae8，淡出支再乘 app+0xaf5c 后右移 8 位）转为浮点再传给 `CAudioPresenter::play`；r17 的分派把整数位模式直接当浮点传入，play 设置的通道增益（presenter+0xac）为 0。LAB 战斗中所有经扩展分派的音效（双方单位攻击、受击、爆炸等 SE）因此静音，语音走另一路径不受影响。r18 按原生方式转换。
+- 对照（1011 关、双方 AI、40 秒）：r16（无扩展）原生通道增益 1523–2539；r17 播放过的通道增益 0.0；r18 原生与扩展通道增益同为 2031/2539。战斗段 PCM 均方根 r16 6342、r17 4162、r18 9819（双方牌组随机，仅作参考）。
+- 同时加入播放槽整理：CMediaManager 的 delAudioPresenter 找到项即返回（0x138b10），stop 实际不注销，槽位由混音回调在通道已结束（+0）或已停止（+0x60）时清空；play 追加不查重。每次 play 前按混音回调的同一规则清除已结束、已停止与重复项，并统计播放后未登记次数（统计第 8 字）。对照运行（头部 +0x308=1 跳过整理）未出现重复项或未登记，本项不是 r17 无声的原因，作为同一规则下的预防保留。
+- 界面语言：准备界面的单位名称列表与地图目录（区域名、按语言的缩略图表）此前每进程只读取一次，切换游戏语言后仍显示旧语言。现按 app+0x3d64 缓存，语言改变后重新读取；缩略图缓存键含语言。繁中→日语→繁中依次进入 LAB，单位名、地图标签与区域名随之切换。
+- 核心 `MSD_Core_LAB_r18_20261007.dll`，hooks10；r18 6 次隔离运行 56 项检查通过（1011 双方 AI、10045、12125/1165 关闭 AI、主菜单直接进出），另有语言切换 3 步检查。证据见 `verification/lab_prep_r17_20261007/verification_summary.json`（comparison_runs 为 r16/r17 对照）与 `shots/t_lang`（lab_ui_20261006）。
+
+## 2.13 AI 段位、原生尺寸图标按钮与按下光效、韩文字形（2026-10-07，核心 r19）
+
+- AI 段位（钩子版本 11，功能位 128）：控制面板“我方 AI / 敌方 AI”两行为“开/关 + 段位选择器”，双方各自设定，默认 SILVER；段位名只用英文大写，配色参考 APEX 色系。8 段：ROOKIE −2、BRONZE −1、SILVER 0、GOLD +1、PLATINUM +2、DIAMOND +3、MASTER +4、PREDATOR +5。
+- 原生 AI（BattleControllerPlayerBase::noukinAutoPlay 0x1cbfe0）每次出兵、弹头车或绝招后等待 rand() & mask 帧（mask = controller+0x420，startAutoPlay 以 rand()%240 抽取，整场固定）。段位接管 setAutoPlayWaitTimer（0x1cbfca），在 [下限, 上限] 内均匀随机：ROOKIE 160–320、BRONZE 80–160、SILVER 30–90、GOLD 18–54、PLATINUM 10–32、DIAMOND 6–18、MASTER 3–10、PREDATOR 1–6（帧，30 帧/秒）。等待期间原生整帧跳过，自动绝招同样受其节奏影响。
+- 紧急阈值（controller+0x424，原生 rand()%220）：己方场上单位 AI 战力（数据行 +0x354）合计低于阈值 −30（据点等级 1 时为阈值/2 −30）时 AI 直接出兵。段位依次为 0、0、110、300、800、1500、永远紧急（0x3fffffff）、永远紧急。
+- 开局据点目标（据点等级 controller+0x3fc，与准备界面同一编号 0–10）：ROOKIE 1、BRONZE 2、SILVER 原生逻辑、GOLD 3、PLATINUM 4、DIAMOND 4、MASTER 5、PREDATOR 5。低于目标且对方前线未推进到距己方据点 60% 以内（原生 r7≥2 同一判据）时，在出兵决策入口（0x1cc070）优先升级据点，AP 不足则保留 AP；达到目标后，AI 自身对 isKyotenLevelup（0x1cbd48，按返回地址限定在 noukinAutoPlay 内）的调用只在 AP 已满且没有可出单位时放行。原生在不处于劣势时会持续升据点至满级，SILVER 保留该行为。“己方不足 4 个单位不出远程”规则保持原生。
+- 头部：+0x500 我方、+0x520 敌方，各 [启用, 等待下限, 等待上限, 据点目标, 段位序号]。开发中曾放在 +0x3c0，与音效统计（+0x380..+0x3f7）重叠，已移开。
+- 选择器：原生左右按钮、压暗的原生按钮底板、段位色加黑色描边与底部色带；文字色按 4.5:1 亮度对比自动提亮（仅 PREDATOR 由 #E0302E 提至 #E44947）。AI 关闭时文字为灰色，色带降为 15% 饱和度、55% 亮度。
+- 顶栏 OK/BACK：按用户确认的比例等比缩小为 1.5 倍（按钮 90×72，y 13–85；按下青色框 99×81，y 9–90），整体位于顶栏深色区（原图第 3–40 行，画布 y 7–92）内，不碰顶部亮线与下沿铆钉条。（开发中曾按主菜单底栏按钮的 2.25 倍、135×108 实施，用户修订。）按下期间按 GT_CockpitButtonDraw（0x2003bc）叠加 ConvMenuParts 79 青色框（锚点 3,3）与 37 三灯（锚点 −19,−2），不压暗、不下移；拖出按钮时取消，抬起执行 OK/BACK 后青色框保持到闸门合拢。
+- 韩文：游戏语言为韩语（app+0x3d64 = 2）时单位名称与区域名为韩文，界面主字体不含韩文字形。含韩文的字符串改用 Malgun Gothic（malgunbd.ttf）；界面文字在韩语下沿用英文。另：语言 10 为俄语，lab_ui.LANGS 将其映射为简体中文，按用户要求未处理。
+- 核心 `MSD_Core_LAB_r19_20261007.dll`，hooks11。验证：4 组对战覆盖 8 段及 SILVER 对 SILVER，共 27 项检查通过（每次记录到的等待均在段位区间内、紧急阈值写入、首次出兵时据点达到目标或属于防守例外）；r17/r18 回归 3 次运行全部通过；段位选择器开/关两组截图、OK 按住截图与韩语界面截图见 `verification/lab_ai_tier_r19_20261007/`。实际对战强度与手感待用户实机核验。
+
+## 2.14 AI 出兵选择：单位价值、积累 AP、建筑类单位与随机积累策略（2026-10-07，核心 r20）
+
+- 用户要求：段位越高越“明白”高 AP 单位的价值（依 HP、伤害、击退权衡）并为其积累 AP；建筑类单位不直接进入最前线；高段位在“用便宜单位填补”与“囤积等待大单位冷却”之间随机切换。
+- 钩子版本 12：在 noukinAutoPlay 出兵调用点 0x1cc40e（r5 为原生选择的槽位）按段位“理解度” s 选择槽位或暂不出兵；ROOKIE/BRONZE/SILVER 的 s 为 0（原生选择），GOLD 35、PLATINUM 55、DIAMOND 70、MASTER 85、PREDATOR 100（`lab.py` AI_TIERS 第 7 列，头部段位块 +20）。
+- 单位价值 S = √(HP × 每秒伤害) × (1 + min(击退门槛, 40)/40)，取 BattleInfo::getUnitStatus 等级状态：+0xc HP、+0x10 击退门槛×100、+0x58 普攻伤害、+0x6c 普攻等待（木乃伊 40 与已记录值一致）、+0x74 绝招伤害、+0x8c 绝招冷却；每秒伤害 = 普攻×30/(等待+30) + 绝招×30/max(冷却,30)。建筑类（单位行动表 [0x109373f4][UnitID] 的 vtable 为 Kouhei/Donou/Mortar_Kouhei/GuerrillaMortar_Kouhei：UID 4、5、73–77、95、108、155、163、171、184 等及社区 1036、1041）本体 HP 1，以原生 AI 战力（状态 +0xc8）×12 估计。排序值 = S / AP^(1−0.75s) × (1 + 0.6(1−s)·u)，u∈[−1,1]。
+- 积累：目标为据点 AP 上限内、冷却完毕或即将完毕的排序最高者；目标暂不能出时积累 AP（本帧不出兵、不设等待）。策略每次出兵后随机重抽（各 50%）：A 填补——只看 3s 秒内冷却结束的单位，出其他单位后余下 AP 不少于目标×(1+s) 时才出，最长积累 s×450 帧；B 囤积——看 30s 秒内冷却结束的单位，期间不出其他单位，最长积累 s×900 帧。压力（对方前线推进到距己方据点 (0.4−0.2s)×场宽以内，或对方场上战力（不含据点）比己方高 400+1200s 以上）时改出能买得起的最高者。
+- 建筑类：工兵行动（BattleAction_Kouhei::update）在遇到攻击范围内的敌人时于原地建成，建成位置即接触线。s>0 时建筑类只在对方有单位在场、且对方前线位于己方半场（≤0.5 场宽）时出击。
+- 开发中修正：① 队伍单位链表为环形，遍历须在回到首个单位时结束（此前计数放大数百倍；r8 支援钩子 apply_support 同类循环一并修正）；② 原生战力合计含据点、据点战力随等级大幅变化，自定义比较排除 getKyotenUnit；③ ROOKIE/BRONZE 紧急阈值 0 时 90 秒内不出兵，改为 50/80。原生模式判定同样包含据点，未修改。
+- 统计：头部 +0x540 每方 8 字（出兵、积累帧、建筑类暂缓、改选、压力出兵、最近 UnitID、AP 合计、建筑类出兵）、+0x580 建筑类出兵时前线最大值、+0x588 无敌方时建筑类出兵、+0x5a0/+0x5c8 各槽出兵次数、+0x5f0 进入策略 B 次数与 B 下出兵。
+- 验证（加速模式，同一混合牌组：士兵、盾牌兵、基寇卡、重装 B、SV-001、大象、爆竹红、木乃伊、木乃伊召唤箱工兵、沙包）：出兵平均 AP SILVER（原生）122.7，GOLD 45.6、PLATINUM 64.2、DIAMOND 62.2、MASTER 76.1、PREDATOR 96.5；积累帧随段位增加（GOLD 86 → PREDATOR 1868）；s>0 段位建筑类出兵时前线最大 0.498，均有敌方在场，SILVER 原生为 0.79。高段位约半数阶段为策略 B。代价：囤积阶段出兵数减少，PREDATOR 对 SILVER 在 90 秒内未再摧毁据点（A/B 之前为 2287 帧）。r20 共 11 次运行 76 项检查通过，回归 8 次运行通过。证据 `verification/lab_ai_tier_r19_20261007/verification_summary_r20.json`、`driver_value.py`、`runs_value/`。
+- 加速验证：driver_r17/driver_ai/driver_value 默认以无等待的 FramePacer 替换 30 Hz 节拍（约 300 fps，约 10 倍实时；`--realtime` 恢复）。游戏逻辑按帧推进，结果与实时一致；同一进程种子固定，重复运行结果相同。
+- 核心 `MSD_Core_LAB_r20_20261007.dll`，hooks12。实际强度与手感待用户实机核验。
+
+## 2.15 标题画面 Esc 退出与对战中关闭窗口（2026-10-07，宿主修订，核心保持 r20）
+
+- 用户要求：标题画面按 Esc 直接退出游戏且不报错；对战进行中关闭游戏不报错（LAB 对战本身不保存）。
+- 复现（`verification/exit_paths_20261007/driver_exit.py`，隔离存档 `verification/lab_ui_20261006/save/`）：① 标题 Esc 经原生 Back 调用 Java `showEndDialogView()V`（Android 退出确认框），宿主未实现该回调而抛出 RuntimeError，写 player_error.log 并弹出错误框；② LAB 对战中关闭窗口时停止事件已设置，`LabProbe.close` → `lab.abort` → `release_enemy_feedback_resource` 的原生调用被 `Probe.call` 以 ProbeCancelled 取消，异常记入 `self.error`，退出码 1；③ 对照组（主菜单关闭）一次运行中帧 140 的诊断标题截图遇帧缓冲 0×0（窗口最小化），PIL 抛出 SystemError 中止游戏线程。
+- 修订：`local_platform.handle_java_call` 处理 `showEndDialogView`，记录 `LOCAL_EXIT_REQUEST` 并设置停止事件，按关闭窗口的正常流程结束；`Lab.abort(native=True)` 新增参数，`LabProbe.close` 在停止事件已设置时以 `native=False` 调用，只还原内存存档映像与共享头，原生横幅资源随进程释放；`player.py` 帧 140 的标题截图失败时记录 `WINDOW_TITLE_CAPTURE_SKIPPED` 并继续。普通关卡关闭路径（event_trial/campaign/online 的 close）不含原生调用，`lab_menu_entry.close` 已有同类停止判断。
+- 验证：标题 Esc、LAB 对战中关闭、主菜单关闭、主菜单 Esc 四组均退出码 0、无 player_error.log、状态 `closed`；标题 Esc 于下一帧记录 `LOCAL_EXIT_REQUEST`；主菜单 Esc 仍返回标题（场景 28→20）且不退出；对战中关闭时 LAB 存档写入均为虚拟文件。普通关卡战斗中关闭未单独运行。
+- 修改文件：`player.py`、`local_platform.py`、`lab.py`、`lab_runtime.py` 及 `src/` 镜像（`lab.py` 无镜像），共 7 项，已同步两个运行目录。
+
+## 2.16 AI 场上投资升级据点与停滞兜底（2026-10-08，核心 r21，钩子版本 13）
+
+- 用户反馈：段位 AI 常停在据点 3/4/5 级不再升级。原因（r20）：达到开局据点目标后，`ai_levelup_query` 只在“AP 已满且没有任何可出单位”时放行 AI 的据点升级；积累策略使 AP 很少达到上限，10 格中通常总有可出单位，升级通道实际关闭。r20 GOLD 对 GOLD 240 秒内双方均停在 3 级（`verification/lab_ai_invest_r21_20261007/runs/mirror_r20_*`）。
+- 规则（`src/lab_hooks.cpp` ai_invest，在出兵决策入口 0x1cc070、开局目标逻辑之后执行；SILVER 保持原生）：
+  - 场上投资 F：己方场上存活单位（HP>0，不含据点）的出兵 AP 合计，按己方卡组同一 UnitID 的出兵费用计价。召唤单位不计入（用户要求）；变身单位（伞兵落地、工兵建成、迫击炮架设等）按最初出兵单位计入一次。
+  - 投资触发：F ≥ k × 本级升级费用（controller+1024）并持续 D 帧 → AP 足够即升级（与原生 0x1cc464 相同的虚函数），不足时暂停出兵保留 AP，最长 L 帧；超时后须再出一次兵才重新触发；F < 0.7×阈值退出。
+  - 停滞兜底（用户要求“不能因等待触发而停滞”）：达到开局目标后据点等级 S 帧未变化时，不论 F 均进入投资，不设暂停上限，保留 AP 直至可升级；本级升级费用超过 AP 上限时不触发。
+  - 压力（对方前线距己方据点 ≤(0.4−0.2s) 场宽，或对方场上战力高出 400+1200s 以上）时照常出兵。
+- 参数（`lab.py` AI_INVEST，(k×100, L, D, S)，帧）：ROOKIE (300, 90, 90, 1200)、BRONZE (250, 120, 60, 900)、SILVER 关闭、GOLD (200, 150, 20, 600)、PLATINUM (170, 180, 10, 450)、DIAMOND (140, 210, 6, 360)、MASTER (120, 240, 3, 300)、PREDATOR (100, 300, 1, 240)。低段位系数高、反应延迟长、兜底晚，表现为“慢半拍”。
+- 单位来源（原生核查）：卡组出兵经 `BattleController::onEventUnitCreate`，召唤与变身经 `BattleObject::createChildObject`（原生 20 余个 summon 函数均调用），二者最终调用 `BattleObjectManager::createUnit`。钩子位于其成功出口 0x1df440（r4 新单位、r6 队伍），以栈上返回地址（sp+52：0x1c9683 出兵、0x1de213 子单位）区分来源，父对象为调用者 r4（sp+24）。子单位在 300 帧内父单位消失且父单位只生成过这一个子单位时视为变身，否则为召唤。对象池指针会复用，记录以指针 + 生成序号区分，新单位生成时同一指针的旧记录失效。单位 UnitID 取单位状态 +0x128 首字。
+- 更正：单位 +0x62 为每个单位的实例编号，不是 UnitID。r20 验证脚本 `driver_value.py` 以 +0x62 匹配卡组 UnitID 统计出兵，只匹配到少数单位，其报告中的“出兵平均 AP”（第 2.14 节所列数值）不可靠；钩子内统计（+0x540 起）不受影响。onEventUnitCreate 出口块的 r0 不总是有效单位（开发初版据此记录，宿主读取无效地址导致随机 AOT 停止），已改为上述出口钩子。
+- 头部：段位块 +24 k×100、+28 L（位 0–11）| D（位 12–19）| S/10（位 20–31）；+0x700 场次编号（宿主每场开战递增，钩子据此清空记录）；+0x710 起每方 8 字（触发、投资升级、超时、暂停帧、最近 F、最近阈值、压力跳过、据点等级）；+0x750 起每方 4 字（出兵、变身继承、召唤、当前计入单位数）；+0x770 起每方 1 字（停滞兜底触发次数）。
+- 验证（`verification/lab_ai_invest_r21_20261007/`，加速模式，隔离存档 `verification/lab_ui_20261006/save`，混合牌组含工兵/沙包/木乃伊召唤箱工兵）：最终参数 9 次运行（7 段同段对战与 GOLD、PREDATOR 对 SILVER，各 240 秒）检查全部通过，达到开局目标后无停滞。同段对战升至 10 级用时：PREDATOR 44 秒、MASTER 49 秒、DIAMOND 49/64 秒、PLATINUM 75 秒、GOLD 138/156 秒；BRONZE 240 秒内到 7/9 级，ROOKIE 到 5/6 级；升级最大间隔 ROOKIE 约 57 秒、BRONZE 约 39 秒、GOLD 约 22 秒、PREDATOR 8 秒。SILVER 未触发投资，行为与 r20 相同。r19/r20 段位检查（等待区间、紧急阈值、建筑类出兵位置、开局目标）同时通过。`summarize.py` 汇总各次运行。实际对战手感待用户实机核验。

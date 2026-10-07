@@ -39,6 +39,8 @@ DEFAULT_CONFIG = {
     'player_auto_special': False,  # 我方自动释放绝招
     'player_support': 0,           # 支援（弹头车按钮效果）：见 SUPPORT_OPTIONS
     'enemy_support': 0,
+    'player_ai_tier': 'SILVER',    # AI 段位（AI_TIERS 名称），我方与敌方各自独立
+    'enemy_ai_tier': 'SILVER',
 }
 # 支援选项（与 src/lab_hooks.cpp apply_support 编号一致；新增选项在两处同时扩展）。
 SUPPORT_OPTIONS = ('弹头车出击', '除据点外全员 HP 回满', '全员绝招立即可用')
@@ -67,11 +69,36 @@ LAB_ENEMY_PANEL = 0x70           # 头部偏移：敌方 operator+24/32/96/100/1
 LAB_ENEMY_BANNER = 0x100         # 钩子版本 9：敌方横幅队列与播放状态（10 字）
 LAB_ENEMY_BANNER_READY = 0x128
 LAB_ENEMY_BANNER_SLOTS = 0x140   # 六个原生横幅槽，每槽 28 字节，+4 为 BattleSprite
+LAB_FLAG_SE_EXTEND = 64          # 钩子版本 10：LAB 战斗中双方音效通道扩展
+LAB_SE_MAGIC = 0x300             # 头部偏移：'LSE1' 表示扩展通道已建立（LAB 结束时保留）
+LAB_SE_COUNT = 0x304             # 每端口扩展通道数
+LAB_SE_EXTRA = 0x310             # 端口 0（1P）与端口 1（2P）各 8 字的 CAudioPresenter 指针
+LAB_SE_STATS = 0x380             # 每端口 8 字统计：请求、同帧合并、满队、播放、抢占、最大并发、当前并发、播放后未登记；+0x40 起每端口 6 字诊断
+LAB_FLAG_AI_TIER = 128           # 钩子版本 11：AI 段位（反应间隔、开局据点目标）
+LAB_AI_TIER = 0x500              # 头部偏移：我方 +0x500、敌方 +0x520（+0x380..0x3f7 为音效统计），各 [启用, 等待下限, 等待上限, 据点目标]
+AI_ALWAYS_URGENT = 0x3fffffff
+# AI 段位：(名称, 等级, 反应间隔下限/上限（帧，30 帧/秒，均匀随机）, 紧急阈值, 开局据点目标（-1 为原生逻辑）,
+# 出兵理解度 0–100（0 为原生选择；越高越重视单位价值、越愿意积累 AP、误判越少，见 src/lab_hooks.cpp ai_choose）)。
+# 紧急阈值写入 controller+0x424：己方场上单位 AI 战力（数据行 +0x354）合计低于阈值 −30（据点等级 1 时为阈值/2 −30）
+# 时，原生 AI 不再保留 AP 而直接出兵；原生每场以 rand()%220 抽取。据点目标与准备界面据点等级同一编号（0–10）。
+AI_TIERS = (('ROOKIE', -2, 160, 320, 50, 1, 0), ('BRONZE', -1, 80, 160, 80, 2, 0), ('SILVER', 0, 30, 90, 110, -1, 0),
+            ('GOLD', 1, 18, 54, 300, 3, 35), ('PLATINUM', 2, 10, 32, 800, 4, 55), ('DIAMOND', 3, 6, 18, 1500, 4, 70),
+            ('MASTER', 4, 3, 10, AI_ALWAYS_URGENT, 5, 85), ('PREDATOR', 5, 1, 6, AI_ALWAYS_URGENT, 5, 100))
+# 场上投资升级据点（钩子版本 13，见 src/lab_hooks.cpp ai_invest）：达到开局据点目标后，己方场上出兵单位（不含召唤单位）
+# 的 AP 合计 ≥ k × 本级升级费用并持续 D 帧时，AP 足够即升级据点，不足时暂停出兵最长 L 帧。
+# 停滞兜底：据点等级 S 帧未变化时不论 F 均保留 AP 直至升级（压力下照常出兵），保证逐级升至满级。
+# 每段 (k×100, L 帧, D 帧, S 帧)；k 为 0 时不启用（SILVER 保持原生逻辑）。低段位系数高、延迟长、兜底晚，升级“慢半拍”。
+AI_INVEST = {'ROOKIE': (300, 90, 90, 1200), 'BRONZE': (250, 120, 60, 900), 'SILVER': (0, 0, 0, 0),
+             'GOLD': (200, 150, 20, 600), 'PLATINUM': (170, 180, 10, 450), 'DIAMOND': (140, 210, 6, 360),
+             'MASTER': (120, 240, 3, 300), 'PREDATOR': (100, 300, 1, 240)}
+LAB_INVEST_SERIAL = 0x700        # 每场开战递增，钩子据此清空单位来源记录；+0x710 投资统计、+0x750 单位来源统计
+LAB_AI_STATS = 0x540             # 头部偏移：每方 8 字统计（出兵、积累帧、建筑类暂缓、改选、压力出兵、最近 UnitID、AP 合计、建筑类出兵），+0x580 起建筑类出兵位置
+AI_TIER_NAMES = tuple(t[0] for t in AI_TIERS)
+SE_EXTRA_PER_PORT = 8            # 原生 3 + 扩展 8 = 每方 11 个通道；CMediaManager 32 个播放槽，原生通道只在播放时占用
 AURA_STRING = 0x103011c3       # BattleEffectRenderer 构造函数引用的 "aura.obm"（.rodata 0x3011c3）
 RESULT_SCENES = (110, 120)
 SAVE_RAM = 0x3d08              # app 偏移：主存档映像（与 event_trial.EventTrial.transaction 相同）
 SAVE_RAM_SIZE = 0x5ab0
-STAGE_TABLE = 0x108fd730 + 48
 PRESET_DIR = 'lab_presets'
 SWITCHES = ('full_control', 'enemy_ai', 'player_ai', 'enemy_auto_special', 'player_auto_special',
             'player_support', 'enemy_support')
@@ -210,15 +237,23 @@ class Lab:
                 return unit['id']
         return None
 
-    def stage_list(self):
-        """原生联机地图表（0x108fd730+48 起，以 4 位数 StageID 连续存放）。"""
-        stages = []
-        for index in range(64):
-            value = self.p.word(STAGE_TABLE + 4 * index)
-            if not 1000 <= value < 2000:
-                break
-            stages.append(value)
-        return stages or [1011]
+    def stage_catalog(self):
+        """原生地图 1–3 与里地图 1–3 的全部小关（lab_stages.StageCatalog，首次使用及游戏语言改变时读取原生表）。"""
+        language = self.p.word(self.app() + 0x3d64)
+        if getattr(self, 'stages', None) is None or self.stages.language != language:
+            from lab_stages import StageCatalog
+            self.stages = StageCatalog(self.p)
+        return self.stages
+
+    def stage_label(self, sid):
+        try:
+            self.stage_catalog().load()
+            entry = self.stages.by_id.get(int(sid))
+        except (TypeError, ValueError):
+            entry = None
+        if not entry:
+            return str(sid)
+        return T(self.p, 'stage_no', T(self.p, f"world_{entry['world']}"), entry['area'] + 1, entry['stage'] + 1)
 
     def resolve_deck(self, deck):
         """把配置项解析为 10 个 (UnitID, 存档等级) 或 None；单位可写 UnitID 或社区单位 key。"""
@@ -348,6 +383,9 @@ class Lab:
         self.write_enemy_deck([None if e is None else (e[0] if e[0] < 400 else self.stand_in(e[0]), e[1])
                                for e in deck])
         stage = int(self.config['stage_id'])
+        self.stage_catalog().load()
+        if self.stages.by_id and stage not in self.stages.by_id:
+            stage = DEFAULT_CONFIG['stage_id']
         p.call('_ZN7AppMain22BattleInit_OnlinerModeEi12BattleTeamID', app, stage, 0)
         p.call('_ZN7AppMain20BattleStartSetStatusEiii9WorldType', app, 0, 0, 0, 0)
         main = p.word(app + 0xc220)
@@ -375,6 +413,8 @@ class Lab:
         # 战斗对象已按联机 1v1（GameMode 1）建立；应用层联机标记随即清除，
         # 使 AppMain::BattleConnectionCheck 与战斗循环不再检查 CGameCenter 连接状态（无对端时会弹出“通讯中断”）。
         p.put(app + APP_ONLINE, 0)
+        if self.native_hooks >= 10:
+            self.ensure_se_channels()
         self.write_header(True)
         p.call('_ZN7AppMain11ChangeExeSTEi', app, 99)
         self.active = True
@@ -390,7 +430,7 @@ class Lab:
                     enemy_deck=[None if e is None else [e[0], e[1] + 1] for e in deck],
                     player_deck=[None if e is None else [e[0], e[1] + 1] for e in player_deck],
                     saved_flags=self.saved_flags, config=self.config)
-        self.feedback(T(p, 'fb_start', stage))
+        self.feedback(T(p, 'fb_start', self.stage_label(stage)))
 
     # ---------- 存档隔离（T9） ----------
     def enter_sandbox(self):
@@ -417,8 +457,9 @@ class Lab:
         self.virtual_write_count = 0
         self.sandbox = False
 
-    def abort(self):
-        """宿主异常时的回退：还原存档映像、关闭隔离并清零共享头。"""
+    def abort(self, native=True):
+        """宿主异常时的回退：还原存档映像、关闭隔离并清零共享头。
+        native=False 用于退出游戏：只做内存还原，原生对象随进程结束释放（退出后原生调用已被取消）。"""
         self.active = False
         try:
             if self.sandbox:
@@ -427,7 +468,10 @@ class Lab:
             try:
                 self.write_header(False)
             finally:
-                self.release_enemy_feedback_resource()
+                if native:
+                    self.release_enemy_feedback_resource()
+                else:
+                    self.enemy_feedback_resource = 0
 
     def read_enemy_deck(self):
         p = self.p
@@ -589,6 +633,10 @@ class Lab:
         self.fix_units(mine, enemy)
         if not self.applied:
             self.applied = True
+            if self.native_hooks >= 13:
+                p.put(LAB_HEADER + LAB_INVEST_SERIAL, (p.word(LAB_HEADER + LAB_INVEST_SERIAL) + 1) & 0xffffffff)
+                for offset in range(0x10, 0x80, 4):
+                    p.put(LAB_HEADER + LAB_INVEST_SERIAL + offset, 0)
             self.apply_ai(mine, enemy)
             if self.full_control:
                 for controller in (mine, enemy):
@@ -767,7 +815,77 @@ class Lab:
             flags |= LAB_FLAG_AUTO_SPLIT
         if self.native_hooks >= 5:
             flags |= LAB_FLAG_SUPPORT
+        if self.native_hooks >= 10 and self.p.word(LAB_HEADER + LAB_SE_MAGIC) == 0x4c534531:
+            flags |= LAB_FLAG_SE_EXTEND
+        if self.native_hooks >= 11:
+            flags |= LAB_FLAG_AI_TIER
         return flags
+
+    def ai_tier(self, side):
+        name = self.config.get(side + '_ai_tier', 'SILVER')
+        return AI_TIERS[AI_TIER_NAMES.index(name) if name in AI_TIER_NAMES else AI_TIER_NAMES.index('SILVER')]
+
+    def apply_ai_tiers(self, mine, enemy):
+        """写入双方 AI 段位：头部段位块（原生钩子读取反应间隔与据点目标）与 controller+0x424 紧急阈值。
+        startAutoPlay 只在 AUTO 由关转开时重抽 +0x420/+0x424，此处在其后写入。"""
+        if self.native_hooks < 11:
+            return
+        p = self.p
+        for index, (controller, side) in enumerate(((mine, 'player'), (enemy, 'enemy'))):
+            name, _, low, high, urgency, target, smart = self.ai_tier(side)
+            block = LAB_HEADER + LAB_AI_TIER + index * 0x20
+            k, hold, delay, stall = AI_INVEST[name] if self.native_hooks >= 13 else (0, 0, 0, 0)
+            for offset, value in ((4, low), (8, high), (12, target & 0xffffffff), (16, AI_TIER_NAMES.index(name)),
+                                  (20, smart if self.native_hooks >= 12 else 0), (24, k), (28, hold | (delay << 12) | ((stall // 10) << 20))):
+                p.put(block + offset, value)
+            for offset in range(0, 0x20, 4):
+                p.put(LAB_HEADER + LAB_AI_STATS + index * 0x20 + offset, 0)
+            for offset in (0x40, 0x48):
+                p.put(LAB_HEADER + LAB_AI_STATS + offset + index * 4, 0)
+            for slot in range(10):
+                p.put(LAB_HEADER + LAB_AI_STATS + 0x60 + index * 0x28 + slot * 4, 0)
+            for offset in (0, 4):
+                p.put(LAB_HEADER + LAB_AI_STATS + 0xb0 + index * 8 + offset, 0)
+            p.put(block, 1)
+            p.put(controller + 0x424, urgency)
+
+    def ensure_se_channels(self):
+        """建立 LAB 音效扩展通道（每进程一次，之后各场 LAB 共用，不释放）。做法与 AppMain::Sound_Create 相同：
+        operator new(0xb0) → CAudioPresenter(CMediaManager app+0xab50) → setInit(端口号, 1, 1)；端口号取该端口
+        原生第 1 个音效通道的值（+0x40），音量属性 4 取当前音效音量 app+0x9ae8。播放槽的登记与注销由原生
+        play/stop 完成。指针写入头部 +0x310 起，最后写魔数，钩子据此启用。"""
+        p = self.p
+        app = self.app()
+        if p.word(LAB_HEADER + LAB_SE_MAGIC) == 0x4c534531:
+            return
+        manager = p.word(app + 0xab50)
+        if not self.valid(manager):
+            return
+        volume = p.word(app + 0x9ae8)
+        created = []
+        for port, first in ((0, 0x9b00), (1, 0x9b18)):
+            native = p.word(app + first)
+            if not self.valid(native):
+                return
+            for index in range(SE_EXTRA_PER_PORT):
+                presenter = p.call('_Znwj', 0xb0)
+                p.call('_ZN15CAudioPresenterC2EP13CMediaManager', presenter, manager)
+                p.call('_ZN15CAudioPresenter7setInitEiii', presenter, p.word(native + 0x40), 1, 1)
+                p.call('_ZN15CAudioPresenter12setAttributeEii', presenter, 4, volume)
+                p.put(LAB_HEADER + LAB_SE_EXTRA + port * 0x20 + index * 4, presenter)
+                created.append(hex(presenter))
+        p.put(LAB_HEADER + LAB_SE_COUNT, SE_EXTRA_PER_PORT)
+        for offset in range(0, 0x80, 4):
+            p.put(LAB_HEADER + LAB_SE_STATS + offset, 0)
+        p.put(LAB_HEADER + LAB_SE_MAGIC, 0x4c534531)
+        self.record('se_channels', per_port=SE_EXTRA_PER_PORT, presenters=created)
+
+    def se_stats(self):
+        """音效扩展统计（验证用）：每端口 [请求, 同帧合并, 满队, 播放, 抢占, 最大并发, 当前并发]。"""
+        p = self.p
+        stats = [[p.word(LAB_HEADER + LAB_SE_STATS + port * 0x20 + i * 4) for i in range(8)] for port in (0, 1)]
+        debug = [[p.word(LAB_HEADER + LAB_SE_STATS + 0x40 + port * 0x20 + i * 4) for i in range(6)] for port in (0, 1)]
+        return stats + debug
 
     def reveal_slot(self, enemy, slot):
         """分栏每侧只显示 3 格：按键出兵的槽位不在可见范围时，把该侧滚动到能看见它。"""
@@ -919,6 +1037,7 @@ class Lab:
             p.call(PB + ('13startAutoPlayEv' if enabled else '13resetAutoPlayEv'), controller)
             disable |= ((0 if deploy else 1) | (0 if special else 2)) << shift
         p.put(LAB_HEADER + LAB_AUTO_DISABLE, disable if split else 0)
+        self.apply_ai_tiers(mine, enemy)
 
     def menu_command(self, command):
         """战斗中菜单（lab_menu.LabMenu）的选择结果。"""

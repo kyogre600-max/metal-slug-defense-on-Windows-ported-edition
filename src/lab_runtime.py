@@ -19,7 +19,7 @@ except BaseException:
 
 PROFILE = 'lab_test_save'
 # 含 LAB 钩子的核心由正式版配置统一加载；独立入口和验证保留显式指定核心接口。
-LAB_CORE = ROOT / 'src' / 'build' / 'MSD_Core_LAB_r16_20261007.dll'
+LAB_CORE = ROOT / 'src' / 'build' / 'MSD_Core_LAB_r21_20261007.dll'
 KEYS = {glfw.KEY_F7: ('prep',), glfw.KEY_F5: ('exit',), glfw.KEY_F8: ('toggle_full',),
         glfw.KEY_F4: ('toggle_enemy_ai',), glfw.KEY_F3: ('toggle_player_ai',),
         glfw.KEY_LEFT_BRACKET: ('enemy_ap',), glfw.KEY_RIGHT_BRACKET: ('enemy_slug',),
@@ -161,7 +161,9 @@ def install():
         def close(self):
             lab = getattr(self, 'lab', None)
             if lab is not None and lab.sandbox:
-                lab.abort()
+                # 关闭窗口时停止事件已设置，原生调用会被取消；LAB 对战不保存，只还原内存存档映像。
+                stopping = self.stop_event is not None and self.stop_event.is_set()
+                lab.abort(native=not stopping)
             entry = getattr(self, 'menu_entry', None)
             if entry is not None:
                 entry.close()

@@ -698,10 +698,12 @@ template<class F> void with_enemy(Context& c,uint32_t op,F action){
     swap_gfx(c,op);swap_banner(c,op);action();swap_banner(c,op);swap_gfx(c,op);
     if(panel_swapped)swap_panel(c,op);
 }
+void origin_observe(Context& c);                                // 第 13 版：单位来源记录（定义见 ai_invest 前）
 Block old_operator_update;
 void operator_update(Context& c){
     uint32_t op=c.r[0];
     if(enemy_sprite_ready(c))with_enemy(c,op,[&]{tick_enemy_sprite(c,op);});
+    origin_observe(c);
     old_operator_update(c);
 }
 // BattleScene 逐帧调用 update_TargetAction；双方独立使用原生入场、45 tick 等待及退场状态机。
@@ -781,8 +783,447 @@ void auto_special(Context& c){                                 // 0x1cc04e：r5=
     if(enabled(c,FLAG_AUTO_SPLIT) && (auto_disabled(c,c.r[4])&2u)){c.pc=0x101cc061u;return;}
     old_auto_special(c);
 }
+// ---------- 第 11 版：AI 段位（功能位 128） ----------
+// noukinAutoPlay（0x1cbfe0）每次出兵、弹头车或绝招后调用 setAutoPlayWaitTimer（0x1cbfca），等待 rand() & mask 帧
+// （mask = controller+0x420，startAutoPlay 以 rand()%240 抽取）。段位启用时改为 [下限, 上限] 内均匀随机。
+// 据点：原生在未处于劣势时只要 AP 够就升据点直至满级。段位的“开局据点目标”：低于目标且敌方前线未推进到
+// 己方 60% 以内（原生 r7≥2 的同一判据）时优先升级，AP 不足则保留 AP；达到目标后，AI 自身对 isKyotenLevelup
+// （0x1cbd48）的调用只在 AP 已满且没有可出单位时放行。紧急阈值（controller+0x424）由宿主写入。
+// 头部 +0x500 我方、+0x520 敌方：+0 启用、+4 等待下限、+8 等待上限（帧）、+12 据点目标（负数为原生）。
+constexpr uint32_t FLAG_AI_TIER=128u,AI_TIER_BASE=H+0x500u;
+constexpr uint32_t NOUKIN_BEGIN=0x101cbfe0u,NOUKIN_END=0x101cc534u,DECISION_EXIT=0x101cc52fu;
+constexpr uint32_t P_IS_LEVELUP=0x101cbd49u,P_MAX_AP=0x101cbdf5u,P_IS_UNIT_CREATE=0x101cbd87u;
+constexpr uint32_t P_STAGE_INSTANCE=0x101e1ae1u,P_BASE_X=0x101e1cf3u;
+uint32_t ai_rng=0x9e3779b9u;
+uint32_t ai_random(){ai_rng^=ai_rng<<13;ai_rng^=ai_rng>>17;ai_rng^=ai_rng<<5;return ai_rng;}
+uint32_t ai_tier(Context& c,uint32_t controller){              // 该控制器的段位块地址；未启用为 0
+    if(!enabled(c,FLAG_AI_TIER))return 0u;
+    uint32_t block=AI_TIER_BASE+(controller==rd<uint32_t>(c,ENEMY_CONTROLLER)?0x20u:0u);
+    return rd<uint32_t>(c,block)?block:0u;
+}
+Block old_ai_wait,old_ai_levelup_query;
+void ai_wait(Context& c){                                      // setAutoPlayWaitTimer(controller)
+    if(uint32_t tier=ai_tier(c,c.r[0])){
+        uint32_t low=rd<uint32_t>(c,tier+4u),high=rd<uint32_t>(c,tier+8u);
+        if(high<low)high=low;
+        wr<uint32_t>(c,c.r[0]+0x428u,low+ai_random()%(high-low+1u));
+        c.pc=c.r[14];return;
+    }
+    old_ai_wait(c);
+}
+bool ai_ap_full_and_idle(Context& c,uint32_t controller){       // AP 已满且没有可出单位（冷却、AP 或人数限制）
+    uint32_t level=rd<uint32_t>(c,controller+0x3fcu),max_ap=0;
+    guest_call(c,P_MAX_AP,controller,level,0,0,nullptr,0,&max_ap);
+    if(rd<float>(c,controller+0x404u)<float(int32_t(max_ap)))return false;
+    uint32_t slots=rd<uint32_t>(c,controller+0x390u);
+    for(uint32_t slot=0;slot<slots && slot<32u;++slot){
+        uint32_t ready=0;guest_call(c,P_IS_UNIT_CREATE,controller,slot,0,0,nullptr,0,&ready);
+        if(ready&0xffu)return false;
+    }
+    return true;
+}
+void ai_levelup_query(Context& c){                             // isKyotenLevelup(controller)
+    uint32_t controller=c.r[0],lr=c.r[14]&~1u;
+    if(lr>=NOUKIN_BEGIN && lr<NOUKIN_END)
+        if(uint32_t tier=ai_tier(c,controller)){
+            int32_t target=int32_t(rd<uint32_t>(c,tier+12u));
+            if(target>=0 && int32_t(rd<uint32_t>(c,controller+0x3fcu))>=target && !ai_ap_full_and_idle(c,controller)){
+                c.r[0]=0u;c.pc=c.r[14];return;
+            }
+        }
+    old_ai_levelup_query(c);
+}
+bool ai_enemy_near(Context& c,uint32_t controller){            // 原生 r7≥2：对方最前单位推进到距己方据点 60% 以内
+    uint32_t manager=0,stage=0,base0=0,base1=0;
+    guest_call(c,OBJECT_MANAGER_GET_INSTANCE,0,0,0,0,nullptr,0,&manager);
+    guest_call(c,P_STAGE_INSTANCE,0,0,0,0,nullptr,0,&stage);
+    uint32_t team=rd<uint32_t>(c,controller+0x38cu)&1u;
+    uint32_t front=rd<uint32_t>(c,manager+(12u+(team^1u))*4u);
+    if(!front)return false;
+    guest_call(c,P_BASE_X,stage,0,0,0,nullptr,0,&base0);
+    guest_call(c,P_BASE_X,stage,1,0,0,nullptr,0,&base1);
+    float width=float(int32_t(base1)-int32_t(base0));
+    float d=rd<float>(c,front+0x8cu)-float(int32_t(base0));
+    if(team==1u)d=width-d;
+    return d<=width*0.6f;
+}
+bool ai_opening(Context& c,uint32_t controller){               // true：本帧已处理（升级或保留 AP），退出决策
+    uint32_t tier=ai_tier(c,controller);
+    if(!tier)return false;
+    int32_t target=int32_t(rd<uint32_t>(c,tier+12u));
+    if(target<0 || int32_t(rd<uint32_t>(c,controller+0x3fcu))>=target || ai_enemy_near(c,controller))return false;
+    uint32_t can=0;guest_call(c,P_IS_LEVELUP,controller,0,0,0,nullptr,0,&can);
+    if(can&0xffu)guest_call(c,rd<uint32_t>(c,rd<uint32_t>(c,controller)+0xa8u),controller);   // 与原生 0x1cc464 相同的虚函数
+    return true;
+}
+// ---------- 第 12 版：AI 段位的出兵选择（单位价值、积累 AP、建筑类单位） ----------
+// noukinAutoPlay 在 0x1cc40e 以 r5 槽位调用 vtable+0x94 出兵。段位块 +20 的“理解度”s（0–100，0 为原生选择）
+// 大于 0 时在此改由下列规则选择或暂不出兵（暂不出兵时不设等待，下一帧重新判断）：
+//   单位价值 S = √(HP × 每秒伤害) × (1 + min(击退门槛, 40)/40)，按 BattleInfo::getUnitStatus 的等级状态计算：
+//   +0xc HP、+0x10 击退门槛×100（≤0 为每次受击均击退）、+0x58 普攻伤害、+0x6c 普攻等待、+0x74 绝招伤害、+0x8c 绝招冷却；
+//   每秒伤害 = 普攻伤害×30/(普攻等待+30) + 绝招伤害×30/max(绝招冷却,30)。建筑类（行动类为 Kouhei 系或 Donou，
+//   本体 HP 1、无伤害）以原生 AI 战力（状态 +0xc8）×12 估计其建成后的价值（按基寇卡、士兵的 S/战力比校准）。
+//   排序值 = S / AP^(1−0.75s) × (1 + 0.6(1−s)·u)，u 为 [−1,1] 随机（理解度越低越看重性价比、越容易误判；越高越看重单位本身强度）。
+//   目标为当前据点 AP 上限内、冷却完毕或在 3s 秒内完毕的排序最高者；目标暂不能出时积累 AP，出其他单位后余下的 AP
+//   仍不少于目标 AP×(1+s) 时才出其他单位；已积累超过 s×450 帧，或处于压力
+//   （对方前线推进到距己方据点 (0.4−0.2s)×场宽以内，或对方场上战力比己方高 400+1200s 以上），此时改出能买得起的最高者。
+//   建筑类只在对方有单位在场、且对方前线位于己方半场（≤0.5 场宽）时出击，使其在己方一侧建成。
+//   积累方式在策略 A（填补）与 B（囤积）之间随机切换，见 ai_hoard。
+constexpr uint32_t P_INFO_INSTANCE=0x101cfa4du,P_UNIT_STATUS=0x101cfbcdu,ACTION_TABLE_GOT=0x109373f4u;
+constexpr uint32_t STATUS_SCRATCH=H+0x600u,AI_STATS_BASE=H+0x540u;
+constexpr uint32_t BUILDER_VTABLES[]={0x10929950u,0x10929980u,0x1092b600u,0x1092b750u};   // Kouhei、Donou、Mortar_Kouhei、GuerrillaMortar_Kouhei
+struct UnitValue{uint32_t uid,level;float value;bool builder;};
+UnitValue unit_values[96];uint32_t unit_value_count;
+uint32_t ai_saving[2],ai_saving_controller[2];
+// 出兵策略（用户要求随机切换）：每次出兵后以各 50% 重新抽取。
+//   A 填补：积累目标只看 3s 秒内冷却结束的单位；余下 AP 不少于目标 AP×(1+s) 时出其他单位；最长积累 s×450 帧。
+//   B 囤积：积累目标看 30s 秒内冷却结束的单位（等待高价值单位冷却）；期间不出其他单位；最长积累 s×900 帧。
+//   两种策略下，压力（据点受威胁或场上战力明显落后）都改为出能买得起的最高者。
+uint32_t ai_hoard[2];
+bool ai_is_builder(Context& c,uint32_t uid){
+    uint32_t table=rd<uint32_t>(c,ACTION_TABLE_GOT);
+    uint32_t action=table?rd<uint32_t>(c,table+uid*4u):0u;
+    if(!action)return false;
+    uint32_t vt=rd<uint32_t>(c,action);
+    for(uint32_t v:BUILDER_VTABLES)if(vt==v)return true;
+    return false;
+}
+const UnitValue& ai_unit_value(Context& c,uint32_t uid,uint32_t level){
+    for(uint32_t i=0;i<unit_value_count;++i)if(unit_values[i].uid==uid && unit_values[i].level==level)return unit_values[i];
+    if(unit_value_count>=96)unit_value_count=0;
+    uint32_t info=0;guest_call(c,P_INFO_INSTANCE,0,0,0,0,nullptr,0,&info);
+    for(uint32_t o=0;o<0xecu;o+=4u)wr<uint32_t>(c,STATUS_SCRATCH+o,0u);
+    guest_call(c,P_UNIT_STATUS,info,uid,level,STATUS_SCRATCH);
+    auto si=[&](uint32_t o){return float(int32_t(rd<uint32_t>(c,STATUS_SCRATCH+o)));};
+    UnitValue v{uid,level,0.0f,ai_is_builder(c,uid)};
+    if(v.builder){
+        v.value=std::max(si(0xc8u),1.0f)*12.0f;
+    }else{
+        float hp=std::max(si(0xcu),1.0f),threshold=std::max(si(0x10u)/100.0f,0.0f);
+        float dps=std::max(si(0x58u),0.0f)*30.0f/(std::max(si(0x6cu),0.0f)+30.0f);
+        if(si(0x74u)>0.0f)dps+=si(0x74u)*30.0f/std::max(si(0x8cu),30.0f);
+        v.value=std::sqrt(hp*std::max(dps,1.0f))*(1.0f+std::min(threshold,40.0f)/40.0f);
+    }
+    unit_values[unit_value_count++]=v;
+    return unit_values[unit_value_count-1];
+}
+float ai_front_ratio(Context& c,uint32_t controller,bool& present){   // 对方最前单位距己方据点的场宽比例
+    uint32_t manager=0,stage=0,base0=0,base1=0;
+    guest_call(c,OBJECT_MANAGER_GET_INSTANCE,0,0,0,0,nullptr,0,&manager);
+    guest_call(c,P_STAGE_INSTANCE,0,0,0,0,nullptr,0,&stage);
+    uint32_t team=rd<uint32_t>(c,controller+0x38cu)&1u;
+    uint32_t front=rd<uint32_t>(c,manager+(12u+(team^1u))*4u);
+    present=front!=0u;
+    if(!front)return 1.0f;
+    guest_call(c,P_BASE_X,stage,0,0,0,nullptr,0,&base0);
+    guest_call(c,P_BASE_X,stage,1,0,0,nullptr,0,&base1);
+    float width=float(int32_t(base1)-int32_t(base0));
+    float d=rd<float>(c,front+0x8cu)-float(int32_t(base0));
+    if(team==1u)d=width-d;
+    return width>0.0f?d/width:1.0f;
+}
+float ai_field_power(Context& c,uint32_t team){
+    // 队伍单位状态 +0xc8（AI 战力）之和，不含据点。原生的同类合计包含据点，据点战力随据点等级大幅变化，
+    // 双方据点等级不同时（LAB 常见）合计差额由据点主导，因此此处排除 getKyotenUnit。
+    uint32_t manager=0,unit=0,base=0;float sum=0.0f;
+    guest_call(c,OBJECT_MANAGER_GET_INSTANCE,0,0,0,0,nullptr,0,&manager);
+    guest_call(c,0x101df341u,manager,team,0,0,nullptr,0,&base);   // getKyotenUnit(team, 0)
+    guest_call(c,0x101df318u,manager,team,0,0,nullptr,0,&unit);   // getTeamUnitList(team, 0)
+    uint32_t first=unit;
+    for(int guard=0;unit && guard<4096;++guard){
+        uint32_t status=unit+0x128u+rd<uint32_t>(c,unit+0x300u)*0xecu;
+        if(unit!=base)sum+=float(int32_t(rd<uint32_t>(c,status+0xc8u)));
+        uint32_t link=rd<uint32_t>(c,unit+0x120u);
+        unit=link?link-0x11cu:0u;
+        if(unit==first)break;                                    // 队伍单位链表为环形（原生遍历回到首个单位即结束）
+    }
+    return sum;
+}
+void ai_stat(Context& c,uint32_t side,uint32_t field,uint32_t value,bool add=true){
+    uint32_t a=AI_STATS_BASE+side*0x20u+field*4u;wr<uint32_t>(c,a,add?rd<uint32_t>(c,a)+value:value);
+}
+// 统计（每方 +0x540/+0x560，8 字）：0 出兵、1 积累帧、2 建筑类暂缓、3 改选、4 压力出兵、5 最近出兵 UnitID、
+// 6 出兵 AP 合计、7 建筑类出兵；+0x580/+0x584 建筑类出兵时对方前线比例的最大值（×1000），+0x588/+0x58c 对方无单位时的建筑类出兵；
+// +0x5a0 起每方 10 字：各槽出兵次数（我方 +0x5a0、敌方 +0x5c8）；+0x5f0 起每方 2 字：进入策略 B 的次数、B 下出兵次数。
+void ai_record_deploy(Context& c,uint32_t controller,uint32_t slot){
+    uint32_t side=controller==rd<uint32_t>(c,ENEMY_CONTROLLER)?1u:0u;
+    uint32_t info=controller+0xcu+slot*0x1cu,uid=rd<uint32_t>(c,info+0x10u);
+    ai_stat(c,side,0,1);
+    ai_stat(c,side,5,uid,false);
+    if(slot<10u){uint32_t a=AI_STATS_BASE+0x60u+side*0x28u+slot*4u;wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);}   // 各槽出兵次数
+    ai_stat(c,side,6,rd<uint32_t>(c,info));
+    if(ai_is_builder(c,uid)){
+        ai_stat(c,side,7,1);
+        bool present=false;
+        uint32_t ratio=uint32_t(std::max(ai_front_ratio(c,controller,present),0.0f)*1000.0f);
+        uint32_t a=AI_STATS_BASE+0x40u+side*4u;
+        if(ratio>rd<uint32_t>(c,a))wr<uint32_t>(c,a,ratio);
+        if(!present)wr<uint32_t>(c,a+8u,rd<uint32_t>(c,a+8u)+1u);
+    }
+}
+Block old_ai_choose;
+void ai_choose(Context& c){                                    // 0x1cc40e：r4 控制器，r5 原生选择的槽位
+    uint32_t controller=c.r[4],tier=ai_tier(c,controller);
+    uint32_t smart=tier?rd<uint32_t>(c,tier+20u):0u;
+    if(!smart){
+        if(tier)ai_record_deploy(c,controller,c.r[5]);           // 原生选择（理解度 0）同样统计，供对照
+        old_ai_choose(c);return;
+    }
+    float s=std::min(float(smart),100.0f)/100.0f;
+    uint32_t side=controller==rd<uint32_t>(c,ENEMY_CONTROLLER)?1u:0u;
+    if(ai_saving_controller[side]!=controller){ai_saving_controller[side]=controller;ai_saving[side]=0;ai_hoard[side]=ai_random()&1u;}   // 新的一场
+    bool hoard=ai_hoard[side]!=0u;
+    uint32_t level=rd<uint32_t>(c,controller+0x3fcu),max_ap=0;
+    guest_call(c,P_MAX_AP,controller,level,0,0,nullptr,0,&max_ap);
+    bool present=false;
+    float front=ai_front_ratio(c,controller,present);
+    uint32_t team=rd<uint32_t>(c,controller+0x38cu)&1u;
+    float deficit=ai_field_power(c,team^1u)-ai_field_power(c,team);
+    bool pressure=front<=0.4f-0.2f*s || deficit>400.0f+1200.0f*s;
+    bool builders_ok=present && front<=0.5f;
+    int32_t target=-1,affordable=-1;float best_target=-1.0f,best_affordable=-1.0f;
+    int32_t target_cost=0,affordable_cost=0;
+    int32_t lookahead=int32_t((hoard?900.0f:90.0f)*s);           // 冷却在 3s（B：30s）秒内结束的单位也作为积累目标
+    float ap=rd<float>(c,controller+0x404u);
+    uint32_t slots=rd<uint32_t>(c,controller+0x390u);
+    for(uint32_t slot=0;slot<slots && slot<32u;++slot){
+        uint32_t info=controller+0xcu+slot*0x1cu;
+        int32_t cost=int32_t(rd<uint32_t>(c,info));
+        if(!rd<uint8_t>(c,info+0xcu) || int32_t(rd<uint32_t>(c,info+0x18u))>lookahead || cost<=0 || cost>int32_t(max_ap))continue;
+        const UnitValue& v=ai_unit_value(c,rd<uint32_t>(c,info+0x10u),rd<uint32_t>(c,info+0x14u));
+        if(v.builder && !builders_ok){ai_stat(c,side,2,1);continue;}
+        float u=float(int32_t(ai_random()%2001u)-1000)/1000.0f;
+        float rank=v.value/std::pow(float(cost),1.0f-0.75f*s)*(1.0f+0.6f*(1.0f-s)*u);
+        if(rank>best_target){best_target=rank;target=int32_t(slot);target_cost=cost;}
+        uint32_t ready=0;guest_call(c,P_IS_UNIT_CREATE,controller,slot,0,0,nullptr,0,&ready);
+        if((ready&0xffu) && rank>best_affordable){best_affordable=rank;affordable=int32_t(slot);affordable_cost=cost;}
+    }
+    int32_t chosen=-1;
+    if(target>=0){
+        uint32_t ready=0;guest_call(c,P_IS_UNIT_CREATE,controller,uint32_t(target),0,0,nullptr,0,&ready);
+        if(ready&0xffu)chosen=target;
+        else if(pressure || ai_saving[side]>=uint32_t((hoard?900.0f:450.0f)*s))chosen=affordable;
+        else if(!hoard && affordable>=0 && affordable!=target && ap-float(affordable_cost)>=float(target_cost)*(1.0f+s))chosen=affordable;   // A：余量足够时动用
+    }else chosen=affordable;
+    if(chosen<0){                                                // 积累 AP：本帧不出兵，也不设等待
+        ++ai_saving[side];ai_stat(c,side,1,1);
+        c.pc=DECISION_EXIT;return;
+    }
+    ai_saving[side]=0;
+    if(uint32_t(chosen)!=c.r[5])ai_stat(c,side,3,1);
+    if(pressure)ai_stat(c,side,4,1);
+    ai_record_deploy(c,controller,uint32_t(chosen));
+    if(hoard){uint32_t a=AI_STATS_BASE+0xb0u+side*8u;wr<uint32_t>(c,a+4u,rd<uint32_t>(c,a+4u)+1u);}   // B 下出兵
+    ai_hoard[side]=ai_random()&1u;                                // 下一阶段重新抽取策略
+    if(ai_hoard[side]){uint32_t a=AI_STATS_BASE+0xb0u+side*8u;wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);}   // 进入 B 的次数
+    c.r[5]=uint32_t(chosen);
+    old_ai_choose(c);
+}
+// ---------- 第 13 版：场上投资升级据点 ----------
+// 达到开局据点目标后，r20 只在“AP 已满且无可出单位”时放行 AI 的据点升级，积累与冷却使两者几乎不同时成立，
+// AI 停在目标等级。第 13 版：己方场上存活单位（不含据点与召唤单位）的 AP 价格合计 F ≥ k × 本级升级费用
+// （controller+1024）连续 D 帧后，AP 足够即升级据点，不足时暂停出兵保留 AP，最长 L 帧；压力下照常出兵。
+// 超时后须再出一次兵才重新触发；F < 0.7 × 阈值时退出。
+// 停滞兜底（用户要求：不得因等待触发而停滞）：达到开局目标后据点等级 S 帧未变化时，不论 F 均进入投资，
+// 且不设暂停上限，保留 AP 直至可升级（压力下照常出兵）；本级升级费用超过 AP 上限时不触发。
+// 段位块 +24 为 k×100（0 关闭），+28 为 L（位 0–11）| D（位 12–19）| S/10（位 20–31）。停滞触发次数：+0x770 起每方 1 字。
+// 单位来源：BattleObjectManager::createUnit 成功出口（0x1df440，r4 新单位）按调用者区分：返回地址（sp+52）为
+// 0x1c9683（BattleController::onEventUnitCreate，卡组出兵）或 0x1de213（BattleObject::createChildObject，召唤与变身，
+// 父对象为调用者的 r4，保存在 sp+24）；其他来源（弹头车等）不计入。AP 取己方卡组中同一 UnitID（单位 +0x128）的出兵费用。
+// 子单位在 300 帧内父单位消失、
+// 且父单位只生成过这一个子单位时视为变身（伞兵落地、工兵建成等），继承父单位的出兵 AP；其余为召唤，不计入。
+// 宿主每场开战时递增头部 +0x700，钩子据此清空记录。统计：+0x710 起每方 8 字（触发、投资升级、超时、
+// 暂停帧、最近 F、最近阈值、压力跳过、据点等级），+0x750 起每方 4 字（出兵记录、变身继承、召唤、当前计入单位数）。
+constexpr uint32_t INVEST_SERIAL=H+0x700u,INVEST_STATS=H+0x710u,ORIGIN_STATS=H+0x750u;
+enum:uint8_t{ORIGIN_DEPLOY=1,ORIGIN_PENDING=2,ORIGIN_INHERIT=3,ORIGIN_SUMMON=4};
+// 单位对象来自原生对象池，指针会被后续单位复用；记录以指针 + 生成序号区分，新单位生成时同一指针的旧记录失效。
+// uid 为计价用的 UnitID：出兵单位为自身（生成时 +0x62 尚未写入，首次使用时读取），变身后的单位为最初出兵单位；
+// AP 已转给变身后单位的父记录置为 UID_TRANSFERRED。
+struct Origin{uint32_t unit,gen,parent_gen,born,dead_since,uid;uint16_t children;uint8_t team,kind,alive;};
+Origin origins[512];uint32_t origin_count,origin_serial=0xffffffffu,origin_gen,ai_frame;
+struct Invest{uint32_t controller,since,hold_start,level,level_since;bool active,need_deploy,forced;};
+Invest invest_state[2];
+constexpr uint32_t UID_TRANSFERRED=0xffffffffu;
+uint32_t origin_uid(Context& c,Origin& o){
+    if(!o.uid && o.kind==ORIGIN_DEPLOY && o.unit)o.uid=rd<uint32_t>(c,o.unit+0x128u);
+    return o.uid;
+}
+Origin* origin_of(uint32_t unit){
+    if(!unit)return nullptr;
+    for(uint32_t i=origin_count;i-->0;)if(origins[i].unit==unit)return &origins[i];
+    return nullptr;
+}
+Origin* origin_gen_find(uint32_t gen){
+    for(uint32_t i=origin_count;i-->0;)if(origins[i].gen==gen)return &origins[i];
+    return nullptr;
+}
+bool origin_tracking(Context& c){
+    return enabled(c,FLAG_AI_TIER) && (rd<uint32_t>(c,AI_TIER_BASE+24u) || rd<uint32_t>(c,AI_TIER_BASE+0x20u+24u));
+}
+void origin_reset(Context& c){
+    uint32_t serial=rd<uint32_t>(c,INVEST_SERIAL);
+    if(serial==origin_serial)return;
+    origin_serial=serial;origin_count=0;ai_frame=0;
+    for(Invest& s:invest_state)s=Invest{};
+}
+void origin_retire(uint32_t unit){                              // 该指针上的旧单位已不存在
+    for(uint32_t i=0;i<origin_count;++i)if(origins[i].unit==unit){
+        origins[i].unit=0;origins[i].alive=0;
+        if(!origins[i].dead_since)origins[i].dead_since=ai_frame?ai_frame:1u;
+    }
+}
+Origin* origin_add(Context& c,uint32_t unit,uint32_t team,uint8_t kind,uint32_t uid){
+    if(origin_count>=512u){                                       // 移除已消失较久的记录；仍满时丢弃最旧的
+        uint32_t n=0;
+        for(uint32_t i=0;i<origin_count;++i)if(origins[i].alive || ai_frame-origins[i].dead_since<=400u)origins[n++]=origins[i];
+        if(n>=512u){for(uint32_t i=1;i<n;++i)origins[i-1]=origins[i];n=511u;}
+        origin_count=n;
+    }
+    origin_retire(unit);
+    Origin& o=origins[origin_count++];
+    o=Origin{unit,++origin_gen,0u,ai_frame,0u,uid,0,uint8_t(team&1u),kind,1};
+    if(kind==ORIGIN_DEPLOY || kind==ORIGIN_SUMMON){uint32_t a=ORIGIN_STATS+o.team*0x10u+(kind==ORIGIN_DEPLOY?0u:8u);wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);}
+    return &o;
+}
+Block old_unit_created;
+void unit_created(Context& c){                                 // BattleObjectManager::createUnit 成功出口：r4 新单位，r6 队伍
+    if(origin_tracking(c)){
+        origin_reset(c);
+        uint32_t unit=c.r[4],team=c.r[6]&1u;
+        uint32_t ret=rd<uint32_t>(c,c.r[13]+52u)&~1u,caller_r4=rd<uint32_t>(c,c.r[13]+24u);
+        origin_retire(unit);
+        if(ret==0x101c9682u){
+            origin_add(c,unit,team,ORIGIN_DEPLOY,0u);
+            invest_state[team==(rd<uint32_t>(c,ENEMY_TEAM)&1u)?1u:0u].need_deploy=false;   // 手动或 AI 出兵后可再次触发
+        }else if(ret==0x101de212u){
+            Origin* p=origin_of(caller_r4);
+            bool counted=p && (p->kind==ORIGIN_DEPLOY || p->kind==ORIGIN_INHERIT);
+            uint32_t parent_gen=p?p->gen:0u,uid=p?origin_uid(c,*p):0u;
+            Origin* o=origin_add(c,unit,team,counted?ORIGIN_PENDING:ORIGIN_SUMMON,counted?uid:0u);
+            if(counted){
+                o->parent_gen=parent_gen;
+                if(Origin* q=origin_gen_find(parent_gen))++q->children;   // origin_add 可能整理了数组，按序号重新查找
+                else o->kind=ORIGIN_SUMMON;
+            }
+        }
+    }
+    old_unit_created(c);
+}
+template<class F> void team_units(Context& c,uint32_t team,F visit){
+    uint32_t manager=0,unit=0,base=0;
+    guest_call(c,OBJECT_MANAGER_GET_INSTANCE,0,0,0,0,nullptr,0,&manager);
+    guest_call(c,0x101df341u,manager,team,0,0,nullptr,0,&base);
+    guest_call(c,0x101df318u,manager,team,0,0,nullptr,0,&unit);
+    uint32_t first=unit;
+    for(int guard=0;unit && guard<4096;++guard){
+        if(unit!=base)visit(unit);
+        uint32_t link=rd<uint32_t>(c,unit+0x120u);
+        unit=link?link-0x11cu:0u;
+        if(unit==first)break;
+    }
+}
+void origin_observe(Context& c){                               // 每帧：标记存活并判定子单位为变身或召唤
+    if(!origin_tracking(c))return;
+    origin_reset(c);
+    ++ai_frame;
+    for(uint32_t i=0;i<origin_count;++i)origins[i].alive=0;
+    for(uint32_t team=0;team<2u;++team)
+        team_units(c,team,[&](uint32_t unit){if(Origin* o=origin_of(unit))o->alive=1;});
+    for(uint32_t i=0;i<origin_count;++i){
+        Origin& o=origins[i];
+        if(!o.alive && !o.dead_since)o.dead_since=ai_frame;
+        if(o.kind!=ORIGIN_PENDING)continue;
+        Origin* p=origin_gen_find(o.parent_gen);
+        if(!(p && p->alive)){
+            o.kind=(p && p->children==1u)?ORIGIN_INHERIT:ORIGIN_SUMMON;
+            if(o.kind==ORIGIN_INHERIT)p->uid=UID_TRANSFERRED;     // 投入的 AP 只由变身后的单位计入一次
+        }else if(ai_frame-o.born>300u)o.kind=ORIGIN_SUMMON;
+        if(o.kind!=ORIGIN_PENDING){uint32_t a=ORIGIN_STATS+o.team*0x10u+(o.kind==ORIGIN_INHERIT?4u:8u);wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);}
+    }
+}
+uint32_t field_invested_ap(Context& c,uint32_t controller,uint32_t team){   // 场上存活、计入的单位的出兵 AP 合计
+    uint32_t sum=0,count=0,slots=rd<uint32_t>(c,controller+0x390u);
+    team_units(c,team,[&](uint32_t unit){
+        if(int32_t(rd<uint32_t>(c,unit+776u))<=0)return;
+        Origin* o=origin_of(unit);
+        if(!o || !(o->kind==ORIGIN_DEPLOY || o->kind==ORIGIN_INHERIT))return;
+        uint32_t uid=origin_uid(c,*o);
+        if(!uid || uid==UID_TRANSFERRED)return;
+        for(uint32_t slot=0;slot<slots && slot<32u;++slot){
+            uint32_t info=controller+0xcu+slot*0x1cu;
+            if(rd<uint32_t>(c,info+0x10u)==uid){sum+=rd<uint32_t>(c,info);++count;break;}
+        }
+    });
+    wr<uint32_t>(c,ORIGIN_STATS+team*0x10u+12u,count);
+    return sum;
+}
+bool ai_invest(Context& c,uint32_t controller){                // true：本帧已处理（升级或保留 AP），退出决策
+    uint32_t tier=ai_tier(c,controller);
+    if(!tier)return false;
+    uint32_t k=rd<uint32_t>(c,tier+24u),timing=rd<uint32_t>(c,tier+28u);
+    int32_t target=int32_t(rd<uint32_t>(c,tier+12u));
+    if(!k || target<0)return false;
+    uint32_t side=controller==rd<uint32_t>(c,ENEMY_CONTROLLER)?1u:0u;
+    Invest& st=invest_state[side];
+    if(st.controller!=controller)st=Invest{controller,0u,0u,0xffffffffu,0u,false,false,false};
+    uint32_t level=rd<uint32_t>(c,controller+0x3fcu);
+    uint32_t stats=INVEST_STATS+side*0x20u;
+    wr<uint32_t>(c,stats+28u,level);
+    if(level!=st.level){st.level=level;st.level_since=ai_frame;st.forced=false;}
+    if(int32_t(level)<target){st.active=false;st.since=0;return false;}
+    uint32_t maxed=0;guest_call(c,KYOTEN_LEVEL_MAX,controller,0,0,0,nullptr,0,&maxed);
+    if(maxed&0xffu){st.active=false;return false;}
+    uint32_t team=rd<uint32_t>(c,controller+0x38cu)&1u;
+    float field=float(field_invested_ap(c,controller,team));
+    float threshold=float(int32_t(rd<uint32_t>(c,controller+1024u)))*float(k)/100.0f;
+    wr<uint32_t>(c,stats+16u,uint32_t(field));wr<uint32_t>(c,stats+20u,uint32_t(threshold));
+    uint32_t hold=timing&0xfffu,delay=(timing>>12)&0xffu,stall=(timing>>20)*10u;
+    if(!st.forced && stall && ai_frame-st.level_since>=stall){
+        uint32_t max_ap=0;guest_call(c,P_MAX_AP,controller,level,0,0,nullptr,0,&max_ap);
+        if(int32_t(rd<uint32_t>(c,controller+1024u))<=int32_t(max_ap)){
+            st.forced=true;st.active=true;st.hold_start=ai_frame;st.need_deploy=false;
+            uint32_t a=INVEST_SERIAL+0x70u+side*4u;wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);
+        }
+    }
+    if(st.forced){
+        st.active=true;                                            // 停滞兜底：保持投资直至升级
+    }else if(st.active){
+        if(field<threshold*0.7f){st.active=false;st.since=0;}
+    }else{
+        if(st.need_deploy || field<threshold){st.since=0;return false;}
+        if(!st.since)st.since=ai_frame;
+        if(ai_frame-st.since<delay)return false;                  // 反应延迟：低段位“慢半拍”
+        st.active=true;st.hold_start=ai_frame;
+        wr<uint32_t>(c,stats,rd<uint32_t>(c,stats)+1u);
+    }
+    if(!st.active)return false;
+    float s=float(std::min(rd<uint32_t>(c,tier+20u),100u))/100.0f;
+    bool present=false;
+    float front=ai_front_ratio(c,controller,present);
+    float deficit=ai_field_power(c,team^1u)-ai_field_power(c,team);
+    if(front<=0.4f-0.2f*s || deficit>400.0f+1200.0f*s){          // 压力：照常出兵，暂停计时不累计
+        st.hold_start=ai_frame;wr<uint32_t>(c,stats+24u,rd<uint32_t>(c,stats+24u)+1u);
+        return false;
+    }
+    uint32_t can=0;guest_call(c,P_IS_LEVELUP,controller,0,0,0,nullptr,0,&can);
+    if(can&0xffu){
+        guest_call(c,rd<uint32_t>(c,rd<uint32_t>(c,controller)+0xa8u),controller);   // 与原生 0x1cc464 相同的虚函数
+        wr<uint32_t>(c,stats+4u,rd<uint32_t>(c,stats+4u)+1u);
+        st.active=false;st.since=0;st.forced=false;
+        return true;
+    }
+    if(!st.forced && ai_frame-st.hold_start>=hold){                             // 超时：恢复出兵，出兵后才可再次触发
+        st.active=false;st.since=0;st.need_deploy=true;
+        wr<uint32_t>(c,stats+8u,rd<uint32_t>(c,stats+8u)+1u);
+        return false;
+    }
+    wr<uint32_t>(c,stats+12u,rd<uint32_t>(c,stats+12u)+1u);
+    return true;
+}
 void auto_deploy(Context& c){                                  // 0x1cc070：绝招检查结束，进入出兵决策
-    if(enabled(c,FLAG_AUTO_SPLIT) && (auto_disabled(c,c.r[4])&1u)){c.pc=0x101cc52fu;return;}
+    if(enabled(c,FLAG_AUTO_SPLIT) && (auto_disabled(c,c.r[4])&1u)){c.pc=DECISION_EXIT;return;}
+    if(ai_opening(c,c.r[4])){c.pc=DECISION_EXIT;return;}
+    if(ai_invest(c,c.r[4])){c.pc=DECISION_EXIT;return;}
     old_auto_deploy(c);
 }
 // ---------- T8 支援：弹头车出击按钮的可选效果（功能位 32） ----------
@@ -798,6 +1239,7 @@ void apply_support(Context& c,uint32_t controller,uint32_t option){
     guest_call(c,OBJECT_MANAGER_GET_INSTANCE,0,0,0,0,nullptr,0,&manager);
     guest_call(c,GET_BASE_UNIT,controller,0,0,0,nullptr,0,&base);
     guest_call(c,GET_TEAM_UNITS,manager,rd<uint32_t>(c,controller+908u),0,0,nullptr,0,&unit);
+    uint32_t first=unit;
     for(int guard=0;unit && guard<4096;++guard){
         if(unit!=base){
             if(option==1u && int32_t(rd<uint32_t>(c,unit+776u))>0)wr<uint32_t>(c,unit+776u,rd<uint32_t>(c,unit+772u));
@@ -805,6 +1247,7 @@ void apply_support(Context& c,uint32_t controller,uint32_t option){
         }
         uint32_t link=rd<uint32_t>(c,unit+0x120u);
         unit=link?link-0x11cu:0u;
+        if(unit==first)break;                                    // 队伍单位链表为环形（原生遍历回到首个单位即结束）
     }
 }
 Block old_slug_action;
@@ -837,6 +1280,7 @@ void install_ui_hooks(){
     old_auto_slug=find_block(0x101cc019u);register_block(0x101cc019u,auto_slug);
     old_auto_special=find_block(0x101cc04fu);register_block(0x101cc04fu,auto_special);
     old_auto_deploy=find_block(0x101cc071u);register_block(0x101cc071u,auto_deploy);
+    old_unit_created=find_block(0x101df441u);register_block(0x101df441u,unit_created);
     old_operator_update=find_block(0x101d6ae5u);register_block(0x101d6ae5u,operator_update);
     old_target_update=find_block(TARGET_UPDATE|1u);register_block(TARGET_UPDATE|1u,target_update);
     old_banner_begin=find_block(0x101d932fu);register_block(0x101d932fu,banner_begin);
@@ -855,8 +1299,172 @@ void install_ui_hooks(){
     old_clearclip=find_block(G_CLEARCLIP);register_block(G_CLEARCLIP,clearclip_hook);
     install_touch_hooks();
 }
+// ---------- 第 10 版：LAB 音效通道扩展（功能位 64） ----------
+// 原生音效（AppMain::Sound_RequestPlaySE 0x1c67e8 / Sound_PlaySE 0x1c7538 / Sound_PlaySE_2P 0x1c778c）每个端口
+// 每帧只收 3 条请求（第 4 条按优先级淘汰），播放时在 3 个 CAudioPresenter（1P app+0x9b00、2P app+0x9b18）间
+// 轮换，3 个都在播放时停止最早开始的一个。BattleObject::playSE 以对象 +0x70 选端口，双方各用一组。
+// LAB 战斗中改为：每端口每帧最多 SE_QUEUE 条请求（同帧同 SoundID 合并），通道为原生 3 个加宿主建立的
+// 宿主建立的扩展通道（每端口至多 SE_EXTRA 个，头部 +0x304 个数、+0x310/+0x330 指针），优先使用空闲通道，
+// 全部占用时停止最早开始者。CMediaManager 有 32 个播放槽，通道只在播放期间登记（play/stop）；槽满时
+// setAudioPresenter 不登记，该声音不混音，不影响其他通道。播放、音量、停止、缓冲释放沿用原生函数，扩展通道在
+// Sound_Stop（标志 2）、Sound_ChangeVolumeSE、bufferReleaseCheck 中与原生通道同样处理。
+constexpr uint32_t FLAG_SE_EXTEND=64u,SE_MAGIC_ADDR=H+0x300u,SE_MAGIC=0x4c534531u,SE_COUNT=H+0x304u;
+constexpr uint32_t SE_EXTRA_BASE=H+0x310u,SE_STATS=H+0x380u;   // 统计：每端口 8 字（请求/合并/满队/播放/抢占/最大并发/当前并发/播放后未登记）
+                                                                // +0x40 起每端口 6 字诊断（调用/有请求/未启用/音效关闭/设声失败/播放失败）
+constexpr uint32_t SE_EXTRA=8u,SE_QUEUE=24u,SE_NATIVE=3u;
+constexpr uint32_t P_PLAY=0x101382b8u,P_STOP=0x101383c4u,P_IS_PLAYEND=0x10138242u,P_SET_SOUND=0x10137fdcu;
+constexpr uint32_t P_SET_PAUSE=0x10138176u,P_RELEASE=0x1013847au,P_SET_ATTRIBUTE=0x101381a4u;
+struct SeRequest{uint32_t id,priority,value,pause;};
+SeRequest se_queue[2][SE_QUEUE];uint32_t se_queued[2];
+uint32_t se_seq_counter;
+struct SeSeq{uint32_t presenter,seq;};SeSeq se_seq[2][SE_NATIVE+SE_EXTRA];
+bool se_ready(Context& c){return rd<uint32_t>(c,SE_MAGIC_ADDR)==SE_MAGIC;}
+bool se_active(Context& c){return se_ready(c) && enabled(c,FLAG_SE_EXTEND);}
+uint32_t se_extra_count(Context& c){uint32_t n=rd<uint32_t>(c,SE_COUNT);return n<SE_EXTRA?n:SE_EXTRA;}
+uint32_t se_extra(Context& c,uint32_t port,uint32_t i){return rd<uint32_t>(c,SE_EXTRA_BASE+port*0x20u+i*4u);}
+void se_stat(Context& c,uint32_t port,uint32_t field,uint32_t add){
+    uint32_t a=SE_STATS+port*0x20u+field*4u;wr<uint32_t>(c,a,rd<uint32_t>(c,a)+add);
 }
-extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 9u;}
+Block old_se_request,old_se_play_1p,old_se_play_2p,old_se_stop,old_se_volume,old_se_release;
+void se_request(Context& c){                                   // r0=app r1=SoundID r2=端口 r3=优先级，栈：值、暂停字节、可屏蔽
+    uint32_t port=c.r[2];
+    if(port>1u || !se_active(c)){old_se_request(c);return;}
+    uint32_t app=c.r[0],id=c.r[1];
+    c.pc=c.r[14];
+    if(!id)return;
+    if(rd<uint8_t>(c,c.r[13]+8u) && (rd<uint32_t>(c,app+0x97d8u)&1u))return;   // 原生请求屏蔽（胜负演出）
+    se_stat(c,port,0,1);
+    for(uint32_t i=0;i<se_queued[port];++i)if(se_queue[port][i].id==id){se_stat(c,port,1,1);return;}
+    if(se_queued[port]>=SE_QUEUE){se_stat(c,port,2,1);return;}
+    se_queue[port][se_queued[port]++]={id,c.r[3],rd<uint32_t>(c,c.r[13]),rd<uint32_t>(c,c.r[13]+4u)};
+}
+// CMediaManager 播放槽（manager+0x20 起 32 个，manager 为 presenter+0x78）：play 经 setAudioPresenter 追加一项
+// 且不查重；stop 经 delAudioPresenter 只在找不到时才进入清除循环（0x138b10 找到即返回），实际不注销；
+// 槽位由混音回调（0x138584）在通道已结束（+0）或已停止（+0x60）时清空。同一回调间隔内对同一通道
+// stop 再 play 会留下重复项（该通道被混音两次），重复项累积占满 32 槽后，新 play 不再登记而无声。
+// 每次 play 前按混音回调的同一规则清除已结束、已停止及重复的项（头部 +0x308 非 0 时跳过，供诊断对照）。
+constexpr uint32_t SE_KEEP_SLOTS=H+0x308u,SLOT_COUNT=32u;
+uint32_t se_slot_table(Context& c,uint32_t presenter){
+    uint32_t manager=rd<uint32_t>(c,presenter+0x78u);
+    return manager>=0x10000000u && manager<0x1ffff000u ? manager+0x20u : 0u;
+}
+void se_compact_slots(Context& c,uint32_t table){
+    for(uint32_t i=0;i<SLOT_COUNT;++i){
+        uint32_t p=rd<uint32_t>(c,table+i*4u);
+        if(!p)continue;
+        bool duplicate=false;
+        for(uint32_t j=0;j<i && !duplicate;++j)duplicate=rd<uint32_t>(c,table+j*4u)==p;
+        if(duplicate || rd<uint8_t>(c,p) || rd<uint8_t>(c,p+0x60u))wr<uint32_t>(c,table+i*4u,0u);
+    }
+}
+bool se_slot_registered(Context& c,uint32_t table,uint32_t presenter){
+    for(uint32_t i=0;i<SLOT_COUNT;++i)if(rd<uint32_t>(c,table+i*4u)==presenter)return true;
+    return false;
+}
+uint32_t& se_seq_of(uint32_t port,uint32_t presenter){
+    for(auto& s:se_seq[port])if(s.presenter==presenter)return s.seq;
+    for(auto& s:se_seq[port])if(!s.presenter){s.presenter=presenter;s.seq=0;return s.seq;}
+    static uint32_t spare;spare=0;return spare;
+}
+void se_debug(Context& c,uint32_t port,uint32_t field){
+    uint32_t a=SE_STATS+0x40u+port*0x20u+field*4u;wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);
+}
+void se_dispatch(Context& c,uint32_t port){
+    uint32_t app=c.r[0],count=se_queued[port];se_queued[port]=0;
+    se_debug(c,port,0);
+    if(!count)return;
+    se_debug(c,port,1);
+    if(!se_active(c)){se_debug(c,port,2);return;}
+    if(!rd<uint32_t>(c,app+0x3d60u)){se_debug(c,port,3);return;}   // 音效关闭：原生同样清空请求
+    uint32_t pool[SE_NATIVE+SE_EXTRA],n=0;
+    for(uint32_t i=0;i<SE_NATIVE;++i)pool[n++]=rd<uint32_t>(c,app+(port?0x9b18u:0x9b00u)+i*4u);
+    for(uint32_t i=0,k=se_extra_count(c);i<k;++i)if(uint32_t p=se_extra(c,port,i))pool[n++]=p;
+    // play(float) 的音量：原生两支都在 0x1c76f0 以 vcvt.f32.s32 把整数音量转为浮点。
+    // 普通支为 app+0x9ae8（Sound_ChangeVolumeSE 写入的整数），淡出支（标志 0x40）为 (app+0x9ae8 × app+0xaf5c)>>8。
+    uint32_t flags=rd<uint32_t>(c,app+0x9ae0u);
+    int32_t level=int32_t(rd<uint32_t>(c,app+0x9ae8u));
+    if(flags&0x40u)level=(level*int32_t(rd<uint32_t>(c,app+0xaf5cu)))>>8;
+    uint32_t volume=fbits(float(level));
+    for(uint32_t r=0;r<count;++r){
+        const SeRequest& q=se_queue[port][r];
+        uint32_t chosen=0,chosen_index=0,oldest=0xffffffffu;
+        for(uint32_t i=0;i<n && !chosen;++i){
+            if(!pool[i])continue;
+            uint32_t ended=0;guest_call(c,P_IS_PLAYEND,pool[i],0,0,0,nullptr,0,&ended);
+            if(ended&0xffu){chosen=pool[i];chosen_index=i;}
+        }
+        if(!chosen){
+            for(uint32_t i=0;i<n;++i){
+                uint32_t s=se_seq_of(port,pool[i]);
+                if(pool[i] && s<oldest){oldest=s;chosen=pool[i];chosen_index=i;}
+            }
+            if(!chosen)continue;
+            guest_call(c,P_STOP,chosen);
+            se_stat(c,port,4,1);
+        }
+        uint32_t sound=rd<uint32_t>(c,app+(0x26ccu+q.id)*4u),ok=0;
+        guest_call(c,P_SET_SOUND,chosen,sound,0,0,nullptr,0,&ok);
+        if(!(ok&0xffu)){se_debug(c,port,4);continue;}
+        float pause;std::memcpy(&pause,&q.pause,4);
+        if(pause>0.0f)guest_call(c,P_SET_PAUSE,chosen,q.pause);
+        uint32_t table=se_slot_table(c,chosen);
+        if(table && !rd<uint32_t>(c,SE_KEEP_SLOTS))se_compact_slots(c,table);
+        guest_call(c,P_PLAY,chosen,volume,0,0,nullptr,0,&ok);
+        if(!(ok&0xffu)){se_debug(c,port,5);continue;}
+        if(table && !se_slot_registered(c,table,chosen))se_stat(c,port,7,1);   // 统计第 8 字：播放后未登记（无声）
+        se_seq_of(port,chosen)=++se_seq_counter;
+        se_stat(c,port,3,1);
+        if(chosen_index<SE_NATIVE){                            // 原生通道状态记录（与 Sound_PlaySE 写入的字段相同）
+            uint32_t state=app+(port?0x9944u:0x982cu)+chosen_index*0x14u;
+            wr<uint32_t>(c,state,q.id);wr<uint32_t>(c,state+4u,q.priority);wr<uint32_t>(c,state+8u,0xffffffffu);
+            wr<uint32_t>(c,state+12u,q.pause);wr<uint32_t>(c,state+16u,se_seq_counter);
+        }
+    }
+    uint32_t playing=0;
+    for(uint32_t i=0;i<n;++i){
+        uint32_t ended=1;if(pool[i])guest_call(c,P_IS_PLAYEND,pool[i],0,0,0,nullptr,0,&ended);
+        if(!(ended&0xffu))++playing;
+    }
+    wr<uint32_t>(c,SE_STATS+port*0x20u+24u,playing);
+    if(playing>rd<uint32_t>(c,SE_STATS+port*0x20u+20u))wr<uint32_t>(c,SE_STATS+port*0x20u+20u,playing);
+}
+void se_play_1p(Context& c){se_dispatch(c,0);old_se_play_1p(c);}
+void se_play_2p(Context& c){se_dispatch(c,1);old_se_play_2p(c);}
+template<typename F> void se_each_extra(Context& c,F f){
+    if(!se_ready(c))return;
+    for(uint32_t port=0;port<2;++port)for(uint32_t i=0,k=se_extra_count(c);i<k;++i)
+        if(uint32_t p=se_extra(c,port,i))f(port,p);
+}
+void se_stop(Context& c){
+    // Sound_Stop（0x1c7e08）：标志 2 停止 1P 音效通道并清空其请求（0x1c7ee6 起）。原生 Sound_Stop 没有处理
+    // Sound_StopSE_2P 置的 0x200（该位置位后一直保留），2P 音效通道不经此处停止；扩展通道与原生一致。
+    uint32_t flags=rd<uint32_t>(c,c.r[0]+0x9a0cu);
+    if(flags&2u){
+        se_queued[0]=0;
+        se_each_extra(c,[&](uint32_t port,uint32_t p){if(!port)guest_call(c,P_STOP,p);});
+    }
+    old_se_stop(c);
+}
+void se_volume(Context& c){                                    // Sound_ChangeVolumeSE(app, 音量)：原生对 6 个音效通道设属性 4
+    uint32_t value=c.r[1];
+    se_each_extra(c,[&](uint32_t,uint32_t p){guest_call(c,P_SET_ATTRIBUTE,p,4u,value);});
+    old_se_volume(c);
+}
+void se_release(Context& c){                                   // bufferReleaseCheck(app, CMediaSound)：释放前停止仍在使用该声音的通道
+    uint32_t sound=c.r[1];
+    if(sound)se_each_extra(c,[&](uint32_t,uint32_t p){guest_call(c,P_RELEASE,p,sound);});
+    old_se_release(c);
+}
+void install_se_hooks(){
+    old_se_request=find_block(0x101c67e9u);register_block(0x101c67e9u,se_request);
+    old_se_play_1p=find_block(0x101c7539u);register_block(0x101c7539u,se_play_1p);
+    old_se_play_2p=find_block(0x101c778du);register_block(0x101c778du,se_play_2p);
+    old_se_stop=find_block(0x101c7e09u);register_block(0x101c7e09u,se_stop);
+    old_se_volume=find_block(0x101c6d05u);register_block(0x101c6d05u,se_volume);
+    old_se_release=find_block(0x101c833du);register_block(0x101c833du,se_release);
+}
+}
+extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 13u;}
 extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     static bool installed=false;
     if(installed)return;
@@ -871,4 +1479,8 @@ extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     old_menu_button_draw=find_block(0x102003bdu);register_block(0x102003bdu,menu_button_draw);
     old_menu_button_tail=find_block(0x1020047bu);register_block(0x1020047bu,menu_button_tail);
     install_ui_hooks();
+    install_se_hooks();
+    old_ai_wait=find_block(0x101cbfcbu);register_block(0x101cbfcbu,ai_wait);
+    old_ai_levelup_query=find_block(0x101cbd49u);register_block(0x101cbd49u,ai_levelup_query);
+    old_ai_choose=find_block(0x101cc40fu);register_block(0x101cc40fu,ai_choose);
 }

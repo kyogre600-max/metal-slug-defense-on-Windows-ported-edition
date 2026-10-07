@@ -1,27 +1,48 @@
 """LAB 准备界面（T8）：宿主自绘的独立全屏界面（砖墙背景、MISSION BGM），F7 经闸门进入，
-开始战斗时经闸门进入战斗，战斗结束或退出后经原生闸门回到本界面。
+开始战斗时经闸门进入战斗，战斗结束后经原生闸门回到本界面；退出时回到原生主菜单（出击 / 强化 / Wi-Fi 对战）。
 
-内容：我方/敌方牌组（各 10 格，点格子选单位，±调整等级，一括等级、随机编队、清空）、双方据点初始等级、
-地图、完全控制与四个 AI 开关、优势设定（原生关卡强化级数，生命/攻击各 +20%/级）、预设 A/B/C（lab_presets/）
+内容：我方/敌方牌组（各 10 格，点格子选单位，±调整等级，一括等级、据点初始等级、复制对方、随机编队、清空）、
+地图（原生地图 1–3 与里地图 1–3 的全部小关，按世界与小关选择，上方为原生缩略图，见 lab_stages.py）、
+完全控制与四个 AI 开关、优势设定（原生关卡强化级数，生命/攻击各 +20%/级）、预设 A/B/C（lab_presets/）
 与战斗履历（lab_presets/history.jsonl）。全部设定保存到 lab_config.json；战斗使用的牌组与等级直接交给
 BattleController::entryUnit，不写存档。界面文字随游戏语言（lab_ui.TEXT）。
 """
 import random
 
-from lab_ui import (W, H, WHITE, GOLD, GRAY, DARK, BLUE, RED, BRICK, CELLS, TAB_ON, TAB_OFF, ROW_STYLES,
-                    SE_DECIDE, SE_CLOSE, BGM_MISSION, BGM_STAGE, T, current_bgm, Canvas, Skin, Shutter, fonts, play_se, play_bgm)
+from lab_ui import (W, H, WHITE, GOLD, GRAY, DARK, BLUE, RED, BRICK, CELLS, TAB_ON, TAB_OFF, ROW_STYLES, HEADER_H,
+                    BUTTONS, ICON_SCALE, HEADER_DARK, TIER_COLORS, SE_DECIDE, SE_CLOSE, BGM_MISSION, BGM_MENU, T, current_bgm,
+                    Canvas, Skin, Shutter, fonts, icon_press_image, readable, play_se, play_bgm)
 
-HEADER_H = 67
 CELL, CELL_GAP = 100, 10                          # 编组格（unit.obm 50×50 原图 2 倍）
-DECK_X = (W - (10 * CELL + 9 * CELL_GAP)) // 2
+DECK_W = 10 * CELL + 9 * CELL_GAP
+DECK_X = (W - DECK_W) // 2
+DECK_TOP, DECK_PITCH = HEADER_H + 8, 160          # 每行：标题与按钮 26、格子 100、等级 28
+PANEL_TOP = DECK_TOP + 2 * DECK_PITCH + 6
+PANEL_H = H - PANEL_TOP - 24
 PICK_CELL, PICK_PITCH, PICK_COLS, PICK_ROWS = 75, 100, 12, 4
 PICK_X = (W - PICK_COLS * PICK_PITCH) // 2 + (PICK_PITCH - PICK_CELL) // 2
+PICK_TABS_Y = HEADER_H + 8
 FALLBACK_LANGUAGE = 3
 ADVANTAGE_MAX = 10                                # 原生强化级数：每级生命/攻击 +20%
+THUMB_SCALE = 2                                   # 原生缩略图 128×56，整数倍最近邻放大
+SCENE_MAIN_MENU, SCENE_MAIN_MENU_INIT, MAIN_MENU_IDLE = 28, 27, 1
+MENU_RETURN_PANEL = 0xb168                        # 主菜单返回时进入的子画面
 # GetUnitAffiliation：0 正规军 1 叛军 2 普特曼军 3 火星人与僵尸 4 其他 5 联动（依各阵营成员核对）
 TABS = (('tab_all', None), ('tab_community', 'community'), ('f0', 0), ('f1', 1), ('f2', 2),
         ('f3', 3), ('f4', 4), ('f5', 5))
 BACK_COMMANDS = ('close', 'back')
+ICON_W, ICON_H = round(60 * ICON_SCALE), round(48 * ICON_SCALE)     # 顶栏图标按钮 90×72
+# 青色框（66×54，锚点 3,3）在顶栏深色区内垂直居中，按钮随之定位。
+ICON_FRAME_H = round(54 * ICON_SCALE)
+ICON_Y = HEADER_DARK[0] + (HEADER_DARK[1] - HEADER_DARK[0] - ICON_FRAME_H) // 2 + round(3 * ICON_SCALE)
+TIER_PLATE = BUTTONS['normal']                                      # 段位名底板：原生棕色按钮压暗
+TIER_PLATE_DIM = 0.45
+
+
+def desaturate(rgb, keep=0.15, dim=0.55):
+    """保留 15% 饱和度并压暗至 55% 亮度的段位色（AI 关闭时的色带）。"""
+    grey = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]
+    return tuple(round((grey + (c - grey) * keep) * dim) for c in rgb)
 
 
 class LabPrep:
@@ -40,20 +61,27 @@ class LabPrep:
         self.shutter = Shutter(lab)
         self.hitboxes = []
         self.units = None
+        self.units_language = None
+        self.thumbs = {}
         self.pressed = None
         self.pressed_rect = None
-        self.return_bgm = None
+        self.pointer_inside = False
+        self.lit = None                  # 抬起后保持青色框的图标按钮命令（闸门合拢期间）
+        self.icons = {}
         self.press_overlay = None
+        self.tier_colors = {}
         self.message = ''
 
     # ---------- 数据 ----------
     def unit_list(self):
         """全部可选单位：原版 1–399 与社区可选单位。原生名称带括号或为“-”的条目是内部子单位
         （投放体、箱体、弹头车攻击等，如“(沙包)”“(伞兵)”），与社区 internal_only 一样排除。
-        名称取 GetMenuUnitName(uid, 游戏语言)。(uid, 名称, 阵营, 是否社区)"""
-        if self.units is None:
-            p, app = self.lab.p, self.lab.app()
-            current = p.word(app + 0x3d64)
+        名称取 GetMenuUnitName(uid, 游戏语言)。(uid, 名称, 阵营, 是否社区)
+        列表按当前游戏语言（app+0x3d64）缓存，语言切换后重新取名。"""
+        p, app = self.lab.p, self.lab.app()
+        current = p.word(app + 0x3d64)
+        if self.units is None or self.units_language != current:
+            self.units_language = current
             def name(uid):
                 for language in (current, FALLBACK_LANGUAGE):
                     try:
@@ -119,14 +147,37 @@ class LabPrep:
         self.lab.save_config()
         self.revision += 1
 
+    def stage_position(self):
+        """(世界列表, 世界序号, 小关序号)；配置中的 StageID 不在目录内时取地图 1 第一关。"""
+        catalog = self.lab.stage_catalog()
+        worlds = catalog.load()
+        wi, si = catalog.locate(int(self.lab.config.get('stage_id', 0)))
+        return worlds, wi, si
+
+    def set_stage(self, world_index, stage_index):
+        worlds, _, _ = self.stage_position()
+        if not worlds:
+            return
+        world_index %= len(worlds)
+        stages = worlds[world_index][1]
+        self.lab.config['stage_id'] = stages[stage_index % len(stages)]['id']
+        self.changed()
+
+    def thumbnail(self, entry):
+        key = (self.lab.stages.language, entry['id'])    # 缩略图文件按语言取自 ImageDataInfo 表
+        if key not in self.thumbs:
+            from PIL import Image
+            image = self.lab.stages.thumbnail(self.skin, entry)
+            if image is not None:
+                image = image.resize((image.width * THUMB_SCALE, image.height * THUMB_SCALE), Image.NEAREST)
+            self.thumbs[key] = image
+        return self.thumbs[key]
+
     # ---------- 打开与关闭（闸门） ----------
     def show(self, from_closed=False):
         """显示准备界面并播放 MISSION BGM。from_closed：画面已被闸门遮住（原生战斗结束闸门），直接开闸。"""
-        if not from_closed:
-            # F7 从当前界面进入：记下该界面正在播放的 BGM，返回时恢复（战斗结束回到准备界面时沿用先前记录）。
-            self.return_bgm = current_bgm(self.lab.p)
         def reveal():
-            self.open, self.page, self.pressed = True, 'main', None
+            self.open, self.page, self.pressed, self.lit = True, 'main', None, None
             self.revision += 1
             play_bgm(self.lab.p, BGM_MISSION)
             self.shutter.open()
@@ -136,21 +187,45 @@ class LabPrep:
             self.shutter.close(reveal)
 
     def hide(self):
-        """返回进入 LAB 前的界面：闸门合拢后关闭准备界面，恢复进入前的 BGM，再开闸。"""
+        """退出 LAB：闸门合拢后关闭准备界面并回到原生主菜单（出击 / 强化 / Wi-Fi 对战）。
+        已在主菜单稳态（场景 28、子状态 1）时直接恢复主菜单 BGM 并开闸；其他界面（CUSTOMIZE、SHOP、OPTION、
+        地图等）按 lab.leave 的方式结束当前场景并进入主菜单初始化（场景 27），由 SC_MainMenuInit 的
+        SetShutterOpen 开闸，SC_MainMenuLoop 在闸门结束后请求主菜单 BGM。"""
         def leave():
+            lab = self.lab
+            p, app = lab.p, lab.app()
             self.open = False
-            play_bgm(self.lab.p, self.return_bgm or BGM_STAGE)
-            self.shutter.open()
+            self.revision += 1
+            scene, state = p.word(app + 0x22bc), p.word(app + 0x22dc)
+            lab.record('prep_exit', scene=scene, state=state)
+            if scene == SCENE_MAIN_MENU and state == MAIN_MENU_IDLE:
+                play_bgm(p, BGM_MENU)
+                self.shutter.open()
+                return
+            # SC_MainMenuLoop 状态 0 按 app+0xb168 决定初始子画面（1 OPTION、3 CUSTOMIZE、4 SHOP，其余为主菜单），
+            # 清零后主菜单初始化进入出击 / 强化 / Wi-Fi 对战的主画面。
+            p.put(app + MENU_RETURN_PANEL, 0)
+            p.call('_ZN7AppMain12SceneEndFuncEi', app, scene)
+            p.call('_ZN7AppMain11ChangeExeSTEi', app, SCENE_MAIN_MENU_INIT)
+            self.shutter.release()
         self.shutter.close(leave)
 
     def set_open(self, value):
         """无动画的开关（启动战斗、测试脚本使用）。"""
         self.open = bool(value)
-        self.page, self.pressed = 'main', None
+        self.page, self.pressed, self.lit = 'main', None, None
         self.revision += 1
 
     def busy(self):
         return self.shutter.state != 'open'
+
+    def hold_bgm(self):
+        """准备界面打开期间保持 MISSION BGM。战斗结束后 LAB 回到原生主菜单场景（27→28），
+        SC_MainMenuLoop 状态 0 在闸门结束时请求一次主菜单 BGM 101，此处在其后改回 135。"""
+        p = self.lab.p
+        if current_bgm(p) != BGM_MISSION:
+            play_bgm(p, BGM_MISSION)
+            self.lab.record('prep_bgm_restore')
 
     # ---------- 指令 ----------
     def command(self, name, *args):
@@ -191,6 +266,11 @@ class LabPrep:
             self.set_deck(side, [[uid, self.level_all[side]] for uid in random.sample(pool, min(10, len(pool)))])
         elif name == 'clear':
             self.set_deck(args[0], [None] * 10)
+        elif name == 'copy':
+            # 复制对方牌组（单位、格位与各格等级）到本方。
+            side = args[0]
+            other = 'enemy' if side == 'player' else 'player'
+            self.set_deck(side, [None if e is None else [e[0], int(e[1])] for e in self.deck(other)])
         elif name == 'base':
             side, step = args
             key = side + '_base_level'
@@ -200,10 +280,28 @@ class LabPrep:
             key, step = args
             lab.config[key] = max(0, min(ADVANTAGE_MAX, int(lab.config.get(key, 0)) + step))
             self.changed()
+        elif name == 'world':
+            # 换世界时保留同一区域与小关序号（新世界没有该关时取其第一关）。
+            worlds, wi, si = self.stage_position()
+            if worlds:
+                current = worlds[wi][1][si]
+                target = (wi + args[0]) % len(worlds)
+                stages = worlds[target][1]
+                match = next((i for i, e in enumerate(stages)
+                              if (e['area'], e['stage']) == (current['area'], current['stage'])), 0)
+                self.set_stage(target, match)
         elif name == 'stage':
-            stages = lab.stage_list()
-            index = stages.index(lab.config['stage_id']) if lab.config['stage_id'] in stages else 0
-            lab.config['stage_id'] = stages[(index + args[0]) % len(stages)]
+            worlds, wi, si = self.stage_position()
+            if worlds:
+                self.set_stage(wi, si + args[0])
+        elif name == 'tier':
+            # AI 段位：ROOKIE … PREDATOR，两端不循环（按到底停止）。
+            from lab import AI_TIER_NAMES
+            side, step = args
+            key = side + '_ai_tier'
+            current = lab.config.get(key, 'SILVER')
+            index = AI_TIER_NAMES.index(current) if current in AI_TIER_NAMES else AI_TIER_NAMES.index('SILVER')
+            lab.config[key] = AI_TIER_NAMES[max(0, min(len(AI_TIER_NAMES) - 1, index + step))]
             self.changed()
         elif name == 'toggle':
             setattr(lab, args[0], not getattr(lab, args[0]))
@@ -261,12 +359,16 @@ class LabPrep:
                 hit, rect = command, box
                 break
         if action == 1:
-            # 按下反馈只叠加该按钮区域的压暗小图（draw 中绘制），不重绘整个界面。
-            self.pressed, self.pressed_rect = hit, rect
+            # 按下反馈只叠加该按钮区域的小图（draw 中绘制），不重绘整个界面。
+            self.pressed, self.pressed_rect, self.pointer_inside = hit, rect, hit is not None
+        elif action == 5:
+            self.pointer_inside = self.pressed is not None and hit == self.pressed
         elif action == 3:
             pressed, self.pressed = self.pressed, None
             if hit is not None and hit == pressed:
                 play_se(self.lab.p, SE_CLOSE if hit[0] in BACK_COMMANDS else SE_DECIDE)
+                if hit in self.icons and hit[0] in ('start', 'close'):
+                    self.lit = hit       # 与原生选单按钮相同：选中后青色框保持到画面切换
                 self.command(*hit)
         return True
 
@@ -274,6 +376,8 @@ class LabPrep:
     def draw(self):
         """每帧调用：准备界面（打开时）在下，宿主闸门在上。"""
         if self.open:
+            if not self.busy():
+                self.hold_bgm()
             if self.overlay is None:
                 from trial_overlay import SurfaceOverlay
                 self.overlay = SurfaceOverlay(self.lab.p.graphics)
@@ -285,19 +389,38 @@ class LabPrep:
                 self.c = Canvas(image, self.skin, self.font, None)
                 {'main': self.draw_main, 'picker': self.draw_picker, 'history': self.draw_history}[self.page]()
                 self.hitboxes = self.c.hitboxes
+                self.icons = self.c.icons
                 self.rendered = image
             self.overlay.draw_image(image, key, (0, 0, W, H))
-            if self.pressed is not None and self.pressed_rect and getattr(self, 'rendered', None) is not None:
-                if self.press_overlay is None:
-                    from trial_overlay import SurfaceOverlay
-                    self.press_overlay = SurfaceOverlay(self.lab.p.graphics)
-                x, y, w, h = self.pressed_rect
-                press_key = ('lab_prep_press', self.revision, self.pressed_rect)
-                part = None
-                if self.press_overlay.cached != press_key:
-                    part = self.skin.darken(self.rendered.crop((x, y, x + w, y + h)), cache=False)
-                self.press_overlay.draw_image(part, press_key, (x, y + 2, w, h))
+            self.draw_press()
         self.shutter.update_and_draw(self.skin)
+
+    def draw_press(self):
+        """按下反馈：原生图标按钮叠加青色框与三灯（按住且指针在按钮上，或抬起后至闸门合拢）；
+        其他按钮叠加该区域的压暗小图并下移 2 像素。"""
+        if getattr(self, 'rendered', None) is None:
+            return
+        command = self.lit if self.lit in self.icons else (self.pressed if self.pointer_inside else None)
+        if command is None or (command not in self.icons and not self.pressed_rect):
+            return
+        if self.press_overlay is None:
+            from trial_overlay import SurfaceOverlay
+            self.press_overlay = SurfaceOverlay(self.lab.p.graphics)
+        if command in self.icons:
+            x, y, name = self.icons[command]
+            press_key = ('lab_prep_icon', self.revision, command)
+            part = None
+            if self.press_overlay.cached != press_key:
+                part, (left, top) = icon_press_image(self.skin, self.rendered, x, y, name)
+                self.icon_rect = (left, top, part.width, part.height)
+            self.press_overlay.draw_image(part, press_key, self.icon_rect)
+            return
+        x, y, w, h = self.pressed_rect
+        press_key = ('lab_prep_press', self.revision, self.pressed_rect)
+        part = None
+        if self.press_overlay.cached != press_key:
+            part = self.skin.darken(self.rendered.crop((x, y, x + w, y + h)), cache=False)
+        self.press_overlay.draw_image(part, press_key, (x, y + 2, w, h))
 
     def cell(self, rect, uid, side, label=None):
         """原生编组格（unit.obm 绿/红/空格 50×50）+ 原生单位头像（与格子同倍率）。"""
@@ -314,26 +437,45 @@ class LabPrep:
         if label is not None:
             c.text((x + 6, y + 3), label, 14, WHITE)
 
+    def header_buttons(self, start=True):
+        """顶栏右侧的原生 OK / BACK 图标按钮（60×48 × 1.5，等比缩小），按钮与按下青色框均在顶栏深色区内。"""
+        c, p = self.c, self.lab.p
+        back_x = W - 12 - ICON_W
+        if start:
+            ok_x = back_x - 14 - ICON_W
+            c.icon_button((ok_x, ICON_Y), 'ok', ('start',))
+            c.text((ok_x - 12, ICON_Y + ICON_H // 2), T(p, 'start'), 18, GOLD, 'rm', 2, 260)
+        c.icon_button((back_x, ICON_Y), 'back', ('close',) if start else ('back',))
+
     def draw_main(self):
         lab, c, p = self.lab, self.c, self.lab.p
         names = self.names()
         c.header(T(p, 'prep_title'))
-        c.icon_button((W - 190, 4, 75, 60), 'ok', ('start',))
-        c.icon_button((W - 100, 4, 75, 60), 'back', ('close',))
-        c.text((W - 200, 35), T(p, 'start'), 18, GOLD, 'rm', 2, 260)
+        self.header_buttons()
         for row, side in enumerate(('player', 'enemy')):
-            top = HEADER_H + 10 + row * 158
-            c.text((DECK_X, top + 13), T(p, side + '_deck'), 18, BLUE if side == 'player' else RED, 'lm', 2, 150)
-            x = DECK_X + 160
+            top = DECK_TOP + row * DECK_PITCH
+            c.text((DECK_X, top + 13), T(p, side + '_deck'), 18, BLUE if side == 'player' else RED, 'lm', 2, 140)
+            x = DECK_X + 150
             c.text((x, top + 13), T(p, 'all_level'), 14, WHITE, 'lm', 2, 80)
             c.button((x + 84, top, 28, 26), '-', ('level_all', side, -1))
             c.text((x + 146, top + 13), f'Lv{self.level_all[side]}', 16, WHITE, 'mm')
             c.button((x + 180, top, 28, 26), '+', ('level_all', side, 1))
             c.button((x + 218, top, 80, 26), T(p, 'apply'), ('apply_all', side), 14, 'light')
-            c.button((DECK_X + 10 * CELL + 9 * CELL_GAP - 186, top, 90, 26), T(p, 'random'), ('random', side), 14)
-            c.button((DECK_X + 10 * CELL + 9 * CELL_GAP - 90, top, 90, 26), T(p, 'clear'), ('clear', side), 14, 'off')
+            # 据点初始等级（0–10，10 为 MAX；完全控制开启时开战即 MAX）
+            bx = DECK_X + 470
+            value = int(lab.config.get(side + '_base_level', 0))
+            shown = 'MAX' if lab.full_control or value >= 10 else f'Lv{value}'
+            c.text((bx, top + 13), T(p, 'base_short'), 14, WHITE, 'lm', 2, 50)
+            c.button((bx + 54, top, 28, 26), '<', ('base', side, -1))
+            c.text((bx + 54 + 28 + 38, top + 13), shown, 16, GRAY if lab.full_control else GOLD, 'mm', 2, 70)
+            c.button((bx + 54 + 28 + 76, top, 28, 26), '>', ('base', side, 1))
+            right = DECK_X + DECK_W
+            c.button((right - 292, top, 100, 26), T(p, 'copy_enemy' if side == 'player' else 'copy_player'),
+                     ('copy', side), 14, 'light')
+            c.button((right - 186, top, 90, 26), T(p, 'random'), ('random', side), 14)
+            c.button((right - 90, top, 90, 26), T(p, 'clear'), ('clear', side), 14, 'off')
             for slot, entry in enumerate(self.deck(side)):
-                x, y = DECK_X + slot * (CELL + CELL_GAP), top + 32
+                x, y = DECK_X + slot * (CELL + CELL_GAP), top + 30
                 uid = None if entry is None else self.uid(entry[0])
                 self.cell((x, y, CELL), uid, side, str(slot + 1))
                 c.hitboxes.append(((x, y, CELL, CELL), ('slot', side, slot)))
@@ -344,21 +486,18 @@ class LabPrep:
                 c.button((x, y + CELL + 4, 28, 24), '-', ('level', side, slot, -1))
                 c.text((x + CELL // 2, y + CELL + 16), f'Lv{entry[1]}', 16, GOLD, 'mm', 2, CELL - 58)
                 c.button((x + CELL - 28, y + CELL + 4, 28, 24), '+', ('level', side, slot, 1))
-        # 下方四块面板：等宽间隔，左右边距与牌组对齐。
-        top, height = HEADER_H + 334, H - HEADER_H - 334 - 34
-        left, right = DECK_X, DECK_X + 10 * CELL + 9 * CELL_GAP
-        widths = (270, 330, 250)
+        # 下方四块面板：地图、控制、优势、预设；左右边距与牌组对齐。
+        widths = (290, 300, 230)
         gap = 10
-        last = right - left - sum(widths) - 3 * gap
-        xs = [left]
+        xs = [DECK_X]
         for w in widths:
             xs.append(xs[-1] + w + gap)
-        boxes = list(zip(xs, list(widths) + [last]))
-        self.draw_settings(boxes[0], top, height)
-        self.draw_control(boxes[1], top, height)
-        self.draw_advantage(boxes[2], top, height)
-        self.draw_presets(boxes[3], top, height)
-        c.text((W // 2, H - 17), T(p, 'hint'), 12, GRAY, 'mm', 1, W - 40)
+        boxes = list(zip(xs, list(widths) + [DECK_X + DECK_W - xs[-1]]))
+        self.draw_map(boxes[0], PANEL_TOP, PANEL_H)
+        self.draw_control(boxes[1], PANEL_TOP, PANEL_H)
+        self.draw_advantage(boxes[2], PANEL_TOP, PANEL_H)
+        self.draw_presets(boxes[3], PANEL_TOP, PANEL_H)
+        c.text((W // 2, H - 12), T(p, 'hint'), 12, GRAY, 'mm', 1, W - 40)
 
     def stepper(self, x, y, w, value, minus, plus):
         c = self.c
@@ -366,38 +505,77 @@ class LabPrep:
         c.text((x + w / 2, y + 14), value, 15, GOLD, 'mm', 2, w - 68)
         c.button((x + w - 30, y, 30, 28), '>', plus)
 
-    def draw_settings(self, box, top, height):
+    def draw_map(self, box, top, height):
+        """地图：原生缩略图（区域缩略图文件中的小关图块，2 倍）、区域名与小关编号、世界与小关两个选择器。"""
         lab, c, p = self.lab, self.c, self.lab.p
         x, w = box
-        c.panel((x, top, w, height), T(p, 'battle_settings'))
-        rows = []
-        for side in ('player', 'enemy'):
-            value = int(lab.config.get(side + '_base_level', 0))
-            shown = T(p, 'max_full') if lab.full_control else ('MAX' if value >= 10 else f'Lv{value}')
-            rows.append((T(p, side + '_base'), shown, ('base', side, -1), ('base', side, 1)))
-        rows.append((T(p, 'map'), str(lab.config['stage_id']), ('stage', -1), ('stage', 1)))
-        for index, (title, value, minus, plus) in enumerate(rows):
-            y = top + 44 + index * 68
-            c.text((x + 14, y + 10), title, 15, WHITE, 'lm', 2, w - 28)
-            self.stepper(x + 14, y + 26, w - 28, value, minus, plus)
+        c.panel((x, top, w, height), T(p, 'map'))
+        worlds, wi, si = self.stage_position()
+        tw, th = 128 * THUMB_SCALE, 56 * THUMB_SCALE
+        tx, ty = x + (w - tw) // 2, top + 36
+        c.draw.rectangle((tx - 3, ty - 3, tx + tw + 2, ty + th + 2), fill=(12, 12, 12, 255), outline=(150, 135, 100, 255),
+                         width=2)
+        if not worlds:
+            c.text((x + w / 2, ty + th / 2), str(lab.config.get('stage_id')), 16, GRAY, 'mm')
+            return
+        world, stages = worlds[wi]
+        entry = stages[si]
+        image = self.thumbnail(entry)
+        if image is not None:
+            c.paste(image, (tx + (tw - image.width) // 2, ty + (th - image.height) // 2))
+        c.text((x + w / 2, ty + th + 14), f"{entry['area_name']}  {entry['area'] + 1}-{entry['stage'] + 1}",
+               15, WHITE, 'mm', 2, w - 20)
+        self.stepper(x + 14, ty + th + 28, w - 28, T(p, f'world_{world}'), ('world', -1), ('world', 1))
+        self.stepper(x + 14, ty + th + 60, w - 28, f"{entry['area'] + 1}-{entry['stage'] + 1}   ({si + 1}/{len(stages)})",
+                     ('stage', -1), ('stage', 1))
 
     def draw_control(self, box, top, height):
+        """控制：完全控制、双方 AI（开/关 + 段位选择器）、双方自动绝招。"""
         lab, c, p = self.lab, self.c, self.lab.p
         x, w = box
         c.panel((x, top, w, height), T(p, 'control'))
         for index, attr in enumerate(('full_control', 'player_ai', 'player_auto_special', 'enemy_ai',
                                       'enemy_auto_special')):
-            y = top + 44 + index * 40
+            y = top + 42 + index * 39
             on = getattr(lab, attr)
+            if attr in ('player_ai', 'enemy_ai'):
+                side = attr[:-3]
+                c.text((x + 14, y + 15), T(p, side + '_ai_short'), 15, WHITE, 'lm', 2, 64)
+                c.button((x + 82, y, 52, 30), T(p, 'on' if on else 'off'), ('toggle', attr), 16, 'on' if on else 'off')
+                self.tier_selector((x + 142, y, w - 156, 30), side, on)
+                continue
             c.text((x + 14, y + 15), T(p, attr), 15, WHITE, 'lm', 2, w - 110)
             c.button((x + w - 86, y, 72, 30), T(p, 'on' if on else 'off'), ('toggle', attr), 16, 'on' if on else 'off')
+
+    def tier_color(self, name, plate):
+        if name not in self.tier_colors:
+            self.tier_colors[name] = readable(TIER_COLORS[name], plate)
+        return self.tier_colors[name]
+
+    def tier_selector(self, rect, side, active):
+        """AI 段位选择器：原生左右按钮与压暗的原生按钮底板，段位名为英文大写、段位色加黑色描边；
+        底板下沿以段位原色画细色带。AI 关闭时文字为灰色（段位保留，不生效）。"""
+        from PIL import ImageEnhance
+        c, lab = self.c, self.lab
+        x, y, w, h = rect
+        name = lab.ai_tier(side)[0]
+        c.button((x, y, 24, h), '<', ('tier', side, -1))
+        c.button((x + w - 24, y, 24, h), '>', ('tier', side, 1))
+        px, pw = x + 27, w - 54
+        plate = ImageEnhance.Brightness(self.skin.nine(TIER_PLATE, pw, h, 6)).enhance(TIER_PLATE_DIM)
+        c.paste(plate, (px, y))
+        color = self.tier_color(name, plate.convert('RGB').resize((1, 1)).getpixel((0, 0)))
+        # AI 关闭时色带降低饱和度并压暗（与灰色文字一致），避免仅凭色带误判 AI 已开启。
+        band = TIER_COLORS[name] if active else desaturate(TIER_COLORS[name])
+        c.draw.rectangle((px + 4, y + h - 4, px + pw - 5, y + h - 3), fill=band + (255,))
+        c.text((px + pw / 2, y + h / 2 - 1), name, 15, color if active else GRAY, 'mm', 2, pw - 8)
 
     def draw_advantage(self, box, top, height):
         """优势设定：原生关卡强化级数（BattleObjectManager+72 起每队两个浮点数，生命/攻击各 ×(1+0.2×级数)）。"""
         lab, c, p = self.lab, self.c, self.lab.p
         x, w = box
         c.panel((x, top, w, height), T(p, 'advantage'))
-        y = top + 44
+        y = top + 42
         for side in ('player', 'enemy'):
             c.text((x + 14, y + 10), T(p, 'adv_' + side), 15, BLUE if side == 'player' else RED, 'lm', 2, w - 28)
             y += 24
@@ -415,13 +593,13 @@ class LabPrep:
         c.panel((x, top, w, height), T(p, 'presets'))
         bw = (w - 28 - 70 - 8) // 2
         for index, name in enumerate('ABC'):
-            y = top + 44 + index * 40
+            y = top + 42 + index * 40
             c.text((x + 14, y + 15), T(p, 'preset', name), 15, WHITE, 'lm', 2, 66)
             c.button((x + 84, y, bw, 30), T(p, 'save'), ('preset_save', name), 14)
             c.button((x + 84 + bw + 8, y, bw, 30), T(p, 'load'), ('preset_load', name), 14, 'light')
-        c.button((x + 14, top + 44 + 3 * 40, w - 28, 30), T(p, 'history'), ('history',), 15)
+        c.button((x + 14, top + 42 + 3 * 40, w - 28, 30), T(p, 'history'), ('history',), 15)
         if self.message:
-            c.text((x + w / 2, top + 44 + 4 * 40 + 16), self.message, 14, GOLD, 'mm', 2, w - 28)
+            c.text((x + w / 2, top + 42 + 4 * 40 + 16), self.message, 14, GOLD, 'mm', 2, w - 28)
 
     def filtered(self):
         tab = TABS[self.tab][1]
@@ -436,25 +614,26 @@ class LabPrep:
         c, p = self.c, self.lab.p
         side, slot = self.picker
         c.header(T(p, 'picker_title', T(p, 'side_' + side), slot + 1))
-        c.icon_button((W - 100, 4, 75, 60), 'back', ('back',))
-        c.button((W - 260, 18, 140, 32), T(p, 'set_empty'), ('pick', None), 16, 'light')
+        self.header_buttons(start=False)
+        c.button((W - 10 - ICON_W - 14 - 140, ICON_Y + (ICON_H - 32) // 2, 140, 32), T(p, 'set_empty'),
+                 ('pick', None), 16, 'light')
         tab_w = (W - 48 - 7 * 8) // 8
         for index, (label, _) in enumerate(TABS):
             x = 24 + index * (tab_w + 8)
             down = c.is_pressed(('tab', index))
             part = self.skin.nine(TAB_ON if index == self.tab else TAB_OFF, tab_w, 33, 6)
-            c.paste(self.skin.darken(part) if down else part, (x, 76 + (2 if down else 0)))
+            c.paste(self.skin.darken(part) if down else part, (x, PICK_TABS_Y + (2 if down else 0)))
             active = index == self.tab
-            c.text((x + tab_w / 2, 93 + (2 if down else 0)), T(p, label), 16, DARK if active else WHITE, 'mm',
-                   0 if active else 2, tab_w - 10)
-            c.hitboxes.append(((x, 76, tab_w, 33), ('tab', index)))
+            c.text((x + tab_w / 2, PICK_TABS_Y + 17 + (2 if down else 0)), T(p, label), 16, DARK if active else WHITE,
+                   'mm', 0 if active else 2, tab_w - 10)
+            c.hitboxes.append(((x, PICK_TABS_Y, tab_w, 33), ('tab', index)))
         units = self.filtered()
         per_page = PICK_COLS * PICK_ROWS
         pages = max(1, (len(units) + per_page - 1) // per_page)
         self.picker_page = min(self.picker_page, pages - 1)
         for index, (uid, name, faction, community) in enumerate(units[self.picker_page * per_page:][:per_page]):
             col, row = index % PICK_COLS, index // PICK_COLS
-            x, y = PICK_X + col * PICK_PITCH, 122 + row * (PICK_CELL + 32)
+            x, y = PICK_X + col * PICK_PITCH, PICK_TABS_Y + 45 + row * (PICK_CELL + 32)
             self.cell((x, y, PICK_CELL), uid, side)
             if c.is_pressed(('pick', uid)):
                 c.paste(self.skin.darken(self.skin.scaled(CELLS['player' if side == 'player' else 'enemy'],
@@ -473,23 +652,23 @@ class LabPrep:
     def draw_history(self):
         c, p = self.c, self.lab.p
         c.header(T(p, 'history_title'))
-        c.icon_button((W - 100, 4, 75, 60), 'back', ('back',))
+        self.header_buttons(start=False)
         entries = self.lab.read_history()[-12:][::-1]
         if not entries:
             c.text((W / 2, H / 2), T(p, 'no_history'), 20, GRAY, 'mm')
         for index, entry in enumerate(entries):
-            y = HEADER_H + 12 + index * 52
+            y = HEADER_H + 10 + index * 49
             winner = entry.get('winner')
-            c.paste(self.skin.nine(ROW_STYLES.get(winner, ROW_STYLES[None]), W - 48, 48, 8), (24, y))
+            c.paste(self.skin.nine(ROW_STYLES.get(winner, ROW_STYLES[None]), W - 48, 45, 8), (24, y))
             result = T(p, {'player': 'win_player', 'enemy': 'win_enemy'}.get(winner, 'aborted'))
-            c.text((40, y + 24), T(p, 'history_row', entry.get('time', ''), result, entry.get('seconds', 0),
-                                   entry.get('stage_id')), 16, WHITE, 'lm', 2, 380)
+            c.text((40, y + 22), T(p, 'history_row', entry.get('time', ''), result, entry.get('seconds', 0),
+                                   self.lab.stage_label(entry.get('stage_id'))), 16, WHITE, 'lm', 2, 380)
             for side_index, key in enumerate(('player_units', 'enemy_units')):
                 for i, uid in enumerate([u for u in entry.get(key, []) if u][:10]):
                     icon = self.skin.icon(uid, 36 / 50)
                     if icon is not None:
                         c.paste(icon, (430 + side_index * 410 + i * 38 + (36 - icon.width) // 2,
-                                       y + 6 + (36 - icon.height) // 2))
+                                       y + 4 + (36 - icon.height) // 2))
 
     def close_resources(self):
         for overlay in (self.overlay, self.press_overlay):

@@ -11,11 +11,17 @@ W, H = 1280, 720
 LANGUAGE_OFFSET = 0x3d64
 SE_DECIDE, SE_CLOSE = 13, 8
 BGM_MISSION, BGM_STAGE = 135, 103
+BGM_MENU = 101                    # SC_MainMenuLoop 状态 0 在闸门结束后请求的主菜单 BGM
 WHITE, GOLD, GRAY, DARK = (240, 240, 240, 255), (255, 214, 90, 255), (165, 165, 165, 255), (40, 30, 20, 255)
 BLUE, RED = (150, 210, 255, 255), (255, 150, 140, 255)
 
 # 原生素材矩形（图集, (x, y, w, h)），按不透明像素的连通区域量得。
-HEADER = ('menuparts.obm', (0, 0, 568, 67))                    # 金属标题栏
+# 顶部标题栏：ConvMenuParts 第 0 项（原生各菜单顶栏，含“METAL SLUG DEFENSE”小字与下沿铆钉条）。
+# 原生以 2 倍绘制于 960 基准画面（16:9 时宽 1137.8），在 1280×720 画布上为等比 2.25 倍，宽 1278。
+# 第 1 项 (0, 0, 568, 67) 是底部按钮栏的底板，不用作顶栏。
+HEADER = ('menuparts.obm', (0, 68, 568, 51))
+HEADER_SCALE = 2.25
+HEADER_H = round(51 * HEADER_SCALE)                            # 115
 PANEL = ('popup.obm', (0, 0, 300, 150))                        # 弹窗底板
 BOARD = ('pause_window.obm', (15, 58, 290, 212))               # 暂停窗口米色面板（不含烙印标题）
 BRICK = ('pause_menu.obm', (0, 0, 512, 320))                   # 暂停背景砖墙
@@ -23,7 +29,19 @@ BUTTONS = {'normal': ('menuparts.obm', (191, 144, 190, 23)),   # 棕
            'light': ('menuparts.obm', (191, 120, 190, 23)),    # 米色
            'on': ('menuparts.obm', (191, 168, 90, 23)),        # 绿
            'off': ('menuparts.obm', (282, 168, 90, 23))}       # 红
-ICON_BUTTONS = {'ok': ('menuparts.obm', (813, 170, 60, 48)), 'back': ('menuparts.obm', (935, 170, 60, 48))}
+ICON_BUTTONS = {'ok': ('menuparts.obm', (813, 170, 60, 48)), 'back': ('menuparts.obm', (935, 170, 60, 48))}  # ConvMenuParts 36/30
+# 原生图标按钮（GT_CockpitButtonDraw 0x2003bc）：按下期间先画 ConvMenuParts 79 青色框（锚点 3,3），再画图标，
+# 最后画 37 三灯（锚点 −19,−2）；按钮与上述部件按同一倍率绘制。
+# 准备界面顶栏按用户确认的比例等比缩小为 1.5 倍（按钮 90×72，青色框 99×81），使按钮与按下光效都位于顶栏深色区内：
+# 顶栏原图第 3–40 行为深色区、第 41 行起为铆钉条，2.25 倍后为画布 y 7–92。
+ICON_SCALE = 1.5
+HEADER_DARK = (round(3 * 2.25), round(41 * 2.25))
+ICON_PRESS_FRAME = (('menuparts.obm', (563, 155, 66, 54)), (3, 3))
+ICON_PRESS_LAMPS = (('menuparts.obm', (221, 247, 22, 6)), (-19, -2))
+# AI 段位文字色（参考 APEX 段位色系）。实际绘制时在深色底板上核对亮度对比，不足 4.5 的只提高文字亮度（色相不变）。
+TIER_COLORS = {'ROOKIE': (0x8A, 0x81, 0x78), 'BRONZE': (0xB8, 0x73, 0x33), 'SILVER': (0xC9, 0xCE, 0xD6),
+               'GOLD': (0xE8, 0xC0, 0x4A), 'PLATINUM': (0x4F, 0xC3, 0xC9), 'DIAMOND': (0x5B, 0xA8, 0xF5),
+               'MASTER': (0xA3, 0x5C, 0xF0), 'PREDATOR': (0xE0, 0x30, 0x2E)}
 TAB_ON, TAB_OFF = ('menuparts.obm', (0, 120, 190, 33)), ('menuparts.obm', (0, 154, 190, 33))
 ROW_STYLES = {None: TAB_OFF, 'player': TAB_OFF, 'enemy': ('menuparts.obm', (0, 222, 190, 33))}
 CELLS = {'player': ('unit.obm', (362, 151, 50, 50)), 'enemy': ('unit.obm', (428, 125, 50, 50)),
@@ -46,10 +64,21 @@ TEXT = {
     'enemy_base': ('敵方據點等級', '敌方据点等级', '敵軍拠点レベル', 'ENEMY BASE LV'),
     'max_full': ('MAX（完全控制）', 'MAX（完全控制）', 'MAX（フルコントロール）', 'MAX (FULL CONTROL)'),
     'map': ('地圖', '地图', 'マップ', 'MAP'),
+    'world_0': ('地圖 1', '地图 1', 'マップ 1', 'MAP 1'), 'world_1': ('地圖 2', '地图 2', 'マップ 2', 'MAP 2'),
+    'world_2': ('地圖 3', '地图 3', 'マップ 3', 'MAP 3'),
+    'world_9': ('裏地圖 1', '里地图 1', '裏マップ 1', 'EX MAP 1'),
+    'world_10': ('裏地圖 2', '里地图 2', '裏マップ 2', 'EX MAP 2'),
+    'world_11': ('裏地圖 3', '里地图 3', '裏マップ 3', 'EX MAP 3'),
+    'stage_no': ('{} {}-{}', '{} {}-{}', '{} {}-{}', '{} {}-{}'),
+    'base_short': ('據點', '据点', '拠点', 'BASE'),
+    'copy_enemy': ('複製敵方', '复制敌方', '敵軍をコピー', 'COPY ENEMY'),
+    'copy_player': ('複製我方', '复制我方', '自軍をコピー', 'COPY YOURS'),
     'control': ('控制', '控制', '操作', 'CONTROL'),
     'full_control': ('完全控制（無冷卻・AP 無限）', '完全控制（无冷却 · AP 无限）', 'フルコントロール（CTなし・AP無限）',
                      'FULL CONTROL (NO CD · ∞ AP)'),
     'player_ai': ('我方 AI 自動出兵', '我方 AI 自动出兵', '自軍 AI 自動出撃', 'YOUR AI DEPLOY'),
+    'player_ai_short': ('我方 AI', '我方 AI', '自軍 AI', 'YOUR AI'),
+    'enemy_ai_short': ('敵方 AI', '敌方 AI', '敵軍 AI', 'ENEMY AI'),
     'player_auto_special': ('我方自動施放絕招', '我方自动释放绝招', '自軍 必殺技自動', 'YOUR AUTO SPECIAL'),
     'enemy_ai': ('敵方 AI 自動出兵', '敌方 AI 自动出兵', '敵軍 AI 自動出撃', 'ENEMY AI DEPLOY'),
     'enemy_auto_special': ('敵方自動施放絕招', '敌方自动释放绝招', '敵軍 必殺技自動', 'ENEMY AUTO SPECIAL'),
@@ -81,8 +110,8 @@ TEXT = {
     'no_history': ('尚無紀錄', '暂无记录', '記録なし', 'No records'),
     'win_player': ('我方勝', '我方胜', '自軍勝利', 'YOU WIN'), 'win_enemy': ('敵方勝', '敌方胜', '敵軍勝利', 'ENEMY WINS'),
     'aborted': ('中止', '中止', '中断', 'ABORTED'),
-    'history_row': ('{}   {}   {:.0f} 秒   地圖 {}', '{}   {}   {:.0f} 秒   地图 {}', '{}   {}   {:.0f} 秒   マップ {}',
-                    '{}   {}   {:.0f}s   MAP {}'),
+    'history_row': ('{}   {}   {:.0f} 秒   {}', '{}   {}   {:.0f} 秒   {}', '{}   {}   {:.0f} 秒   {}',
+                    '{}   {}   {:.0f}s   {}'),
     'side_player': ('我方', '我方', '自軍', 'YOUR'), 'side_enemy': ('敵方', '敌方', '敵軍', 'ENEMY'),
     'menu_title': ('LAB 選單', 'LAB 菜单', 'LAB メニュー', 'LAB MENU'),
     'menu_paused': ('戰鬥已暫停', '战斗已暂停', 'バトル一時停止中', 'PAUSED'),
@@ -90,7 +119,7 @@ TEXT = {
     'exit_lab': ('返回準備畫面', '返回准备界面', '準備画面へ戻る', 'BACK TO SETUP'),
     'resume': ('繼續', '继续', '続ける', 'RESUME'),
     'fb_busy': ('戰鬥中無法啟動 LAB', '战斗中无法启动 LAB', 'バトル中は LAB を開始できません', 'Cannot start LAB during a battle'),
-    'fb_start': ('戰鬥開始・地圖 {}', '战斗开始 · 地图 {}', 'バトル開始・マップ {}', 'Battle start · map {}'),
+    'fb_start': ('戰鬥開始・{}', '战斗开始 · {}', 'バトル開始・{}', 'Battle start · {}'),
     'fb_back': ('已返回準備畫面', '已返回准备界面', '準備画面に戻りました', 'Back to setup'),
     'fb_back_menu': ('已返回選單', '已返回菜单', 'メニューに戻りました', 'Back to menu'),
     'fb_failed': ('{} 失敗：{}', '{} 失败：{}', '{} 失敗：{}', '{} failed: {}'),
@@ -152,18 +181,27 @@ def play_bgm(p, sound):
         p.log('LAB_BGM_ERROR', sound, type(error).__name__, str(error))
 
 
+def has_hangul(text):
+    """含韩文字符（音节、字母、兼容字母）。游戏语言为韩语（app+0x3d64 = 2）时单位名称与区域名为韩文。"""
+    return any('\uac00' <= ch <= '\ud7a3' or '\u1100' <= ch <= '\u11ff' or '\u3130' <= ch <= '\u318f'
+               for ch in text)
+
+
 def fonts():
+    """font(字号, hangul=False)。界面主字体（微软正黑体等）不含韩文字形，含韩文的字符串改用 Malgun Gothic。"""
     from PIL import ImageFont
     folder = Path(os.environ['SystemRoot']) / 'Fonts'
     path = next((folder / n for n in ('msjhbd.ttc', 'msjh.ttc', 'msyhbd.ttc', 'msyh.ttc', 'msgothic.ttc')
                  if (folder / n).is_file()), None)
+    korean = next((folder / n for n in ('malgunbd.ttf', 'malgun.ttf') if (folder / n).is_file()), None)
     cache = {}
 
-    def font(size):
-        # 按字号缓存；字体文件只在首次使用该字号时载入。
-        if size not in cache:
-            cache[size] = ImageFont.truetype(str(path), size)
-        return cache[size]
+    def font(size, hangul=False):
+        # 按字号与字体缓存；字体文件只在首次使用时载入。
+        key = (size, bool(hangul and korean))
+        if key not in cache:
+            cache[key] = ImageFont.truetype(str(korean if key[1] else path), size)
+        return cache[key]
     return font
 
 
@@ -175,22 +213,29 @@ class Canvas:
         self.image, self.skin, self.font, self.pressed = image, skin, font, pressed
         self.draw = ImageDraw.Draw(image)
         self.hitboxes = []
+        self.icons = {}                  # 命令 → (x, y, 图标)，供按下效果叠加
+
+    def face(self, value):
+        hangul = has_hangul(value)
+        return lambda size: self.font(size, hangul)
 
     def fit_size(self, value, size, width, minimum=10):
         """超出宽度时先缩小字号（不低于 minimum），仍超出时以“…”截断。"""
-        while size > minimum and self.font(size).getlength(value) > width:
+        face = self.face(value)
+        while size > minimum and face(size).getlength(value) > width:
             size -= 1
         return size
 
     def text(self, xy, value, size=16, fill=WHITE, anchor='la', stroke=2, width=None):
+        face = self.face(value)
         if width is not None:
             size = self.fit_size(value, size, width)
-            font = self.font(size)
+            font = face(size)
             if font.getlength(value) > width:
                 while value and font.getlength(value + '…') > width:
                     value = value[:-1]
                 value += '…'
-        self.draw.text(xy, value, font=self.font(size), fill=fill, anchor=anchor,
+        self.draw.text(xy, value, font=face(size), fill=fill, anchor=anchor,
                        stroke_width=stroke, stroke_fill=(0, 0, 0, 255))
 
     def paste(self, part, xy):
@@ -212,12 +257,13 @@ class Canvas:
         self.text((x + w / 2, y + h / 2 + oy), label, size, DARK if light else WHITE, 'mm', 0 if light else 2, w - 8)
         self.hitboxes.append((rect, command))
 
-    def icon_button(self, rect, part_name, command):
-        x, y, w, h = rect
-        part = self.skin.scaled(ICON_BUTTONS[part_name], w, h)
-        down = self.is_pressed(command)
-        self.paste(self.skin.darken(part) if down else part, (x, y + (2 if down else 0)))
-        self.hitboxes.append((rect, command))
+    def icon_button(self, origin, part_name, command):
+        """原生尺寸图标按钮（60×48 × 2.25）。按下效果由 icon_press_image 叠加（青色框与三灯，不压暗、不下移）。"""
+        x, y = origin
+        w, h = round(60 * ICON_SCALE), round(48 * ICON_SCALE)
+        self.paste(self.skin.scaled(ICON_BUTTONS[part_name], w, h), (x, y))
+        self.hitboxes.append(((x, y, w, h), command))
+        self.icons[command] = (x, y, part_name)
 
     def panel(self, rect, title=None):
         x, y, w, h = rect
@@ -226,8 +272,43 @@ class Canvas:
             self.text((x + 14, y + 20), title, 18, GOLD, 'lm', 2, w - 28)
 
     def header(self, title):
-        self.paste(self.skin.nine(HEADER, W, 67, 26), (0, 0))
-        self.text((28, 35), title, 26, GOLD, 'lm', 3, 700)
+        """原生顶栏等比放大（不拉伸、不九宫格），水平居中；标题写在“METAL SLUG DEFENSE”小字下方。"""
+        w = round(HEADER[1][2] * HEADER_SCALE)
+        self.paste(self.skin.scaled(HEADER, w, HEADER_H), ((W - w) // 2, 0))
+        self.text((44, 60), title, 30, GOLD, 'lm', 3, 640)
+
+
+def icon_press_image(skin, background, x, y, part_name):
+    """按下状态的原生图标按钮：背景裁切 + 79 青色框 + 图标 + 37 三灯。返回 (图像, 左上角)。"""
+    s = ICON_SCALE
+    (frame, (fx, fy)), (lamps, (lx, ly)) = ICON_PRESS_FRAME, ICON_PRESS_LAMPS
+    left, top = x - round(fx * s), y - round(fy * s)
+    fw, fh = round(frame[1][2] * s), round(frame[1][3] * s)
+    out = background.crop((left, top, left + fw, top + fh)).copy()
+    out.alpha_composite(skin.scaled(frame, fw, fh), (0, 0))
+    out.alpha_composite(skin.scaled(ICON_BUTTONS[part_name], round(60 * s), round(48 * s)), (x - left, y - top))
+    out.alpha_composite(skin.scaled(lamps, round(lamps[1][2] * s), round(lamps[1][3] * s)),
+                        (x - round(lx * s) - left, y - round(ly * s) - top))
+    return out, (left, top)
+
+
+def luminance(rgb):
+    def channel(v):
+        v /= 255
+        return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+    r, g, b = (channel(v) for v in rgb[:3])
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def readable(color, plate, ratio=4.5):
+    """在底板色上达到亮度对比 ratio 的文字色：不足时向白色混合（保持色相方向），返回 RGBA。"""
+    base = luminance(plate)
+    for step in range(0, 101):
+        t = step / 100
+        rgb = tuple(round(c + (255 - c) * t) for c in color[:3])
+        if (luminance(rgb) + 0.05) / (base + 0.05) >= ratio:
+            return rgb + (255,)
+    return (255, 255, 255, 255)
 
 
 class Skin:
@@ -245,10 +326,14 @@ class Skin:
             community = Path(self.lab.root) / 'community_content' / name
             path = community if community.is_file() else Path(probe.RESOURCE_ROOT) / probe.PKG / name
             raw = path.read_bytes()
-            if raw[:4] != b'OI\x01\x20':
-                raise ValueError(f'{name}：不是 32 位 RGBA 图集')
             w, h = struct.unpack_from('<HH', raw, 4)
-            self.atlases[name] = Image.frombytes('RGBA', (w, h), raw[8:8 + w * h * 4])
+            if raw[:4] == b'OI\x01\x20':
+                self.atlases[name] = Image.frombytes('RGBA', (w, h), raw[8:8 + w * h * 4])
+            elif raw[:3] == b'OI\x00' and raw[3] in (0x18, 0x20) and len(raw) == 8 + w * h * 3:
+                # 关卡缩略图等无透明直接色图集（OI 种类 0）：每像素 3 字节 RGB。
+                self.atlases[name] = Image.frombytes('RGB', (w, h), raw[8:8 + w * h * 3]).convert('RGBA')
+            else:
+                raise ValueError(f'{name}：不支持的图集格式 {raw[:4]!r}')
         return self.atlases[name]
 
     def crop(self, part):

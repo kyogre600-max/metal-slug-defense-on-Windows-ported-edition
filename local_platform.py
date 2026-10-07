@@ -23,6 +23,11 @@ def string_array(p,values):
 
 def handle_java_call(p,method,arg):
     name=method[1]
+    if name=='showEndDialogView':
+        # 原生标题画面 Back 请求 Android 退出确认框；Windows 版直接按关闭窗口的正常流程结束。
+        p.log('LOCAL_EXIT_REQUEST',name,p.frame)
+        if p.stop_event is not None:p.stop_event.set()
+        return True,0
     if name in ('purchasesInit','purchasesFinalize'):
         p.local_store_state=2 if name=='purchasesInit' else 0
         p.log('LOCAL_MEDAL_STORE',name)

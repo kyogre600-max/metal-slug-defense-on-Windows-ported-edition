@@ -9,6 +9,7 @@ sys.path.insert(0,str(RUNTIME_PACKAGES if RUNTIME_PACKAGES.is_dir() else ROOT.pa
 import glfw
 from probe import Probe, ProbeCancelled
 from window_layout import game_point, fit_rect, WIDTH, HEIGHT
+from app_icon import WindowIcon, set_app_user_model_id
 
 from branding import load as load_branding
 TITLE=load_branding(ROOT)['application_name']
@@ -40,6 +41,7 @@ class Player:
         self.status_file=ROOT/('ui_test_status.json' if self_test else 'player_status.json')
         self.log_name='ui_test.log' if self_test else 'player.log'
         self.window=None
+        self.app_icon=None
         self.probe=None
         self.worker=None
         self.mutex=None
@@ -215,7 +217,9 @@ class Player:
                 p.step_frame()
                 self.frames=p.frame
                 if p.frame==140:
-                    p.graphics.capture(ROOT/('ui_test_title.png' if self.self_test else 'player_title.png'))
+                    # 标题截图属于诊断输出：窗口最小化（帧缓冲 0×0）等情形下跳过，不中止运行。
+                    try:p.graphics.capture(ROOT/('ui_test_title.png' if self.self_test else 'player_title.png'))
+                    except Exception as error:p.log('WINDOW_TITLE_CAPTURE_SKIPPED',type(error).__name__,str(error))
                     self.ready=True;p.log('WINDOW_READY',self.hwnd)
                 if self.capture_requested:
                     self.capture_requested=False
@@ -281,6 +285,7 @@ class Player:
         return True
 
     def run(self):
+        set_app_user_model_id()
         if not self.acquire_instance():return 0
         if not glfw.init():raise RuntimeError('GLFW could not initialize a Windows window')
         try:
@@ -297,6 +302,7 @@ class Player:
             if not self.window:raise RuntimeError('Could not create the game window')
             glfw.set_window_pos(self.window,x,y)
             self.hwnd=glfw.get_win32_window(self.window)
+            self.app_icon=WindowIcon(self.hwnd,ROOT)
             self.framebuffer_size=glfw.get_framebuffer_size(self.window)
             glfw.set_mouse_button_callback(self.window,self.mouse_button)
             glfw.set_cursor_pos_callback(self.window,self.cursor)
@@ -304,6 +310,7 @@ class Player:
             glfw.set_window_iconify_callback(self.window,lambda w,icon:self.__setattr__('minimized',bool(icon)))
             glfw.set_key_callback(self.window,self.key)
             glfw.set_framebuffer_size_callback(self.window,lambda w,x,y:self.__setattr__('framebuffer_size',(x,y)))
+            glfw.set_window_content_scale_callback(self.window,lambda w,x,y:self.app_icon.refresh())
             if not self.self_test:glfw.show_window(self.window)
             self.write_status('loading')
             self.worker=threading.Thread(target=self.game_thread,name='MSD game runtime')
@@ -341,6 +348,7 @@ class Player:
                 if self.window:glfw.hide_window(self.window)
                 while self.worker.is_alive():
                     glfw.poll_events();self.worker.join(0.05)
+            if self.app_icon:self.app_icon.close()
             if self.window:glfw.destroy_window(self.window)
             glfw.terminate()
             if self.mutex:

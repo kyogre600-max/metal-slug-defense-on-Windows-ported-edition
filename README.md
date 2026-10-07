@@ -8,6 +8,10 @@ This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds 
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+**Update 1.47.1**
+
+- Added AI BOT difficulty levels for use in LAB.
+
 **Update 1.47.0**
 
 - Added an independent fully unlocked maximum-level save profile, including all available units, maximum army and base upgrades, and all POW effects from Maps 1, 2, and 3.
@@ -63,13 +67,15 @@ Mouse controls remain available. Deployment and special attacks follow the game'
 
 Open the [project page](https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition), click the green **Code** button, and select **Download ZIP**. Extract the entire archive, open the extracted project folder, and run **MSD WINDOWS S1XLV.exe**. Windows 10/11 x64 is required; the runtime is bundled.
 
+The normal, all-units Lv1, fully unlocked maximum-level, and LAB EXE launchers share the supplied application icon. Both original 512×512 PNG designs and a 192×192 PNG version are retained under `custom_content/`; the active design is `LOGOAPP2.png`. [Windows icon resources and launchers](docs/WINDOWS_APP_ICON_2026.10.08.md).
+
 The package starts with an initial save. Units can be purchased with medals, and the original daily and event reward paths are preserved. Save files are created in `play_save/`; existing personal progress is excluded from the distributed package. Full campaign coverage and long-term stability remain under evaluation.
 
 To update an existing installation, close the game, back up all existing `play_save*/` folders, extract the new package into a separate folder, and copy those complete save folders into it. The existing save format remains compatible; initial seeds are used only when the corresponding save does not exist.
 
 ### Optional all-units Lv1 save
 
-Run **Start_MSD_All_Units_Level1.vbs** from the extracted game folder. This entry uses the same formal game core and creates an independent save in `play_save_all_units_level1/` on first launch. The normal EXE continues to use `play_save/`; an existing local maximum-level launcher retains its separate save.
+Run **Start_MSD_All_Units_Level1.exe** from the extracted game folder; the corresponding VBS entry remains available. This entry uses the same formal game core and creates an independent save in `play_save_all_units_level1/` on first launch. The normal EXE continues to use `play_save/`; an existing local maximum-level launcher retains its separate save.
 
 The preset owns all 399 original units and the 13 currently registered playable community units at **Lv1**. All nine upgrades under the native army/base customization menu also start at **Lv1**. Maps retain initial progress, no stages are cleared and no prisoners are collected; later stages and worlds require progression. Currency, items and the initial deck follow the formal initial save. World progression and faction-core level limits remain active.
 
@@ -77,7 +83,7 @@ Subsequent launches preserve upgrades, map progress and settings. To use this pr
 
 ### Optional fully unlocked maximum-level save
 
-Run **Start_MSD_All_Unlocked_Max_Level.vbs**. On first launch, this entry creates `play_save_all_unlocked_max_level/` with all **399 original unit records (UnitIDs 1–399) and 17 playable community units at Lv40**, all **nine army/base upgrades at Lv30**, and all six faction cores owned. Maps 1, 2, and 3 have their stages unlocked and cleared, with all **48 area prisoner rewards at 100%**. Historical Event progress follows the initial profile.
+Run **Start_MSD_All_Unlocked_Max_Level.exe**; the corresponding VBS entry remains available. On first launch, this entry creates `play_save_all_unlocked_max_level/` with all **399 original unit records (UnitIDs 1–399) and 17 playable community units at Lv40**, all **nine army/base upgrades at Lv30**, and all six faction cores owned. Maps 1, 2, and 3 have their stages unlocked and cleared, with all **48 area prisoner rewards at 100%**. Historical Event progress follows the initial profile.
 
 This entry shares the current formal core and preserves its independent progress on subsequent launches. Existing normal and maximum-level saves retain their own directories. To migrate this profile, copy the entire `play_save_all_unlocked_max_level/` folder. Preset files are distributed under `game_data/all_unlocked_max_level/`; implementation and validation scope are recorded in [the profile report](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md).
 
@@ -94,6 +100,10 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+**1.47.1 更新**
+
+- 加入了不同等级的AI BOT以在LAB中使用
 
 **1.47.0 更新**
 
@@ -150,13 +160,15 @@ LAB 功能说明：[LAB 修复记录](docs/LAB_BUGFIX_2026.10.07.md)、[LAB 菜�
 
 在[项目主页](https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition)点击绿色 **Code** 按钮，选择 **Download ZIP** 下载压缩包。完整解压后，打开解压得到的项目文件夹，启动 **MSD WINDOWS S1XLV.exe**。适用于 Windows 10/11 x64，运行依赖已随包提供。
 
+普通、全兵种 Lv1、全解锁满级及 LAB 的 EXE 入口统一使用用户提供的应用图标。两份 512×512 PNG 原稿与 192×192 PNG 版本保留在 `custom_content/`，当前采用 `LOGOAPP2.png`。实施与资源规格见 [Windows 应用图标与入口说明](docs/WINDOWS_APP_ICON_2026.10.08.md)。
+
 分发包采用初始存档，玩家可以使用勋章购买单位；原版每日奖励、活动奖励及对应解锁流程均保留。个人进度保存在 `play_save/`，分发包不包含已有个人进度。全关卡覆盖与长期运行稳定性仍需持续验证。
 
 更新已有安装时，请先关闭游戏并备份所有已有的 `play_save*/` 存档目录，将新运行包解压至独立目录，再将这些完整存档目录复制至该目录。现有存档格式保持兼容；初始种子仅在对应存档不存在时使用。
 
 ### 全兵种 Lv1 可替代存档
 
-在解压后的游戏目录中启动 **Start_MSD_All_Units_Level1.vbs**。该入口使用同一正式版核心，首次启动时在 `play_save_all_units_level1/` 创建独立存档。普通 EXE 继续使用 `play_save/`；本地既有满级入口继续使用其独立存档。
+在解压后的游戏目录中启动 **Start_MSD_All_Units_Level1.exe**，对应 VBS 入口继续可用。该入口使用同一正式版核心，首次启动时在 `play_save_all_units_level1/` 创建独立存档。普通 EXE 继续使用 `play_save/`；本地既有满级入口继续使用其独立存档。
 
 该预设包含全部 **399 个原版兵种及当前登记的 13 个可用社区兵种**，均已拥有且初始为 **Lv1**。“我方阵营”的 **9 项强化均为 Lv1**。地图采用初始进度，关卡均未通关、捕虏均未收集，后续关卡及世界按游戏规则逐步解锁。货币、道具及初始编队沿用正式版初始存档。世界进度与军队核等级上限继续生效。
 
@@ -164,7 +176,7 @@ LAB 功能说明：[LAB 修复记录](docs/LAB_BUGFIX_2026.10.07.md)、[LAB 菜�
 
 ### 全解锁满级独立存档
 
-启动 **Start_MSD_All_Unlocked_Max_Level.vbs**。首次启动时在 `play_save_all_unlocked_max_level/` 创建独立存档，包含全部 **399 个原版单位记录（UnitID 1–399）和 17 款可选社区单位，均为 Lv40**；“我方阵营”的 **九项基地强化均为 Lv30**，六阵营核心全部持有。地图 1、2、3 的关卡开放并完成通关，**48 项区域人质奖励效果均为 100%**。历史活动进度沿用初始预设。
+启动 **Start_MSD_All_Unlocked_Max_Level.exe**，对应 VBS 入口继续可用。首次启动时在 `play_save_all_unlocked_max_level/` 创建独立存档，包含全部 **399 个原版单位记录（UnitID 1–399）和 17 款可选社区单位，均为 Lv40**；“我方阵营”的 **九项基地强化均为 Lv30**，六阵营核心全部持有。地图 1、2、3 的关卡开放并完成通关，**48 项区域人质奖励效果均为 100%**。历史活动进度沿用初始预设。
 
 该入口共用当前正式版核心，后续启动保留该独立存档的游戏进度。既有普通入口和原满级入口继续使用各自存档目录。迁移时复制完整的 `play_save_all_unlocked_max_level/`；预设位于 `game_data/all_unlocked_max_level/`，实施与核验范围见 [独立预设说明](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md)。
 
