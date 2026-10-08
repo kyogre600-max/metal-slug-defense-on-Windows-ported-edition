@@ -41,7 +41,18 @@ DEFAULT_CONFIG = {
     'enemy_support': 0,
     'player_ai_tier': 'SILVER',    # AI 段位（AI_TIERS 名称），我方与敌方各自独立
     'enemy_ai_tier': 'SILVER',
+    'versus': False,               # 本地双人对战（docs/lab/local_versus_design_2026-10-06.md 第 5 节）
+    'versus_keys': None,           # 双人键位（None 为 VERSUS_KEYS 默认）；值为 GLFW 键名（KEY_ 之后部分）
+    'versus_pad': None,            # 双人手柄功能键（None 为 lab_versus_input.PAD_DEFAULTS）；值为 PAD_BINDABLE 名称
+    'versus_pad_single': 'p2',     # 只连接一只手柄时分配给的玩家
 }
+# 双人对战默认键位（用户 2026-10-08 修订）：玩家1（P1）为左半区，玩家2（P2）为右半区。
+# 出兵、绝招、AP、弹头车依次为 R T Y U 与 M , . /（同一行相邻四键）。
+VERSUS_ACTIONS = ('left', 'right', 'ap', 'deploy', 'special', 'slug')
+VERSUS_KEYS = {'p1': {'left': 'A', 'right': 'D', 'ap': 'Y', 'deploy': 'R', 'special': 'T', 'slug': 'U'},
+               'p2': {'left': 'LEFT', 'right': 'RIGHT', 'ap': 'PERIOD', 'deploy': 'M', 'special': 'COMMA', 'slug': 'SLASH'}}
+# 双人对战期间暂时关闭的 LAB 开关（开战时保存、离开战斗时还原，不写入设定文件）。
+VERSUS_OVERRIDES = ('full_control', 'player_ai', 'enemy_ai', 'player_auto_special', 'enemy_auto_special')
 # 支援选项（与 src/lab_hooks.cpp apply_support 编号一致；新增选项在两处同时扩展）。
 SUPPORT_OPTIONS = ('弹头车出击', '除据点外全员 HP 回满', '全员绝招立即可用')
 PLAYER_FAMILY = ('BattleControllerPlayerBase', 'BattleControllerPlayer', 'BattleControllerNetPlayer',
@@ -75,6 +86,8 @@ LAB_SE_COUNT = 0x304             # 每端口扩展通道数
 LAB_SE_EXTRA = 0x310             # 端口 0（1P）与端口 1（2P）各 8 字的 CAudioPresenter 指针
 LAB_SE_STATS = 0x380             # 每端口 8 字统计：请求、同帧合并、满队、播放、抢占、最大并发、当前并发、播放后未登记；+0x40 起每端口 6 字诊断
 LAB_FLAG_AI_TIER = 128           # 钩子版本 11：AI 段位（反应间隔、开局据点目标）
+LAB_FLAG_VERSUS = 256            # 钩子版本 14：双人对战中双方胜利均播放 MISSION COMPLETE（changeScene 4→3，计数 +0x780）
+LAB_FLAG_VS_CURSOR = 512         # 钩子版本 15：双人对战选中格光标插入原生出兵格绘制（头部 +0xa00，lab_versus.py）
 LAB_AI_TIER = 0x500              # 头部偏移：我方 +0x500、敌方 +0x520（+0x380..0x3f7 为音效统计），各 [启用, 等待下限, 等待上限, 据点目标]
 AI_ALWAYS_URGENT = 0x3fffffff
 # AI 段位：(名称, 等级, 反应间隔下限/上限（帧，30 帧/秒，均匀随机）, 紧急阈值, 开局据点目标（-1 为原生逻辑）,
@@ -100,9 +113,13 @@ RESULT_SCENES = (110, 120)
 RESULT_FALLBACK_FRAMES = 450     # 战斗停止后原生仍未离开场景 100 时的兜底（15 秒）；实测 FAILED 演出约 140 帧后离开
 SAVE_RAM = 0x3d08              # app 偏移：主存档映像（与 event_trial.EventTrial.transaction 相同）
 SAVE_RAM_SIZE = 0x5ab0
+AUDIO_WORDS = (0x3d5c, 0x3d60)   # 音乐、音效开关（audio_options.MUSIC / EFFECTS，位于 SAVE_RAM 内）
+AUDIO_HEADER, AUDIO_MAGIC = 0x1ffea000, 0x41554431   # audio_options 共享头：+4 为修订计数
 PRESET_DIR = 'lab_presets'
 SWITCHES = ('full_control', 'enemy_ai', 'player_ai', 'enemy_auto_special', 'player_auto_special',
             'player_support', 'enemy_support')
+# 双人对战与 LAB 互不切换（用户 2026-10-08 要求）：模式只由入口决定（VERSUS 页本地对战为双人对战，LAB 图标与 F7 为 LAB），
+# 不作为开关保存，预设与设定文件不改变模式。
 PB = '_ZN26BattleControllerPlayerBase'
 # BattleObjectManager::createUnit（0x1df344）以 manager+72+(队伍×2+成员)×8 的两个浮点数调用
 # BattleObjectFactory::createUnitObject → createUnitStatus（0.2 常量所在函数）；里世界关卡把关卡强化级数写入敌方的这一对值。
@@ -125,6 +142,14 @@ class Lab:
         self.config = self.load_config()
         self.active = False
         self.saved_flags = None
+        self.versus = False           # 当前模式（双人对战 / LAB），由打开准备界面的入口决定
+        self.vs_saved = None          # 双人对战：开战时保存的 LAB 开关（VERSUS_OVERRIDES）；None 表示非双人对战
+        self.vs_cursor = [0, 0]       # 双人对战：P1、P2 的选中格
+        from lab_versus import VersusCursor
+        self.vs_view = VersusCursor(self)
+        from lab_versus_input import VersusCamera
+        self.vs_camera = VersusCamera(self)   # 右摇杆与鼠标拖动的镜头仲裁
+        self.pad_status = ()                  # 窗口线程写入：((jid, 玩家, 名称), …)
         self.started_frame = 0
         self.applied = False
         self.apply_switches()
@@ -175,6 +200,8 @@ class Lab:
     def save_config(self):
         for name in SWITCHES:
             self.config[name] = getattr(self, name)
+        if getattr(self, 'vs_saved', None):
+            self.config.update(self.vs_saved)        # 双人对战期间的临时关闭不写入设定
         (self.config_dir / CONFIG_NAME).write_text(json.dumps(self.config, ensure_ascii=False, indent=2), encoding='utf-8')
 
     # ---------- 预设与履历（lab_presets/） ----------
@@ -227,7 +254,7 @@ class Lab:
         entry = {'time': time.strftime('%m-%d %H:%M'), 'reason': reason, 'winner': winner,
                  'seconds': (self.p.frame - self.started_frame) / 30, 'stage_id': self.config['stage_id'],
                  'player_units': [e[0] if e else 0 for e in self.player_units],
-                 'enemy_units': [e[0] if e else 0 for e in self.enemy_units]}
+                 'enemy_units': [e[0] if e else 0 for e in self.enemy_units], 'versus': bool(self.versus)}
         with self.preset_path('A').parent.joinpath('history.jsonl').open('a', encoding='utf-8') as stream:
             stream.write(json.dumps(entry, ensure_ascii=False) + '\n')
 
@@ -353,6 +380,14 @@ class Lab:
             return
         self.config = self.load_config()
         self.config.update({name: getattr(self, name) for name in SWITCHES})
+        self.vs_restore()
+        if self.versus:
+            # 双人对战：完全控制、双方 AI 与自动绝招关闭（正常 AP 增长与冷却），离开战斗时还原。
+            self.vs_saved = {name: getattr(self, name) for name in VERSUS_OVERRIDES}
+            for name in VERSUS_OVERRIDES:
+                setattr(self, name, False)
+            self.vs_cursor = [0, 0]
+            self.vs_camera.reset()
         # 先完成全部校验与查表，确认无误后才改动原生场景状态。
         configured = None
         if self.config['enemy_deck'] is not None:
@@ -450,7 +485,15 @@ class Lab:
         p = self.p
         if self.save_snapshot is not None:
             restored = p.read(self.app() + SAVE_RAM, SAVE_RAM_SIZE) != self.save_snapshot
+            # 战斗中菜单的音乐 / 音效开关属于玩家设定：还原存档映像后保留当前值，并递增 audio_options 的修订计数，
+            # 使其在 LAB 结束后写入实际存档（与原生暂停页一致）。
+            audio = [p.word(self.app() + offset) for offset in AUDIO_WORDS]
             p.write(self.app() + SAVE_RAM, self.save_snapshot)
+            if [p.word(self.app() + offset) for offset in AUDIO_WORDS] != audio:
+                for offset, value in zip(AUDIO_WORDS, audio):
+                    p.put(self.app() + offset, value)
+                if p.word(AUDIO_HEADER) == AUDIO_MAGIC:
+                    p.put(AUDIO_HEADER + 4, p.word(AUDIO_HEADER + 4) + 1)
             self.record('sandbox_leave', ram_restored=restored,
                         virtual_writes=sorted(self.virtual_files), write_count=self.virtual_write_count)
         self.save_snapshot = None
@@ -462,6 +505,7 @@ class Lab:
         """宿主异常时的回退：还原存档映像、关闭隔离并清零共享头。
         native=False 用于退出游戏：只做内存还原，原生对象随进程结束释放（退出后原生调用已被取消）。"""
         self.active = False
+        self.vs_restore()
         try:
             if self.sandbox:
                 self.leave_sandbox()
@@ -531,6 +575,7 @@ class Lab:
         # 27 为原生主菜单初始化，28 为其稳态；31 属于关卡地图初始化。
         p.call('_ZN7AppMain11ChangeExeSTEi', app, 27)
         self.active = False
+        self.vs_restore()
         self.finishing = None
         if reopen_prep:
             self.prep.show(from_closed=True)   # 原生闸门已合拢：宿主闸门接手并在准备界面上打开（T8）
@@ -580,6 +625,9 @@ class Lab:
                 self.start()
             self.prep.draw()
             return
+        self.vs_view.prepare()                   # 双人对战选中格光标：写入头部，由原生钩子在出兵格绘制中画出
+        if self.vs_battle() and not self.menu.open and self.finishing is None:
+            self.vs_camera.update()              # 右摇杆镜头（与 P1 鼠标拖动仲裁）
         self.menu.draw()
         self.prep.draw()
         if self.finishing is not None:
@@ -795,6 +843,7 @@ class Lab:
     def write_header(self, active):
         p = self.p
         self.release_enemy_banners()
+        p.put(LAB_HEADER + 0xa00, 0)            # 双人对战光标（lab_versus.VS_CUR）
         p.put(LAB_HEADER + LAB_ENEMY_GFX_READY, 0)
         p.put(LAB_HEADER + LAB_ENEMY_PANEL_READY, 0)
         p.put(LAB_HEADER + LAB_SUPPORT_COUNT, 0)
@@ -821,6 +870,10 @@ class Lab:
             flags |= LAB_FLAG_SE_EXTEND
         if self.native_hooks >= 11:
             flags |= LAB_FLAG_AI_TIER
+        if self.native_hooks >= 14 and self.vs_battle():
+            flags |= LAB_FLAG_VERSUS
+        if self.native_hooks >= 15 and self.vs_battle():
+            flags |= LAB_FLAG_VS_CURSOR
         return flags
 
     def ai_tier(self, side):
@@ -1059,6 +1112,13 @@ class Lab:
             name = command[1]
             setattr(self, name, (getattr(self, name) + 1) % len(SUPPORT_OPTIONS))
             self.record('menu_cycle', name=name, value=getattr(self, name))
+        elif kind == 'audio':
+            # 音乐 / 音效开关：改写原生存档字，audio_options 在下一帧应用音量并保存（LAB 期间写入隔离的虚拟存档，
+            # 离开时 leave_sandbox 保留该值并写入实际存档）。
+            app = self.app()
+            self.p.put(app + command[1], 0 if self.p.word(app + command[1]) else 1)
+            self.record('menu_audio', offset=hex(command[1]), value=self.p.word(app + command[1]))
+            self.menu.revision += 1
         elif kind == 'restart':
             self.finish('menu_restart', restart=True)   # 合拢闸门 → 离开 → 重新开始（原生开场闸门打开）
         elif kind == 'exit':
@@ -1092,10 +1152,13 @@ class Lab:
             return
         if kind == 'prep_key':
             if self.prep.open:
-                self.prep.key(command[1])
+                self.prep.key(*command[1:])
             return
         if kind == 'prep':
             if not self.active and not self.prep.busy():
+                if not self.prep.open:
+                    # 打开方式决定模式：VERSUS 页本地对战为双人对战；主菜单 LAB 图标与 F7 为 LAB。
+                    self.versus = len(command) > 1 and command[1] == 'versus'
                 if self.prep.open:
                     self.prep.hide()
                 elif self.p.word(self.app() + 0x22bc) in (99, SCENE_BATTLE):
@@ -1143,6 +1206,12 @@ class Lab:
             self.feedback(T(self.p, 'fb_no_enemy'), False)
             return
         p = self.p
+        if kind == 'vs':
+            if self.vs_battle():
+                self.versus_action(command[1], (mine, enemy)[command[1]], command[2])
+            return
+        if self.vs_battle():
+            return                                  # 双人对战期间停用 LAB 直出键（Q–P、[ ] \）
         if kind == 'enemy_unit':
             self.enemy_slot(enemy, command[1])
         elif kind == 'enemy_ap':
@@ -1177,6 +1246,85 @@ class Lab:
             self.menu.set_open(not self.menu.open)
             return True
         return False
+
+    # ---------- 本地双人对战 ----------
+    def vs_restore(self):
+        if getattr(self, 'vs_saved', None):
+            for name, value in self.vs_saved.items():
+                setattr(self, name, value)
+        self.vs_saved = None
+
+    def vs_battle(self):
+        return self.active and getattr(self, 'vs_saved', None) is not None
+
+    def versus_keys(self):
+        """双人键位：{'p1': {动作: GLFW 键名}, 'p2': …}；设定缺项时以默认补齐。"""
+        configured = self.config.get('versus_keys') or {}
+        return {side: {action: (configured.get(side) or {}).get(action, default)
+                       for action, default in VERSUS_KEYS[side].items()} for side in VERSUS_KEYS}
+
+    def versus_pad(self):
+        """双人手柄功能键：{'p1': {动作: 按键名}, 'p2': …}；左右选择固定为十字键与左摇杆。"""
+        from lab_versus_input import PAD_DEFAULTS
+        configured = self.config.get('versus_pad') or {}
+        return {side: {action: (configured.get(side) or {}).get(action, default)
+                       for action, default in PAD_DEFAULTS.items()} for side in ('p1', 'p2')}
+
+    def versus_action(self, side, controller, action):
+        """side 0 为 P1（我方），1 为 P2（敌方）。选格、出兵、AP 升级、全体绝招、弹头车（支援接口 0 号）。"""
+        p = self.p
+        label = ('P1', 'P2')[side]
+        slots = max(1, min(10, p.word(controller + 0x390)))
+        if action in ('left', 'right'):
+            cursor = max(0, min(slots - 1, self.vs_cursor[side] + (1 if action == 'right' else -1)))
+            self.vs_cursor[side] = cursor
+            self.reveal_slot(side == 1, cursor)
+            return
+        if action == 'deploy':
+            self.deploy_slot(controller, self.vs_cursor[side], label, side == 1)
+        elif action == 'ap':
+            if p.call(PB + '15isKyotenLevelupEv', controller):
+                p.call(p.word(p.word(controller) + 0xa8), controller)
+                self.feedback(T(p, 'fb_vs_ap', label))
+            else:
+                self.feedback(T(p, 'fb_vs_ap_no', label), False)
+        elif action == 'slug':
+            if p.call(PB + '16isUseMetasuraHouEv', controller):
+                p.call(p.word(p.word(controller) + 0xa0), controller)
+                self.feedback(T(p, 'fb_vs_slug', label))
+            else:
+                self.feedback(T(p, 'fb_vs_slug_no', label), False)
+        elif action == 'special':
+            from battle_controls import team_units
+            ready = [u for u in team_units(p, controller)
+                     if not p.read(u + 0x3d4, 1)[0] and p.call('_ZNK10BattleUnit10isSpAttackEv', u)]
+            for unit in ready:
+                p.call(p.word(p.word(controller) + 0x98), controller, int.from_bytes(p.read(unit + 0x62, 2), 'little'))
+            self.feedback(T(p, 'fb_vs_special', label, len(ready)) if ready else T(p, 'fb_vs_special_none', label),
+                          bool(ready))
+
+    def deploy_slot(self, controller, slot, label, enemy_side):
+        """双方共用的选格出兵：与 enemy_slot 相同的原生检查、出兵与音效。"""
+        p = self.p
+        main, _ = self.battle()
+        if not main or not p.call('_ZN10BattleMain15isBattlePlayingEv', main):
+            return
+        info = p.call('_ZNK16BattleController11getUnitInfoEi', controller, slot)
+        if not info:
+            self.feedback(T(p, 'fb_empty_slot', label), False)
+            return
+        if p.call('_ZNK16BattleController15isUnitCountOverEv', controller):
+            self.feedback(T(p, 'fb_unit_limit', label), False)
+            return
+        if not p.call(PB + '12isUnitCreateEi', controller, slot):
+            self.feedback(T(p, 'fb_cannot', label, p.call(PB + '5getAPEv', controller), p.word(info)), False)
+            return
+        created = p.call(p.word(p.word(controller) + 0x94), controller, slot)
+        if created:
+            p.call('_ZN17FrameworkInstance6playSEENS_9SoundTypeE7SoundIDi', 0, 8, 0)
+        self.record('vs_unit', side=label, slot=slot + 1, unit_id=p.word(info + 0x10), created=bool(created))
+        self.reveal_slot(enemy_side, slot)
+        self.feedback(T(p, 'fb_vs_deployed' if created else 'fb_rejected', label), bool(created))
 
     def enemy_slot(self, enemy, slot):
         p = self.p

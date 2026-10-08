@@ -1,0 +1,1348 @@
+{
+ "note": "坐标单位为像素；字形图第 0–1 行为空行，第 2 行为上轮廓，第 3 行起为填充（16/12/8 行）。",
+ "sizes": {
+  "16": {
+   "fill_rows": 16,
+   "atlas": "font_atlas_16.png",
+   "glyphs": {
+    "A": {
+     "rect": [
+      1,
+      0,
+      18,
+      20
+     ],
+     "fl": 1,
+     "fr": 16,
+     "source": "16/A_login_bonus_478_68_8",
+     "composite": false,
+     "source_word": "login_bonus@478:68",
+     "context": [
+      "R",
+      "T"
+     ],
+     "notes": null,
+     "variants": [
+      "16/A_login_bonus_478_68_4",
+      "16/A_login_bonus_478_68_8",
+      "16/A_medal_shop_69_305_3",
+      "16/A_menu_485_133_1",
+      "16/A_menu_485_133_5",
+      "16/A_pause_menu_331_114_1",
+      "16/A_shop_321_446_1",
+      "16/A_stageselect_01_212_0_2",
+      "16/A_stageselect_01_231_0_0",
+      "16/A_stageselect_01_231_0_3"
+     ]
+    },
+    "B": {
+     "rect": [
+      21,
+      0,
+      16,
+      20
+     ],
+     "fl": 1,
+     "fr": 13,
+     "source": "16/B_login_bonus_1_74_0",
+     "composite": false,
+     "source_word": "login_bonus@1:74",
+     "context": [
+      null,
+      "O"
+     ],
+     "notes": null,
+     "variants": [
+      "16/B_login_bonus_1_74_0",
+      "16/B_login_bonus_478_68_5",
+      "16/B_shop_321_446_0"
+     ]
+    },
+    "C": {
+     "rect": [
+      39,
+      0,
+      18,
+      20
+     ],
+     "fl": 1,
+     "fr": 15,
+     "source": "16/C_login_bonus_478_68_0",
+     "composite": false,
+     "source_word": "login_bonus@478:68",
+     "context": [
+      null,
+      "O"
+     ],
+     "notes": null,
+     "variants": [
+      "16/C_login_bonus_478_68_0",
+      "16/C_menu_485_0_0",
+      "16/C_shop_477_0_0",
+      "16/C_stageselect_01_212_81_4",
+      "16/C_stageselect_01_231_68_4",
+      "16/C_unit_232_340_2"
+     ]
+    },
+    "D": {
+     "rect": [
+      59,
+      0,
+      18,
+      20
+     ],
+     "fl": 2,
+     "fr": 15,
+     "source": "16/D_medal_shop_69_305_2",
+     "composite": false,
+     "source_word": "medal_shop@69:305",
+     "context": [
+      "E",
+      "A"
+     ],
+     "notes": null,
+     "variants": [
+      "16/D_medal_shop_69_305_2",
+      "16/D_unit_232_340_0"
+     ]
+    },
+    "E": {
+     "rect": [
+      79,
+      0,
+      14,
+      20
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "16/E_medal_shop_69_305_1",
+     "composite": false,
+     "source_word": "medal_shop@69:305",
+     "context": [
+      "M",
+      "D"
+     ],
+     "notes": null,
+     "variants": [
+      "16/E_login_bonus_228_270_2",
+      "16/E_login_bonus_228_270_4",
+      "16/E_medal_shop_69_305_1",
+      "16/E_menu_485_0_8",
+      "16/E_menu_485_133_7",
+      "16/E_menu_485_344_1",
+      "16/E_pause_menu_331_114_4",
+      "16/E_pause_menu_331_195_1",
+      "16/E_profile_197_61_1",
+      "16/E_profile_216_0_6",
+      "16/E_shop_321_446_3",
+      "16/E_shop_343_322_2",
+      "16/E_shop_477_0_8",
+      "16/E_stageselect_01_212_0_4",
+      "16/E_stageselect_01_212_81_1",
+      "16/E_stageselect_01_212_81_3",
+      "16/E_stageselect_01_231_0_2",
+      "16/E_stageselect_01_231_68_1",
+      "16/E_stageselect_01_231_68_3",
+      "16/E_unit_232_340_1"
+     ]
+    },
+    "F": {
+     "rect": [
+      95,
+      0,
+      15,
+      20
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "16/F_profile_197_0_3",
+     "composite": false,
+     "source_word": "profile@197:0",
+     "context": [
+      "-",
+      "i"
+     ],
+     "notes": null,
+     "variants": [
+      "16/F_profile_197_0_3",
+      "16/F_profile_216_0_3"
+     ]
+    },
+    "G": {
+     "rect": [
+      112,
+      0,
+      17,
+      20
+     ],
+     "fl": 1,
+     "fr": 14,
+     "source": "16/G_login_bonus_1_0_2",
+     "composite": false,
+     "source_word": "login_bonus@1:0",
+     "context": [
+      "O",
+      "I"
+     ],
+     "notes": null,
+     "variants": [
+      "16/G_login_bonus_1_0_2",
+      "16/G_menu_485_133_3",
+      "16/G_menu_485_133_6",
+      "16/G_stageselect_01_212_0_3"
+     ]
+    },
+    "H": {
+     "rect": [
+      131,
+      0,
+      17,
+      20
+     ],
+     "fl": 1,
+     "fr": 15,
+     "source": "16/H_menu_485_412_1",
+     "composite": false,
+     "source_word": "menu@485:412",
+     "context": [
+      "S",
+      "O"
+     ],
+     "notes": null,
+     "variants": [
+      "16/H_medal_shop_69_388_1",
+      "16/H_menu_485_412_1",
+      "16/H_shop_278_391_1"
+     ]
+    },
+    "I": {
+     "rect": [
+      150,
+      0,
+      7,
+      20
+     ],
+     "fl": 1,
+     "fr": 5,
+     "source": "16/I_login_bonus_1_0_3",
+     "composite": false,
+     "source_word": "login_bonus@1:0",
+     "context": [
+      "G",
+      "N"
+     ],
+     "notes": null,
+     "variants": [
+      "16/I_login_bonus_1_0_3",
+      "16/I_login_bonus_478_68_10",
+      "16/I_menu_485_0_6",
+      "16/I_menu_485_258_3",
+      "16/I_menu_mission_206_228_1",
+      "16/I_menu_mission_206_228_4",
+      "16/I_prisoner_list_202_57_1",
+      "16/I_profile_216_0_4",
+      "16/I_shop_343_322_0",
+      "16/I_shop_477_0_6"
+     ]
+    },
+    "J": {
+     "rect": [
+      159,
+      0,
+      17,
+      20
+     ],
+     "fl": 1,
+     "fr": 15,
+     "source": "composite/16_J",
+     "composite": true,
+     "source_word": null,
+     "context": null,
+     "notes": "U（MENU 词尾）去掉左竖笔第 2–12 行，左竖笔下段保留为钩；钩顶第 12 行写入 U 第 2 行左竖笔上方的原生上轮廓。",
+     "variants": [
+      "composite/16_J"
+     ]
+    },
+    "K": {
+     "rect": [
+      178,
+      0,
+      18,
+      20
+     ],
+     "fl": 1,
+     "fr": 16,
+     "source": "16/K_unit_232_340_3",
+     "composite": false,
+     "source_word": "unit@232:340",
+     "context": [
+      "C",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "16/K_unit_232_340_3"
+     ]
+    },
+    "L": {
+     "rect": [
+      198,
+      0,
+      14,
+      20
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "16/L_login_bonus_1_0_0",
+     "composite": false,
+     "source_word": "login_bonus@1:0",
+     "context": [
+      null,
+      "O"
+     ],
+     "notes": null,
+     "variants": [
+      "16/L_login_bonus_1_0_0",
+      "16/L_login_bonus_478_68_2",
+      "16/L_login_bonus_478_68_3",
+      "16/L_medal_shop_69_305_4",
+      "16/L_menu_485_133_0",
+      "16/L_prisoner_list_202_57_0",
+      "16/L_profile_216_0_5",
+      "16/L_stageselect_01_212_81_2",
+      "16/L_stageselect_01_231_68_2"
+     ]
+    },
+    "M": {
+     "rect": [
+      214,
+      0,
+      19,
+      20
+     ],
+     "fl": 1,
+     "fr": 17,
+     "source": "16/M_medal_shop_69_305_0",
+     "composite": false,
+     "source_word": "medal_shop@69:305",
+     "context": [
+      null,
+      "E"
+     ],
+     "notes": null,
+     "variants": [
+      "16/M_medal_shop_69_305_0",
+      "16/M_menu_485_0_5",
+      "16/M_menu_485_344_0",
+      "16/M_menu_mission_206_228_0",
+      "16/M_pause_menu_331_195_0",
+      "16/M_shop_343_322_3",
+      "16/M_shop_477_0_5"
+     ]
+    },
+    "N": {
+     "rect": [
+      235,
+      0,
+      17,
+      20
+     ],
+     "fl": 1,
+     "fr": 15,
+     "source": "16/N_menu_485_258_5",
+     "composite": false,
+     "source_word": "menu@485:258",
+     "context": [
+      "O",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "16/N_login_bonus_1_0_4",
+      "16/N_login_bonus_1_74_2",
+      "16/N_login_bonus_228_270_5",
+      "16/N_login_bonus_478_68_12",
+      "16/N_menu_485_133_2",
+      "16/N_menu_485_258_5",
+      "16/N_menu_485_344_2",
+      "16/N_menu_mission_206_228_6",
+      "16/N_pause_menu_331_195_2"
+     ]
+    },
+    "O": {
+     "rect": [
+      254,
+      0,
+      18,
+      20
+     ],
+     "fl": 1,
+     "fr": 16,
+     "source": "16/O_login_bonus_478_68_1",
+     "composite": false,
+     "source_word": "login_bonus@478:68",
+     "context": [
+      "C",
+      "L"
+     ],
+     "notes": null,
+     "variants": [
+      "16/O_login_bonus_1_0_1",
+      "16/O_login_bonus_1_74_1",
+      "16/O_login_bonus_478_68_1",
+      "16/O_login_bonus_478_68_11",
+      "16/O_login_bonus_478_68_6",
+      "16/O_medal_shop_69_388_2",
+      "16/O_menu_485_0_4",
+      "16/O_menu_485_258_0",
+      "16/O_menu_485_258_4",
+      "16/O_menu_485_412_2",
+      "16/O_menu_mission_206_228_5",
+      "16/O_prisoner_list_202_0_1",
+      "16/O_profile_216_0_2",
+      "16/O_shop_278_391_2",
+      "16/O_shop_477_0_4"
+     ]
+    },
+    "P": {
+     "rect": [
+      274,
+      0,
+      15,
+      20
+     ],
+     "fl": 1,
+     "fr": 13,
+     "source": "16/P_medal_shop_69_388_3",
+     "composite": false,
+     "source_word": "medal_shop@69:388",
+     "context": [
+      "O",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "16/P_login_bonus_228_270_0",
+      "16/P_medal_shop_69_388_3",
+      "16/P_menu_485_258_1",
+      "16/P_menu_485_412_3",
+      "16/P_pause_menu_331_114_0",
+      "16/P_prisoner_list_202_0_0",
+      "16/P_profile_216_0_0",
+      "16/P_shop_278_391_3"
+     ]
+    },
+    "Q": {
+     "rect": [
+      291,
+      0,
+      21,
+      20
+     ],
+     "fl": 1,
+     "fr": 18,
+     "source": "composite/16_Q",
+     "composite": true,
+     "source_word": null,
+     "context": null,
+     "notes": "O（OPTION 词首）+ R（PRESENT）右下腿第 14–19 行（同行号），右移 3 列作为尾巴；填充优先。",
+     "variants": [
+      "composite/16_Q"
+     ]
+    },
+    "R": {
+     "rect": [
+      314,
+      0,
+      18,
+      20
+     ],
+     "fl": 1,
+     "fr": 15,
+     "source": "16/R_login_bonus_228_270_1",
+     "composite": false,
+     "source_word": "login_bonus@228:270",
+     "context": [
+      "P",
+      "E"
+     ],
+     "notes": null,
+     "variants": [
+      "16/R_login_bonus_228_270_1",
+      "16/R_login_bonus_478_68_7",
+      "16/R_profile_197_61_2",
+      "16/R_profile_216_0_1",
+      "16/R_stageselect_01_231_0_1"
+     ]
+    },
+    "S": {
+     "rect": [
+      334,
+      0,
+      16,
+      20
+     ],
+     "fl": 2,
+     "fr": 14,
+     "source": "16/S_profile_197_61_3",
+     "composite": false,
+     "source_word": "profile@197:61",
+     "context": [
+      "R",
+      "U"
+     ],
+     "notes": null,
+     "variants": [
+      "16/S_login_bonus_1_74_4",
+      "16/S_login_bonus_228_270_3",
+      "16/S_medal_shop_69_388_0",
+      "16/S_menu_485_0_2",
+      "16/S_menu_485_412_0",
+      "16/S_menu_mission_206_228_2",
+      "16/S_menu_mission_206_228_3",
+      "16/S_pause_menu_331_114_3",
+      "16/S_prisoner_list_202_57_2",
+      "16/S_profile_197_61_3",
+      "16/S_profile_197_61_5",
+      "16/S_shop_278_391_0",
+      "16/S_shop_321_446_2",
+      "16/S_shop_343_322_4",
+      "16/S_shop_477_0_2",
+      "16/S_stageselect_01_212_0_0",
+      "16/S_stageselect_01_212_81_0",
+      "16/S_stageselect_01_231_68_0"
+     ]
+    },
+    "T": {
+     "rect": [
+      352,
+      0,
+      16,
+      20
+     ],
+     "fl": 1,
+     "fr": 14,
+     "source": "16/T_login_bonus_228_270_6",
+     "composite": false,
+     "source_word": "login_bonus@228:270",
+     "context": [
+      "N",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "16/T_login_bonus_228_270_6",
+      "16/T_login_bonus_478_68_9",
+      "16/T_menu_485_0_3",
+      "16/T_menu_485_258_2",
+      "16/T_prisoner_list_202_57_3",
+      "16/T_shop_343_322_1",
+      "16/T_shop_477_0_3",
+      "16/T_stageselect_01_212_0_1",
+      "16/T_stageselect_01_212_81_5",
+      "16/T_stageselect_01_231_68_5"
+     ]
+    },
+    "U": {
+     "rect": [
+      370,
+      0,
+      17,
+      20
+     ],
+     "fl": 1,
+     "fr": 15,
+     "source": "16/U_menu_485_0_1",
+     "composite": false,
+     "source_word": "menu@485:0",
+     "context": [
+      "C",
+      "S"
+     ],
+     "notes": null,
+     "variants": [
+      "16/U_login_bonus_1_74_3",
+      "16/U_menu_485_0_1",
+      "16/U_menu_485_133_4",
+      "16/U_menu_485_344_3",
+      "16/U_pause_menu_331_114_2",
+      "16/U_pause_menu_331_195_3",
+      "16/U_profile_197_61_4",
+      "16/U_shop_477_0_1"
+     ]
+    },
+    "V": {
+     "rect": [
+      389,
+      0,
+      19,
+      20
+     ],
+     "fl": 1,
+     "fr": 16,
+     "source": "16/V_profile_197_61_0",
+     "composite": false,
+     "source_word": "profile@197:61",
+     "context": [
+      null,
+      "E"
+     ],
+     "notes": null,
+     "variants": [
+      "16/V_profile_197_61_0"
+     ]
+    },
+    "W": {
+     "rect": [
+      410,
+      0,
+      24,
+      20
+     ],
+     "fl": 2,
+     "fr": 21,
+     "source": "16/W_prisoner_list_202_0_2",
+     "composite": false,
+     "source_word": "prisoner_list@202:0",
+     "context": [
+      "O",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "16/W_prisoner_list_202_0_2",
+      "16/W_profile_197_0_0"
+     ]
+    },
+    "X": {
+     "rect": [
+      436,
+      0,
+      19,
+      20
+     ],
+     "fl": 1,
+     "fr": 17,
+     "source": "composite/16_X",
+     "composite": true,
+     "source_word": null,
+     "context": null,
+     "notes": "V 行 0–11（上半两臂）+ K（DECK 词尾）右下腿第 12–19 行（右移 1 列）+ 同一右下腿的水平镜像作为左下腿（镜像为位置变换，像素值为原生）。",
+     "variants": [
+      "composite/16_X"
+     ]
+    },
+    "Y": {
+     "rect": [
+      457,
+      0,
+      19,
+      20
+     ],
+     "fl": 1,
+     "fr": 16,
+     "source": "composite/16_Y",
+     "composite": true,
+     "source_word": null,
+     "context": null,
+     "notes": "V 行 0–11（上半两臂）+ T 第 12–19 行竖笔（同行号）；第 12 行两臂下方写入 T 第 7 行横笔下轮廓的原生轮廓像素（仅黑色轮廓移行，填充颜色不移行）。",
+     "variants": [
+      "composite/16_Y"
+     ]
+    },
+    "Z": {
+     "rect": [
+      478,
+      0,
+      16,
+      20
+     ],
+     "fl": 2,
+     "fr": 14,
+     "source": "16/Z_menu_485_0_7",
+     "composite": false,
+     "source_word": "menu@485:0",
+     "context": [
+      "I",
+      "E"
+     ],
+     "notes": null,
+     "variants": [
+      "16/Z_menu_485_0_7",
+      "16/Z_shop_477_0_7"
+     ]
+    },
+    "-": {
+     "rect": [
+      496,
+      0,
+      11,
+      16
+     ],
+     "fl": 1,
+     "fr": 8,
+     "source": "16/U002D_profile_197_0_2",
+     "composite": false,
+     "source_word": "profile@197:0",
+     "context": [
+      "i",
+      "F"
+     ],
+     "notes": null,
+     "variants": [
+      "16/U002D_profile_197_0_2"
+     ]
+    },
+    "i": {
+     "rect": [
+      509,
+      0,
+      7,
+      20
+     ],
+     "fl": 1,
+     "fr": 5,
+     "source": "16/lower_i_profile_197_0_1",
+     "composite": false,
+     "source_word": "profile@197:0",
+     "context": [
+      "W",
+      "-"
+     ],
+     "notes": null,
+     "variants": [
+      "16/lower_i_profile_197_0_1",
+      "16/lower_i_profile_197_0_4"
+     ]
+    }
+   },
+   "missing": [],
+   "default_gap": 1,
+   "gap_distribution": {
+    "1": 81,
+    "2": 33
+   },
+   "pair_gaps": {
+    "-F": 2,
+    "AB": 1,
+    "AG": 1,
+    "AL": 1,
+    "AN": 1,
+    "AR": 1,
+    "AS": 1,
+    "AT": 0,
+    "AU": 1,
+    "BA": 1,
+    "BO": 1,
+    "CK": 1,
+    "CO": 1,
+    "CT": 0,
+    "CU": 2,
+    "DA": 1,
+    "DE": 1,
+    "EA": 1,
+    "EC": 1,
+    "ED": 2,
+    "EL": 1,
+    "EM": 2,
+    "EN": 2,
+    "ER": 2,
+    "ES": 1,
+    "FI": 1,
+    "Fi": 1,
+    "GE": 2,
+    "GI": 2,
+    "GU": 1,
+    "HO": 1,
+    "IL": 2,
+    "IN": 2,
+    "IO": 2,
+    "IS": 1,
+    "IT": 1,
+    "IZ": 2,
+    "LA": 0,
+    "LE": 1,
+    "LI": 1,
+    "LL": 1,
+    "LO": 0,
+    "ME": 2,
+    "MI": 1,
+    "MS": 1,
+    "NG": 1,
+    "NT": 1,
+    "NU": 2,
+    "OF": 1,
+    "OG": 1,
+    "OL": 1,
+    "OM": 1,
+    "ON": 1,
+    "OP": 1,
+    "OR": 1,
+    "OW": 1,
+    "PA": 1,
+    "PO": 1,
+    "PR": 1,
+    "PT": 1,
+    "RA": 0,
+    "RE": 1,
+    "RO": 0,
+    "RS": 1,
+    "SE": 2,
+    "SH": 1,
+    "SI": 1,
+    "SS": 2,
+    "ST": 1,
+    "SU": 2,
+    "TA": 0,
+    "TE": 1,
+    "TI": 1,
+    "TO": 0,
+    "UA": 1,
+    "US": 1,
+    "VE": 1,
+    "Wi": 0,
+    "ZE": 1,
+    "i-": 1
+   }
+  },
+  "12": {
+   "fill_rows": 12,
+   "atlas": "font_atlas_12.png",
+   "glyphs": {
+    "A": {
+     "rect": [
+      1,
+      0,
+      14,
+      16
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "12/A_icon_mov_119_126_0",
+     "composite": false,
+     "source_word": "icon_mov@119:126",
+     "context": [
+      null,
+      "D"
+     ],
+     "notes": null,
+     "variants": [
+      "12/A_icon_mov_119_126_0"
+     ]
+    },
+    "C": {
+     "rect": [
+      17,
+      0,
+      14,
+      16
+     ],
+     "fl": 1,
+     "fr": 11,
+     "source": "composite/12_C",
+     "composite": true,
+     "source_word": null,
+     "context": null,
+     "notes": "O（VIDEO 词尾）右笔第 7–10 行打开；第 7、10 行写入 O 内孔上轮廓的原生值作为两端收笔轮廓，右角点取 O 外轮廓值；上收笔末行（第 6 行）取 S 第 6 行右上收笔暗化像素（同行号）。",
+     "variants": [
+      "composite/12_C"
+     ]
+    },
+    "D": {
+     "rect": [
+      33,
+      0,
+      13,
+      16
+     ],
+     "fl": 1,
+     "fr": 11,
+     "source": "12/D_icon_mov_104_126_2",
+     "composite": false,
+     "source_word": "icon_mov@104:126",
+     "context": [
+      "I",
+      "E"
+     ],
+     "notes": null,
+     "variants": [
+      "12/D_icon_mov_104_126_2",
+      "12/D_icon_mov_119_126_1"
+     ]
+    },
+    "E": {
+     "rect": [
+      48,
+      0,
+      11,
+      16
+     ],
+     "fl": 1,
+     "fr": 9,
+     "source": "12/E_icon_mov_104_126_3",
+     "composite": false,
+     "source_word": "icon_mov@104:126",
+     "context": [
+      "D",
+      "O"
+     ],
+     "notes": null,
+     "variants": [
+      "12/E_icon_mov_104_126_3",
+      "12/E_shop_455_125_2"
+     ]
+    },
+    "I": {
+     "rect": [
+      61,
+      0,
+      6,
+      16
+     ],
+     "fl": 1,
+     "fr": 4,
+     "source": "12/I_icon_mov_104_126_1",
+     "composite": false,
+     "source_word": "icon_mov@104:126",
+     "context": [
+      "V",
+      "D"
+     ],
+     "notes": null,
+     "variants": [
+      "12/I_icon_mov_104_126_1",
+      "12/I_shop_180_434_2",
+      "12/I_shop_455_125_0"
+     ]
+    },
+    "L": {
+     "rect": [
+      69,
+      0,
+      11,
+      16
+     ],
+     "fl": 1,
+     "fr": 9,
+     "source": "composite/12_L",
+     "composite": true,
+     "source_word": null,
+     "context": null,
+     "notes": "E（VIDEO）第 0–1、11–15 行（底横及其上轮廓）；第 2–10 行为竖笔：E 的左轮廓与竖笔填充 0–3 列、UNIT 的 I 右暗边、ITEM 词首 I 的右侧外轮廓；顶角取 ITEM 的 I 上轮廓角点。",
+     "variants": [
+      "composite/12_L"
+     ]
+    },
+    "M": {
+     "rect": [
+      82,
+      0,
+      16,
+      16
+     ],
+     "fl": 2,
+     "fr": 14,
+     "source": "12/M_shop_304_241_0",
+     "composite": false,
+     "source_word": "shop@304:241",
+     "context": [
+      null,
+      "S"
+     ],
+     "notes": null,
+     "variants": [
+      "12/M_shop_304_241_0",
+      "12/M_shop_455_125_3"
+     ]
+    },
+    "N": {
+     "rect": [
+      100,
+      0,
+      14,
+      16
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "12/N_shop_180_434_1",
+     "composite": false,
+     "source_word": "shop@180:434",
+     "context": [
+      "U",
+      "I"
+     ],
+     "notes": null,
+     "variants": [
+      "12/N_shop_180_434_1"
+     ]
+    },
+    "O": {
+     "rect": [
+      116,
+      0,
+      14,
+      16
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "12/O_icon_mov_104_126_4",
+     "composite": false,
+     "source_word": "icon_mov@104:126",
+     "context": [
+      "E",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "12/O_icon_mov_104_126_4"
+     ]
+    },
+    "P": {
+     "rect": [
+      132,
+      0,
+      13,
+      16
+     ],
+     "fl": 1,
+     "fr": 11,
+     "source": "12/P_shop_304_241_2",
+     "composite": false,
+     "source_word": "shop@304:241",
+     "context": [
+      "S",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "12/P_shop_304_241_2"
+     ]
+    },
+    "S": {
+     "rect": [
+      147,
+      0,
+      12,
+      16
+     ],
+     "fl": 1,
+     "fr": 10,
+     "source": "12/S_shop_304_241_1",
+     "composite": false,
+     "source_word": "shop@304:241",
+     "context": [
+      "M",
+      "P"
+     ],
+     "notes": null,
+     "variants": [
+      "12/S_shop_304_241_1"
+     ]
+    },
+    "T": {
+     "rect": [
+      161,
+      0,
+      14,
+      16
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "12/T_shop_180_434_3",
+     "composite": false,
+     "source_word": "shop@180:434",
+     "context": [
+      "I",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "12/T_shop_180_434_3",
+      "12/T_shop_455_125_1"
+     ]
+    },
+    "U": {
+     "rect": [
+      177,
+      0,
+      15,
+      16
+     ],
+     "fl": 2,
+     "fr": 12,
+     "source": "12/U_shop_180_434_0",
+     "composite": false,
+     "source_word": "shop@180:434",
+     "context": [
+      null,
+      "N"
+     ],
+     "notes": null,
+     "variants": [
+      "12/U_shop_180_434_0"
+     ]
+    },
+    "V": {
+     "rect": [
+      194,
+      0,
+      14,
+      16
+     ],
+     "fl": 1,
+     "fr": 12,
+     "source": "12/V_icon_mov_104_126_0",
+     "composite": false,
+     "source_word": "icon_mov@104:126",
+     "context": [
+      null,
+      "I"
+     ],
+     "notes": null,
+     "variants": [
+      "12/V_icon_mov_104_126_0"
+     ]
+    }
+   },
+   "missing": [
+    "B",
+    "F",
+    "G",
+    "H",
+    "J",
+    "K",
+    "Q",
+    "R",
+    "W",
+    "X",
+    "Y",
+    "Z"
+   ],
+   "default_gap": 1,
+   "gap_distribution": {
+    "1": 9,
+    "2": 2
+   },
+   "pair_gaps": {
+    "AD": 1,
+    "DE": 1,
+    "EM": 1,
+    "EO": 0,
+    "ID": 1,
+    "IT": 2,
+    "MS": 1,
+    "NI": 1,
+    "SP": 1,
+    "TE": 1,
+    "UN": 2,
+    "VI": 0
+   }
+  },
+  "8": {
+   "fill_rows": 8,
+   "atlas": "font_atlas_8.png",
+   "glyphs": {
+    "A": {
+     "rect": [
+      1,
+      0,
+      12,
+      12
+     ],
+     "fl": 2,
+     "fr": 9,
+     "source": "8/A_shop_308_351_1",
+     "composite": false,
+     "source_word": "shop@308:351",
+     "context": [
+      "B",
+      "C"
+     ],
+     "notes": null,
+     "variants": [
+      "8/A_shop_308_351_1"
+     ]
+    },
+    "B": {
+     "rect": [
+      15,
+      0,
+      10,
+      12
+     ],
+     "fl": 1,
+     "fr": 8,
+     "source": "8/B_shop_308_351_0",
+     "composite": false,
+     "source_word": "shop@308:351",
+     "context": [
+      null,
+      "A"
+     ],
+     "notes": null,
+     "variants": [
+      "8/B_shop_308_351_0"
+     ]
+    },
+    "C": {
+     "rect": [
+      27,
+      0,
+      10,
+      12
+     ],
+     "fl": 1,
+     "fr": 8,
+     "source": "8/C_shop_308_351_2",
+     "composite": false,
+     "source_word": "shop@308:351",
+     "context": [
+      "A",
+      "K"
+     ],
+     "notes": null,
+     "variants": [
+      "8/C_shop_308_351_2"
+     ]
+    },
+    "E": {
+     "rect": [
+      39,
+      0,
+      9,
+      12
+     ],
+     "fl": 1,
+     "fr": 6,
+     "source": "8/E_shop_308_312_1",
+     "composite": false,
+     "source_word": "shop@308:312",
+     "context": [
+      "N",
+      "X"
+     ],
+     "notes": null,
+     "variants": [
+      "8/E_shop_308_312_1"
+     ]
+    },
+    "K": {
+     "rect": [
+      50,
+      0,
+      10,
+      12
+     ],
+     "fl": 1,
+     "fr": 6,
+     "source": "8/K_shop_308_351_3",
+     "composite": false,
+     "source_word": "shop@308:351",
+     "context": [
+      "C",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "8/K_shop_308_351_3"
+     ]
+    },
+    "N": {
+     "rect": [
+      62,
+      0,
+      12,
+      12
+     ],
+     "fl": 1,
+     "fr": 9,
+     "source": "8/N_shop_308_312_0",
+     "composite": false,
+     "source_word": "shop@308:312",
+     "context": [
+      null,
+      "E"
+     ],
+     "notes": null,
+     "variants": [
+      "8/N_shop_308_312_0"
+     ]
+    },
+    "T": {
+     "rect": [
+      76,
+      0,
+      10,
+      12
+     ],
+     "fl": 1,
+     "fr": 6,
+     "source": "8/T_shop_308_312_3",
+     "composite": false,
+     "source_word": "shop@308:312",
+     "context": [
+      "X",
+      null
+     ],
+     "notes": null,
+     "variants": [
+      "8/T_shop_308_312_3"
+     ]
+    },
+    "X": {
+     "rect": [
+      88,
+      0,
+      12,
+      12
+     ],
+     "fl": 1,
+     "fr": 9,
+     "source": "8/X_shop_308_312_2",
+     "composite": false,
+     "source_word": "shop@308:312",
+     "context": [
+      "E",
+      "T"
+     ],
+     "notes": null,
+     "variants": [
+      "8/X_shop_308_312_2"
+     ]
+    }
+   },
+   "missing": [
+    "D",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "L",
+    "M",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "U",
+    "V",
+    "W",
+    "Y",
+    "Z"
+   ],
+   "default_gap": 1,
+   "gap_distribution": {
+    "1": 6
+   },
+   "pair_gaps": {
+    "AC": 1,
+    "BA": 1,
+    "CK": 1,
+    "EX": 1,
+    "NE": 1,
+    "XT": 1
+   }
+  }
+ }
+}

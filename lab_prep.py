@@ -20,6 +20,22 @@ DECK_TOP, DECK_PITCH = HEADER_H + 8, 160          # 每行：标题与按钮 26�
 PANEL_TOP = DECK_TOP + 2 * DECK_PITCH + 6
 PANEL_H = H - PANEL_TOP - 24
 PICK_CELL, PICK_PITCH, PICK_COLS, PICK_ROWS = 75, 100, 12, 4
+KEY_LABELS = {'LEFT': '←', 'RIGHT': '→', 'UP': '↑', 'DOWN': '↓', 'COMMA': ',', 'PERIOD': '.', 'SLASH': '/',
+              'SEMICOLON': ';', 'APOSTROPHE': "'", 'LEFT_BRACKET': '[', 'RIGHT_BRACKET': ']', 'BACKSLASH': '\\',
+              'MINUS': '-', 'EQUAL': '=', 'GRAVE_ACCENT': '`', 'SPACE': 'SPACE', 'ENTER': 'ENTER',
+              'LEFT_SHIFT': 'L SHIFT', 'RIGHT_SHIFT': 'R SHIFT', 'LEFT_CONTROL': 'L CTRL', 'RIGHT_CONTROL': 'R CTRL',
+              'LEFT_ALT': 'L ALT', 'RIGHT_ALT': 'R ALT', 'LEFT_SUPER': 'WIN', 'RIGHT_SUPER': 'WIN', 'PRINT_SCREEN': 'PRTSC',
+              'CAPS_LOCK': 'CAPS', 'BACKSPACE': 'BKSP', 'PAGE_UP': 'PGUP', 'PAGE_DOWN': 'PGDN'}
+
+
+def key_label(name):
+    """GLFW 键名（KEY_ 之后部分）的显示文字。"""
+    name = str(name).upper()
+    if name in KEY_LABELS:
+        return KEY_LABELS[name]
+    if name.startswith('KP_'):
+        return 'NUM' + key_label(name[3:])
+    return name
 PICK_X = (W - PICK_COLS * PICK_PITCH) // 2 + (PICK_PITCH - PICK_CELL) // 2
 PICK_TABS_Y = HEADER_H + 8
 FALLBACK_LANGUAGE = 3
@@ -49,7 +65,8 @@ class LabPrep:
     def __init__(self, lab):
         self.lab = lab
         self.open = False
-        self.page = 'main'               # main / picker / history
+        self.page = 'main'               # main / picker / history / keys / help
+        self.capture = None              # 按键设定等待中的 (玩家 'p1'/'p2', 'key'/'pad', 动作)
         self.picker = None               # (side, slot)
         self.tab = 0
         self.picker_page = 0
@@ -73,6 +90,12 @@ class LabPrep:
         self.message = ''
 
     # ---------- 数据 ----------
+    def t(self, key, *args):
+        """双人对战中“我方 / 敌方”类文字改用 vs_ 前缀的“玩家1 / 玩家2”版本（lab_ui.TEXT）。"""
+        from lab_ui import TEXT
+        p = self.lab.p
+        return T(p, 'vs_' + key, *args) if self.lab.versus and 'vs_' + key in TEXT else T(p, key, *args)
+
     def unit_list(self):
         """全部可选单位：原版 1–399 与社区可选单位。原生名称带括号或为“-”的条目是内部子单位
         （投放体、箱体、弹头车攻击等，如“(沙包)”“(伞兵)”），与社区 internal_only 一样排除。
@@ -327,7 +350,22 @@ class LabPrep:
         elif name == 'picker_page':
             self.picker_page = max(0, self.picker_page + args[0])
         elif name == 'back':
-            self.page = 'main'
+            self.page, self.capture = 'main', None
+        elif name == 'vs_page':
+            self.page, self.capture, self.message = args[0], None, ''
+        elif name == 'capture':
+            side, device, action = args
+            self.capture = (side, device, action)
+            self.message = T(lab.p, 'vs_capture_' + device, side.upper(), T(lab.p, 'vs_act_' + action))
+        elif name == 'keys_reset':
+            lab.config['versus_keys'] = None
+            lab.config['versus_pad'] = None
+            self.capture = None
+            self.message = T(lab.p, 'vs_reset_done')
+            lab.save_config()
+        elif name == 'pad_single':
+            lab.config['versus_pad_single'] = 'p1' if lab.config.get('versus_pad_single', 'p2') == 'p2' else 'p2'
+            lab.save_config()
         elif name == 'history':
             self.page = 'history'
         elif name == 'preset_save':
@@ -337,14 +375,51 @@ class LabPrep:
             self.message = T(lab.p, 'loaded' if lab.load_preset(args[0]) else 'preset_empty', args[0])
         self.revision += 1
 
-    def key(self, name):
+    def key(self, name, *args):
+        if name == 'pads':
+            if self.page in ('keys', 'help'):
+                self.revision += 1                     # 手柄连接状态变化
+            return
+        if name in ('bind', 'pad_bind'):
+            self.bind(name, args[0])
+            return
         if name == 'escape' and not self.busy():
             play_se(self.lab.p, SE_CLOSE)
-            if self.page != 'main':
+            if self.capture is not None:
+                self.capture, self.message = None, ''
+                self.revision += 1
+            elif self.page != 'main':
                 self.page = 'main'
                 self.revision += 1
             else:
                 self.hide()
+
+    def bind(self, kind, value):
+        """按键设定：校验并保存一次指定（同一玩家内已占用时两项互换，保留键拒绝并保持等待）。"""
+        from lab_versus_input import glfw_key_names, key_banned, bind
+        lab, p = self.lab, self.lab.p
+        if self.capture is None or (kind == 'bind') != (self.capture[1] == 'key'):
+            return
+        side, device, action = self.capture
+        if device == 'key':
+            name = glfw_key_names().get(value)
+            if name is None or key_banned(name):
+                play_se(p, SE_CLOSE)
+                self.message = T(p, 'vs_banned', key_label(name) if name else '?')
+                self.revision += 1
+                return
+            table, store, label = lab.versus_keys(), 'versus_keys', key_label(name)
+        else:
+            name, table, store, label = value, lab.versus_pad(), 'versus_pad', value
+        swapped = bind(table[side], action, name)
+        lab.config[store] = table
+        lab.save_config()
+        play_se(p, SE_DECIDE)
+        self.capture = None
+        act = T(p, 'vs_act_' + action)
+        self.message = (T(p, 'vs_swapped', side.upper(), act, label, T(p, 'vs_act_' + swapped)) if swapped
+                        else T(p, 'vs_bound', side.upper(), act, label))
+        self.revision += 1
 
     def touch(self, action, x, y):
         """按下：按钮显示按下状态；在同一按钮上抬起：播放原生确定（返回类为关闭）音效并执行。"""
@@ -387,7 +462,8 @@ class LabPrep:
             if self.overlay.cached != key:
                 image = self.skin.tiled(BRICK, W, H).copy()
                 self.c = Canvas(image, self.skin, self.font, None)
-                {'main': self.draw_main, 'picker': self.draw_picker, 'history': self.draw_history}[self.page]()
+                {'main': self.draw_main, 'picker': self.draw_picker, 'history': self.draw_history,
+                 'keys': self.draw_keys, 'help': self.draw_help}[self.page]()
                 self.hitboxes = self.c.hitboxes
                 self.icons = self.c.icons
                 self.rendered = image
@@ -450,11 +526,16 @@ class LabPrep:
     def draw_main(self):
         lab, c, p = self.lab, self.c, self.lab.p
         names = self.names()
-        c.header(T(p, 'prep_title'))
+        c.header(T(p, 'vs_prep_title' if lab.versus else 'prep_title'))
         self.header_buttons()
+        if lab.versus:
+            # 双人对战：顶栏增加按键设定与操作说明两个入口页（位于标题与“开始战斗”之间，顶栏深色区内）。
+            for index, page in enumerate(('keys', 'help')):
+                c.button((420 + index * 176, ICON_Y + (ICON_H - 40) // 2, 164, 40), T(p, f'vs_{page}_title'),
+                         ('vs_page', page), 16)
         for row, side in enumerate(('player', 'enemy')):
             top = DECK_TOP + row * DECK_PITCH
-            c.text((DECK_X, top + 13), T(p, side + '_deck'), 18, BLUE if side == 'player' else RED, 'lm', 2, 140)
+            c.text((DECK_X, top + 13), self.t(side + '_deck'), 18, BLUE if side == 'player' else RED, 'lm', 2, 140)
             x = DECK_X + 150
             c.text((x, top + 13), T(p, 'all_level'), 14, WHITE, 'lm', 2, 80)
             c.button((x + 84, top, 28, 26), '-', ('level_all', side, -1))
@@ -470,7 +551,7 @@ class LabPrep:
             c.text((bx + 54 + 28 + 38, top + 13), shown, 16, GRAY if lab.full_control else GOLD, 'mm', 2, 70)
             c.button((bx + 54 + 28 + 76, top, 28, 26), '>', ('base', side, 1))
             right = DECK_X + DECK_W
-            c.button((right - 292, top, 100, 26), T(p, 'copy_enemy' if side == 'player' else 'copy_player'),
+            c.button((right - 292, top, 100, 26), self.t('copy_enemy' if side == 'player' else 'copy_player'),
                      ('copy', side), 14, 'light')
             c.button((right - 186, top, 90, 26), T(p, 'random'), ('random', side), 14)
             c.button((right - 90, top, 90, 26), T(p, 'clear'), ('clear', side), 14, 'off')
@@ -530,22 +611,32 @@ class LabPrep:
                      ('stage', -1), ('stage', 1))
 
     def draw_control(self, box, top, height):
-        """控制：完全控制、双方 AI（开/关 + 段位选择器）、双方自动绝招。"""
+        """控制：LAB 为完全控制、双方 AI（开/关 + 段位选择器）、双方自动绝招；双人对战显示双方键位与对战规则
+        （完全控制、AI 与自动绝招在对战中关闭，设定保留）。两种模式由入口决定，此处不提供切换。"""
         lab, c, p = self.lab, self.c, self.lab.p
         x, w = box
         c.panel((x, top, w, height), T(p, 'control'))
+        y = top + 26
+        if lab.versus:
+            keys = lab.versus_keys()
+            for row, (side, color) in enumerate((('p1', BLUE), ('p2', RED))):
+                k = {a: key_label(n) for a, n in keys[side].items()}
+                c.text((x + 14, y + 52 + row * 40), T(p, 'vs_keys', side.upper(), k['left'], k['right'], k['ap'],
+                                                     k['deploy'], k['special'], k['slug']), 13, color, 'lm', 2, w - 28)
+            c.text((x + 14, y + 134), T(p, 'vs_rules'), 12, GRAY, 'lm', 2, w - 28)
+            return
         for index, attr in enumerate(('full_control', 'player_ai', 'player_auto_special', 'enemy_ai',
                                       'enemy_auto_special')):
-            y = top + 42 + index * 39
+            y = top + 44 + index * 34
             on = getattr(lab, attr)
             if attr in ('player_ai', 'enemy_ai'):
                 side = attr[:-3]
                 c.text((x + 14, y + 15), T(p, side + '_ai_short'), 15, WHITE, 'lm', 2, 64)
-                c.button((x + 82, y, 52, 30), T(p, 'on' if on else 'off'), ('toggle', attr), 16, 'on' if on else 'off')
-                self.tier_selector((x + 142, y, w - 156, 30), side, on)
+                c.button((x + 82, y, 52, 28), T(p, 'on' if on else 'off'), ('toggle', attr), 16, 'on' if on else 'off')
+                self.tier_selector((x + 142, y, w - 156, 28), side, on)
                 continue
-            c.text((x + 14, y + 15), T(p, attr), 15, WHITE, 'lm', 2, w - 110)
-            c.button((x + w - 86, y, 72, 30), T(p, 'on' if on else 'off'), ('toggle', attr), 16, 'on' if on else 'off')
+            c.text((x + 14, y + 14), T(p, attr), 15, WHITE, 'lm', 2, w - 110)
+            c.button((x + w - 86, y, 72, 28), T(p, 'on' if on else 'off'), ('toggle', attr), 16, 'on' if on else 'off')
 
     def tier_color(self, name, plate):
         if name not in self.tier_colors:
@@ -577,7 +668,7 @@ class LabPrep:
         c.panel((x, top, w, height), T(p, 'advantage'))
         y = top + 42
         for side in ('player', 'enemy'):
-            c.text((x + 14, y + 10), T(p, 'adv_' + side), 15, BLUE if side == 'player' else RED, 'lm', 2, w - 28)
+            c.text((x + 14, y + 10), self.t('adv_' + side), 15, BLUE if side == 'player' else RED, 'lm', 2, w - 28)
             y += 24
             for stat in ('hp', 'atk'):
                 key = f'{side}_{stat}_boost'
@@ -613,7 +704,7 @@ class LabPrep:
     def draw_picker(self):
         c, p = self.c, self.lab.p
         side, slot = self.picker
-        c.header(T(p, 'picker_title', T(p, 'side_' + side), slot + 1))
+        c.header(T(p, 'picker_title', self.t('side_' + side), slot + 1))
         self.header_buttons(start=False)
         c.button((W - 10 - ICON_W - 14 - 140, ICON_Y + (ICON_H - 32) // 2, 140, 32), T(p, 'set_empty'),
                  ('pick', None), 16, 'light')
@@ -649,6 +740,82 @@ class LabPrep:
         c.text((W / 2, H - 35), T(p, 'page', self.picker_page + 1, pages, len(units)), 16, WHITE, 'mm', 2, 600)
         c.button((W - 164, H - 54, 140, 38), T(p, 'next'), ('picker_page', 1), 16)
 
+    def pad_lines(self):
+        """已连接手柄的显示行：(序号, 名称, 玩家)。"""
+        return [(index + 1, name or f'#{jid}', '-' if side is None else ('P1', 'P2')[side])
+                for index, (jid, side, name) in enumerate(self.lab.pad_status)]
+
+    def draw_keys(self):
+        """按键设定：每名玩家 6 项键盘键与 4 项手柄功能键（点击后按下新键；同一玩家内重复时互换）。"""
+        lab, c, p = self.lab, self.c, self.lab.p
+        from lab_versus_input import ACTIONS
+        c.header(T(p, 'vs_keys_title'))
+        self.header_buttons(start=False)
+        keys, pads = lab.versus_keys(), lab.versus_pad()
+        top, height = HEADER_H + 10, 400
+        for index, (side, color) in enumerate((('p1', BLUE), ('p2', RED))):
+            x, w = 24 + index * 626, 606
+            c.panel((x, top, w, height), None)
+            c.text((x + 18, top + 22), T(p, 'vs_side_' + side), 20, color, 'lm', 2, w - 36)
+            for label, cx in (('vs_col_action', x + 22), ('vs_col_key', x + 210), ('vs_col_pad', x + 410)):
+                c.text((cx, top + 60), T(p, label), 14, GRAY, 'lm', 2, 180)
+            for row, action in enumerate(ACTIONS):
+                y = top + 80 + row * 50
+                c.text((x + 22, y + 19), T(p, 'vs_act_' + action), 17, WHITE, 'lm', 2, 176)
+                waiting = self.capture == (side, 'key', action)
+                c.button((x + 200, y, 180, 38), '…' if waiting else key_label(keys[side][action]),
+                         ('capture', side, 'key', action), 18, 'on' if waiting else 'normal')
+                if action in pads[side]:
+                    waiting = self.capture == (side, 'pad', action)
+                    c.button((x + 400, y, 180, 38), '…' if waiting else pads[side][action],
+                             ('capture', side, 'pad', action), 18, 'on' if waiting else 'normal')
+                else:
+                    c.text((x + 490, y + 19), T(p, 'vs_pad_fixed'), 14, GRAY, 'mm', 2, 180)
+        y = top + height + 10
+        c.panel((24, y, W - 48, 120), T(p, 'vs_pads'))
+        lines = self.pad_lines()
+        if not lines:
+            c.text((42, y + 64), T(p, 'vs_pad_none'), 16, GRAY, 'lm', 2, 760)
+        for row, (number, name, side) in enumerate(lines[:3]):
+            c.text((42, y + 52 + row * 24), T(p, 'vs_pad_row', number, name, side), 15, WHITE, 'lm', 2, 760)
+        single = lab.config.get('versus_pad_single', 'p2').upper()
+        c.button((W - 48 - 400, y + 46, 220, 36), T(p, 'vs_pad_single', single), ('pad_single',), 15)
+        c.button((W - 48 - 168, y + 46, 150, 36), T(p, 'vs_reset'), ('keys_reset',), 15, 'off')
+        if self.message:
+            c.text((W // 2, H - 20), self.message, 16, GOLD, 'mm', 2, W - 60)
+
+    def draw_help(self):
+        """操作说明：双方当前键位与手柄按键（随自定义实时显示）与对战规则。"""
+        lab, c, p = self.lab, self.c, self.lab.p
+        c.header(T(p, 'vs_help_title'))
+        self.header_buttons(start=False)
+        keys, pads = lab.versus_keys(), lab.versus_pad()
+        top, height = HEADER_H + 10, 262
+        for index, (side, color) in enumerate((('p1', BLUE), ('p2', RED))):
+            x, w = 24 + index * 626, 606
+            k, g = keys[side], pads[side]
+            rows = (('select', f"{key_label(k['left'])} / {key_label(k['right'])}", T(p, 'vs_pad_fixed')),
+                    ('ap', key_label(k['ap']), g['ap']), ('deploy', key_label(k['deploy']), g['deploy']),
+                    ('special', key_label(k['special']), g['special']), ('slug', key_label(k['slug']), g['slug']),
+                    ('menu', 'Esc', 'START'),
+                    ('camera', T(p, 'vs_cam_' + side), None))
+            c.panel((x, top, w, height), None)
+            c.text((x + 18, top + 22), T(p, 'vs_side_' + side), 20, color, 'lm', 2, w - 36)
+            for label, cx in (('vs_col_action', x + 22), ('vs_col_key', x + 230), ('vs_col_pad', x + 420)):
+                c.text((cx, top + 54), T(p, label), 14, GRAY, 'lm', 2, 180)
+            for row, (action, key, pad) in enumerate(rows):
+                y = top + 80 + row * 26
+                c.text((x + 22, y), T(p, 'vs_act_' + action), 16, WHITE, 'lm', 2, 200)
+                if pad is None:
+                    c.text((x + 230, y), key, 16, GOLD, 'lm', 2, w - 250)
+                    continue
+                c.text((x + 230, y), key, 16, GOLD, 'lm', 2, 180)
+                c.text((x + 420, y), pad, 16, GOLD, 'lm', 2, 170)
+        y = top + height + 10
+        c.panel((24, y, W - 48, H - y - 14), None)
+        for row, line in enumerate(T(p, 'vs_rule_lines')):
+            c.text((44, y + 24 + row * 30), '・' + line, 16, WHITE, 'lm', 2, W - 100)
+
     def draw_history(self):
         c, p = self.c, self.lab.p
         c.header(T(p, 'history_title'))
@@ -660,7 +827,8 @@ class LabPrep:
             y = HEADER_H + 10 + index * 49
             winner = entry.get('winner')
             c.paste(self.skin.nine(ROW_STYLES.get(winner, ROW_STYLES[None]), W - 48, 45, 8), (24, y))
-            result = T(p, {'player': 'win_player', 'enemy': 'win_enemy'}.get(winner, 'aborted'))
+            key = {'player': 'win_player', 'enemy': 'win_enemy'}.get(winner, 'aborted')
+            result = T(p, 'vs_' + key if entry.get('versus') and winner else key)
             c.text((40, y + 22), T(p, 'history_row', entry.get('time', ''), result, entry.get('seconds', 0),
                                    self.lab.stage_label(entry.get('stage_id'))), 16, WHITE, 'lm', 2, 380)
             for side_index, key in enumerate(('player_units', 'enemy_units')):

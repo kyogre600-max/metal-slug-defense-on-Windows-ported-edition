@@ -1,0 +1,13 @@
+{
+ "self_exact": 35,
+ "words": 35,
+ "gap_agree": [
+  105,
+  149
+ ],
+ "per_letter_from_other_words": {
+  "n": 164,
+  "median_diff_px": 88.5,
+  "exact": 27
+ }
+}

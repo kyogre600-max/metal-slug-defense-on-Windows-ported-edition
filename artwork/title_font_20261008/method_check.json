@@ -1,0 +1,103 @@
+{
+ "recipe": [
+  [
+   "base",
+   "16/E_medal_shop_69_305_1"
+  ],
+  [
+   "erase",
+   5,
+   2,
+   13,
+   13
+  ],
+  [
+   "rows",
+   "16/I_shop_343_322_0",
+   3,
+   13,
+   5,
+   5,
+   0
+  ],
+  [
+   "rows",
+   "16/I_shop_343_322_0",
+   3,
+   13,
+   6,
+   6,
+   0
+  ],
+  [
+   "px",
+   "16/I_shop_343_322_0",
+   5,
+   2,
+   5,
+   2
+  ],
+  [
+   "px",
+   "16/I_shop_343_322_0",
+   6,
+   2,
+   6,
+   2
+  ]
+ ],
+ "stitched_vs_native": {
+  "16/L_login_bonus_1_0_0": {
+   "pixels": 168,
+   "diff_px": 43,
+   "max_channel_diff": 102
+  },
+  "16/L_login_bonus_478_68_2": {
+   "pixels": 168,
+   "diff_px": 59,
+   "max_channel_diff": 71
+  },
+  "16/L_login_bonus_478_68_3": {
+   "pixels": 169,
+   "diff_px": 47,
+   "max_channel_diff": 255
+  },
+  "16/L_medal_shop_69_305_4": {
+   "pixels": 168,
+   "diff_px": 43,
+   "max_channel_diff": 102
+  },
+  "16/L_menu_485_133_0": {
+   "pixels": 169,
+   "diff_px": 44,
+   "max_channel_diff": 255
+  },
+  "16/L_prisoner_list_202_57_0": {
+   "pixels": 171,
+   "diff_px": 69,
+   "max_channel_diff": 255
+  },
+  "16/L_profile_216_0_5": {
+   "pixels": 187,
+   "diff_px": 91,
+   "max_channel_diff": 255
+  },
+  "16/L_stageselect_01_212_81_2": {
+   "pixels": 168,
+   "diff_px": 59,
+   "max_channel_diff": 68
+  },
+  "16/L_stageselect_01_231_68_2": {
+   "pixels": 182,
+   "diff_px": 86,
+   "max_channel_diff": 255
+  }
+ },
+ "stitched_best_diff_px": 43,
+ "native_pairwise_diff_px": {
+  "min": 1,
+  "median": 76,
+  "max": 93,
+  "pairs": 36
+ }
+}

@@ -237,3 +237,33 @@
 - 修订（`lab.py`）：以原生离开场景 100 作为演出结束点；停止计时改为 15 秒兜底（`RESULT_FALLBACK_FRAMES = 450`），仅在原生未离开场景时生效。
 - 验证（`verification/lab_result_anim_20261008/driver_result.py`，隔离存档 `verification/lab_ui_20261006/save/`）：FAILED 与 COMPLETE 各一场，`finish` 只调用一次，原因均为 `battle_finished_scene_101`（FAILED 第 155 帧、COMPLETE 第 135 帧），未触发兜底；合拢前截图显示文字完整入场与退场，合拢后准备界面正常打开（`runs/lose_48624/contact.png`、`runs/win_49972/contact.png`）。`--observe` 模式记录原生完整演出（`runs/lose_observe_47012`）。
 - 同步：两个运行目录的 `lab.py` 与提交 1.47.1（HEAD 7bdc26d）相同，工作区 `lab.py` 另含其他会话未完成的双人对战修改；同步文件为 HEAD 版本加本修订（与 HEAD 差异仅上述两处），见 `verification/lab_result_anim_20261008/sync_files/lab.py`，同步前副本在同目录 `dist_before/`、`user_install_before/`。同步文件未单独运行，行为验证基于工作区 `lab.py`（相同修改）。
+
+
+## 2.17 本地双人对战（2026-10-08，核心 r22–r24，钩子版本 14–16）
+
+- 结束演出（hooks14，功能位 256）、出兵格光标（hooks15，功能位 512，头部 +0xa00）、主菜单“對戰”与 VERSUS 子页面（hooks16，drawConv 替换表 +0xb40 'VSPG'，诊断记录 +0xb00 'DLOG'）、准备界面的按鍵設定 / 操作說明页、手柄（`lab_versus_input.py`，`player.Player.poll_input` 窗口线程轮询）与右摇杆镜头仲裁（原生 `BattleScreen::movePosition`）。
+- 详细机制、参数与验证见 `docs/lab/local_versus_design_2026-10-06.md` 第 6 节；驱动位于 `verification/lab_versus_20261008/`。
+- 2026-10-08 修订（宿主，核心 r24）：模式只由入口决定、VERSUS 页 SHOP 按钮原生切换、默认键位 R T Y U / M , . /、选项页音频两行逐行入场、战斗中菜单音频开关、玩家1 / 玩家2 文字；见设计文档第 6.7 节。
+
+## 2.18 对战卡片固定 VS 字样及上下留白（2026-10-08，宿主修订，核心保持 r24）
+
+- 用户自行设计 `custom_content/versus_card_{local,lan,online}.png` 的 98×102 人物图标；三张卡的 VS、原生卡框与底部文字由程序保留。`placeholder_art()` 仅包含占位士兵，`versus_mark()` 保留当前原生裁切像素，`card_image()` 在人物图层上独立叠加 VS。
+- VS 图块为 34×20，透明边缘 bbox 为 (2,2,31,20)，完整图块左上角由 (32,14) 上移至 (32,5)。卡片内容相对 112×144 卡框偏移 (7,7)，VS 上方可见像素留白为 7+5+2=14；下方标签裁切后贴至 98×123 内容下沿，底部留白为 144−7−123=14。LAN、ONLINE 的灰度与“準備中”处理保持。
+- 离线验证：三张卡、四种语言、缺省头像及透明/不透明用户图的 76 项像素、位置、留白和尺寸检查通过；人物图标、标签及提示在 VS 修改区域外逐像素保持。证据 `verification/lab_versus_20261008/fixed_vs_20261008/verification.json`。本轮未启动游戏，用户人物素材与实际窗口效果待其使用时核验。
+- 同步清单：`lab_versus_page.py`、本文件及 `docs/lab/local_versus_design_2026-10-06.md`；目标为第 2.2、2.3 节的两个固定运行目录。个人存档、LAB 配置、预设及核心保持，部署记录见同一验证目录的 `deployment.json`。
+
+## 2.19 用户三张对战人物插画接入（2026-10-08）
+
+- 用户原稿位于 `F:\MSD宣传\versus_card_{local,lan,online}.png`，三图均为 98×102 RGBA。原样接入 `custom_content/` 与 `src/custom_content/`，对应文件逐字节一致；用户原稿、像素、透明度及配色保持。
+- 用户最终要求三图下移以避让 VS，`card_image()` 将用户人物图统一绘制于 (0,16)，原 PNG 像素、尺寸及透明度保持；缺省士兵位置保持。VS 固定位置 (32,5)、卡框、底部文字和未实现模式的灰度/“準備中”保持。
+- 移动后 LOCAL/LAN/ONLINE 至 VS 的最小纵向空隙分别为 14/2/12 px，至底部标签均为 6 px；与 VS 及底部标签的非透明像素交集均为 0，全部人物可见像素保留。
+- 三卡四语言的离线合成与固定 VS 像素检查通过，原生 shop.obm 卡框/底板的 4 倍最近邻合成预览已核验。本轮未启动游戏；证据 `verification/lab_versus_20261008/user_card_art_20261008/verification.json`、`cards_preview_4x.png`。
+- 同步清单为六项人物素材、`lab_versus_page.py` 及两份 LAB 文档，共九项，目标为两个固定运行目录；部署与保护检查见同一验证目录的 `deployment.json`。核心、配置、存档及 LAB 预设保持，图片重载通过正常退出和重新启动完成。
+
+## 2.20 对战原生按压反馈与 LOCAL 关闸修复（2026-10-08，宿主修订，核心保持 r24）
+
+- 原因：原入口向底栏 SHOP 模拟按下/松开，入口与三卡触点由宿主截断，LOCAL 在关闸前清除 VSPG。隔离基准实际复现 SHOP 蓝光、白光缺失及关闸前的原生 ITEM/MSP/UNIT 商店显现。
+- `lab_versus_page.py` 复用入口 `GT_MenuPanel` 与三卡 `GT_MenuGenrePanel` 的原生按压路径；松开时框外释放并 `ClearSelectPanel`，业务由宿主处理。开页临时登记 SHOP 布局选择并调用 `SelectCockpitMainMenu()`，底栏 SHOP 按压状态保持 0，原生入场及单次确定音保留。入场就绪、拖出取消、重新移回及异常释放均已处理。
+- LOCAL 使用 `local_transition` 保持 VSPG，待闸门闭合且准备界面打开后撤掉替换。准备界面返回 MENU 与用户主动进入正常 SHOP 的原生路径保持；用户插画、固定 VS 及其坐标保持。
+- 验证：实际 r24、1280×720 ANGLE pbuffer 的 35/35 项检查通过，121 张 GPU 截图；入口与三卡白光为 64/128/192/255，SHOP 无误按压，LOCAL 关闸期间 VSPG 持续保留，正常 SHOP/三卡/OPTION 返回及拖出移回取消通过。证据 `verification/versus_feedback_20261008/final_/20261008_170449_29364/report.json` 与 `frames.jsonl`。所有验证写入限定独立 fixture，SHA-256 抛错守卫记录计算尝试 0。
+- 同步 `lab_versus_page.py` 及两份 LAB 文档至两个固定运行目录，清单与保护检查见 `verification/versus_feedback_20261008/deployment.json`。核心、配置、个人存档与素材保持，更新通过正常退出与重新启动加载。

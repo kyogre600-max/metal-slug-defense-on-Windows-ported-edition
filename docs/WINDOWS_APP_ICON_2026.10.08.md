@@ -31,7 +31,7 @@ python src/build_app_icon.py
 python src/build_launchers.py
 ```
 
-图标生成脚本默认使用 `LOGOAPP2.png`；以 `--source custom_content/LOGOAPP.png` 可指定保留的第一份设计。启动器构建脚本采用已有 MinGW 工具链，并只为 `--entry-root` 下存在的 Python 入口生成 EXE；`--output-dir` 可指定候选输出目录。当前统一版本为 1.47.1，更新条目为“加入了不同等级的AI BOT以在LAB中使用”。
+图标生成脚本默认使用 `LOGOAPP2.png`；以 `--source custom_content/LOGOAPP.png` 可指定保留的第一份设计。启动器构建脚本采用已有 MinGW 工具链，并只为 `--entry-root` 下存在的 Python 入口生成 EXE；`--output-dir` 可指定候选输出目录。当前统一版本为 1.47.2，更新条目为“新添加本地双人对战功能，可使用键盘/手柄进行对战（手柄操作默认XBOX360操作模式）”。
 
 ## 核验范围
 

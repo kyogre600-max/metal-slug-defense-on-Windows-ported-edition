@@ -19,7 +19,7 @@ except BaseException:
 
 PROFILE = 'lab_test_save'
 # 含 LAB 钩子的核心由正式版配置统一加载；独立入口和验证保留显式指定核心接口。
-LAB_CORE = ROOT / 'src' / 'build' / 'MSD_Core_LAB_r21_20261007.dll'
+LAB_CORE = ROOT / 'src' / 'build' / 'MSD_Core_LAB_r24_20261008.dll'
 KEYS = {glfw.KEY_F7: ('prep',), glfw.KEY_F5: ('exit',), glfw.KEY_F8: ('toggle_full',),
         glfw.KEY_F4: ('toggle_enemy_ai',), glfw.KEY_F3: ('toggle_player_ai',),
         glfw.KEY_LEFT_BRACKET: ('enemy_ap',), glfw.KEY_RIGHT_BRACKET: ('enemy_slug',),
@@ -28,6 +28,10 @@ KEYS.update({key: ('enemy_unit', slot) for slot, key in enumerate(
     (glfw.KEY_Q, glfw.KEY_W, glfw.KEY_E, glfw.KEY_R, glfw.KEY_T,
      glfw.KEY_Y, glfw.KEY_U, glfw.KEY_I, glfw.KEY_O, glfw.KEY_P))})
 BLOCKED_MODS = glfw.MOD_SHIFT | glfw.MOD_CONTROL | glfw.MOD_ALT | glfw.MOD_SUPER
+# 双人对战：始终交给原有流程的按键（菜单、全屏、截图、静音），其余按键只按双方键位处理。
+VS_PASS_KEYS = (glfw.KEY_ESCAPE, glfw.KEY_F7, glfw.KEY_F9, glfw.KEY_F11, glfw.KEY_F12)
+VS_BAR_TOP = 573          # 底栏上沿（1280×720 逻辑坐标，HANDOFF 设计文档 4.1b）
+VS_DRAG_START = 8         # 鼠标移动超过该距离（逻辑像素）才视为镜头拖动
 
 
 def safe_profile(path):
@@ -103,6 +107,14 @@ def install():
                 self.log('LAB_NATIVE_HOOKS', self.lab.native_hooks, str(self.uc.library_path))
             from lab_menu_entry import LabMenuEntry
             self.menu_entry = LabMenuEntry(self, self.lab, ROOT)
+            from lab_versus_page import VersusPage
+            self.versus_page = VersusPage(self, self.lab, ROOT, probe_class.touch_event)
+
+        def draw_text(self, a, idx):
+            page = getattr(self, 'versus_page', None)
+            if page is not None:
+                page.rename_strings(a)              # 主菜单 Wi-Fi 对战按钮 → 对战
+            return super().draw_text(a, idx)
 
         def filecall(self, name, a):
             # 敌方红色绝招光圈：LAB 以替换文件名 aurR.obm 构造第二个 BattleEffectRenderer，
@@ -147,6 +159,35 @@ def install():
             lab = getattr(self, 'lab', None)
             if lab is not None and (lab.menu.touch(action, x, y) or lab.prep.touch(action, x, y)):
                 return
+            if lab is not None and lab.vs_battle() and not lab.menu.open:
+                # 双人对战：鼠标只拖动镜头。按下先缓存，移动超过阈值后才把按下送入原生（成为战场拖动）；
+                # 未移动的点击不送入原生（不点出兵栏、按钮与单位绝招）；底栏区域的按下一律忽略。
+                if action == 1:
+                    self.vs_press = (x, y) if y < VS_BAR_TOP else None
+                    self.vs_dragging = False
+                    return
+                press = getattr(self, 'vs_press', None)
+                if press is None:
+                    return
+                if action == 5 and not self.vs_dragging:            # 5 为拖动（player.py 逐帧送出最近位置）
+                    if abs(x - press[0]) + abs(y - press[1]) < VS_DRAG_START:
+                        return
+                    if not lab.vs_camera.mouse_allowed():
+                        return                                      # P2 右摇杆正在控制镜头
+                    self.vs_dragging = True
+                    lab.vs_camera.mouse = True
+                    super().touch_event(1, *press)
+                if action == 3:
+                    self.vs_press = None
+                    if not self.vs_dragging:
+                        return
+                    self.vs_dragging = False
+                    lab.vs_camera.mouse = False
+                super().touch_event(action, x, y)
+                return
+            page = getattr(self, 'versus_page', None)
+            if page is not None and lab is not None and not lab.active and page.touch(action, x, y):
+                return
             entry = getattr(self, 'menu_entry', None)
             if entry is not None and entry.touch(action, x, y):
                 return
@@ -167,6 +208,9 @@ def install():
             entry = getattr(self, 'menu_entry', None)
             if entry is not None:
                 entry.close()
+            page = getattr(self, 'versus_page', None)
+            if page is not None:
+                page.shutdown()
             return super().close()
 
         def activate_unit_slot(self, slot):
@@ -180,6 +224,9 @@ def install():
             entry = getattr(self, 'menu_entry', None)
             if entry is not None:
                 entry.prepare_frame()
+            page = getattr(self, 'versus_page', None)
+            if page is not None:
+                page.prepare_frame()
             super().step_frame()
             lab = getattr(self, 'lab', None)
             if lab is None:
@@ -200,8 +247,38 @@ def install():
     class LabPlayer(player_class):
         lab_runtime_installed = True
 
+        def poll_input(self):
+            """窗口线程：准备界面打开或双人对战进行中时轮询手柄（GLFW 手柄函数只在主线程调用）。"""
+            lab = getattr(self.probe, 'lab', None) if self.probe else None
+            if lab is None or not self.ready:
+                return
+            if not (lab.prep.open or lab.vs_battle()):
+                lab.vs_camera.stick = [0.0, 0.0]
+                return
+            if getattr(self, 'pad_poller', None) is None:
+                from lab_versus_input import PadPoller
+                self.pad_poller = PadPoller()
+            try:
+                self.pad_poller.poll(lab)
+            except Exception as error:
+                if not getattr(self, 'pad_error', None):
+                    self.pad_error = f'{type(error).__name__}: {error}'
+                    self.probe.log('VS_PAD_ERROR', self.pad_error)
+
         def key(self, window, key, scan, action, mods):
             lab = getattr(self.probe, 'lab', None) if self.probe else None
+            if (lab is not None and self.ready and action == glfw.PRESS and lab.prep.open and key != glfw.KEY_ESCAPE
+                    and lab.prep.capture is not None and lab.prep.capture[1] == 'key'):
+                # 按键设定：等待指定时下一次按键（含修饰键与保留键，由游戏线程校验）交给准备界面。
+                lab.commands.append(('prep_key', 'bind', key))
+                return
+            if lab is not None and self.ready and lab.vs_battle() and not lab.menu.open and key not in VS_PASS_KEYS:
+                # 双人对战：只接受双方键位（修饰键状态为全局，不据此拒绝）；左右选择允许按住连发。其余游戏按键不送入战斗。
+                if action == glfw.PRESS or (action == glfw.REPEAT and key in self.vs_repeat_keys(lab)):
+                    for command in self.vs_commands(lab).get(key, ()):
+                        if action == glfw.PRESS or command[2] in ('left', 'right'):
+                            lab.commands.append(command)
+                return
             if lab is not None and self.ready and action == glfw.PRESS and not mods & BLOCKED_MODS:
                 # 战斗中菜单（T6）：Esc 打开/关闭；打开期间 ↑/↓/Enter 操作菜单，其余游戏按键不送入战斗。
                 if key == glfw.KEY_ESCAPE and lab.active:
@@ -230,6 +307,24 @@ def install():
                     lab.commands.append(command)
                 return
             super().key(window, key, scan, action, mods)
+
+        def vs_commands(self, lab):
+            """GLFW 键码 → 指令列表；同一键可同时属于两名玩家（用户确认允许），各自触发。"""
+            keys = lab.versus_keys()
+            cache = getattr(self, 'vs_cache', None)
+            if cache is None or cache[0] != keys:
+                table = {}
+                for side, name in ((0, 'p1'), (1, 'p2')):
+                    for action, key_name in keys[name].items():
+                        code = getattr(glfw, 'KEY_' + str(key_name).upper(), None)
+                        if code is not None:
+                            table.setdefault(code, []).append(('vs', side, action))
+                cache = self.vs_cache = (keys, table)
+            return cache[1]
+
+        def vs_repeat_keys(self, lab):
+            return {code for code, commands in self.vs_commands(lab).items()
+                    if any(command[2] in ('left', 'right') for command in commands)}
 
     if not getattr(probe_class, 'lab_runtime_installed', False):
         player.Probe = LabProbe

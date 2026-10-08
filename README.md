@@ -8,6 +8,10 @@ This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds 
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+**Update 1.47.2**
+
+- Added local two-player versus mode with keyboard/controller support (default controller layout: Xbox 360).
+
 **Update 1.47.1**
 
 - Added AI BOT difficulty levels for use in LAB.
@@ -100,6 +104,10 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+**1.47.2 更新**
+
+- 新添加本地双人对战功能，可使用键盘/手柄进行对战（手柄操作默认XBOX360操作模式）
 
 **1.47.1 更新**
 

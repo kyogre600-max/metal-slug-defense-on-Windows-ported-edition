@@ -67,7 +67,10 @@ class AudioOptions:
         if mode=='menu':
             offsets=(0x338c,0x3390,0x3394)
             if self.mode!=mode:
-                for index in (12,13):p.call('_ZN7AppMain10SetPanelInEii',app,index,0)
+                # 原生选项页逐行入场（SelectCockpitMainMenu：第 10、11 行延迟 5、7 帧，每行 +2）。本调用晚于原生一帧，
+                # 音乐、音效两行以语言行（第 11 行，任务 +104 为剩余延迟）当前值 +2、+4 接续。
+                language_task=p.word(app+0x338c);remaining=p.word(language_task+104) if language_task else 7
+                for index,step in ((12,2),(13,4)):p.call('_ZN7AppMain10SetPanelInEii',app,index,remaining+step)
         elif mode=='pause':offsets=(0x3364,0x3368,0x336c)
         else:offsets=(0x3390,0x3394,0x3398)
         language,music,effects=(p.word(app+offset) for offset in offsets)

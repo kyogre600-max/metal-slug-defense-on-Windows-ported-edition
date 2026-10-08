@@ -4,11 +4,13 @@ GameMode 1 中原生暂停页不可用；打开菜单时置 BattleGameMaster+0x1
 原生不显示暂停界面），关闭时还原。面板使用原生素材（pause_window.obm 米色面板、menuparts.obm 标题栏与按钮），
 打开时自上方滑入、关闭时滑出（8 帧），打开/选择播放原生确定音，关闭播放原生关闭音。
 鼠标点击行或 ↑/↓ + Enter 选择，Esc 打开/关闭。文字随游戏语言（lab_ui.TEXT）。
+LAB 与双人对战均提供音乐、音效开关（与原生暂停页相同的存档字 app+0x3d5c / app+0x3d60，由 audio_options 应用音量与保存）。
 """
 from lab_ui import (W, H, WHITE, GOLD, GRAY, HEADER, BOARD, SE_DECIDE, SE_CLOSE, T, Canvas, Skin, fonts, play_se)
 
-PANEL_W, PANEL_H = 500, 520
+PANEL_W = 500
 ROW_H, ROW_TOP = 44, 92
+AUDIO_ROWS = (('menu_music', 0x3d5c), ('menu_effects', 0x3d60))   # app 偏移（audio_options.MUSIC / EFFECTS）
 SLIDE_FRAMES = 8
 
 
@@ -31,8 +33,10 @@ class LabMenu:
     # ---------- 行 ----------
     def rows(self):
         lab, p = self.lab, self.lab.p
-        rows = [(T(p, name), getattr(lab, name), ('toggle', name)) for name in
+        rows = [] if lab.vs_battle() else [(T(p, name), getattr(lab, name), ('toggle', name)) for name in
                 ('full_control', 'player_ai', 'player_auto_special', 'enemy_ai', 'enemy_auto_special')]
+        app = p.app_instance()
+        rows += [(T(p, name), bool(p.word(app + offset)), ('audio', offset)) for name, offset in AUDIO_ROWS]
         return rows + [(T(p, 'restart'), None, ('restart',)), (T(p, 'exit_lab'), None, ('exit',)),
                        (T(p, 'resume'), None, ('close',))]
 
@@ -108,27 +112,34 @@ class LabMenu:
         if self.closing:
             t = 1 - t
         t = t * t * (3 - 2 * t)
-        left, top = (W - PANEL_W) // 2, (H - PANEL_H) // 2
-        y = int(-PANEL_H + (top + PANEL_H) * t)
-        self.rect = (left, top, PANEL_W, PANEL_H)
-        self.dim.draw_image(self.dim_image, ('lab_menu_dim',), (0, 0, W, H))
         rows = self.rows()
+        panel_h = self.panel_h(rows)
+        left, top = (W - PANEL_W) // 2, (H - panel_h) // 2
+        y = int(-panel_h + (top + panel_h) * t)
+        self.rect = (left, top, PANEL_W, panel_h)
+        self.dim.draw_image(self.dim_image, ('lab_menu_dim',), (0, 0, W, H))
         key = ('lab_menu', self.revision, tuple(r[1] for r in rows), self.selected, self.pressed)
         image = None
         if self.overlay.cached != key:
             image = self.render(rows)
-        self.overlay.draw_image(image, key, (left, y, PANEL_W, PANEL_H))
+        self.overlay.draw_image(image, key, (left, y, PANEL_W, panel_h))
         if self.closing and self.frame >= SLIDE_FRAMES:
             self.set_open(False, animate=False)
+
+    @staticmethod
+    def panel_h(rows):
+        """面板高度随行数（LAB 10 行、双人对战 5 行）。"""
+        return ROW_TOP + len(rows) * ROW_H + 40
 
     def render(self, rows):
         from PIL import Image
         p = self.lab.p
-        image = Image.new('RGBA', (PANEL_W, PANEL_H), (0, 0, 0, 0))
+        panel_h = self.panel_h(rows)
+        image = Image.new('RGBA', (PANEL_W, panel_h), (0, 0, 0, 0))
         c = Canvas(image, self.skin, self.font, None)
-        c.paste(self.skin.nine(BOARD, PANEL_W, PANEL_H - 30, 26), (0, 30))
+        c.paste(self.skin.nine(BOARD, PANEL_W, panel_h - 30, 26), (0, 30))
         c.paste(self.skin.nine(HEADER, PANEL_W - 40, 58, 20), (20, 0))
-        c.text((PANEL_W / 2, 24), T(p, 'menu_title'), 22, GOLD, 'mm', 3, PANEL_W - 80)
+        c.text((PANEL_W / 2, 24), T(p, 'vs_menu_title' if self.lab.versus else 'menu_title'), 22, GOLD, 'mm', 3, PANEL_W - 80)
         c.text((PANEL_W / 2, 46), T(p, 'menu_paused'), 13, WHITE, 'mm', 2, PANEL_W - 80)
         left, top = self.rect[:2]
         self.hitboxes = []
@@ -143,7 +154,7 @@ class LabMenu:
                 c.button((PANEL_W - 122, y, 82, ROW_H - 8), T(p, 'on' if state else 'off'), ('row', index), 16,
                          'on' if state else 'off')
             self.hitboxes.append(((left + 40, top + y, PANEL_W - 80, ROW_H - 8), index))
-        c.text((PANEL_W / 2, PANEL_H - 22), T(p, 'menu_hint'), 13, GRAY, 'mm', 1, PANEL_W - 60)
+        c.text((PANEL_W / 2, panel_h - 22), T(p, 'menu_hint'), 13, GRAY, 'mm', 1, PANEL_W - 60)
         return image
 
     def close_resources(self):

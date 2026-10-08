@@ -134,6 +134,9 @@ class Player:
         self.last_mouse=point
         if self.pressed:self.last_motion=self.last_mouse
 
+    def poll_input(self):
+        '''窗口线程每轮事件循环调用一次（手柄等需在主线程轮询的输入）；默认无操作。'''
+
     def focus(self,window,focused):
         if not focused:self.window_drag=None
         if not focused and self.pressed:
@@ -318,6 +321,7 @@ class Player:
             last_status=0;test_press=None;test_released=False;test_mute_phase=0
             while not glfw.window_should_close(self.window) and not self.done:
                 glfw.wait_events_timeout(0.02)
+                self.poll_input()
                 now=time.perf_counter()
                 if self.self_test and self.ready and getattr(self,'self_test_input',True):
                     # Exercise the same input queue used by GLFW's real mouse callbacks.

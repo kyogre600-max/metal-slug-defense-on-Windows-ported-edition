@@ -1220,6 +1220,98 @@ bool ai_invest(Context& c,uint32_t controller){                // true：本帧�
     wr<uint32_t>(c,stats+12u,rd<uint32_t>(c,stats+12u)+1u);
     return true;
 }
+// ---------- 第 14 版：本地双人对战的结束演出（功能位 256） ----------
+// BattleMain::changeScene（0x1d0b57，r1 = SceneType）在已建立的场景中按类型切换：1 MISSION START、
+// 3 MISSION COMPLETE（BattleStartAndCompleteEffectScene，效果类型非 0）、4 MISSION FAILED（BattleFailedEffectScene）。
+// 原生演出以 P1（本地队伍）视角选择 3 或 4。双人对战中双方胜利都播放 MISSION COMPLETE（用户要求：动画与音效相同），
+// 因此功能位开启时把 4 改为 3。替换次数记于头部 +0x780。
+constexpr uint32_t FLAG_VERSUS=256u,VERSUS_COMPLETE_COUNT=H+0x780u;
+Block old_change_scene;
+void change_scene(Context& c){
+    if(enabled(c,FLAG_VERSUS) && c.r[1]==4u){
+        c.r[1]=3u;
+        wr<uint32_t>(c,VERSUS_COMPLETE_COUNT,rd<uint32_t>(c,VERSUS_COMPLETE_COUNT)+1u);
+    }
+    old_change_scene(c);
+}
+// ---------- 第 15 版：双人对战选中格光标（原生绘制顺序，功能位 512） ----------
+// drawUI 的出兵格循环（0x1d8700–0x1d8a80）以 GraphicsOpt::drawConv（0x10136985：r0 graphics、r1 Image、r2/r3 x/y、
+// 栈 [转换项, 3 个浮点, 整数]）绘制格子：底板为 operator+200 转换表项 53/54/55（50×50），其后为单位头像（项 56–74），
+// 费用牌为 createGrahics 按槽位预先画好价格数字的项 78–97（绿/红）及 77（OK!）、98（MAX）、107。
+// r6 为槽位序号（drawUI 0x1d88b0 以其与按下格 operator+32 比较）。敌方半区绘制时 operator+188/+200 换入敌方图集与
+// 转换表（swap_gfx），因此转换表基址按调用时的 operator+200 实时读取。
+// 功能位开启时，若当前片段为出兵格（pass.cells）且该槽为本侧光标所在格，先画原生图块，再以相同位置与参数画
+// 宿主建立的光标图块（头部 +0xa00）：底板后画光标框、费用牌后画光标费用牌，单位头像与数字随后由原生画在其上。
+// 头部 +0xa00：+0 启用，+4/+8 P1/P2 光标槽，+0x10 起每侧 4 个 Image*（0 框、1 费用牌），
+// +0x30 起每侧 4 个转换项（16 字节，至 +0xaf），+0xc0 BattlePlayerOperator 指针，+0xd0/+0xd4 命中计数（框、费用牌）。
+constexpr uint32_t FLAG_VS_CURSOR=512u,VS_CUR=H+0xa00u,VS_CUR_HITS=H+0xad0u,G_DRAW_CONV=0x10136985u;
+constexpr uint32_t SLOT_LOOP_BEGIN=0x101d8700u,SLOT_LOOP_END=0x101d8a80u;
+// 诊断：头部 +0xb00 为 'DLOG' 时，把 drawConv 调用记入宿主分配的缓冲区（+0xb08 地址、+0xb0c 容量条数），
+// 计数在 +0xb04；同一转换项指针只记一次。每条 32 字节：返回地址、Image*、x、y 位、转换项 16 字节。不改变绘制。
+constexpr uint32_t DRAW_LOG=H+0xb00u,DRAW_LOG_MAGIC=0x474f4c44u;
+// ---------- 第 16 版：VERSUS 子页面（借用原生 SHOP 子页面 scene28/state4 的图块替换） ----------
+// 头部 +0xb40 为 'VSPG' 时启用（与 LAB 战斗头部无关，主菜单中由宿主写入）：+4 条目数（≤8），+0x10 起每条 32 字节：
+// [匹配的转换项指针, 匹配的 Image*（0 为任意）, 新 Image*（0 为跳过绘制）, 保留, 新转换项 16 字节]。
+// drawConv 的转换项为原生只读数据中的固定地址（SHOP 标题字、三张卡的插画与标签、底栏 LOCK），位置与参数沿用原生调用。
+constexpr uint32_t VS_PAGE=H+0xb40u,VS_PAGE_MAGIC=0x47505356u;
+Block old_draw_conv;
+bool in_vs_cursor=false;
+void draw_conv(Context& c){
+    uint32_t lr=c.r[14]&~1u;
+    if(rd<uint32_t>(c,VS_PAGE)==VS_PAGE_MAGIC){
+        uint32_t conv=rd<uint32_t>(c,c.r[13]),n=std::min(rd<uint32_t>(c,VS_PAGE+4u),8u);
+        for(uint32_t i=0;i<n;++i){
+            uint32_t e=VS_PAGE+0x10u+i*32u,want=rd<uint32_t>(c,e+4u);
+            if(rd<uint32_t>(c,e)!=conv || (want && want!=c.r[1]))continue;
+            uint32_t image=rd<uint32_t>(c,e+8u);
+            if(!image){c.pc=c.r[14];return;}                        // 跳过绘制（底栏 LOCK）
+            c.r[1]=image;wr<uint32_t>(c,c.r[13],e+16u);              // 新图像与新转换项（沿用原生位置与缩放）
+            break;
+        }
+    }
+    if(rd<uint32_t>(c,DRAW_LOG)==DRAW_LOG_MAGIC){
+        uint32_t n=rd<uint32_t>(c,DRAW_LOG+4u),buf=rd<uint32_t>(c,DRAW_LOG+8u),cap=rd<uint32_t>(c,DRAW_LOG+12u);
+        uint32_t conv=rd<uint32_t>(c,c.r[13]);
+        bool seen=false;
+        for(uint32_t i=0;i<n && !seen;++i)seen=rd<uint32_t>(c,buf+i*32u+28u)==conv && rd<uint32_t>(c,buf+i*32u+4u)==c.r[1];
+        if(buf && n<cap && !seen){
+            uint32_t e=buf+n*32u;
+            wr<uint32_t>(c,e,lr);wr<uint32_t>(c,e+4u,c.r[1]);wr<uint32_t>(c,e+8u,c.r[2]);wr<uint32_t>(c,e+12u,c.r[3]);
+            for(uint32_t k=0;k<12u;k+=4u)wr<uint32_t>(c,e+16u+k,conv?rd<uint32_t>(c,conv+k):0u);
+            wr<uint32_t>(c,e+28u,conv);                                  // 转换项前 12 字节（矩形 x,y,w,h,锚点 x,y）与指针
+            wr<uint32_t>(c,DRAW_LOG+4u,n+1u);
+        }
+    }
+    if(!in_vs_cursor && lr>=SLOT_LOOP_BEGIN && lr<SLOT_LOOP_END && pass.active && pass.cells &&
+       enabled(c,FLAG_VS_CURSOR) && rd<uint32_t>(c,VS_CUR)){
+        uint32_t conv=rd<uint32_t>(c,c.r[13]);
+        int part=-1;
+        uint32_t op=rd<uint32_t>(c,VS_CUR+0xc0u);
+        uint32_t base=op?rd<uint32_t>(c,op+200u):0u;                 // 当前（含敌方换入）转换表基址，项号 = 偏移/16
+        if(base && conv>=base && (conv-base)%16u==0u){
+            uint32_t index=(conv-base)/16u;
+            if(index==53u||index==54u||index==55u)part=0;
+            else if((index>=77u && index<=98u)||index==107u)part=1;
+        }
+        uint32_t side=enemy_pass?1u:0u;
+        if(part>=0 && c.r[6]==rd<uint32_t>(c,VS_CUR+4u+side*4u)){
+            uint32_t image=rd<uint32_t>(c,VS_CUR+0x10u+side*0x10u+uint32_t(part)*4u);
+            uint32_t stack[5];
+            for(uint32_t i=0;i<5u;++i)stack[i]=rd<uint32_t>(c,c.r[13]+i*4u);
+            uint32_t r0=c.r[0],r1=c.r[1],r2=c.r[2],r3=c.r[3];
+            in_vs_cursor=true;
+            guest_call(c,G_DRAW_CONV,r0,r1,r2,r3,stack,5u);              // 原生图块
+            if(image){
+                stack[0]=VS_CUR+0x30u+side*0x40u+uint32_t(part)*16u;
+                guest_call(c,G_DRAW_CONV,r0,image,r2,r3,stack,5u);       // 光标图块（同位置、同缩放）
+                uint32_t a=VS_CUR_HITS+(part?4u:0u);wr<uint32_t>(c,a,rd<uint32_t>(c,a)+1u);
+            }
+            in_vs_cursor=false;
+            c.pc=c.r[14];return;
+        }
+    }
+    old_draw_conv(c);
+}
 void auto_deploy(Context& c){                                  // 0x1cc070：绝招检查结束，进入出兵决策
     if(enabled(c,FLAG_AUTO_SPLIT) && (auto_disabled(c,c.r[4])&1u)){c.pc=DECISION_EXIT;return;}
     if(ai_opening(c,c.r[4])){c.pc=DECISION_EXIT;return;}
@@ -1281,6 +1373,8 @@ void install_ui_hooks(){
     old_auto_special=find_block(0x101cc04fu);register_block(0x101cc04fu,auto_special);
     old_auto_deploy=find_block(0x101cc071u);register_block(0x101cc071u,auto_deploy);
     old_unit_created=find_block(0x101df441u);register_block(0x101df441u,unit_created);
+    old_change_scene=find_block(0x101d0b57u);register_block(0x101d0b57u,change_scene);
+    old_draw_conv=find_block(0x10136985u);register_block(0x10136985u,draw_conv);
     old_operator_update=find_block(0x101d6ae5u);register_block(0x101d6ae5u,operator_update);
     old_target_update=find_block(TARGET_UPDATE|1u);register_block(TARGET_UPDATE|1u,target_update);
     old_banner_begin=find_block(0x101d932fu);register_block(0x101d932fu,banner_begin);
@@ -1464,7 +1558,7 @@ void install_se_hooks(){
     old_se_release=find_block(0x101c833du);register_block(0x101c833du,se_release);
 }
 }
-extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 13u;}
+extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 16u;}
 extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     static bool installed=false;
     if(installed)return;

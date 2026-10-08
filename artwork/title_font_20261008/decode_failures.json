@@ -1,0 +1,288 @@
+{
+ "0001_0231_2_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   128
+  ],
+  16456,
+  "('Unverified OI format', 1, 4, 256, 128)"
+ ],
+ "asc.obm": [
+  "4f49",
+  4,
+  24,
+  [
+   128,
+   128
+  ],
+  32776,
+  "('Unverified OI format', 4, 24, 128, 128)"
+ ],
+ "aura.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   256,
+   256
+  ],
+  32808,
+  "('Unverified OI format', 4, 4, 256, 256)"
+ ],
+ "decoration.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   128,
+   64
+  ],
+  4136,
+  "('Unverified OI format', 4, 4, 128, 64)"
+ ],
+ "EFFECT_COK_001_2_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "fio_eff.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   512
+  ],
+  131144,
+  "('Unverified OI format', 1, 4, 512, 512)"
+ ],
+ "fio_eff_base_1_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   512
+  ],
+  131144,
+  "('Unverified OI format', 1, 4, 512, 512)"
+ ],
+ "fio_eff_base_8_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   512
+  ],
+  131144,
+  "('Unverified OI format', 1, 4, 512, 512)"
+ ],
+ "fio_xmaseff.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   512
+  ],
+  131144,
+  "('Unverified OI format', 1, 4, 512, 512)"
+ ],
+ "hadou_1_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "kemuri_large_4_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   512
+  ],
+  131144,
+  "('Unverified OI format', 1, 4, 512, 512)"
+ ],
+ "kemuri_large_snow_2_out.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   512,
+   512
+  ],
+  131112,
+  "('Unverified OI format', 4, 4, 512, 512)"
+ ],
+ "maggotbug_out2.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   256,
+   256
+  ],
+  32808,
+  "('Unverified OI format', 4, 4, 256, 256)"
+ ],
+ "maggotbug_out3.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   512,
+   256
+  ],
+  65576,
+  "('Unverified OI format', 4, 4, 512, 256)"
+ ],
+ "mizuhashira_6_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   1024,
+   512
+  ],
+  262216,
+  "('Unverified OI format', 1, 4, 1024, 512)"
+ ],
+ "neko_base_eff_base_1_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   256
+  ],
+  65608,
+  "('Unverified OI format', 1, 4, 512, 256)"
+ ],
+ "neko_base_eff_base_2_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "neko_base_eff_base_4_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "network_mars.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   512,
+   256
+  ],
+  65576,
+  "('Unverified OI format', 4, 4, 512, 256)"
+ ],
+ "pirate2_1_0_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   512,
+   256
+  ],
+  65608,
+  "('Unverified OI format', 1, 4, 512, 256)"
+ ],
+ "pirate2_2_2_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "pirate2_3_3_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "pirate2_4_1_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   256,
+   256
+  ],
+  32840,
+  "('Unverified OI format', 1, 4, 256, 256)"
+ ],
+ "stage26_03.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   512,
+   512
+  ],
+  131112,
+  "('Unverified OI format', 4, 4, 512, 512)"
+ ],
+ "stage26_04.obm": [
+  "4f49",
+  4,
+  4,
+  [
+   512,
+   512
+  ],
+  131112,
+  "('Unverified OI format', 4, 4, 512, 512)"
+ ],
+ "Wire_5_out.obm": [
+  "4f49",
+  1,
+  4,
+  [
+   32,
+   64
+  ],
+  1096,
+  "('Unverified OI format', 1, 4, 32, 64)"
+ ]
+}

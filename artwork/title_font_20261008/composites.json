@@ -1,0 +1,122 @@
+{
+ "composite/16_Y": {
+  "fl": 1,
+  "fr": 16,
+  "w": 19,
+  "h": 20,
+  "ch": "Y",
+  "id": "composite/16_Y",
+  "size": 16,
+  "word": null,
+  "index": 0,
+  "abs_x": 0,
+  "joined_left": false,
+  "joined_right": false,
+  "composite": true,
+  "notes": "V 行 0–11（上半两臂）+ T 第 12–19 行竖笔（同行号）；第 12 行两臂下方写入 T 第 7 行横笔下轮廓的原生轮廓像素（仅黑色轮廓移行，填充颜色不移行）。",
+  "sources": [
+   "16/T_login_bonus_228_270_6",
+   "16/V_profile_197_61_0"
+  ]
+ },
+ "composite/16_J": {
+  "fl": 1,
+  "fr": 15,
+  "w": 17,
+  "h": 20,
+  "ch": "J",
+  "id": "composite/16_J",
+  "size": 16,
+  "word": null,
+  "index": 0,
+  "abs_x": 0,
+  "joined_left": false,
+  "joined_right": false,
+  "composite": true,
+  "notes": "U（MENU 词尾）去掉左竖笔第 2–12 行，左竖笔下段保留为钩；钩顶第 12 行写入 U 第 2 行左竖笔上方的原生上轮廓。",
+  "sources": [
+   "16/U_menu_485_344_3"
+  ]
+ },
+ "composite/16_Q": {
+  "fl": 1,
+  "fr": 18,
+  "w": 21,
+  "h": 20,
+  "ch": "Q",
+  "id": "composite/16_Q",
+  "size": 16,
+  "word": null,
+  "index": 0,
+  "abs_x": 0,
+  "joined_left": false,
+  "joined_right": false,
+  "composite": true,
+  "notes": "O（OPTION 词首）+ R（PRESENT）右下腿第 14–19 行（同行号），右移 3 列作为尾巴；填充优先。",
+  "sources": [
+   "16/O_menu_485_258_0",
+   "16/R_login_bonus_228_270_1"
+  ]
+ },
+ "composite/16_X": {
+  "fl": 1,
+  "fr": 17,
+  "w": 19,
+  "h": 20,
+  "ch": "X",
+  "id": "composite/16_X",
+  "size": 16,
+  "word": null,
+  "index": 0,
+  "abs_x": 0,
+  "joined_left": false,
+  "joined_right": false,
+  "composite": true,
+  "notes": "V 行 0–11（上半两臂）+ K（DECK 词尾）右下腿第 12–19 行（右移 1 列）+ 同一右下腿的水平镜像作为左下腿（镜像为位置变换，像素值为原生）。",
+  "sources": [
+   "16/K_unit_232_340_3",
+   "16/V_profile_197_61_0"
+  ]
+ },
+ "composite/12_L": {
+  "fl": 1,
+  "fr": 9,
+  "w": 11,
+  "h": 16,
+  "ch": "L",
+  "id": "composite/12_L",
+  "size": 12,
+  "word": null,
+  "index": 0,
+  "abs_x": 0,
+  "joined_left": false,
+  "joined_right": false,
+  "composite": true,
+  "notes": "E（VIDEO）第 0–1、11–15 行（底横及其上轮廓）；第 2–10 行为竖笔：E 的左轮廓与竖笔填充 0–3 列、UNIT 的 I 右暗边、ITEM 词首 I 的右侧外轮廓；顶角取 ITEM 的 I 上轮廓角点。",
+  "sources": [
+   "12/E_icon_mov_104_126_3",
+   "12/I_shop_180_434_2",
+   "12/I_shop_455_125_0"
+  ]
+ },
+ "composite/12_C": {
+  "fl": 1,
+  "fr": 11,
+  "w": 14,
+  "h": 16,
+  "ch": "C",
+  "id": "composite/12_C",
+  "size": 12,
+  "word": null,
+  "index": 0,
+  "abs_x": 0,
+  "joined_left": false,
+  "joined_right": false,
+  "composite": true,
+  "notes": "O（VIDEO 词尾）右笔第 7–10 行打开；第 7、10 行写入 O 内孔上轮廓的原生值作为两端收笔轮廓，右角点取 O 外轮廓值；上收笔末行（第 6 行）取 S 第 6 行右上收笔暗化像素（同行号）。",
+  "sources": [
+   "12/O_icon_mov_104_126_4",
+   "12/S_shop_304_241_1"
+  ]
+ }
+}

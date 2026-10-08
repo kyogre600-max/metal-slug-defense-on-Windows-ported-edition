@@ -1,0 +1,269 @@
+{
+ "VERSUS_16_native": {
+  "source": "profile@197:61",
+  "glyphs": [
+   "16/V_profile_197_61_0",
+   "16/E_profile_197_61_1",
+   "16/R_profile_197_61_2",
+   "16/S_profile_197_61_3",
+   "16/U_profile_197_61_4",
+   "16/S_profile_197_61_5"
+  ]
+ },
+ "VERSUS_16_typeset": {
+  "glyphs": [
+   "16/V_profile_197_61_0",
+   "16/E_profile_197_61_1",
+   "16/R_profile_197_61_2",
+   "16/S_profile_197_61_3",
+   "16/U_profile_197_61_4",
+   "16/S_login_bonus_1_74_4"
+  ],
+  "contexts": [
+   [
+    null,
+    "E"
+   ],
+   [
+    "V",
+    "R"
+   ],
+   [
+    "E",
+    "S"
+   ],
+   [
+    "R",
+    "U"
+   ],
+   [
+    "S",
+    "S"
+   ],
+   [
+    "U",
+    null
+   ]
+  ],
+  "gaps_from": [
+   "native_pair",
+   "native_pair",
+   "native_pair",
+   "native_pair",
+   "native_pair"
+  ],
+  "composite_letters": []
+ },
+ "LOCAL_16": {
+  "glyphs": [
+   "16/L_login_bonus_1_0_0",
+   "16/O_login_bonus_1_0_1",
+   "16/C_unit_232_340_2",
+   "16/A_medal_shop_69_305_3",
+   "16/L_medal_shop_69_305_4"
+  ],
+  "contexts": [
+   [
+    null,
+    "O"
+   ],
+   [
+    "L",
+    "G"
+   ],
+   [
+    "E",
+    "K"
+   ],
+   [
+    "D",
+    "L"
+   ],
+   [
+    "A",
+    null
+   ]
+  ],
+  "gaps_from": [
+   "native_pair",
+   "default",
+   "default",
+   "native_pair"
+  ],
+  "composite_letters": []
+ },
+ "LAN_16": {
+  "glyphs": [
+   "16/L_menu_485_133_0",
+   "16/A_menu_485_133_1",
+   "16/N_menu_485_258_5"
+  ],
+  "contexts": [
+   [
+    null,
+    "A"
+   ],
+   [
+    "L",
+    "N"
+   ],
+   [
+    "O",
+    null
+   ]
+  ],
+  "gaps_from": [
+   "native_pair",
+   "native_pair"
+  ],
+  "composite_letters": []
+ },
+ "ONLINE_16": {
+  "glyphs": [
+   "16/O_menu_485_258_0",
+   "16/N_login_bonus_1_74_2",
+   "16/L_login_bonus_478_68_3",
+   "16/I_login_bonus_1_0_3",
+   "16/N_menu_485_133_2",
+   "16/E_menu_485_0_8"
+  ],
+  "contexts": [
+   [
+    null,
+    "P"
+   ],
+   [
+    "O",
+    "U"
+   ],
+   [
+    "L",
+    "A"
+   ],
+   [
+    "G",
+    "N"
+   ],
+   [
+    "A",
+    "G"
+   ],
+   [
+    "Z",
+    null
+   ]
+  ],
+  "gaps_from": [
+   "native_pair",
+   "default",
+   "native_pair",
+   "native_pair",
+   "default"
+  ],
+  "composite_letters": []
+ },
+ "LOCAL_12": {
+  "glyphs": [
+   "composite/12_L",
+   "12/O_icon_mov_104_126_4",
+   "composite/12_C",
+   "12/A_icon_mov_119_126_0",
+   "composite/12_L"
+  ],
+  "contexts": [
+   null,
+   [
+    "E",
+    null
+   ],
+   null,
+   [
+    null,
+    "D"
+   ],
+   null
+  ],
+  "gaps_from": [
+   "default",
+   "default",
+   "default",
+   "default"
+  ],
+  "composite_letters": [
+   "L",
+   "C",
+   "L"
+  ]
+ },
+ "LAN_12": {
+  "glyphs": [
+   "composite/12_L",
+   "12/A_icon_mov_119_126_0",
+   "12/N_shop_180_434_1"
+  ],
+  "contexts": [
+   null,
+   [
+    null,
+    "D"
+   ],
+   [
+    "U",
+    "I"
+   ]
+  ],
+  "gaps_from": [
+   "default",
+   "default"
+  ],
+  "composite_letters": [
+   "L"
+  ]
+ },
+ "ONLINE_12": {
+  "glyphs": [
+   "12/O_icon_mov_104_126_4",
+   "12/N_shop_180_434_1",
+   "composite/12_L",
+   "12/I_icon_mov_104_126_1",
+   "12/N_shop_180_434_1",
+   "12/E_icon_mov_104_126_3"
+  ],
+  "contexts": [
+   [
+    "E",
+    null
+   ],
+   [
+    "U",
+    "I"
+   ],
+   null,
+   [
+    "V",
+    "D"
+   ],
+   [
+    "U",
+    "I"
+   ],
+   [
+    "D",
+    "O"
+   ]
+  ],
+  "gaps_from": [
+   "default",
+   "default",
+   "default",
+   "default",
+   "default"
+  ],
+  "composite_letters": [
+   "L"
+  ]
+ },
+ "VERSUS_12": {
+  "skipped": "'12 行字号缺少字母 R'"
+ }
+}

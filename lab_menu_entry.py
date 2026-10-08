@@ -99,7 +99,7 @@ class LabMenuEntry:
             if inside:
                 from lab_ui import play_se, SE_DECIDE
                 play_se(self.p, SE_DECIDE)
-                self.lab.commands.append(('prep',))
+                self.lab.commands.append(('prep', 'lab'))
                 self.p.log('LAB_MENU_OPEN', self.p.frame)
         return True
 
