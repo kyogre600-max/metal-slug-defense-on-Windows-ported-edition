@@ -8,6 +8,13 @@ This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds 
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+**Update 1.47.3**
+
+- Now you can play all EVENTS just like decade ago
+- Historical EVENTs now use the original EventMSD event map, prisoner screen and shops, entered through an EVENT browser page with 13 separate entries (Part 1/Part 2 entries share progress).
+- Units sold for medals during each EVENT are available in that EVENT's own shop (bottom SHOP in the instructor base) after the original unlock condition is met; they are no longer mixed into the normal shop.
+- The bottom-bar buttons and panels used for EVENTs show the native press highlight, kept until the shutter closes, and the LAB button stays visible while the shutter opens and closes.
+
 **Update 1.47.2**
 
 - Added local two-player versus mode with keyboard/controller support (default controller layout: Xbox 360).
@@ -104,6 +111,13 @@ The self-hosted room and transport preparation is described in [ONLINE_INTERFACE
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+**1.47.3 更新**
+
+- 你现在可以游玩所有的EVENT了
+- 历史 EVENT 改用原版活动地图、人质页面与商店，并由 EVENT 浏览页进入，共 13 个独立入口（第一部分与第二部分共享进度）。
+- 各 EVENT 期间以勋章出售的单位，改在该 EVENT 的独立商店（女教官基地底栏 SHOP）中购买，满足原版开售条件后开放，不再与普通商店混在一起。
+- EVENT 相关的底栏按钮与面板显示原生按压反馈，并保持至闸门合拢；LAB 按钮在开闸与关闸过程中保持显示。
 
 **1.47.2 更新**
 

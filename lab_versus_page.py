@@ -287,6 +287,9 @@ class VersusPage:
 
     def touch(self, action, x, y):
         """返回 True 表示已处理（不送入原生）。"""
+        trial = getattr(self.p, 'event_trial', None)
+        if trial is not None and trial.browser.active:
+            return False                                    # 历史活动浏览页借用主菜单，第三行由浏览页处理
         if self.state == 'closed':
             if action == 1 and self.can_open() and inside(WIFI_BUTTON, x, y):
                 self.end_press()

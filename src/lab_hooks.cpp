@@ -155,6 +155,30 @@ Block old_menu_layout,old_menu_button_draw,old_menu_button_tail;
 bool menu_pointer(uint32_t p,uint32_t size){
     return p>=0x10000000u && uint64_t(p)+size<=0x20000000ull;
 }
+// 主菜单离场后，底栏任务地址可被其他场景重新分配。绘制时同时核验当前场景、
+// 当前 MEDAL 槽位及任务身份，避免旧地址在 EVENT 基地或选关页继续承载 LAB 图像。
+bool current_menu_medal(Context& c,uint32_t t){
+    uint32_t app=rd<uint32_t>(c,MENU_H+44u);
+    if(!menu_pointer(app,0xc21eu) || !menu_pointer(t,0x1bcu))return false;
+    uint32_t scene=rd<uint32_t>(c,app+0x22bcu);
+    return (scene==27u || scene==28u) && rd<uint32_t>(c,app+MENU_SLOTS[3])==t &&
+           rd<uint32_t>(c,t)==MENU_BUTTON && rd<uint32_t>(c,t+0x50u)==MENU_IMAGES[3] &&
+           rd<float>(c,t+0xfcu)==140.0f;
+}
+// 宿主受理的原生底栏按钮（GT_CockpitButton）：原生 PushPanel 每帧依触点重算 +0x174/+0x194，
+// 宿主拦截触点时反馈只能维持一帧。头部 +0x40 为 'HOLD' 时，+0x44 起四个任务指针跳过 PushPanel，
+// 保持按压（+0x174=1）且不产生原生选择（+0x194=0），由宿主在取消或场景切换后清除。
+constexpr uint32_t HOLD_H=MENU_H+0x40u,HOLD_MAGIC=0x444c4f48u;
+Block old_cockpit_push;
+void cockpit_push(Context& c){
+    uint32_t t=c.r[4];
+    if(rd<uint32_t>(c,HOLD_H)==HOLD_MAGIC && menu_pointer(t,0x198u)){
+        for(uint32_t i=0;i<4;++i)if(rd<uint32_t>(c,HOLD_H+4u+i*4u)==t){
+            wr<uint32_t>(c,t+0x174u,1u);wr<uint32_t>(c,t+0x194u,0u);c.pc=0x101ff525u;return;
+        }
+    }
+    old_cockpit_push(c);
+}
 void menu_layout(Context& c){
     uint32_t app=c.r[0];
     old_menu_layout(c);                                    // 保留原块的分配、寄存器与后续控制流
@@ -187,7 +211,7 @@ void menu_layout(Context& c){
 void menu_button_draw(Context& c){
     uint32_t t=c.r[0];
     if(rd<uint32_t>(c,MENU_H)==MENU_MAGIC && t==rd<uint32_t>(c,MENU_H+24u) &&
-       menu_pointer(t,0x1bcu) && !(rd<uint32_t>(c,t+0x80u)&2u) &&
+       current_menu_medal(c,t) && !(rd<uint32_t>(c,t+0x80u)&2u) &&
        !(rd<uint32_t>(c,t+0x7cu)&0x80u)){
         uint32_t parent=rd<uint32_t>(c,t+0x1b8u);
         if(menu_pointer(parent,0xd8u)){
@@ -213,9 +237,11 @@ void menu_button_tail(Context& c){
     uint32_t t=c.r[4],image=rd<uint32_t>(c,MENU_H+48u),app=rd<uint32_t>(c,MENU_H+44u);
     if(rd<uint32_t>(c,MENU_H)==MENU_MAGIC && rd<uint32_t>(c,MENU_H+4u) &&
        rd<uint32_t>(c,MENU_H+56u) && t==rd<uint32_t>(c,MENU_H+24u) &&
-       menu_pointer(image,56u) && menu_pointer(app,0x80u)){
+       current_menu_medal(c,t) && menu_pointer(image,56u) && menu_pointer(app,0x80u)){
         uint32_t graphics=rd<uint32_t>(c,app+0x7cu);
-        bool pressed=rd<uint32_t>(c,MENU_H+52u) && rd<uint32_t>(c,MENU_H+36u);
+        // +52：1 为按住且指针在图标内（需输入许可），2 为确认后保持至 LAB 闸门合拢。
+        uint32_t press=rd<uint32_t>(c,MENU_H+52u);
+        bool pressed=press==2u || (press && rd<uint32_t>(c,MENU_H+36u));
         uint32_t x=rd<uint32_t>(c,MENU_H+8u),y=rd<uint32_t>(c,MENU_H+12u);
         guest_call(c,0x10137711u,graphics,rd<uint32_t>(c,t+0xd0u),rd<uint32_t>(c,t+0xd4u));
         uint32_t item=79u;
@@ -1251,7 +1277,8 @@ constexpr uint32_t SLOT_LOOP_BEGIN=0x101d8700u,SLOT_LOOP_END=0x101d8a80u;
 constexpr uint32_t DRAW_LOG=H+0xb00u,DRAW_LOG_MAGIC=0x474f4c44u;
 // ---------- 第 16 版：VERSUS 子页面（借用原生 SHOP 子页面 scene28/state4 的图块替换） ----------
 // 头部 +0xb40 为 'VSPG' 时启用（与 LAB 战斗头部无关，主菜单中由宿主写入）：+4 条目数（≤8），+0x10 起每条 32 字节：
-// [匹配的转换项指针, 匹配的 Image*（0 为任意）, 新 Image*（0 为跳过绘制）, 保留, 新转换项 16 字节]。
+// [匹配的转换项指针, 匹配的 Image*（0 为任意）, 新 Image*（0 为跳过绘制）, 匹配的 y 坐标位（0 为任意）, 新转换项 16 字节]。
+// 历史活动浏览页（event_browser.py）在主菜单中使用同一表，以 y 坐标区分共用图块的第二、三行按钮。
 // drawConv 的转换项为原生只读数据中的固定地址（SHOP 标题字、三张卡的插画与标签、底栏 LOCK），位置与参数沿用原生调用。
 constexpr uint32_t VS_PAGE=H+0xb40u,VS_PAGE_MAGIC=0x47505356u;
 Block old_draw_conv;
@@ -1261,8 +1288,8 @@ void draw_conv(Context& c){
     if(rd<uint32_t>(c,VS_PAGE)==VS_PAGE_MAGIC){
         uint32_t conv=rd<uint32_t>(c,c.r[13]),n=std::min(rd<uint32_t>(c,VS_PAGE+4u),8u);
         for(uint32_t i=0;i<n;++i){
-            uint32_t e=VS_PAGE+0x10u+i*32u,want=rd<uint32_t>(c,e+4u);
-            if(rd<uint32_t>(c,e)!=conv || (want && want!=c.r[1]))continue;
+            uint32_t e=VS_PAGE+0x10u+i*32u,want=rd<uint32_t>(c,e+4u),wanty=rd<uint32_t>(c,e+12u);
+            if(rd<uint32_t>(c,e)!=conv || (want && want!=c.r[1]) || (wanty && wanty!=c.r[3]))continue;
             uint32_t image=rd<uint32_t>(c,e+8u);
             if(!image){c.pc=c.r[14];return;}                        // 跳过绘制（底栏 LOCK）
             c.r[1]=image;wr<uint32_t>(c,c.r[13],e+16u);              // 新图像与新转换项（沿用原生位置与缩放）
@@ -1558,7 +1585,7 @@ void install_se_hooks(){
     old_se_release=find_block(0x101c833du);register_block(0x101c833du,se_release);
 }
 }
-extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 16u;}
+extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 17u;}
 extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     static bool installed=false;
     if(installed)return;
@@ -1570,6 +1597,7 @@ extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     old_touch_loop_exit=find_block(0x101d76c9u);register_block(0x101d76c9u,touch_loop_exit);
     old_touch_activate=find_block(0x101d76d3u);register_block(0x101d76d3u,touch_activate);
     old_menu_layout=find_block(MENU_LAYOUT);register_block(MENU_LAYOUT,menu_layout);
+    old_cockpit_push=find_block(0x101ff51bu);register_block(0x101ff51bu,cockpit_push);
     old_menu_button_draw=find_block(0x102003bdu);register_block(0x102003bdu,menu_button_draw);
     old_menu_button_tail=find_block(0x1020047bu);register_block(0x1020047bu,menu_button_tail);
     install_ui_hooks();

@@ -15,6 +15,7 @@ class LabMenuEntry:
         self.native_image = None
         self.pressed = False
         self.pointer_inside = False
+        self.lit = False             # 释放确认后保持原生青色框，直至 LAB 闸门合拢
         self.p.write(MENU_HEADER, bytes(64))
         if lab.native_hooks < 8:
             return
@@ -52,13 +53,25 @@ class LabMenuEntry:
 
     def prepare_frame(self):
         self.p.put(MENU_HEADER + 4, 0)
-        visible = not (self.lab.active or self.lab.prep.open or self.lab.prep.busy())
+        app = self.p.app_instance()
+        # 闸门开合期间图标与其他原生底栏按钮一同绘制于闸门之下；准备界面打开或 LAB 战斗时停绘。
+        visible = bool(app and self.p.word(app + 0x22bc) in (27, 28)
+                       and not (self.lab.active or self.lab.prep.open))
+        if not visible:
+            self.pressed = self.pointer_inside = self.lit = False
+            self.p.put(MENU_HEADER + 36, 0)
+        elif self.lit:
+            # 准备界面闸门开始合拢后记为进行中；闸门回到开启状态而界面未打开时解除保持。
+            if self.lab.prep.busy():
+                self.lit = 'closing'
+            elif self.lit == 'closing':
+                self.lit = False
         self.p.put(MENU_HEADER + 56, int(visible))
-        self.p.put(MENU_HEADER + 52, int(self.pressed and self.pointer_inside))
+        self.p.put(MENU_HEADER + 52, 2 if self.lit else int(self.pressed and self.pointer_inside))
 
     def visible(self):
         p, lab = self.p, self.lab
-        if self.image is None or lab.active or lab.prep.open or lab.prep.busy():
+        if self.image is None or lab.active or lab.prep.open:
             return False
         app = p.app_instance()
         return (p.word(MENU_HEADER) == MENU_MAGIC and p.word(MENU_HEADER + 4) == 1
@@ -66,7 +79,7 @@ class LabMenuEntry:
 
     def ready(self):
         app = self.p.app_instance()
-        return (self.visible() and self.p.word(app + 0x22bc) == 28
+        return (self.visible() and not self.lab.prep.busy() and self.p.word(app + 0x22bc) == 28
                 and self.p.word(app + 0x22dc) in MENU_INPUT_STATES
                 and self.p.word(MENU_HEADER + 36) == 1)
 
@@ -99,6 +112,7 @@ class LabMenuEntry:
             if inside:
                 from lab_ui import play_se, SE_DECIDE
                 play_se(self.p, SE_DECIDE)
+                self.lit = True
                 self.lab.commands.append(('prep', 'lab'))
                 self.p.log('LAB_MENU_OPEN', self.p.frame)
         return True

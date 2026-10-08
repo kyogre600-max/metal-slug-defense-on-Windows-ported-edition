@@ -1,0 +1,214 @@
+{
+  "schema": 2,
+  "publisher": "SNK PLAYMORE CORPORATION",
+  "note": "Independent phase entry_key; stable event_key retains shared progress. P1 shows source first-phase content, P2 includes all inherited content. Original 360x240 monitor news artwork is stored as lossless WebP.",
+  "events": [
+    {
+      "event_key": "anniversary_2015",
+      "date": "2015-04-30",
+      "platform": "Android",
+      "image": "anniversary_2015.webp",
+      "names": {
+        "ZT": "一周年紀念",
+        "ZS": "一周年纪念",
+        "JP": "1周年記念",
+        "KR": "1주년 기념",
+        "EN": "1st Anniversary"
+      },
+      "entry_key": "anniversary_2015",
+      "image_source_note": "User-drawn monitor artwork (2026-10-09); no archived original found."
+    },
+    {
+      "event_key": "msd_max_2015",
+      "date": "2015-07-23",
+      "platform": "Android",
+      "image": "msd_max_2015.webp",
+      "names": {
+        "ZT": "MSD MAX",
+        "ZS": "MSD MAX",
+        "JP": "MSD MAX",
+        "KR": "MSD MAX",
+        "EN": "MSD MAX"
+      },
+      "entry_key": "msd_max_2015",
+      "image_source_note": "User-drawn monitor artwork (2026-10-09); no archived original found."
+    },
+    {
+      "event_key": "midsummer_horror_2015",
+      "date": "2015-08-20",
+      "platform": "Android",
+      "image": "midsummer_horror_2015.webp",
+      "names": {
+        "ZT": "盛夏恐怖夜",
+        "ZS": "盛夏恐怖夜",
+        "JP": "真夏のホラーナイト",
+        "KR": "한여름 호러 나이트",
+        "EN": "Midsummer Horror Night"
+      },
+      "entry_key": "midsummer_horror_2015"
+    },
+    {
+      "event_key": "sleeping_gigantic_weapon_2015",
+      "date": "2015-09-03",
+      "platform": "Android",
+      "image": "sleeping_gigantic_weapon_2015.webp",
+      "names": {
+        "ZT": "沉睡的巨大兵器",
+        "ZS": "沉睡的巨大兵器",
+        "JP": "眠れる巨大兵器",
+        "KR": "잠든 거대 병기",
+        "EN": "Sleeping Gigantic Weapon"
+      },
+      "entry_key": "sleeping_gigantic_weapon_2015"
+    },
+    {
+      "event_key": "battle_cats_2015",
+      "date": "2015-10-06",
+      "platform": "",
+      "image": "battle_cats_2015_part1.webp",
+      "localized_images": {
+        "EN": "battle_cats_2015_part1_us.webp",
+        "ZT": "battle_cats_2015_part1_hk.webp",
+        "ZS": "battle_cats_2015_part1_hk.webp",
+        "KR": "battle_cats_2015_part1_kr.webp"
+      },
+      "partner": "PONOS",
+      "names": {
+        "ZT": "貓咪大戰爭 聯動 (PART1)",
+        "ZS": "猫咪大战争 联动 (PART1)",
+        "JP": "にゃんこ大戦争 コラボ (PART1)",
+        "KR": "냥코 대전쟁 콜라보 (PART1)",
+        "EN": "The Battle Cats Collaboration (PART1)"
+      },
+      "entry_key": "battle_cats_2015_part1",
+      "phase_id": "part1"
+    },
+    {
+      "event_key": "battle_cats_2015",
+      "date": "2015-10-20",
+      "platform": "",
+      "image": "battle_cats_2015.webp",
+      "localized_images": {
+        "EN": "battle_cats_2015_us.webp",
+        "ZT": "battle_cats_2015_hk.webp",
+        "ZS": "battle_cats_2015_hk.webp",
+        "KR": "battle_cats_2015_kr.webp"
+      },
+      "partner": "PONOS",
+      "names": {
+        "ZT": "貓咪大戰爭 聯動 (PART2)",
+        "ZS": "猫咪大战争 联动 (PART2)",
+        "JP": "にゃんこ大戦争 コラボ (PART2)",
+        "KR": "냥코 대전쟁 콜라보 (PART2)",
+        "EN": "The Battle Cats Collaboration (PART2)"
+      },
+      "entry_key": "battle_cats_2015_part2",
+      "phase_id": "part2"
+    },
+    {
+      "event_key": "halloween_2015",
+      "date": "2015-11-05",
+      "platform": "Android",
+      "image": "halloween_2015.webp",
+      "names": {
+        "ZT": "萬聖節區域",
+        "ZS": "万圣节区域",
+        "JP": "ハロウィンエリア",
+        "KR": "할로윈 에리어",
+        "EN": "Halloween Area"
+      },
+      "entry_key": "halloween_2015"
+    },
+    {
+      "event_key": "treasure_recovery_2015",
+      "date": "2015-11-19",
+      "platform": "Android/iOS",
+      "image": "treasure_recovery_2015.webp",
+      "names": {
+        "ZT": "秘寶奪還大作戰 (PART1)",
+        "ZS": "秘宝夺还大作战 (PART1)",
+        "JP": "お宝奪還大作戦 (PART1)",
+        "KR": "보물 탈환 대작전 (PART1)",
+        "EN": "Treasure Recovery Operation (PART1)"
+      },
+      "entry_key": "treasure_recovery_2015_part1",
+      "phase_id": "part1"
+    },
+    {
+      "event_key": "treasure_recovery_2015",
+      "date": "2015-12-03",
+      "platform": "Android/iOS",
+      "image": "treasure_recovery_2015_part2.webp",
+      "names": {
+        "ZT": "秘寶奪還 PART2：阿瑪迪斯襲擊",
+        "ZS": "秘宝夺还 PART2：阿玛迪斯攻击",
+        "JP": "お宝奪還 PART2：アマデウス襲来",
+        "KR": "보물 탈환 PART2: 아마데우스 습격",
+        "EN": "Treasure Recovery PART2: Amadeus's Attack"
+      },
+      "entry_key": "treasure_recovery_2015_part2",
+      "phase_id": "part2"
+    },
+    {
+      "event_key": "melty_christmas_2015",
+      "date": "2015-12-17",
+      "platform": "Android/iOS",
+      "image": "melty_christmas_2015.webp",
+      "names": {
+        "ZT": "戰場聖誕",
+        "ZS": "战场圣诞",
+        "JP": "戦場のメルティ・クリスマス",
+        "KR": "전장의 멜티 크리스마스",
+        "EN": "Merry Christmas, Mr. Morden"
+      },
+      "entry_key": "melty_christmas_2015"
+    },
+    {
+      "event_key": "kof_black_noah_2016",
+      "date": "2016-01-14",
+      "platform": "Android/iOS",
+      "image": "kof_black_noah_2016.webp",
+      "names": {
+        "ZT": "黑色諾亞襲來",
+        "ZS": "黑色诺亚袭来",
+        "JP": "ブラックノア襲来",
+        "KR": "블랙 노아 습격",
+        "EN": "Black Noah Attack"
+      },
+      "entry_key": "kof_black_noah_2016"
+    },
+    {
+      "event_key": "cooperation_2016_current",
+      "date": "2016-01-28",
+      "platform": "Android/iOS",
+      "image": "cooperation_2016_current.webp",
+      "names": {
+        "ZT": "協力作戰 (PART1)",
+        "ZS": "协力作战 (PART1)",
+        "JP": "協力バトル (PART1)",
+        "KR": "협력 배틀 (PART1)",
+        "EN": "Co-operation Battle (PART1)"
+      },
+      "entry_key": "cooperation_2016_current_part1",
+      "phase_id": "part1",
+      "image_source_note": "User-drawn PART 1 monitor artwork (2026-10-09), replacing the 1.41 original."
+    },
+    {
+      "event_key": "cooperation_2016_current",
+      "date": "2016-03-10",
+      "platform": "Android/iOS",
+      "image": "cooperation_2016_current_part2.webp",
+      "names": {
+        "ZT": "協力作戰 (PART2)",
+        "ZS": "协力作战 (PART2)",
+        "JP": "協力バトル (PART2)",
+        "KR": "협력 배틀 (PART2)",
+        "EN": "Co-operation Battle (PART2)"
+      },
+      "entry_key": "cooperation_2016_current_part2",
+      "phase_id": "part2",
+      "content_scope": "All subsequent cooperation expansions, 24 stages / 44 products",
+      "image_source_note": "User-drawn PART 2 monitor artwork (2026-10-09), replacing the 1.46 KOF placeholder."
+    }
+  ]
+}

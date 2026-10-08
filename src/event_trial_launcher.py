@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT))
 import portable_launcher
 import probe,player
-from event_trial import EventTrial,recover_transaction
+from event_trial import EventTrial,recover_transaction,HEADER
 config=json.loads((ROOT/'event_trial_config.json').read_text(encoding='utf-8'))
 source=(ROOT/config['source_pack']).resolve()
 probe.APK=source/'game_data/original.apk'
@@ -59,11 +59,30 @@ class TrialProbe(OriginalProbe):
             campaign.page=0
             return True
         if trial.overlay:trial.command('close');return True
+        if trial.browser.active and trial.browser.back():return True
         if trial.native_selector.active:trial.native_selector.back();return True
-        if trial.native_map.active and not trial.active_battle and scene==34 and self.word(app+0x22dc) in (4,7,9):
+        if trial.selected and scene==67 and not trial.active_battle:trial.leave_to_menu();return True
+        if trial.native_map.active and not self.word(HEADER+84) and not trial.active_battle and scene==34 and self.word(app+0x22dc) in (4,7,9):
             trial.native_map.back();return True
-        if trial.native_shop_active and scene==39:trial.close_native_shop();return True
+        if trial.is_native_shop_context():trial.close_native_shop();return True
         return super().back()
+    def java_call(self,method,a,idx):
+        if method and method[1]=='getFontWidthJava' and hasattr(self,'event_trial'):
+            ref=self.word(a[3]+4) if (idx-114)%3==1 else a[4]
+            size=self.word(a[3]) if (idx-114)%3==1 else a[3]
+            text=self.objects.get(ref)
+            new=self.event_trial.browser.measure(text,max(size,1)) if isinstance(text,str) else None
+            if new is not None:
+                self.objects[ref]=new
+                try:return super().java_call(method,a,idx)
+                finally:self.objects[ref]=text
+        return super().java_call(method,a,idx)
+    def draw_text(self,a,idx):
+        # 浏览页：主菜单按钮文字仅在光栅化期间替换，随后恢复原字符串对象。
+        restore=self.event_trial.browser.rename(a) if hasattr(self,'event_trial') else []
+        try:return super().draw_text(a,idx)
+        finally:
+            for item,text in restore:self.objects[item]=text
     def touch_event(self,action,x,y):
         if self.campaign.touch(action,x,y):return
         if self.event_trial.touch(action,x,y):return
@@ -78,7 +97,7 @@ import lab_runtime
 lab_runtime.install()
 lab_runtime.install_platform()
 def create_player(self_test=False,audio_mode=None,fullscreen=None):
-    player.TITLE='MSD WINDOWS S1XLV · 1.47.2'
+    player.TITLE='MSD WINDOWS S1XLV · 1.47.3'
     session=player.Player(self_test=self_test,audio_mode=audio_mode,fullscreen=fullscreen)
     session.guest_root=ROOT/('ui_test_guest' if self_test else config['profile'])
     session.status_file=ROOT/('ui_test_status.json' if self_test else 'event_trial_status.json')
@@ -87,7 +106,7 @@ def create_player(self_test=False,audio_mode=None,fullscreen=None):
     return session
 if __name__=='__main__':
     try:
-        parser=argparse.ArgumentParser(description='MSD WINDOWS S1XLV 1.47.2')
+        parser=argparse.ArgumentParser(description='MSD WINDOWS S1XLV 1.47.3')
         parser.add_argument('--self-test',action='store_true')
         parser.add_argument('--mute',action='store_true')
         parser.add_argument('--windowed',action='store_true')

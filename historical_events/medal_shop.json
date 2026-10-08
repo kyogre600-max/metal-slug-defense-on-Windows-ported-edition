@@ -1,0 +1,339 @@
+{
+ "schema": 1,
+ "note": "历史活动勋章单位商店（每个活动独立目录）。商品身份与标准勋章价取自原始 APK；开售条件见 verification/event_repair_20261008/source_phase_audit/ 与 verification/cat_unit_shop_20261009/。",
+ "rows": [
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 268,
+   "unit_id": 294,
+   "name": "GROSS CAT",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 269,
+   "unit_id": 295,
+   "name": "WALL CAT",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 270,
+   "unit_id": 296,
+   "name": "TITAN CAT",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 271,
+   "unit_id": 297,
+   "name": "TEACHER BUN BUN",
+   "medal_price": 400,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 272,
+   "unit_id": 300,
+   "name": "BLACK GROSS CAT",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 273,
+   "unit_id": 301,
+   "name": "BLACK WALL CAT",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 274,
+   "unit_id": 302,
+   "name": "BLACK TITAN CAT",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part1",
+    "part2"
+   ],
+   "menu_shop_id": 275,
+   "unit_id": 303,
+   "name": "BUN BUN BLACK",
+   "medal_price": 500,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "1.34 SHOP 联动期间限时销售，原版无关卡门槛"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part2"
+   ],
+   "menu_shop_id": 276,
+   "unit_id": 304,
+   "name": "CAT INFANTERY",
+   "medal_price": 300,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "42051"
+   },
+   "source": "1.35 GetAreaResult WorldType2 world1 type5"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part2"
+   ],
+   "menu_shop_id": 279,
+   "unit_id": 308,
+   "name": "CAT MINI UFO",
+   "medal_price": 300,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "42101"
+   },
+   "source": "1.35 GetAreaResult WorldType2 world1 type5"
+  },
+  {
+   "event_key": "battle_cats_2015",
+   "phases": [
+    "part2"
+   ],
+   "menu_shop_id": 280,
+   "unit_id": 309,
+   "name": "IRON NOKAMEOW",
+   "medal_price": 500,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "42151"
+   },
+   "source": "1.35 GetAreaResult WorldType2 world1 type5"
+  },
+  {
+   "event_key": "sleeping_gigantic_weapon_2015",
+   "phases": null,
+   "menu_shop_id": 263,
+   "unit_id": 286,
+   "name": "REBEL GIGANT",
+   "medal_price": 500,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "33073"
+   },
+   "source": "原始marker奖励类型5直接开放商品"
+  },
+  {
+   "event_key": "halloween_2015",
+   "phases": null,
+   "menu_shop_id": 256,
+   "unit_id": 280,
+   "name": "ZOMBIE ERI",
+   "medal_price": 150,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "12101"
+   },
+   "source": "原始marker奖励类型5直接开放商品"
+  },
+  {
+   "event_key": "halloween_2015",
+   "phases": null,
+   "menu_shop_id": 258,
+   "unit_id": 283,
+   "name": "ZOMBIE FIO",
+   "medal_price": 200,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "12102"
+   },
+   "source": "原始marker奖励类型5直接开放商品"
+  },
+  {
+   "event_key": "halloween_2015",
+   "phases": null,
+   "menu_shop_id": 254,
+   "unit_id": 278,
+   "name": "ZOMBIE TARMA",
+   "medal_price": 250,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "12103"
+   },
+   "source": "原始marker奖励类型5直接开放商品"
+  },
+  {
+   "event_key": "halloween_2015",
+   "phases": null,
+   "menu_shop_id": 255,
+   "unit_id": 279,
+   "name": "TAR MAN(RED) ",
+   "medal_price": 300,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "12104"
+   },
+   "source": "原始marker奖励类型5直接开放商品"
+  },
+  {
+   "event_key": "halloween_2015",
+   "phases": null,
+   "menu_shop_id": 288,
+   "unit_id": 318,
+   "name": "HALLOWEEN SOLDIER",
+   "medal_price": 0,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "12105"
+   },
+   "source": "原始marker奖励类型5直接开放商品"
+  },
+  {
+   "event_key": "melty_christmas_2015",
+   "phases": null,
+   "menu_shop_id": 318,
+   "unit_id": 344,
+   "name": "CHRISTMAS ERI",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "用户提供资料与本轮明确授权"
+  },
+  {
+   "event_key": "melty_christmas_2015",
+   "phases": null,
+   "menu_shop_id": 326,
+   "unit_id": 362,
+   "name": "CHRISTMAS FIO",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "用户提供资料与本轮明确授权"
+  },
+  {
+   "event_key": "kof_black_noah_2016",
+   "phases": null,
+   "menu_shop_id": 327,
+   "unit_id": 339,
+   "name": "RUGAL BERNSTEIN",
+   "medal_price": 500,
+   "availability": {
+    "kind": "stage_win",
+    "local_stage_key": "12095"
+   },
+   "source": "用户提供资料与本轮明确授权"
+  },
+  {
+   "event_key": "cooperation_2016_current",
+   "phases": null,
+   "menu_shop_id": 331,
+   "unit_id": 370,
+   "name": "PARTY PEOPLE",
+   "medal_price": 10,
+   "availability": {
+    "kind": "score",
+    "minimum": 10000
+   },
+   "source": "用户提供资料与本轮明确授权"
+  },
+  {
+   "event_key": "cooperation_2016_current",
+   "phases": null,
+   "menu_shop_id": 332,
+   "unit_id": 371,
+   "name": "PARTY PEOPLE CADRE",
+   "medal_price": 30,
+   "availability": {
+    "kind": "score",
+    "minimum": 10000
+   },
+   "source": "用户提供资料与本轮明确授权"
+  },
+  {
+   "event_key": "cooperation_2016_current",
+   "phases": null,
+   "menu_shop_id": 333,
+   "unit_id": 372,
+   "name": "PARTY PEOPLE ELITE",
+   "medal_price": 90,
+   "availability": {
+    "kind": "score",
+    "minimum": 10000
+   },
+   "source": "用户提供资料与本轮明确授权"
+  },
+  {
+   "event_key": "cooperation_2016_current",
+   "phases": [
+    "part2"
+   ],
+   "menu_shop_id": 347,
+   "unit_id": 387,
+   "name": "VALENTINE NADIA",
+   "medal_price": 300,
+   "availability": {
+    "kind": "event_available"
+   },
+   "source": "用户提供资料与本轮明确授权"
+  }
+ ]
+}

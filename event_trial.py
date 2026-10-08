@@ -24,8 +24,10 @@ class EventTrial:
     def __init__(self,p,root):
         self.p=p;self.root=Path(root);self.app=0;self.overlay=None;self.selected=None
         self.catalog=json.loads((self.root/'historical_events/catalog.json').read_text(encoding='utf-8'))['events']
-        self.shop_price=1
         self.data={e['event_key']:json.loads((self.root/'historical_events/data'/Path(e['data_path']).name).read_text(encoding='utf-8')) for e in self.catalog}
+        from event_phases import EventPhases
+        self.phases=EventPhases(self.root,self.data);self.selected_phase=None
+        self.phase_tables={};self.phase_shop_tables={}
         self.info=p.call('_ZN10BattleInfo11getInstanceEv');self.db=p.word(self.info)
         self.groups=p.word(self.db+0x14)
         self.original_groups=[p.read(self.groups+i*8,8) for i in range(14)]
@@ -80,22 +82,114 @@ class EventTrial:
                     raw=bytes.fromhex(r['raw_hex'])
                     if len(raw)!=32 or struct.unpack_from('<H',raw)[0]!=r['id'] or raw[2]!=r['type']:
                         raise ValueError(f'Invalid Event shop record: {key}/{r["id"]}')
-                    records.append(struct.pack('<16I',r['id'],self.blob(raw),self.shop_price,
+                    records.append(struct.pack('<16I',r['id'],self.blob(raw),r['event_currency_price'],
                                                r['native_maximum'],0,r['type'],r['unit_id'],*([0]*9)))
                 self.shop_tables[key]={'catalog':self.blob(struct.pack('<'+'I'*len(products),*[r['id'] for r in products])),
                                        'records':self.blob(b''.join(records)),'count':len(products)}
+        medal=json.loads((self.root/'historical_events/medal_shop.json').read_text(encoding='utf-8'))
+        self.medal_catalog=[r for r in medal['rows'] if r['event_key'] in self.data]
+        self.medal_table=None;self.shop_kind='token';self.medal_owned=set()
+        # 活动勋章单位的商品号登记为活动专属（src/event_trial_hooks.cpp event_exclusive_sku）。
+        skus=sorted({r['menu_shop_id'] for r in self.medal_catalog})[:64]
+        p.write(0x1ffef200,struct.pack('<II',0x4b535645,len(skus))+struct.pack('<'+'I'*len(skus),*skus))
         from event_native_map import NativeEventMap
         self.native_map=NativeEventMap(self)
         from event_native_selector import NativeEventSelector
         self.native_selector=NativeEventSelector(self)
+        from event_browser import EventBrowser
+        self.browser=EventBrowser(self)
     def blob(self,raw):
         if not raw:return 0
         addr=self.p.alloc(len(raw));self.p.write(addr,raw);return addr
+    def mission_table(self,key,phase_id=None):
+        phase_id=self.phases.resolve(key,phase_id);phase=self.phases.part(key,phase_id)
+        source=self.tables[key]
+        if phase is None or (len(phase['stage_ids'])==source['count'] and not phase.get('stage_overrides')):return source
+        cache_key=(key,phase_id)
+        if cache_key in self.phase_tables:return self.phase_tables[cache_key]
+        rows=[]
+        for index,sid in enumerate(phase['stage_ids']):
+            words=list(struct.unpack('<30I',self.p.read(source['missions']+index*120,120)))
+            override=phase.get('stage_overrides',{}).get(str(sid),{}).get('pointed_data',{})
+            for field,offset in (('schedule_packed',19),('waves_raw',21),('auxiliary_packed',23),('additional_units_raw',28)):
+                if field in override:
+                    item=override[field];raw=bytes.fromhex(item['hex'])
+                    if len(raw)!=item['count']*item['stride']:raise ValueError('Invalid source phase array')
+                    words[offset]=self.blob(raw)
+            rows.append(struct.pack('<30I',*words))
+        table=dict(source);table['missions']=self.blob(b''.join(rows));table['count']=len(rows)
+        if 'ex' in table:table['ex_count']=min(table['ex_count'],len(rows))
+        self.phase_tables[cache_key]=table
+        return table
+    def shop_table(self,key,phase_id=None):
+        phase_id=self.phases.resolve(key,phase_id);phase=self.phases.part(key,phase_id)
+        source=self.shop_tables.get(key)
+        if source is None or phase is None:return source
+        allowed=set(phase['shop_ids']);products=self.data[key].get('shop',{}).get('rows',[])
+        if len(allowed)==len(products):return source
+        cache_key=(key,phase_id)
+        if cache_key in self.phase_shop_tables:return self.phase_shop_tables[cache_key]
+        selected=[(i,r) for i,r in enumerate(products) if r['id'] in allowed]
+        if not selected:return None
+        table={'catalog':self.blob(struct.pack('<'+'I'*len(selected),*[r['id'] for _,r in selected])),
+               'records':self.blob(b''.join(self.p.read(source['records']+i*64,64) for i,_ in selected)),
+               'count':len(selected)}
+        self.phase_shop_tables[cache_key]=table
+        return table
+    def active_shop_table(self):
+        return self.shop_table(self.selected,self.selected_phase) if self.selected else None
+    def is_native_shop_context(self):
+        if not self.selected or self.p.word(self.app+0x22bc)!=39:return False
+        kind,mode=self.p.word(HEADER+8),self.p.word(self.app+0xb890)
+        return bool((kind==1 and mode==6 and self.has_shop()) or (kind==2 and mode==2 and self.medal_table))
+    # ---------- 活动勋章单位商店（每个活动独立目录，原生单位商店页面，原生勋章结算） ----------
+    def medal_rows(self):
+        if not self.selected:return []
+        phase=self.selected_phase
+        return [r for r in self.medal_catalog if r['event_key']==self.selected
+                and (not r.get('phases') or phase is None or phase in r['phases'])]
+    def has_medal_shop(self):
+        return bool(self.medal_rows())
+    def medal_permitted(self,row):
+        rule=row['availability'];state=self.state()
+        if rule['kind']=='event_available':return True
+        if rule['kind']=='stage_win':
+            return state['stages'].get(rule['local_stage_key'],{}).get('wins',0)>0
+        if rule['kind']=='score':
+            return max(state.get('score_peak',0),state['currency'])>=rule['minimum']
+        return False
+    def build_medal_table(self):
+        p=self.p;rows=self.medal_rows();records=[]
+        for r in rows:
+            raw=bytearray(p.read(p.call('_Z15GetMenuShopData10MenuShopID',r['menu_shop_id']),32))
+            if struct.unpack_from('<H',raw)[0]!=r['menu_shop_id'] or raw[2]!=2:raise ValueError(f"Invalid medal shop row {r['menu_shop_id']}")
+            raw[0x14]=1
+            records.append(struct.pack('<16I',r['menu_shop_id'],self.blob(bytes(raw)),r['medal_price'],1,0,2,r['unit_id'],
+                                       int(self.medal_permitted(r)),*([0]*8)))
+        table={'catalog':self.blob(struct.pack('<'+'I'*len(rows),*[r['menu_shop_id'] for r in rows])),
+               'records':self.blob(b''.join(records)),'count':len(rows)}
+        if self.medal_table:
+            for key in ('catalog','records'):self.p.free(self.medal_table[key])
+        self.medal_table=table
+        self.medal_owned={r['unit_id'] for r in rows if self.unit_owned(r['unit_id'])}
+        return table
+    def unit_owned(self,uid):
+        return self.p.call('_ZN7AppMain20GetUnitLevelSaveDataE6UnitID',self.app,uid)!=0xffffffff
+    def poll_medal_purchase(self):
+        """原生勋章购买完成后立即写入原生存档（勋章与单位均属原生进度）。"""
+        owned={r['unit_id'] for r in self.medal_rows() if self.unit_owned(r['unit_id'])}
+        new=owned-self.medal_owned
+        if new:
+            self.medal_owned=owned
+            self.p.call('_ZN7AppMain17WriteMainSaveDataEv',self.app)
+            self.p.log('HISTORICAL_MEDAL_SHOP_PURCHASE',self.selected,sorted(new))
     def state(self):
         state=self.progress['events'].setdefault(self.selected,{'currency':0,'stages':{},'inventory':{}})
         state['currency']=max(0,min(99999999,state['currency']))
         if 'purchase_counts' not in state:
-            state['purchase_counts']={str(r['id']):state['inventory'].get(str(r['id']),0)//max(1,r['quantity']) for r in self.shop_rows()}
+            # 旧存档的商品计数按整个活动家族恢复，包含当前首期未显示的后期商品。
+            rows=self.data[self.selected].get('shop',{}).get('rows',[])
+            state['purchase_counts']={str(r['id']):state['inventory'].get(str(r['id']),0)//max(1,r['quantity']) for r in rows}
         return state
     def transition(self,action):
         if self.transition_action is not None:return False
@@ -103,22 +197,23 @@ class EventTrial:
         self.p.call('_ZN7AppMain15SetShutterCloseEv',self.app)
         self.p.log('HISTORICAL_SHUTTER_CLOSE')
         return True
-    def select(self,key,enter=False,immediate=False):
-        if enter and not immediate:return self.transition(lambda:self.select(key,True,True))
+    def select(self,key,enter=False,immediate=False,phase_id=None):
+        phase_id=self.phases.resolve(key,phase_id)
+        if enter and not immediate:return self.transition(lambda:self.select(key,True,True,phase_id=phase_id))
         p=self.p;self.app=p.app_instance()
         assert key in self.data
         if self.active_battle:raise RuntimeError('Cannot switch Event during battle')
         self.native_map.disable()
         self.native_selector.disable()
-        for offset in (8,12,16,20,24,28,44):p.put(HEADER+offset,0)
+        for offset in (8,12,16,20,24,28,44,48):p.put(HEADER+offset,0)
         self.native_shop_active=False
         for i,raw in enumerate(self.original_groups):p.write(self.groups+i*8,raw)
         p.write(self.db+0x20,self.original_survival)
         if self.original_currency is None:
             self.original_currency=self.progress.setdefault('baseline_survival_currency',p.call('_ZN7AppMain24GetSurvivalPointSaveDataEv',self.app))
             self.dirty=True;self.flush()
-        self.selected=key;d=self.data[key];t=self.tables[key]
-        shop=self.shop_tables.get(key)
+        self.selected=key;self.selected_phase=phase_id;d=self.data[key];t=self.mission_table(key,phase_id)
+        shop=self.active_shop_table()
         if shop:
             for offset,name in ((12,'catalog'),(16,'count'),(20,'records'),(24,'count')):p.put(HEADER+offset,shop[name])
         p.put(HEADER+36,self.app)
@@ -128,16 +223,22 @@ class EventTrial:
         self.state();self.overlay=None;self.page=0;self.revision+=1;p.put(HEADER,MAGIC);p.put(HEADER+4,0)
         p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',self.app,self.state()['currency'])
         p.put(self.app+0xc63c,4);p.put(self.app+0xc06c,1);p.put(self.app+0xc8c8,6)
+        # 女教官基地的原生“出擊”进入 EventMSD 场景（158），由此处启用的历史数据回应。
+        self.native_map.enable()
+        # 原生 Survival 兑换商店（地图 BASE 区域，MenuShop 模式 6）在活动中读取该活动目录与原价。
+        if self.has_shop():self.prepare_native_shop()
+        p.put(HEADER+48,len(self.medal_rows()))
         if enter:
             p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
             p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
-        p.log('HISTORICAL_EVENT_SELECTED',key,t['count'])
+        p.log('HISTORICAL_EVENT_SELECTED',key,t['count'],phase_id)
     def start_battle(self,index):
+        if index not in self.native_map.active_table()['by_index']:raise ValueError('Stage is outside the selected Event phase')
         p=self.p;app=self.app;d=self.data[self.selected];s=d['stages'][index]
         cost=s['stamina_cost'];stamina=p.call('_ZN7AppMain18GetStaminaSaveDataEv',app)
         if stamina<cost:self.last_message='体力不足';return False
         p.call('_ZN7AppMain12SceneEndFuncEi',app,p.word(app+0x22bc))
-        p.put(HEADER+164,self.native_map.tables[self.selected]['by_index'][index]['bgm_id'])
+        p.put(HEADER+164,self.native_map.active_table()['by_index'][index]['bgm_id'])
         p.call('_ZN7AppMain18AddStaminaSaveDataEi',app,-cost)
         legacy=d['controller'] in ('legacy_survival','current_cooperation')
         p.put(app+0xc030,0);p.put(app+0xc034,0)
@@ -153,7 +254,7 @@ class EventTrial:
             p.put(app+0xb9a4,p.word(ptr+8))
         p.call('_ZN7AppMain26SetContinueStageIDSaveDataEi',app,0)
         p.call('_ZN7AppMain11ChangeExeSTEi',app,99)
-        music=self.native_map.tables[self.selected]['by_index'][index]['bgm_id']
+        music=self.native_map.active_table()['by_index'][index]['bgm_id']
         p.call('_ZN7AppMain10Sound_LoadE7SoundID',app,music)
         p.call('_ZN7AppMain20Sound_RequestPlayBGME7SoundIDi',app,music,0)
         self.active_battle={'index':index,'stage':s,'key':self.selected};self.overlay=None;self.revision+=1
@@ -162,6 +263,8 @@ class EventTrial:
     def update(self):
         self.app=self.p.app_instance()
         if not self.app:return
+        from cockpit_hold import instance
+        instance(self.p).tick()
         if self.p.word(HEADER+200):
             self.reset_event_context()
             self.transition_action=None
@@ -176,11 +279,14 @@ class EventTrial:
         self.last_scene=self.p.word(self.app+0x22bc)
         self.native_map.update()
         self.native_selector.update()
+        self.browser.update()
+        self.native_shop_active=self.is_native_shop_context()
+        if self.native_shop_active and self.shop_kind=='medal':self.poll_medal_purchase()
         pending=self.p.word(HEADER+28)
         if pending:
             self.p.put(HEADER+28,0)
             self.native_shop_purchase(pending-1)
-        if self.native_shop_active and self.last_scene==67:
+        if self.native_shop_active and self.last_scene==67 and not self.p.word(HEADER+84):
             self.p.put(HEADER+8,0);self.native_shop_active=False
         if not self.started and self.p.frame>=140:
             self.started=True
@@ -193,10 +299,12 @@ class EventTrial:
             self.finish_battle()
         if self.selected and self.last_scene==67 and self.active_battle is None:
             self.p.put(self.app+0xc63c,4);self.p.put(self.app+0xc06c,1)
-        if self.selected and self.overlay is None and self.last_scene==160:
-            self.p.call('_ZN7AppMain12SceneEndFuncEi',self.app,160)
-            self.p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
-            self.open('stages')
+        # 原生合作流程（模式 6）在原生存档中增减活动积分，回写该活动的独立进度。
+        if self.selected=='cooperation_2016_current' and self.p.word(HEADER+84) and self.p.word(self.app+0xc8c8)==6:
+            point=self.p.call('_ZN7AppMain24GetSurvivalPointSaveDataEv',self.app)
+            if point!=self.state()['currency']:
+                state=self.state();state['currency']=point;state['score_peak']=max(state.get('score_peak',0),point)
+                self.dirty=True;self.flush()
         if self.overlay:self.draw()
     def flush(self):
         if not self.dirty:return
@@ -243,7 +351,7 @@ class EventTrial:
         p.put(app+0xc8c8,7)
         p.call('_ZN7AppMain12SC_BattleEndEv',app)
         if native_map:
-            p.put(app+0xb160,32)
+            p.put(app+0xb160,159 if p.word(HEADER+84) else 32)
             p.put(app+0xb8dc,0)
             self.result.update(rank=rank,time=p.word(battle+0x48))
             self.active_battle=None;self.overlay=None
@@ -268,10 +376,10 @@ class EventTrial:
         self.native_selector.disable()
         for i,raw in enumerate(self.original_groups):p.write(self.groups+i*8,raw)
         p.write(self.db+0x20,self.original_survival)
-        p.write(HEADER,b'\0'*204)
+        p.write(HEADER,b'\0'*216)
         if self.selected is not None and self.original_currency is not None:
             p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',self.app,self.original_currency)
-        self.selected=None;self.overlay=None;self.native_shop_active=False;self.active_battle=None
+        self.selected=None;self.selected_phase=None;self.overlay=None;self.native_shop_active=False;self.active_battle=None
         self.hitboxes=[];self.result=None;self.page=0;self.revision+=1
         for offset in (0xb1ec,0xb1f0,0xb1f4,0xc030,0xc034,0xc63c,0xc06c,0xc8c8):p.put(self.app+offset,0)
     def leave(self,immediate=False):
@@ -281,9 +389,17 @@ class EventTrial:
         self.reset_event_context()
         p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
         p.call('_ZN7AppMain11ChangeExeSTEi',self.app,31)
+    def leave_to_menu(self,immediate=False):
+        """已进入的活动顶层（女教官基地）退出：恢复非活动上下文后直接返回主菜单（R10）。"""
+        if self.active_battle:return
+        if not immediate:return self.transition(lambda:self.leave_to_menu(True))
+        p=self.p
+        self.reset_event_context()
+        p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
+        p.call('_ZN7AppMain11ChangeExeSTEi',self.app,27)
     def apply_prisoner_rewards(self):
         p=self.p;state=self.state();claims=state.setdefault('reward_claims',{})
-        event=self.native_map.manifest['events'][self.selected];parts=self.data[self.selected]['controller']=='parts'
+        event=self.native_map.active_manifest();parts=self.data[self.selected]['controller']=='parts'
         for area in event['areas']:
             pid=area['prisoner_id']
             if pid<0 or str(pid) in claims:continue
@@ -303,27 +419,37 @@ class EventTrial:
                 p.call('_ZN7AppMain20SetUnitLevelSaveDataE6UnitIDi',self.app,285,0)
     def open(self,page):
         if page=='shop':return self.open_native_shop()
+        if page=='medal_shop':return self.open_medal_shop()
         if page=='stages':return self.native_map.open()
-        if page=='events':return self.native_selector.open()
+        if page=='events':return self.browser.open()
+        if page=='main_menu':return self.leave_to_menu()
         if page in ('tasks','cooperation'):
             self.overlay=None
             if page=='tasks':
-                wins=sum(v.get('wins',0)>0 for v in self.state()['stages'].values())
-                title='EVENT PROGRESS';message=f"CLEAR: {wins}/{len(self.data[self.selected]['stages'])}\nEVENT POINTS: {self.state()['currency']}"
+                visible=self.native_map.active_table()['by_index']
+                stages=self.data[self.selected]['stages'];saved=self.state()['stages']
+                wins=sum(saved.get(stages[i]['local_stage_key'],{}).get('wins',0)>0 for i in visible)
+                title='EVENT PROGRESS';message=f"CLEAR: {wins}/{len(visible)}\nEVENT POINTS: {self.state()['currency']}"
             else:
                 title='COOPERATION';message='Historical stages are available in single-player mode.\nThe original online cooperation service is unavailable.'
-            self.p.call('_ZN7AppMain10SetPopupOKEPcS0_PFvvEiiii',self.app,self.p.cstr(title),self.p.cstr(message),0,290,-256,30,0)
+            self.p.call('_ZN7AppMain10SetPopupOKEPcS0_PFvvEiiii',self.app,self.p.cstr(message),self.p.cstr(title),0,290,30,-256,0)
             return
         self.overlay=page;self.page=0;self.last_message='';self.revision+=1;self.image=None
+    def prepare_native_shop(self):
+        p=self.p;t=self.active_shop_table()
+        for i,r in enumerate(self.shop_rows()):p.put(t['records']+i*64+16,self.state()['purchase_counts'].get(str(r['id']),0))
+        p.put(HEADER+12,t['catalog']);p.put(HEADER+16,t['count']);p.put(HEADER+20,t['records']);p.put(HEADER+24,t['count'])
+        p.put(HEADER+28,0);p.put(HEADER+44,0);p.put(HEADER+36,self.app);p.put(HEADER+8,1)
     def open_native_shop(self,immediate=False):
         if not self.has_shop():return False
         if not immediate:return self.transition(lambda:self.open_native_shop(True))
         p=self.p;app=self.app;self.overlay=None;self.native_shop_active=True
         self.shop_map_return=self.native_map.active
-        t=self.shop_tables.get(self.selected)
+        t=self.active_shop_table()
         for i,r in enumerate(self.shop_rows()):p.put(t['records']+i*64+16,self.state()['purchase_counts'].get(str(r['id']),0))
         p.put(HEADER+12,t['catalog']);p.put(HEADER+16,t['count']);p.put(HEADER+20,t['records']);p.put(HEADER+24,t['count'])
         p.put(HEADER+28,0);p.put(HEADER+44,0);p.put(HEADER+36,app);p.put(HEADER+8,1)
+        self.shop_kind='token'
         mode=6
         p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',app,self.state()['currency'])
         p.call('_ZN7AppMain12SceneEndFuncEi',app,p.word(app+0x22bc))
@@ -331,22 +457,47 @@ class EventTrial:
         p.call('_ZN7AppMain15SC_MenuShopInitEv',app)
         p.log('HISTORICAL_NATIVE_SHOP',self.selected,mode,t['count'])
         return True
+    def open_medal_shop(self,immediate=False):
+        if not self.has_medal_shop():return False
+        if not any(self.medal_permitted(r) and not self.unit_owned(r['unit_id']) for r in self.medal_rows()):
+            # 原生目录不列出已拥有单位；无可购买商品时显示与原生 SC_MenuShopLoop 相同的空目录提示（字符串 13/14、SE 18），停留在女教官基地。
+            p=self.p
+            p.call('_ZN7AppMain23Sound_RequestPlayMenuSEE7SoundID',self.app,0x12)
+            message=p.call('_Z13GetStringShopii',0xe,0xffffffff);title=p.call('_Z13GetStringShopii',0xd,0xffffffff)
+            p.call('_ZN7AppMain10SetPopupOKEPcS0_PFvvEiiii',self.app,message,title,0,0x122,0x32,0xffffff00,0)
+            from cockpit_hold import instance
+            instance(p).release(p.word(self.app+0x36e0))
+            p.log('HISTORICAL_MEDAL_SHOP_EMPTY',self.selected,self.selected_phase)
+            return False
+        if not immediate:return self.transition(lambda:self.open_medal_shop(True))
+        p=self.p;app=self.app;self.overlay=None;self.native_shop_active=True;self.shop_kind='medal'
+        t=self.build_medal_table()
+        p.put(HEADER+12,t['catalog']);p.put(HEADER+16,t['count']);p.put(HEADER+20,t['records']);p.put(HEADER+24,t['count'])
+        p.put(HEADER+28,0);p.put(HEADER+44,0);p.put(HEADER+36,app);p.put(HEADER+8,2)
+        p.call('_ZN7AppMain12SceneEndFuncEi',app,p.word(app+0x22bc))
+        p.put(app+0xb890,2)
+        p.call('_ZN7AppMain15SC_MenuShopInitEv',app)
+        p.log('HISTORICAL_MEDAL_SHOP',self.selected,self.selected_phase,t['count'],
+              [r['menu_shop_id'] for r in self.medal_rows() if self.medal_permitted(r)])
+        return True
     def close_native_shop(self,immediate=False):
         if not immediate:return self.transition(lambda:self.close_native_shop(True))
         p=self.p
-        for offset in (8,28,44):p.put(HEADER+offset,0)
-        self.native_shop_active=False
+        if self.shop_kind=='medal':self.poll_medal_purchase()
+        for offset in (8,12,16,20,24,28,44):p.put(HEADER+offset,0)
+        self.native_shop_active=False;self.shop_kind='token'
         p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
-        if getattr(self,'shop_map_return',False):
-            p.call('_ZN7AppMain11ChangeExeSTEi',self.app,32)
-        else:p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
+        # 活动商店返回女教官基地，保留活动与分期身份。
+        p.put(self.app+0xc63c,4);p.put(self.app+0xc06c,1);p.put(self.app+0xc8c8,6)
+        p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
+        if self.has_shop():self.prepare_native_shop()
     def native_shop_purchase(self,sid):
-        if not self.has_shop() or not self.native_shop_active:return False
+        if not self.has_shop() or not (self.native_shop_active or self.p.word(HEADER+84)):return False
         p=self.p;row=next((r for r in self.shop_rows() if r['id']==sid),None)
         if row is None:raise ValueError('Purchase outside the selected Event catalog')
         if row['type']==2 and p.call('_ZN7AppMain20GetUnitLevelSaveDataE6UnitID',self.app,row['unit_id'])!=0xffffffff:
             return False
-        state=self.state();cost=self.shop_price;t=self.shop_tables[self.selected]
+        state=self.state();cost=row['event_currency_price'];t=self.active_shop_table()
         if state['currency']<cost or state['purchase_counts'].get(str(sid),0)>=row['native_maximum']:
             return False
         getter='_ZN7AppMain20GetUnitLevelSaveDataE6UnitID' if row['type']==2 else '_ZN7AppMain18GetMSPointSaveDataEv' if row['type']==1 else '_ZN7AppMain21GetMedalCountSaveDataEv' if row['type']==3 else '_ZN7AppMain19GetMenuItemSaveDataE6ItemID'
@@ -383,13 +534,16 @@ class EventTrial:
     def touch(self,action,x,y):
         if self.transition_action is not None:return True
         if not self.app:return False
+        if self.browser.touch(action,x,y):return True
         scene=self.p.word(self.app+0x22bc)
+        legacy_map=self.native_map.active and not self.p.word(HEADER+84)
+        if scene==34 and not legacy_map and self.world_event_touch(action,x,y):return True
         if self.native_selector.active:
             xx,yy=self.native_point(x,y)
             if xx<175 and yy>=525:
                 if action==3:self.native_selector.back()
                 return True
-        if self.native_map.active and not self.active_battle and scene==34:
+        if legacy_map and not self.active_battle and scene==34:
             xx,yy=self.native_point(x,y)
             subscene=self.p.word(self.app+0x22dc)
             if xx<175 and yy>=525 and subscene in (4,7,9):
@@ -399,11 +553,9 @@ class EventTrial:
             if abs(xx-shop_center)<70 and yy>=525:
                 if action==3:self.open_native_shop()
                 return True
-        if self.native_shop_active and scene==39:
+        if self.is_native_shop_context():
             xx,yy=self.native_point(x,y)
-            if xx<175 and yy>=525:
-                if action==3:self.close_native_shop()
-                return True
+            if self.host_button(action,x,y,[(0x36d8,'cockpit',xx<175 and yy>=525,('close_shop',))]):return True
         if self.active_battle and scene==100 and not self.active_battle.get('native_map'):
             battle=self.p.word(self.app+0xc220)
             if battle and self.p.read(battle+0x1c,1)[0] and not self.p.call('_ZN10BattleMain15isBattlePlayingEv',battle):
@@ -422,13 +574,19 @@ class EventTrial:
         xx,yy=self.native_point(x,y)
         scene=self.p.word(self.app+0x22bc)
         command=None
-        if scene==34 and not self.native_map.active and 480<=xx<=640 and yy>=525:command=('open','events')
         if scene==67 and self.selected:
+            # 宿主受理的原生按钮：底栏按钮写入原生按压字段（青色框与三灯），面板转送原生触点（白光）；
+            # 释放在框内时保持反馈至闸门合拢，拖出框外取消。
+            panel=self.has_shop() or self.has_medal_shop()
+            buttons=[(0x36d8,'cockpit',xx<175 and yy>=525,('open','main_menu')),
+                     (0x36e0,'cockpit',panel and 400<=xx<=555 and yy>=525,
+                      ('open','medal_shop' if self.has_medal_shop() else 'shop')),
+                     (0x3400,'panel',panel and 400<=xx<=655 and 430<=yy<=505,
+                      ('open','shop' if self.has_shop() else 'medal_shop')),
+                     (0x3378,'panel',self.selected!='cooperation_2016_current' and 400<=xx<=655 and 350<=yy<=425,
+                      ('open','cooperation'))]
+            if self.host_button(action,x,y,buttons):return True
             if 770<=xx<=915 and 218<=yy<=258:command=('open','events')
-            elif 400<=xx<=655 and 280<=yy<=345:command=('open','stages')
-            elif 400<=xx<=655 and 350<=yy<=425:command=('open','cooperation')
-            elif (400<=xx<=655 and 430<=yy<=505) or (400<=xx<=555 and yy>=525):command=('open','shop')
-            elif xx<175 and yy>=525:command=('open','events')
             elif 935<=xx<=1020 and 95<=yy<=190:command=('open','tasks')
         if command:
             if action==1:self.pending_touch=command
@@ -436,6 +594,85 @@ class EventTrial:
                 self.pending_touch=None;self.command(*command)
             return True
         return False
+    def host_button(self,action,x,y,buttons):
+        """buttons: (任务槽, 'cockpit'|'panel', 是否命中, 命令)。返回 True 表示已处理。"""
+        current=getattr(self,'host_press',None)
+        if action==1:
+            self.release_host_press()
+            for slot,kind,hit,command in buttons:
+                if not hit:continue
+                task=self.p.word(self.app+slot)
+                self.host_press={'slot':slot,'kind':kind,'task':task,'command':command,'cancelled':False,
+                                 'hits':{b[0]:b for b in buttons}}
+                if kind=='cockpit':
+                    from cockpit_hold import instance
+                    instance(self.p).hold(task)
+                else:
+                    from probe import Probe
+                    Probe.touch_event(self.p,1,x,y)
+                return True
+            return False
+        if current is None:return False
+        inside=any(slot==current['slot'] and hit for slot,_,hit,_ in buttons)
+        if action==5:
+            if current['cancelled']:return True
+            if current['kind']=='panel':
+                from probe import Probe
+                Probe.touch_event(self.p,5,x,y)
+            if not inside:
+                current['cancelled']=True;self.release_host_press(keep=current)
+            return True
+        if action==3:
+            activate=inside and not current['cancelled']
+            if current['kind']=='panel' or not activate:self.release_host_press(keep=current)
+            self.host_press=None
+            if activate:
+                from lab_ui import play_se,SE_DECIDE,SE_CLOSE
+                command=current['command']
+                play_se(self.p,SE_CLOSE if command in (('open','main_menu'),('close_shop',),('open','shop'),('open','medal_shop')) else SE_DECIDE)
+                if command==('close_shop',):self.close_native_shop()
+                else:self.command(*command)
+            return True
+        return True
+    def release_host_press(self,keep=None):
+        current=keep or getattr(self,'host_press',None)
+        if not current:return
+        task=current['task']
+        if task and self.p.word(self.app+current['slot'])==task:
+            if current['kind']=='cockpit':
+                from cockpit_hold import instance
+                instance(self.p).release(task)
+            else:
+                from probe import Probe
+                Probe.touch_event(self.p,3,-1000,-1000)
+                self.p.call('_ZN7AppMain16ClearSelectPanelEP17GENERAL_TASK_BASEi',self.app,task,0)
+        if keep is None:self.host_press=None
+    def world_event_touch(self,action,x,y):
+        """世界地图 EVENT（底栏任务 app+0x3748，图号 131）：底栏按钮按下即由原生受理，故不送入原生触点；
+        按下期间写入原生按压字段（+0x174）显示蓝光，释放在框内时打开浏览页（R01）。"""
+        xx,yy=self.native_point(x,y);inside=480<=xx<=640 and yy>=525
+        pressed=getattr(self,"event_press",None);task=self.p.word(self.app+0x3748)
+        from cockpit_hold import instance
+        hold=instance(self.p)
+        if action==1:
+            if not inside:return False
+            self.event_press=[True,False]
+            hold.hold(task)
+            return True
+        if not pressed:return False
+        if action==5:
+            if not inside and not pressed[1]:
+                pressed[1]=True
+                hold.release(task)
+            return True
+        if action==3:
+            self.event_press=None
+            if not inside or pressed[1]:hold.release(task)
+            if inside and not pressed[1]:
+                from lab_ui import play_se,SE_DECIDE
+                play_se(self.p,SE_DECIDE);self.open('events')
+            return True
+        return True
     def command(self,name,*args):
         if name=='open':self.open(args[0])
         elif name=='select':self.select(args[0],enter=True)
@@ -447,15 +684,19 @@ class EventTrial:
             if self.overlay=='events' and not self.selected:self.overlay=None
             elif self.overlay=='events':self.leave()
             else:self.overlay=None;self.revision+=1
-    def shop_rows(self):return self.data[self.selected].get('shop',{}).get('rows',[])
+    def shop_rows(self):
+        rows=self.data[self.selected].get('shop',{}).get('rows',[])
+        phase=self.phases.part(self.selected,self.selected_phase)
+        allowed=set(phase['shop_ids']) if phase else None
+        return [r for r in rows if allowed is None or r['id'] in allowed]
     def has_shop(self):
-        table=self.shop_tables.get(self.selected)
+        table=self.active_shop_table()
         return bool(table and table['count'] and table['catalog'] and table['records'])
     def buy(self,index):
         p=self.p;row=self.shop_rows()[index];state=self.state()
         if row['type']==2 and p.call('_ZN7AppMain20GetUnitLevelSaveDataE6UnitID',self.app,row['unit_id'])!=0xffffffff:
             self.last_message='此单位已获得';return False
-        cost=self.shop_price
+        cost=row['event_currency_price']
         if state['currency']<cost:self.last_message='活动货币不足';return False
         if row['type'] not in (0,1,2,3):self.last_message='此商品类别尚未适配';return False
         if not self.native_shop_active:self.open_native_shop()
@@ -524,7 +765,7 @@ class EventTrial:
                         else:
                             owned=False;ptr=self.p.call('_Z16GetEventItemName10MenuShopIDi',r['id'],self.p.word(self.app+0x3d64));name=self.p.string(ptr)
                             if not name:name=f"ITEM {r['unit_id']} × {r['quantity']}"
-                        button((45+col*615,148+row*112,575,100),name[:30],('buy',index),f"价格 {self.shop_price}   {'已获得' if owned else 'BUY'}")
+                        button((45+col*615,148+row*112,575,100),name[:30],('buy',index),f"价格 {r['event_currency_price']}   {'已获得' if owned else 'BUY'}")
                     if not rows:draw.text((90,245),'此活动的历史专属兑换配置仍在核查。',font=self.fonts[26],fill='white')
                     if self.page>0:button((280,625,210,62),'PREVIOUS',('page',-1))
                     if self.page<count-1:button((760,625,210,62),'NEXT',('page',1))
