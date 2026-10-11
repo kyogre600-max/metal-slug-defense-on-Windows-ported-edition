@@ -450,6 +450,20 @@ class Skin:
             elif raw[:3] == b'OI\x00' and raw[3] in (0x18, 0x20) and len(raw) == 8 + w * h * 3:
                 # 关卡缩略图等无透明直接色图集（OI 种类 0）：每像素 3 字节 RGB。
                 self.atlases[name] = Image.frombytes('RGB', (w, h), raw[8:8 + w * h * 3]).convert('RGBA')
+            elif raw[:4] == b'OI\x01\x08' and len(raw) == 1032 + w * h:
+                # 8 位索引、256 色 RGBA 调色板（content_assets.import_png 生成的社区图集）。
+                image = Image.frombytes('P', (w, h), raw[1032:1032 + w * h])
+                image.putpalette(raw[8:1032], rawmode='RGBA')
+                self.atlases[name] = image.convert('RGBA')
+            elif raw[:2] == b'OI' and len(raw) == 520 + w * h:
+                # 8 位索引、256 色 RGB5A1 调色板（shopback.obm、musume.obm 等）。
+                palette = bytearray()
+                for v in struct.unpack_from('<256H', raw, 8):
+                    palette += bytes((((v >> 11) & 31) * 255 // 31, ((v >> 6) & 31) * 255 // 31,
+                                      ((v >> 1) & 31) * 255 // 31, (v & 1) * 255))
+                image = Image.frombytes('P', (w, h), raw[520:520 + w * h])
+                image.putpalette(bytes(palette), rawmode='RGBA')
+                self.atlases[name] = image.convert('RGBA')
             else:
                 raise ValueError(f'{name}：不支持的图集格式 {raw[:4]!r}')
         return self.atlases[name]

@@ -728,6 +728,12 @@ class CommunityContent:
         fields+=(0,0,stock_table)
         # 头部偏移 152/156：自定义音效的 SoundID → 记录指针表（1032 项）与登记数（M6；无音效时为 0）。
         fields+=content_sounds.install(self,self.sounds,self.sound_ids)
+        # 头部偏移 160：逐槽获得时间（原生 Get/SetUnitGetTimeSaveData 对 UnitID ≥ 300 无上界，核心钩子改读写此表；U1c）。
+        get_times=[int((self.progress['units'].get(u['key'],{}) if u else {}).get('get_time',0))&0xffffffff for u in units]
+        self.get_time_table=self.alloc(struct.pack('<'+'I'*n,*get_times))
+        fields+=(self.get_time_table,)
+        # 头部偏移 164：原生单位商店勋章不足时只提示、不询问前往商店（新单位界面的组合包页面期间由宿主置 1，U1c D45）。
+        fields+=(0,)
         p.write(HEADER,struct.pack('<%dI'%len(fields),*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==bytes(rows[:400*0x390])
@@ -792,7 +798,7 @@ class CommunityContent:
             values=struct.unpack('<5I',p.read(self.records+i*RECORD_SIZE+24,20))
             self.progress['units'][u['key']]={'id':u['id'],'level':struct.unpack('<i',struct.pack('<I',values[0]))[0],
              'level_open':values[1],'custom_time':values[2],'new':values[3],'shop_new':values[4],
-             'deck_time':p.word(self.records+i*RECORD_SIZE+0x88)}
+             'deck_time':p.word(self.records+i*RECORD_SIZE+0x88),'get_time':p.word(self.get_time_table+i*4)}
         temporary=self.path.with_suffix('.json.tmp')
         with temporary.open('w',encoding='utf-8') as stream:
             json.dump(self.progress,stream,ensure_ascii=False,indent=2);stream.flush();os.fsync(stream.fileno())

@@ -117,6 +117,20 @@ HOOK(gettime,0x10167bafu, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c
 HOOK(settime,0x10167bcfu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+32,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(getdecktime,0x10167c0du, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+0x88u));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(setdecktime,0x10167c2bu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+0x88u,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
+// 获得时间（GetUnitGetTimeSaveData / SetUnitGetTimeSaveData，0x167b74 / 0x167b90）：原生对 UnitID ≥ 300 读写
+// app+0x857c+4·uid，无上界（U1 开工说明附录 A.11）。社区单位改用头部 +160 的逐槽表（宿主随社区进度保存）。
+static uint32_t get_time_slot(Context& c,uint32_t uid){uint32_t t=head(c,160);return t&&record(c,uid)?t+(uid-U)*4u:0u;}
+HOOK(getgettime,0x10167b75u, uint32_t p=get_time_slot(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
+HOOK(setgettime,0x10167b91u, uint32_t p=get_time_slot(c,c.r[1]);if(p){wr<uint32_t>(c,p,c.r[2]);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
+extern "C" __declspec(dllexport) uint32_t msd_community_get_time_version(){return 1u;}
+// 原生单位商店勋章不足（PopupResultMenuShopBuyYes：0x20b686 起以 strShop 8 格式化“还差 %d 个 [deco0]\n是否前往购买画面”，
+// 0x20b69a 起以 SetPopupYesNo 询问，“是”转勋章商店）。头部 +164 非零时（新单位界面的组合包页面，开工说明 D45）只保留第一行，
+// 改走同函数模式 6 的 SetPopupOK 路径（0x20b66c：r4 为 AppMain、r5 为文字缓冲），不询问是否前往商店。
+HOOK(shop_short_ok,0x1020b69bu, if(active(c)&&head(c,164u)){
+ for(uint32_t i=0,s=c.r[5];i<512u;++i){uint8_t ch=rd<uint8_t>(c,s+i);if(!ch)break;
+  if(ch=='\n'){uint32_t e=i;while(e&&rd<uint8_t>(c,s+e-1u)==' ')--e;wr<uint8_t>(c,s+e,0);break;}}
+ c.pc=0x1020b66du;return;})
+extern "C" __declspec(dllexport) uint32_t msd_community_shop_short_ok_version(){return 1u;}
 HOOK(getnew,0x10167c67u, uint32_t p=record(c,c.r[1]);if(p){ret(c,rd<uint32_t>(c,p+36));return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(addnew,0x10167c7bu, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+36,1u);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})
 HOOK(delnew,0x10167ca3u, uint32_t p=record(c,c.r[1]);if(p){wr<uint32_t>(c,p+36,0u);dirty(c);ret(c,0);return;}if(active(c)&&c.r[1]>=400u){ret(c,0u);return;})

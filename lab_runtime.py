@@ -19,7 +19,7 @@ except BaseException:
 
 PROFILE = 'lab_test_save'
 # 含 LAB 钩子的核心由正式版配置统一加载；独立入口和验证保留显式指定核心接口。
-LAB_CORE = ROOT / 'src' / 'build' / 'MSD_Core_LAB_r48_20261011.dll'
+LAB_CORE = ROOT / 'src' / 'build' / 'MSD_Core_LAB_r50_20261012.dll'
 KEYS = {glfw.KEY_F7: ('prep',), glfw.KEY_F5: ('exit',), glfw.KEY_F8: ('toggle_full',),
         glfw.KEY_F4: ('toggle_enemy_ai',), glfw.KEY_F3: ('toggle_player_ai',),
         glfw.KEY_LEFT_BRACKET: ('enemy_ap',), glfw.KEY_RIGHT_BRACKET: ('enemy_slug',),
@@ -126,6 +126,8 @@ def install():
             from netplay_lobby import NetplayLobby
             self.netplay_lobby = NetplayLobby(self, self.lab, ROOT)
             self.versus_page.lobby = self.netplay_lobby
+            from unit_browser import UnitBrowser
+            self.unit_browser = UnitBrowser(self, self.lab, ROOT)
 
         def draw_text(self, a, idx):
             page = getattr(self, 'versus_page', None)
@@ -182,6 +184,9 @@ def install():
         def touch_event(self, action, x, y):
             mods = getattr(self, 'mod_page', None)
             if mods is not None and mods.touch(action, x, y):
+                return
+            browser = getattr(self, 'unit_browser', None)
+            if browser is not None and browser.touch(action, x, y):
                 return
             lobby = getattr(self, 'netplay_lobby', None)
             if lobby is not None and lobby.touch(action, x, y):
@@ -255,6 +260,9 @@ def install():
             mods = getattr(self, 'mod_page', None)
             if mods is not None and mods.back():
                 return True
+            browser = getattr(self, 'unit_browser', None)
+            if browser is not None and browser.back():
+                return True
             lobby = getattr(self, 'netplay_lobby', None)
             if lobby is not None and lobby.back():
                 return True
@@ -278,6 +286,9 @@ def install():
             mods = getattr(self, 'mod_page', None)
             if mods is not None:
                 mods.close()
+            browser = getattr(self, 'unit_browser', None)
+            if browser is not None:
+                browser.close()
             lobby = getattr(self, 'netplay_lobby', None)
             if lobby is not None:
                 lobby.shutdown()
@@ -328,6 +339,9 @@ def install():
                     entry.draw()
                 if mods is not None:
                     mods.draw()
+                browser = getattr(self, 'unit_browser', None)
+                if browser is not None:
+                    browser.draw()
                 if lobby is not None:
                     lobby.draw()
             except Exception as error:
@@ -347,6 +361,7 @@ def install():
             if not getattr(self, 'char_installed', False) and getattr(self, 'window', None):
                 # 文字输入（联机大厅的名称与 IP，N6a）：GLFW 字符回调在窗口线程送出已确认的字符（含输入法的结果）。
                 glfw.set_char_callback(self.window, self.text_input)
+                glfw.set_scroll_callback(self.window, self.scroll)
                 self.char_installed = True
             lab = getattr(self.probe, 'lab', None) if self.probe else None
             if lab is None or not self.ready:
@@ -364,12 +379,31 @@ def install():
                     self.pad_error = f'{type(error).__name__}: {error}'
                     self.probe.log('VS_PAD_ERROR', self.pad_error)
 
+        def scroll(self, window, dx, dy):
+            # 单位浏览（U1）：滚轮翻页。
+            browser = getattr(self.probe, 'unit_browser', None) if self.probe else None
+            if browser is not None and self.ready and browser.open and dy:
+                browser.commands.append(('wheel', dy))
+
         def text_input(self, window, codepoint):
+            browser = getattr(self.probe, 'unit_browser', None) if self.probe else None
+            if browser is not None and self.ready and browser.wants_text():
+                browser.commands.append(('text', chr(codepoint)))
+                return
             lobby = getattr(self.probe, 'netplay_lobby', None) if self.probe else None
             if lobby is not None and self.ready and lobby.wants_text():
                 lobby.commands.append(('text', chr(codepoint)))
 
         def key(self, window, key, scan, action, mods):
+            browser = getattr(self.probe, 'unit_browser', None) if self.probe else None
+            if browser is not None and self.ready and browser.wants_keys() and key != glfw.KEY_ESCAPE:
+                # 单位浏览（U1）：←/→ 翻页（可按住连发）、Enter 确定、Backspace 删除搜索字；Esc 经原有返回流程。
+                name = {glfw.KEY_LEFT: 'left', glfw.KEY_RIGHT: 'right', glfw.KEY_UP: 'up', glfw.KEY_DOWN: 'down',
+                        glfw.KEY_ENTER: 'enter', glfw.KEY_KP_ENTER: 'enter', glfw.KEY_BACKSPACE: 'backspace'}.get(key)
+                if name and (action == glfw.PRESS or (action == glfw.REPEAT and name != 'enter')):
+                    browser.commands.append(('key', name))
+                if key not in (glfw.KEY_F11, glfw.KEY_F12, glfw.KEY_F9):
+                    return
             lobby = getattr(self.probe, 'netplay_lobby', None) if self.probe else None
             if lobby is not None and self.ready and lobby.wants_keys() and action in (glfw.PRESS, glfw.REPEAT):
                 # 联机大厅窗口（名称、IP、房间等）：Enter 确定、Esc 取消、Backspace 删除；其他按键不送入原生菜单（F 键除外）。

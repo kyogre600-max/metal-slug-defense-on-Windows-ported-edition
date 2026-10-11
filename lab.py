@@ -1302,6 +1302,9 @@ class Lab:
                 self.prep.key(*command[1:])
             return
         if kind == 'prep':
+            browser = getattr(self.p, 'unit_browser', None)
+            if browser is not None and (browser.open or browser.busy()):
+                return                              # 单位强化界面（U1b）打开或闸门动画中：不打开 LAB
             if not self.active and not self.prep.busy():
                 if not self.prep.open:
                     # 打开方式决定模式：VERSUS 页本地对战为双人对战、VS CPU 卡为 VS CPU；主菜单 LAB 图标与 F7 为 LAB。

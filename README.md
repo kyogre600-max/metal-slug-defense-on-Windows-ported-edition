@@ -8,6 +8,11 @@ This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds 
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+**Update 26.10.2**
+
+- Redesigned the unit browsing and purchase screens, and added a unit favorites feature (test).
+- This UI may still have issues; they will be fixed gradually in later updates.
+
 **Update 26.10.1**
 
 - Added remote online play and LAN online play; feel free to try them out.
@@ -119,6 +124,11 @@ Esta edición añade controles de teclado y un **formato 16:9**. Los fondos ampl
 
 **La energía (stamina) se recupera a 1 punto por segundo.** La versión original de Android recupera 1 punto por minuto.
 
+**Actualización 26.10.2**
+
+- Se rediseñaron las pantallas de exploración y compra de unidades, y se añadió una función de unidades favoritas (en prueba).
+- Esta interfaz aún puede tener problemas; se irán corrigiendo en próximas actualizaciones.
+
 **Actualización 26.10.1**
 
 - Se añadió el juego en línea remoto y por red local (LAN); puedes probarlo por tu cuenta.
@@ -229,6 +239,11 @@ Los mundos configurables, los enemigos comunitarios registrados, y los escenario
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+**26.10.2 更新**
+
+- 重制了单位的浏览与购买UI界面，以及额外的单位收藏功能（测试）
+- 此UI可能还存在问题，后续会逐渐修复
 
 **26.10.1 更新**
 
