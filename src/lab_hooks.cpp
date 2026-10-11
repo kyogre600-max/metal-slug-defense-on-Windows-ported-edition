@@ -1838,6 +1838,10 @@ void install_se_hooks(){
     old_se_release=find_block(0x101c833du);register_block(0x101c833du,se_release);
 }
 }
+// 供其他编译单元（community_content.cpp 的商店翻页判定）在钩子内同步调用客体函数。
+bool msd_guest_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,uint32_t* result){
+    return guest_call(c,fn,a0,a1,a2,a3,nullptr,0,result);
+}
 // 联机回滚（netplay.cpp）：本文件中跨帧保留、参与战斗、AI 决策或音效队列的静态状态，随客体内存快照保存与恢复；
 // 仅在单次原生调用内有效的绘制遍标记（pass、in_ui 等）与布局缓存不在其中。
 void msd_lab_netplay_state(StateIO& io){

@@ -1425,8 +1425,90 @@ static void cc_1020a3cc(Context& c){if(!active(c)){old_block_1020a3cc(c);return;
 {uint32_t a=(c.r[5]+0u+4u);c.r[0]=rd<uint32_t>(c,a+0u);}
 {if(c.r[0] == 0){c.pc=(270574560u|1u);return;}}
 c.pc=270574557u;}
+// ---------- 单位商店翻页的显示判定（2026-10-11，核心 r48）----------
+// 原生单位商店（模式 2）正向建页（InitMenuShopWindowTask）按商品类型决定是否显示：单位须所属阵营未被筛选隐藏、启用且未售罄；
+// 组合包须启用、未售罄且包内单位均未被隐藏；类型 0/7 须启用且未售罄；类型 3 只在模式 6 显示；其余类型直接显示。
+// 原生 BACK 回溯与 NEXT/BACK 卡的存在判定只看“启用且未售罄”，筛选开启时与实际页面不一致：BACK 每次只退回 50 个目录项，
+// 后续只剩被隐藏的商品时 NEXT 进入空页（空页上 BACK 读取 BACK 卡自身的字段作为目录序号）。以下三处改用与正向建页相同的判定；
+// 活动商店（event_trial_hooks.cpp）与其他模式保持原生路径。客体函数经 msd_guest_call 调用，原有钩子（社区与活动）照常生效。
+bool msd_guest_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,uint32_t* result);
+static bool shop_event_active(Context& c){   // 与 event_trial_hooks.cpp 的 event_shop 判定相同
+    constexpr uint32_t EH=0x1ffed000u,EMAGIC=0x45565431u;
+    if(rd<uint32_t>(c,EH)!=EMAGIC||!rd<uint32_t>(c,EH+16u)||!rd<uint32_t>(c,EH+24u))return false;
+    uint32_t app=rd<uint32_t>(c,EH+36u),kind=rd<uint32_t>(c,EH+8u);
+    return app&&((kind==1u&&rd<uint32_t>(c,app+0xb890u)==6u)||(kind==2u&&rd<uint32_t>(c,app+0xb890u)==2u));
+}
+static bool shop_unit_pages(Context& c,uint32_t app){
+    return active(c)&&rd<uint32_t>(c,app+0xb890u)==2u&&!shop_event_active(c);
+}
+static uint32_t shop_page_total(Context& c,uint32_t app){return std::min(rd<uint32_t>(c,app+0xb8a0u),head(c,48));}
+// 最近一次单位商店建页的实际起点（InitMenuShopWindowTask 入口记录）。购买后原生按所购商品（+0x9c）重建页面，
+// 起点为该商品的目录序号，+0x84 仍为 0，因此 BACK 以此记录为准。
+static uint32_t shop_page_start=0xffffffffu;
+static int shop_visible(Context& c,uint32_t app,uint32_t sid);
+// 从 start 向前数 50 件显示的商品，out 为第 50 件的目录序号（不足 50 件为 0）；客体调用失败返回 false。
+static bool shop_back_start(Context& c,uint32_t app,uint32_t start,uint32_t& out){
+    uint32_t base=head(c,44),prev=0,n=0;
+    for(uint32_t i=std::min(start,shop_page_total(c,app));i-->0;){
+        int v=shop_visible(c,app,rd<uint32_t>(c,base+i*4u));
+        if(v<0)return false;
+        if(v){prev=i;if(++n==50u)break;}
+    }
+    out=n<50u?0u:prev;
+    return true;
+}
+// 1 显示、0 不显示、-1 客体调用失败（调用方回到原生路径）。
+static int shop_visible(Context& c,uint32_t app,uint32_t sid){
+    uint32_t type=0,v=0;
+    auto call=[&](uint32_t fn,uint32_t a0,uint32_t a1)->bool{return msd_guest_call(c,fn,a0,a1,0u,0u,&v);};
+    uint32_t filter=rd<uint32_t>(c,app+0x6dc8u);                     // GetFilterState：被隐藏的所属位
+    auto hidden=[&](uint32_t uid,int& h)->bool{                       // GetUnitAffiliation 与 GetFilterStateType（位 1<<所属，0–5）
+        if(!call(0x101ed1fdu,app,uid))return false;
+        h=v<=5u&&((filter>>v)&1u);return true;};
+    auto available=[&](int& a)->bool{                                 // IsMenuShopEnable 且非 IsMenuShopSoldOut
+        if(!call(0x102093f5u,app,sid))return false;
+        if(!v){a=0;return true;}
+        if(!call(0x10165835u,sid,0u))return false;
+        a=!v;return true;};
+    if(!call(0x10165691u,sid,0u))return -1;                           // GetMenuShopType
+    type=v;
+    int a=0,h=0;
+    switch(type){
+    case 0u:case 7u:
+        return available(a)?a:-1;
+    case 2u:
+        if(!call(0x1016569fu,sid,0u)||!hidden(v,h))return -1;         // GetMenuShopUniqueID → UnitID
+        if(h)return 0;
+        return available(a)?a:-1;
+    case 3u:
+        return 0;
+    case 4u:{
+        if(!available(a))return -1;
+        if(!a)return 0;
+        if(!call(0x1016569fu,sid,0u))return -1;                       // UnitPackID
+        uint32_t pack=v;
+        for(uint32_t k=0;k<256u;++k){
+            if(!call(0x101654b5u,pack,k))return -1;                   // GetUnitPackDataID，-1 结束
+            if(v==0xffffffffu)return 1;
+            if(!hidden(v,h))return -1;
+            if(h)return 0;
+        }
+        return 1;}
+    default:
+        return 1;
+    }
+}
 static Block old_block_1020baa8;
 static void cc_1020baa8(Context& c){if(!active(c)){old_block_1020baa8(c);return;}
+if(shop_unit_pages(c,c.r[0])){
+    // 起点之后已无显示的商品（如买下最后一件后按该商品重建、筛选后只剩被隐藏的商品）时显示最后一页，不建立空页。
+    uint32_t app=c.r[0],base=head(c,44),total=shop_page_total(c,app),start=std::min(c.r[1],total),back=0;
+    int found=0;
+    for(uint32_t i=start;i<total&&!found;++i)found=shop_visible(c,app,rd<uint32_t>(c,base+i*4u));
+    if(found==0&&start>0&&shop_back_start(c,app,start,back))start=back;
+    c.r[1]=start;
+    shop_page_start=start;
+}
 {uint32_t a=c.r[13]-36u;wr<uint32_t>(c,a+0u,c.r[4]);wr<uint32_t>(c,a+4u,c.r[5]);wr<uint32_t>(c,a+8u,c.r[6]);wr<uint32_t>(c,a+12u,c.r[7]);wr<uint32_t>(c,a+16u,c.r[8]);wr<uint32_t>(c,a+20u,c.r[9]);wr<uint32_t>(c,a+24u,c.r[10]);wr<uint32_t>(c,a+28u,c.r[11]);wr<uint32_t>(c,a+32u,c.r[14]);c.r[13]=a;}
 {uint32_t a=c.r[13]-8u;wr<uint64_t>(c,a+0u,c.d[8]);c.r[13]=a;}
 {uint32_t v=shift(c,c.r[1],2u,1,true);nz(c,v);c.r[3]=v;}
@@ -1447,6 +1529,12 @@ static void cc_1020baa8(Context& c){if(!active(c)){old_block_1020baa8(c);return;
 {uint32_t v=c.r[1];c.r[11]=v;}
 {uint32_t v=0u;nz(c,v);c.r[5]=v;}
 {uint32_t a=(c.r[6]+0u+164u);wr<uint32_t>(c,a+0u,c.r[5]);}
+if(shop_unit_pages(c,c.r[4])){   // BACK 卡：起点之前存在显示的商品（判定同正向建页）时建立，否则跳过（0x1020bb2c / 0x1020bb48）
+    uint32_t app=c.r[4],base=head(c,44),i=std::min(c.r[11],shop_page_total(c,app));
+    int found=0;
+    while(i-->0){found=shop_visible(c,app,rd<uint32_t>(c,base+i*4u));if(found)break;}
+    if(found>=0){c.pc=(found?0x1020bb2cu:0x1020bb48u)|1u;return;}
+}
 {uint32_t v=add(c,c.r[2],~(0u),1,true);}
 {if(cond(c,12)){c.pc=(270580552u|1u);return;}}
 c.pc=270580453u;}
@@ -1489,10 +1577,22 @@ static void cc_1020dc74(Context& c){if(!active(c)){old_block_1020dc74(c);return;
 {uint32_t v=add(c,c.r[7],~((head(c,72)-1u)),1,true);}
 {if(cond(c,13)){c.pc=(270589256u|1u);return;}}
 c.pc=270589049u;}
-// 单位商店 BACK（UpdateSelectedMenuShop 0x1020c3e6）：从当前页首向前数 50 件可售商品求上一页起点，原生读 259 项原版目录；
-// 社区商品追加在目录末尾（索引 259 起），须读同一份扩展目录（头部 +44），否则读到原版目录之后的数据。
+// 单位商店 BACK（UpdateSelectedMenuShop 0x1020c3e6）：从当前页实际起点（shop_page_start）向前数 50 件显示的商品，上一页起点为
+// 第 50 件的序号（不足 50 件为 0），与 NEXT 的正向建页互逆；写入 +0x84 后接原生重建（0x1020c2e4）。r7（选中卡的目录序号，原生用于重建后的
+// 滚动位置）在空页或越界时取当前页起点。其他模式与活动商店沿用下方原生回溯（单位目录取扩展目录）。
 static Block old_block_1020c3e6;
 static void cc_1020c3e6(Context& c){if(!active(c)){old_block_1020c3e6(c);return;}
+if(shop_unit_pages(c,c.r[5])){
+    uint32_t app=c.r[5],b=app+0xb800u,total=shop_page_total(c,app),prev=0;
+    uint32_t start=std::min(shop_page_start!=0xffffffffu?shop_page_start:rd<uint32_t>(c,b+0x84u),total);
+    if(shop_back_start(c,app,start,prev)){
+        wr<uint32_t>(c,b+0x84u,prev);
+        if(c.r[7]>=total||!rd<uint32_t>(c,b+0x98u))c.r[7]=start;
+        c.pc=0x1020c2e5u;return;
+    }
+}
+// 原生回溯：从当前页首向前数 50 件可售商品求上一页起点；原生读 259 项原版目录，社区商品追加在目录末尾（索引 259 起），
+// 单位目录须读同一份扩展目录（头部 +44），否则读到原版目录之后的数据。
 {uint32_t a=((270582762u&~3u)+0u+112u);c.r[3]=rd<uint32_t>(c,a+0u);}
 {uint32_t v=shift(c,c.r[7],2u,1,false);c.r[11]=v;}
 {uint32_t v=0u;c.r[8]=v;}
@@ -1519,6 +1619,19 @@ static void cc_10209a04(Context& c){if(!active(c)){old_block_10209a04(c);return;
 {uint32_t v=c.r[4];c.r[0]=v;}
 {c.r[14]=270572059u;c.pc=(270570668u|1u);return;}
 c.pc=270572059u;}
+// 单位商店 NEXT 卡（InitMenuShopWindowTask 循环体 0x1020be02，r7 为本页已检视商品之后的目录序号）：之后存在显示的商品
+// （判定同正向建页）时建立（0x1020be3a），否则跳过（0x1020be58），不再进入只剩被隐藏商品的空页。生成代码中 0x1020bdd8 块
+// 内联首次循环判定后直接进入 0x1020be02，因此钩子位于循环体而非循环头 0x1020bdfa。
+static Block old_block_1020be02;
+static void cc_1020be02(Context& c){
+    if(shop_unit_pages(c,c.r[4])){
+        uint32_t app=c.r[4],base=head(c,44),total=shop_page_total(c,app);
+        int found=0;
+        for(uint32_t i=c.r[7];i<total;++i){found=shop_visible(c,app,rd<uint32_t>(c,base+i*4u));if(found)break;}
+        if(found>=0){c.pc=(found?0x1020be3au:0x1020be58u)|1u;return;}
+    }
+    old_block_1020be02(c);
+}
 extern "C" __declspec(dllexport) void msd_enable_community_content(){static bool done=false;if(done)return;find_block(0x101652a9u);done=true;
 old_block_101c9abc=find_block(270310077u);register_block(270310077u,cc_101c9abc);
 old_block_101d09b4=find_block(270338485u);register_block(270338485u,cc_101d09b4);
@@ -1678,6 +1791,7 @@ old_block_1020be14=find_block(270581269u);register_block(270581269u,cc_1020be14)
 old_block_1020c0c4=find_block(270581957u);register_block(270581957u,cc_1020c0c4);
 old_block_1020c0e8=find_block(270581993u);register_block(270581993u,cc_1020c0e8);
 old_block_1020c3e6=find_block(270582759u);register_block(270582759u,cc_1020c3e6);
+old_block_1020be02=find_block(0x1020be03u);register_block(0x1020be03u,cc_1020be02);
 old_block_10209a04=find_block(270572037u);register_block(270572037u,cc_10209a04);
 old_block_1020dc74=find_block(270589045u);register_block(270589045u,cc_1020dc74);
 old_vehicle_motion=find_block(0x101dde11u);register_block(0x101dde11u,vehicle_motion);
