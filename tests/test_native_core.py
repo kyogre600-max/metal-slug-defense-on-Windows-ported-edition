@@ -43,4 +43,10 @@ class NativeCoreRelease(unittest.TestCase):
         missing=sorted(required_symbols()-exports)
         self.assertFalse(missing,f'{dll.name} 缺少导出 {missing}；请用 src/build.py 重新构建并复制到 build/{name}')
 
+    def test_build_holds_only_active_core(self):
+        # build/ 随 ZIP 发布；换核心时删除上一版，旧版保留在 src/build/（不发布）与 Git 历史中。
+        name=json.loads((ROOT/'core_runtime.json').read_text(encoding='utf-8'))['library']
+        extra=sorted(p.name for p in (ROOT/'build').glob('*.dll') if p.name!=name)
+        self.assertFalse(extra,f'build/ 只应保留 {name}，请删除 {extra}')
+
 if __name__=='__main__':unittest.main()
