@@ -270,13 +270,18 @@ class UnitMenu:
 
     # ---------- 合成 ----------
     def compose(self):
-        """当前页面图像与点击区域。"""
+        """当前页面图像与点击区域。单位菜单页面的分层（底层、面板与画框、整页）记入 b.layers['menu']，供过渡使用（D52）。"""
+        from PIL import Image
         b, art = self.b, self.b.art
         if self.panel is not None and self.base is not None:
             img = self.base.copy()
             return img, self.compose_panel(img)
-        img, boxes = b.chrome(['back'])
-        boxes += self.compose_menu(img)
+        chrome, boxes = b.chrome(['back'])
+        items = Image.new('RGBA', (W, H))
+        boxes += self.compose_menu(items)
+        img = chrome.copy()
+        img.alpha_composite(items)
+        b.layers['menu'] = {'chrome': chrome, 'items': items, 'page': img.copy(), 'serial': b.stamp()}
         if self.panel is not None:
             self.base = b.shaded(img)
             img = self.base.copy()
@@ -314,13 +319,18 @@ class UnitMenu:
             b.number(img, sx + 86, sy + 30, self.price(), 0, 2, 18, lead=False)
         else:
             favorite = self.key in b.favorites()
-            d = ImageDraw.Draw(img)
+            # 收藏（星形与文字）画在独立的透明图上再叠入，按下时只让这一块变亮
+            fx, fy = sx + sw - 220, sy + 10
+            mark = Image.new('RGBA', (210, 46))
+            d = ImageDraw.Draw(mark)
             if favorite:
-                d.polygon(star_polygon(sx + sw - 34, sy + 32, 13), fill=FAVORITE_STAR, outline=(60, 30, 0, 255), width=2)
+                d.polygon(star_polygon(186, 22, 13), fill=FAVORITE_STAR, outline=(60, 30, 0, 255), width=2)
             else:
-                d.polygon(star_polygon(sx + sw - 34, sy + 32, 13), outline=YELLOW, width=2)
-            self.text(img, (sx + sw - 54, sy + 32), self.tr('favorite'), 18, YELLOW, 'rm')
-            boxes.append(((sx + sw - 220, sy + 10, 210, 46), ('favorite',)))
+                d.polygon(star_polygon(186, 22, 13), outline=YELLOW, width=2)
+            self.text(mark, (166, 22), self.tr('favorite'), 18, YELLOW, 'rm')
+            img.alpha_composite(mark, (fx, fy))
+            b.icon_lights[('favorite',)] = (mark, (fx, fy))
+            boxes.append(((fx, fy, 210, 46), ('favorite',)))
         cx, cy, cw, ch = CAPTION_BOX
         img.alpha_composite(art.slice(CAPTION, cw, ch, (6, 6, 10, 12), 2), (cx, cy))
         self.text(img, (cx + 28, cy + ch // 2 - 2), 'Lv', 24, anchor='lm')
@@ -348,11 +358,24 @@ class UnitMenu:
             mid = sy + sh // 2 - arrow.height // 2
             left = (sx - arrow.width - 14, mid, arrow.width, arrow.height)
             right = (sx + sw + 14, mid, arrow.width, arrow.height)
-            img.alpha_composite(arrow.transpose(Image.Transpose.FLIP_LEFT_RIGHT), left[:2])
+            flipped = arrow.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+            img.alpha_composite(flipped, left[:2])
             img.alpha_composite(arrow, right[:2])
+            b.icon_lights[('nav', -1)] = (flipped, left[:2])
+            b.icon_lights[('nav', 1)] = (arrow, right[:2])
             boxes.append(((left[0] - 12, left[1] - 12, left[2] + 24, left[3] + 24), ('nav', -1)))
             boxes.append(((right[0] - 12, right[1] - 12, right[2] + 24, right[3] + 24), ('nav', 1)))
         return boxes
+
+    def panel_rect(self, panel):
+        """各窗口的位置与大小（窗口开合动效使用）。"""
+        return {'lvup': LV_PANEL, 'limit': LIMIT_PANEL, 'confirm': CONFIRM_PANEL, 'buy': BUY_PANEL,
+                'message': MESSAGE_PANEL, 'status': BIG_PANEL, 'action': BIG_PANEL}[panel]
+
+    def motion_rects(self):
+        """列表面板进出时逐个移动的区域（左侧面板、含左右箭头的画框、说明条），依次相隔 2 帧进入。"""
+        x, y, w, h = FRAME
+        return [MENU_PANEL, (x - 70, y, w + 140, h), CAPTION_BOX]
 
     def compose_panel(self, img):
         return {'lvup': self.compose_lvup, 'limit': self.compose_limit, 'confirm': self.compose_confirm,

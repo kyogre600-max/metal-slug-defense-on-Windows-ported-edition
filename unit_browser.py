@@ -13,6 +13,8 @@ ConvUnitIcon 锚点放置（D16、D19）、格内绿色调为 MSA 色调（D18�
 未拥有的单位（D30），卡片 BUY 与单位菜单 BUY 打开购买确认（D32，unit_menu）；PACK 进入原生单位商店页面（场景 38/39），
 期间原生商品目录只含可购买的组合包（D33，购买界面沿用原版），页面上的 BACK / Esc 回到本界面。操作与数据经 unit_catalog。
 排序、筛选、页码与显示设定、收藏保存在当前存档目录的 unit_browser.json（R7、D13），不写入原生存档。
+动效（D52，unit_motion）：按下白光按原生亮版渐变；弹窗（SORT 面板、单位菜单各窗口）按原生弹窗开合；浏览大菜单与单位
+菜单之间按原生列表面板进出；翻页时卡片整体平移。过渡由画面状态（view_state）的变化触发，期间不接受输入（翻页除外）。
 """
 import json
 import math
@@ -22,6 +24,7 @@ import time
 from pathlib import Path
 
 from lab_ui import W, H, SE_DECIDE, SE_CLOSE, Skin, Shutter, play_se
+from unit_motion import Layers, Lights, Motion, color_map, lighten, relight, panels_in, panels_out, popup_close, popup_open, slide
 
 STATE_NAME = 'unit_browser.json'
 STATE_SCHEMA = 1
@@ -67,6 +70,21 @@ DLG_RED = ('menuparts.obm', (282, 168, 90, 23))        # 原生弹窗 OK（红�
 DLG_BROWN = ('menuparts.obm', (282, 216, 90, 23))      # 原生弹窗按钮（棕）
 FIELD = ('menuparts.obm', (191, 120, 190, 23))         # 米色底板（搜索框）
 PRESS_FRAME = (('menuparts.obm', (563, 155, 66, 54)), (3, 3))   # ConvMenuParts 79：按下青色框
+# 按下白光的亮版（与原图 alpha 轮廓相同的原生图块，D52）
+RED_LIT = ('shop.obm', (322, 318, 84, 23))             # RED 的亮版（GT_MenuShopWindowDraw 图 5 → 6）
+DLG_RED_LIT = ('menuparts.obm', (191, 216, 90, 23))    # 弹窗 OK 的亮版（GT_PopupOKDraw 图 4 → 5）
+DLG_BROWN_LIT = ('menuparts.obm', (282, 192, 90, 23))
+LIGHT_PARTS = {'buy': (RED, RED_LIT), 'lv_up': (RED, RED_LIT), 'lv_lock': (RED, RED_LIT),
+               'open': (TAB_OFF, TAB_ON), 'act': (TAB_OFF, TAB_ON), 'sort': (TAB_OFF, TAB_ON),
+               'direction': (TAB_OFF, TAB_ON), 'source': (TAB_OFF, TAB_ON),
+               'limit_pay': (DLG_RED, DLG_RED_LIT), 'confirm_ok': (DLG_RED, DLG_RED_LIT), 'buy_ok': (DLG_RED, DLG_RED_LIT),
+               'message_ok': (DLG_RED, DLG_RED_LIT), 'ok': (DLG_RED, DLG_RED_LIT),
+               'confirm_cancel': (DLG_BROWN, DLG_BROWN_LIT), 'buy_cancel': (DLG_BROWN, DLG_BROWN_LIT),
+               'reset': (DLG_BROWN, DLG_BROWN_LIT)}
+LIGHT_INSTANT = {'limit_pay', 'confirm_ok', 'buy_ok', 'message_ok', 'ok', 'confirm_cancel', 'buy_cancel', 'reset'}
+LIGHT_NONE = {'bar', 'lv_na', 'lv_col', 'panel', 'outside', 'search', 'desc_bar', 'desc_text'}
+SORT_PANEL = (40, 96, 1200, 500)
+CARD_CLIP = (LEFT - 8, TOP - 8, RIGHT - LEFT + 16, BOTTOM - TOP + 16)   # 翻页平移的裁切范围（卡片区）
 PRESS_LAMPS = (('menuparts.obm', (221, 247, 22, 6)), (-19, -2))  # ConvMenuParts 37：三灯
 CONV_MENU_PARTS = 0x1031c900                   # ConvMenuParts（16 字节：x,y,w,h,锚点 x,y,—,页）
 CONV_POSITION = 0x1030a1c0                     # position_icon.obm 转换表 53（阵营 0–5）
@@ -296,10 +314,38 @@ class Art:
             self.cache[key] = scaled(tint_cell(self.part(CELL), CELL_TINT), CARD_SCALE)
         return self.cache[key]
 
-    def card_base(self, w):
-        key = ('card_base', w)
+    def card_base(self, w, lit=False):
+        """卡片底板；lit 为真时为按下的亮版：底板内部（四边以内）按原生列表按钮原图与亮版（ConvMenuParts 110 → 111）
+        的平均颜色比提亮，边框不变（D52）。"""
+        from PIL import Image
+        key = ('card_base', w, lit)
         if key not in self.cache:
-            self.cache[key] = nine4(self.part(CARD), w, CARD_H, CARD_EDGES, CARD_SCALE)
+            if not lit:
+                self.cache[key] = nine4(self.part(CARD), w, CARD_H, CARD_EDGES, CARD_SCALE)
+            else:
+                base = self.card_base(w).copy()
+                ratio = self.lit_ratio()
+                left, top, right, bottom = (e * CARD_SCALE for e in CARD_EDGES)
+                inner = base.crop((left, top, w - right, CARD_H - bottom))
+                channels = [band.point(lambda v, r=r: min(255, round(v * r))) for band, r in zip(inner.split()[:3], ratio)]
+                inner = Image.merge('RGBA', channels + [inner.getchannel('A')])
+                base.paste(inner, (left, top))
+                self.cache[key] = base
+        return self.cache[key]
+
+    def lit_ratio(self):
+        """原生列表按钮亮版与原图的逐通道平均颜色比（两图逐像素配对，只计不同的不透明像素）。"""
+        key = ('lit_ratio',)
+        if key not in self.cache:
+            pairs = [(a, b) for a, b in zip(self.part(TAB_OFF).getdata(), self.part(TAB_ON).getdata())
+                     if a[3] == 255 and a != b]
+            self.cache[key] = tuple(sum(b[c] for _, b in pairs) / max(1, sum(a[c] for a, _ in pairs)) for c in range(3))
+        return self.cache[key]
+
+    def color_map(self, base, lit):
+        key = ('color_map', base, lit)
+        if key not in self.cache:
+            self.cache[key] = color_map(self.part(base), self.part(lit))
         return self.cache[key]
 
     def gauge_frame(self):
@@ -465,6 +511,18 @@ class UnitBrowser:
         self.saved_catalog = None             # 组合包页面期间暂存的原生商品目录（社区头部 +44 / +48）
         self.pack_list = None
         self.back_press = None                # 组合包页面上原生 BACK 的按压（宿主受理）
+        self.layers = {}                      # 最近一次合成的各画面分层：'grid' / 'menu' → {'chrome', 卡片或面板, 'page'}
+        self.gl = None                        # 动效与按下白光的纹理层（unit_motion.Layers）
+        self.motion = None                    # 进行中的过渡（unit_motion.Motion）
+        self.motion_drawn = False             # 本帧画了过渡（单位菜单的动作演示在过渡结束后的下一帧开始）
+        self.shown_state = None               # 当前画面状态（view_state），变化时开始过渡
+        self.slide_dir = 0                    # 翻页方向（flip 设定，过渡开始时取用）
+        self.lights = Lights()                # 按下白光
+        self.lit_cache = {}
+        self.black = None
+        self.icon_lights = {}        # 图标类按钮（箭头、收藏、阵营标志）：命令 → (图标图像, 画布位置)，按下时只让图标本身变亮
+        self.layer_serial = 0                 # 每次合成分层时递增，作为分层纹理的键（空闲帧预先上传）
+        self.frames = {}                      # 弹窗空框（按弹窗种类缓存）
 
     # ---------- 状态与持久化 ----------
     def state_path(self):
@@ -557,6 +615,9 @@ class UnitBrowser:
                 self.menu.close()
             self.save_state()
         self.pressed = None
+        self.motion = self.shown_state = None
+        self.slide_dir = 0
+        self.lights.clear()
 
     def invalidate(self):
         self.query_key = None
@@ -667,6 +728,7 @@ class UnitBrowser:
         s = self.settings
         s['page'] = (s['page'] + delta) % self.pages
         self.page_items = self.all_items[s['page'] * PAGE_SIZE:(s['page'] + 1) * PAGE_SIZE]
+        self.slide_dir = 1 if delta > 0 else -1
         self.revision += 1
         self.query_key = (self.mode, self.revision, self.language())
         return True
@@ -809,25 +871,25 @@ class UnitBrowser:
         cap = self.catalog().cap_of(entry['uid'])
         return ('custom', entry['uid'], entry['level'], cap, favorite, self.language())
 
-    def card_image(self, entry):
-        key = self.card_key(entry)
+    def card_image(self, entry, lit=False):
+        key = self.card_key(entry) + (('lit',) if lit else ())
         image = self.cards.get(key)
         if image is None:
-            image = self.render_card(entry, key)
+            image = self.render_card(entry, key, lit)
             self.cards[key] = image
             self.card_order.append(key)
             while len(self.card_order) > CARD_CACHE_LIMIT:
                 self.cards.pop(self.card_order.pop(0), None)
         return image
 
-    def render_card(self, entry, key):
+    def render_card(self, entry, key, lit=False):
         """卡片（make_mockups.card / make_detail_mockups.shop_card）：底板、选单位格与头像（原生锚点）、阵营标志与名称、
         强化为等级进度条 + 等级 / 上限 + MAX，商店为勋章售价 + BUY；DISPLAY 为 ap 时显示出击 AP。"""
         from PIL import ImageDraw
         art = self.art
         k = CARD_SCALE
         w = CARD_W
-        img = art.card_base(w).copy()
+        img = art.card_base(w, lit).copy()
         d = ImageDraw.Draw(img)
         ix, iy = CARD_EDGES[0] * k, CARD_EDGES[1] * k
         cell = art.cell()
@@ -840,7 +902,7 @@ class UnitBrowser:
         right = w - CARD_EDGES[2] * k - 8
         logo = art.logo(entry['faction'])
         row1 = iy + CARD_ROW1
-        favorite = key[-2]
+        favorite = self.card_key(entry)[-2]
         name_x = x0
         if logo is not None:
             img.alpha_composite(logo, (x0, row1))
@@ -859,7 +921,7 @@ class UnitBrowser:
             self.text(img, (bx + bw / 2, by + bh / 2), self.tr('buy'), 24, anchor='mm', width=bw - 12)
         else:
             level = entry['level'] or 1
-            cap = key[3]
+            cap = self.card_key(entry)[3]
             by = iy + 44
             g = art.gauge(level, cap, right - x0)
             img.alpha_composite(g, (x0, by))
@@ -875,10 +937,11 @@ class UnitBrowser:
         return (LEFT + c * (CARD_W + GAP_X), TOP + r * (CARD_H + GAP_Y), CARD_W, CARD_H)
 
     def compose(self):
-        """整页图像：静态层 + 计数 + 卡片 + 翻页箭头与页码；同时登记点击区域。"""
+        """整页图像：静态层 + 计数 + 卡片 + 翻页箭头与页码；同时登记点击区域与分层（self.layers['grid']）。"""
         from PIL import Image, ImageDraw
         began = time.perf_counter()
         art = self.art
+        self.icon_lights = {}
         if self.menu is not None and self.menu.active:
             img, self.hitboxes = self.menu.compose()
             self.last_compose_ms = (time.perf_counter() - began) * 1000
@@ -896,32 +959,51 @@ class UnitBrowser:
         wallet = self.catalog().wallet()
         self.counter(img, 654, 41, 6, 40, 56, wallet['medal'], 6)
         self.counter(img, 871, 41, 7, 68, 84, wallet['msp'], 8)
+        # 卡片画在独立的透明层（过渡时整页或逐行移动），再叠到底层之上
+        cards = Image.new('RGBA', (W, H))
         for i, entry in enumerate(self.page_items):
             x, y, w, h = self.card_box(i)
-            img.alpha_composite(self.card_image(entry), (x, y))
+            cards.alpha_composite(self.card_image(entry), (x, y))
             boxes.append(((x, y, w, h), ('card', entry['key'])))
             if self.mode == 'shop':
                 bx, by, bw, bh = BUY_RECT
                 boxes.append(((x + bx, y + by, bw, bh), ('buy', entry['key'])))
         if not self.page_items:
-            self.text(img, (W // 2, (TOP + BOTTOM) // 2), self.tr('empty'), 28, anchor='mm')
+            self.text(cards, (W // 2, (TOP + BOTTOM) // 2), self.tr('empty'), 28, anchor='mm')
+        nav = Image.new('RGBA', (W, H))                 # 翻页箭头与页码：切换画面时随卡片离开与进入，翻页平移时留在原处
+        self.nav_rects = []
         if self.pages > 1:
             arrow = scaled(art.part(ARROW), 3)
             mid = (TOP + BOTTOM) // 2 - arrow.height // 2
             right_box = (RIGHT + 14, mid, arrow.width, arrow.height)
             left_box = (LEFT - 14 - arrow.width, mid, arrow.width, arrow.height)
-            img.alpha_composite(arrow, right_box[:2])
-            img.alpha_composite(arrow.transpose(Image.Transpose.FLIP_LEFT_RIGHT), left_box[:2])
+            flipped = arrow.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+            nav.alpha_composite(arrow, right_box[:2])
+            nav.alpha_composite(flipped, left_box[:2])
+            self.icon_lights[('page', 1)] = (arrow, right_box[:2])
+            self.icon_lights[('page', -1)] = (flipped, left_box[:2])
             # 点击区域在可见箭头外各放宽 12 像素
             boxes.append(((right_box[0] - 12, right_box[1] - 12, right_box[2] + 24, right_box[3] + 24), ('page', 1)))
             boxes.append(((left_box[0] - 12, left_box[1] - 12, left_box[2] + 24, left_box[3] + 24), ('page', -1)))
             page, pages = self.settings['page'] + 1, self.pages
             k, pitch = 2, 18
             width = (len(str(page)) + len(str(pages))) * pitch + 12 * k
-            x = RIGHT + 64 - width
-            x = self.number(img, x, TOP - 4, page, 0, k, pitch, lead=False)
-            self.conv_paste(img, 85, x + 1, TOP - 4, k)
-            self.number(img, x + 12 * k, TOP - 4, pages, 0, k, pitch, lead=False)
+            x0 = x = RIGHT + 64 - width
+            x = self.number(nav, x, TOP - 4, page, 0, k, pitch, lead=False)
+            self.conv_paste(nav, 85, x + 1, TOP - 4, k)
+            self.number(nav, x + 12 * k, TOP - 4, pages, 0, k, pitch, lead=False)
+            counter = nav.getchannel('A').crop((x0 - 8, 0, W, TOP - 8)).getbbox()
+            if counter:
+                self.nav_rects.append(((x0 - 8 + counter[0] - 4, counter[1] - 4, counter[2] - counter[0] + 8,
+                                        counter[3] - counter[1] + 8), 0))
+            for bx, by, bw, bh in (left_box, right_box):
+                self.nav_rects.append(((bx - 4, by - 4, bw + 8, bh + 8), 1))
+        chrome = img.copy()
+        items = cards.copy()
+        items.alpha_composite(nav)                      # 页码压在右上卡片的边角之上，翻页平移时同样在卡片之上
+        img.alpha_composite(items)
+        self.layers['grid'] = {'chrome': chrome, 'nav': nav, 'items': items, 'cards': cards,
+                               'page': img.copy() if self.panel == 'sort' else img, 'serial': self.stamp()}
         if self.panel == 'sort':
             boxes = self.compose_panel(img)
         self.hitboxes = boxes
@@ -980,7 +1062,9 @@ class UnitBrowser:
             lx = left + faction * (ls + lgap)
             logo = art.logo(faction, 4, dim=faction not in s['factions'])
             if logo is not None:
-                img.alpha_composite(logo, (lx + (ls - logo.width) // 2, ly + (ls - logo.height) // 2))
+                spot = (lx + (ls - logo.width) // 2, ly + (ls - logo.height) // 2)
+                img.alpha_composite(logo, spot)
+                self.icon_lights[('faction', faction)] = (logo, spot)
             boxes.append(((lx - lgap // 2, ly - 8, ls + lgap, ls + 16), ('faction', faction)))
         sy, sw = ly + ls + 18, 184
         for i, name in enumerate(SOURCES):
@@ -1106,6 +1190,10 @@ class UnitBrowser:
     def in_menu(self):
         return self.menu is not None and self.menu.active
 
+    def locked(self):
+        """过渡进行中（翻页平移除外）：不接受输入，与原生弹窗、面板的动作结束前不受理按压相同。"""
+        return self.motion is not None and not self.motion.interruptible
+
     # ---------- 输入 ----------
     def touch(self, action, x, y):
         """页面打开时拦截全部触点（返回 True）。按下时登记命令，抬起于同一区域时执行。
@@ -1116,6 +1204,8 @@ class UnitBrowser:
             return self.entry_touch(action, x, y)
         if self.packs_native:
             return self.pack_touch(action, x, y)
+        if self.locked():
+            return True
         if self.in_menu():
             return self.menu_touch(action, x, y)
         hit = rect = None
@@ -1143,7 +1233,7 @@ class UnitBrowser:
     def key(self, name):
         """键盘：←/→ 翻页（单位菜单中为上一个 / 下一个单位）、↑/↓ 滚动 ACTION 说明条、Enter 确定（面板中关闭面板）、
         Backspace 删除搜索字。"""
-        if not self.open or self.busy() or self.packs_native:
+        if not self.open or self.busy() or self.packs_native or self.locked():
             return
         if self.in_menu():
             if self.menu.panel is None and name in ('left', 'right'):
@@ -1163,7 +1253,7 @@ class UnitBrowser:
                 play_se(self.p, SE_DECIDE)
 
     def wheel(self, dy):
-        if self.packs_native:
+        if self.packs_native or self.locked():
             return
         if self.in_menu():
             if self.open and self.menu.panel is None and dy and not self.busy():
@@ -1179,7 +1269,7 @@ class UnitBrowser:
     def back(self, sound=True):
         """Esc / BACK：单位菜单中逐层返回；面板打开时关闭面板；否则交给 on_back，未设置时经闸门离开本界面
         （由主菜单“單位”面板进入时回到 CUSTOMIZE 子页）。"""
-        if self.busy():
+        if self.busy() or self.locked():
             return True
         if not self.open:
             return False
@@ -1522,7 +1612,7 @@ class UnitBrowser:
             self.watch_packs()
         elif self.open:
             self.draw_page()
-            if self.in_menu():
+            if self.in_menu() and not self.motion_drawn:  # 过渡的各帧（含最后一帧）不演示，下一帧开始
                 self.menu.draw_live()
         self.shutter.update_and_draw()
 
@@ -1532,12 +1622,21 @@ class UnitBrowser:
         if self.overlay is None:
             from trial_overlay import SurfaceOverlay
             self.overlay = SurfaceOverlay(self.p.graphics)
+        if self.gl is None:
+            from unit_motion import Layers
+            self.gl = Layers(self.p.graphics)
         caret = (self.p.frame // 15) % 2 if self.wants_text() else 0
         key = ('unit_browser', self.revision, self.language(), caret)
         image = None
         if self.overlay.cached != key:
+            previous_items = self.layers.get('grid', {}).get('cards')
             image = self.compose()
             self.rendered, self.rendered_key = image, key
+            state = self.view_state()
+            if self.shown_state is not None and state != self.shown_state:
+                self.start_motion(self.shown_state, state, previous_items)
+            self.shown_state = state
+            self.slide_dir = 0
             self.timings.append({'frame': self.p.frame, 'query_ms': round(getattr(self, 'last_query_ms', 0), 2),
                                  'compose_ms': round(self.last_compose_ms, 2), 'page': self.settings['page'],
                                  'total': self.total})
@@ -1547,15 +1646,119 @@ class UnitBrowser:
         self.overlay.draw_image(image, key, (0, 0, W, H))
         if image is not None:
             self.timings[-1]['upload_ms'] = round((time.perf_counter() - began) * 1000, 2)
-        self.draw_press()
-        if image is None:
+        self.motion_drawn = self.motion is not None
+        if self.motion is not None:
+            if self.motion.draw(self.gl):
+                self.motion = None
+        else:
+            self.draw_press()
+        if image is None and self.motion is None:
             self.run_prefetch()
+            self.preload_layers()
 
     def repaint(self):
         """以已上传的界面图像重画整个画面（不重新合成或上传），再画按下反馈；供动作演示测量后覆盖测量区域。"""
         if self.overlay is not None and self.overlay.cached is not None:
             self.overlay.draw_image(None, self.overlay.cached, (0, 0, W, H))
-            self.draw_press()
+            self.draw_press(advance=False)
+
+    # ---------- 过渡（D52） ----------
+    def view_state(self):
+        """画面状态：(底层 'grid' / 'menu', 弹窗, 浏览大菜单页码)。卡片 BUY 的购买确认画在浏览大菜单之上。"""
+        if self.in_menu():
+            menu = self.menu
+            return ('grid' if menu.standalone else 'menu', menu.panel, None)
+        return ('grid', 'sort' if self.panel == 'sort' else None, self.settings['page'])
+
+    def popup_rect(self, panel):
+        return SORT_PANEL if panel == 'sort' else self.unit_menu().panel_rect(panel)
+
+    def popup_frame(self, panel):
+        """空窗口（开合期间只显示窗口框与底色，与原生相同）。"""
+        from PIL import Image
+        x, y, w, h = self.popup_rect(panel)
+        img = Image.new('RGBA', (w, h))
+        if panel == 'sort':
+            img.alpha_composite(Image.new('RGBA', (w, h), (0, 0, 0, 110)))
+        img.alpha_composite(self.art.slice(POPUP, w, h, (6, 6, 6, 6), 2))
+        return img
+
+    def panel_rects(self, kind):
+        """列表面板进出时逐个移动的区域：浏览大菜单为三行卡片，单位菜单为左侧面板、画框与说明条。"""
+        if kind == 'menu':
+            return self.unit_menu().motion_rects()
+        rows = [(LEFT - 4, TOP + r * (CARD_H + GAP_Y) - 4, RIGHT - LEFT + 8, CARD_H + 8) for r in range(ROWS)]
+        return rows + list(getattr(self, 'nav_rects', []))
+
+    def stamp(self):
+        self.layer_serial += 1
+        return self.layer_serial
+
+    def preload_layers(self):
+        """空闲帧：把当前画面的分层（底层、面板层、整页）预先上传为纹理（每帧至多一张），过渡开始时只需上传新画面。"""
+        if self.gl is None or self.shown_state is None:
+            return
+        base = self.shown_state[0]
+        layers = self.layers.get(base)
+        if not layers:
+            return
+        for part in ('chrome', 'items', 'page'):
+            name, key = ('base', base, part), ('base', layers['serial'], part)
+            if self.gl.cached(name) != key:
+                self.gl.upload(name, layers[part], key)
+                return
+
+    def popup_frame_cached(self, panel):
+        rect = self.popup_rect(panel)
+        cached = self.frames.get(panel)
+        if cached is None or cached[0] != rect:
+            cached = self.frames[panel] = (rect, self.popup_frame(panel))
+        return cached[1]
+
+    def start_motion(self, old, new, previous_items):
+        """按画面状态的变化选择过渡：翻页平移；弹窗开合（换窗口时先关后开）；浏览大菜单与单位菜单之间先离开后进入。
+        画面分层与弹窗空框的纹理按名称与键共用（空闲帧已预先上传的不再上传）。"""
+        from PIL import Image
+        ob, op, opage = old
+        nb, np_, npage = new
+        if self.black is None:
+            self.black = Image.new('RGBA', (4, 4), (0, 0, 0, 255))
+        images, keys = {'black': self.black}, {'black': ('black',)}
+
+        def layer(base, part):
+            name = ('base', base, part)
+            images[name] = self.layers[base][part]
+            keys[name] = ('base', self.layers[base]['serial'], part)
+            return name
+
+        def frame(panel):
+            name = ('frame', panel)
+            images[name] = self.popup_frame_cached(panel)
+            keys[name] = ('frame', panel, self.popup_rect(panel))
+            return name
+
+        frames, interruptible = [], False
+        if ob == nb and op == np_:
+            if nb == 'grid' and op is None and opage != npage and self.slide_dir and previous_items is not None:
+                grid = self.layers['grid']
+                x, y, w, h = CARD_CLIP
+                box = (x, y, x + w, y + h)                  # 只上传卡片区（平移只画在这一块之内）
+                images.update(chrome=grid['chrome'].crop(box), nav=grid['nav'].crop(box),
+                              old=previous_items.crop(box), new=grid['cards'].crop(box))
+                frames = slide('chrome', 'old', 'new', CARD_CLIP, self.slide_dir, top='nav')
+                interruptible = True
+        else:
+            if op is not None:
+                frames += popup_close(self.popup_rect(op), layer(ob, 'page'), frame(op))
+            if ob != nb:
+                frames += panels_out(layer(ob, 'chrome'), layer(ob, 'items'), self.panel_rects(ob))
+                frames += panels_in(layer(nb, 'chrome'), layer(nb, 'items'), self.panel_rects(nb))
+            if np_ is not None:
+                frames += popup_open(self.popup_rect(np_), layer(nb, 'page'), frame(np_), op is None or ob != nb)
+        self.lights.clear()
+        self.motion = Motion((old, new), images, frames, interruptible, keys) if frames else None
+        if self.motion is not None:
+            self.p.log('UNIT_BROWSER_MOTION', old, new, len(frames))
 
     def schedule_prefetch(self):
         """相邻两页的卡片在之后的空闲帧逐张生成（每帧至多一张），使翻页时卡片已在缓存中。"""
@@ -1591,50 +1794,78 @@ class UnitBrowser:
                 catalog.stats(uid, level)
                 done += 1
 
-    def draw_press(self):
-        command = self.pressed if self.pointer_inside else None
-        if command is None or self.rendered is None or self.pressed_rect is None:
+    def draw_press(self, advance=True):
+        """按下反馈：底栏为原生青色框与三灯（按住时显示）；其余按钮与卡片为按下白光（Lights，每帧推进一次）。"""
+        if self.rendered is None:
             return
-        if self.press_overlay is None:
-            from trial_overlay import SurfaceOverlay
-            self.press_overlay = SurfaceOverlay(self.p.graphics)
-        press_key = ('unit_browser_press', self.rendered_key, command)
-        part, rect = None, getattr(self, 'press_rect', None)
-        if self.press_overlay.cached != press_key:
-            part, rect = self.press_image(command)
-            self.press_rect = rect
-        if rect is not None:
+        command = self.pressed
+        if command is not None and command[0] == 'bar' and self.pointer_inside and self.pressed_rect is not None:
+            if self.press_overlay is None:
+                from trial_overlay import SurfaceOverlay
+                self.press_overlay = SurfaceOverlay(self.p.graphics)
+            press_key = ('unit_browser_press', self.rendered_key, command)
+            part, rect = None, getattr(self, 'press_rect', None)
+            if self.press_overlay.cached != press_key:
+                part, rect = self.cockpit_press(command)
+                self.press_rect = rect
             self.press_overlay.draw_image(part, press_key, rect)
+        if advance:
+            lit = command if command is not None and command[0] not in LIGHT_NONE else None
+            self.lights.update(lit, self.pressed_rect, self.pointer_inside, lit is not None and lit[0] in LIGHT_INSTANT)
+        names = set()
+        for command, (value, rect, _) in self.lights.values.items():
+            if value <= 0:
+                continue
+            name = ('light', command)
+            names.add(name)
+            key = (self.rendered_key, command)
+            lit = self.light_image(command, rect)
+            if lit is None:
+                continue
+            image, dst = lit
+            self.gl.draw(name, image, key, dst, alpha=value / 255)
+        self.gl.drop(lambda name: isinstance(name, tuple) and name[0] == 'light' and name not in names)
 
-    def press_image(self, command):
-        """按下反馈：底栏为原生青色框与三灯（GT_CockpitButtonDraw），卡片为白色高光，其余为压暗。"""
-        from PIL import Image, ImageEnhance
+    def cockpit_press(self, command):
+        """底栏按下：原生青色框与三灯（GT_CockpitButtonDraw）。"""
         x, y, w, h = self.pressed_rect
-        if command[0] == 'bar':
-            k = BUTTON_SCALE
-            (frame, (fx, fy)), (lamps, (lx, ly)) = PRESS_FRAME, PRESS_LAMPS
-            left, top = x - round(fx * k), y - round(fy * k)
-            fw, fh = round(frame[1][2] * k), round(frame[1][3] * k)
-            out = self.rendered.crop((left, top, left + fw, top + fh)).copy()
-            out.alpha_composite(scaled(self.art.part(frame), k), (0, 0))
-            out.alpha_composite(scaled(self.art.button(command[1]), k), (x - left, y - top))
-            out.alpha_composite(scaled(self.art.part(lamps), k), (x - round(lx * k) - left, y - round(ly * k) - top))
-            return out, (left, top, fw, fh)
-        crop = self.rendered.crop((x, y, x + w, y + h))
-        if command[0] == 'card':
-            white = Image.new('RGBA', crop.size, (255, 255, 255, 80))
-            mask = crop.getchannel('A')
-            white.putalpha(mask.point(lambda a: 80 if a > 0 else 0))
-            out = crop.copy()
-            out.alpha_composite(white)
-            return out, (x, y, w, h)
-        rgb = ImageEnhance.Brightness(crop).enhance(0.7)
-        rgb.putalpha(crop.getchannel('A'))
-        return rgb, (x, y, w, h)
+        k = BUTTON_SCALE
+        (frame, (fx, fy)), (lamps, (lx, ly)) = PRESS_FRAME, PRESS_LAMPS
+        left, top = x - round(fx * k), y - round(fy * k)
+        fw, fh = round(frame[1][2] * k), round(frame[1][3] * k)
+        out = self.rendered.crop((left, top, left + fw, top + fh)).copy()
+        out.alpha_composite(scaled(self.art.part(frame), k), (0, 0))
+        out.alpha_composite(scaled(self.art.button(command[1]), k), (x - left, y - top))
+        out.alpha_composite(scaled(self.art.part(lamps), k), (x - round(lx * k) - left, y - round(ly * k) - top))
+        return out, (left, top, fw, fh)
+
+    def light_image(self, command, rect):
+        """按下白光的亮版与其画布矩形：卡片为底板亮版的卡片（Art.card_base），原生按钮为同一图块的亮版（LIGHT_PARTS，
+        按颜色对照替换画面中的按钮底色，文字不变），图标类按钮（icon_lights）为图标本身提亮；其余不显示。"""
+        key = (self.rendered_key, command)
+        cached = self.lit_cache.get(key)
+        if cached is not None:
+            return cached
+        x, y, w, h = rect
+        kind = command[0]
+        entry = next((e for e in self.page_items if e['key'] == command[1]), None) if kind == 'card' else None
+        if entry is not None:
+            lit = (self.card_image(entry, lit=True), rect)
+        elif kind in LIGHT_PARTS:
+            lit = (relight(self.rendered.crop((x, y, x + w, y + h)), self.art.color_map(*LIGHT_PARTS[kind])), rect)
+        elif command in self.icon_lights:
+            icon, (ix, iy) = self.icon_lights[command]
+            lit = (lighten(icon), (ix, iy, icon.width, icon.height))
+        else:
+            lit = None
+        if len(self.lit_cache) > 16:
+            self.lit_cache.pop(next(iter(self.lit_cache)))
+        self.lit_cache[key] = lit
+        return lit
 
     def close(self):
         self.save_state() if self.open else None
-        for overlay in (self.overlay, self.press_overlay):
+        for overlay in (self.overlay, self.press_overlay, self.gl):
             if overlay is not None:
                 overlay.close()
-        self.overlay = self.press_overlay = None
+        self.overlay = self.press_overlay = self.gl = None
