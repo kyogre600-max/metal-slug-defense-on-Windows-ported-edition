@@ -1,0 +1,5574 @@
+{
+  "key": "s1xlv.pvz_football",
+  "base_id": 313,
+  "faction": 3,
+  "identity": "Zombie",
+  "shop_price": 130,
+  "available_from_start": true,
+  "ap": 225,
+  "hp_multiplier": [
+    90,
+    17
+  ],
+  "knockback_threshold_multiplier": [
+    8,
+    3
+  ],
+  "production_reference_id": 313,
+  "production_interval_multiplier": [
+    67,
+    260
+  ],
+  "damage_multiplier": [
+    1,
+    2
+  ],
+  "special_damage_multiplier": [
+    1,
+    1
+  ],
+  "move_speed_multiplier": [
+    201,
+    125
+  ],
+  "knockback_distance_multiplier": [
+    1,
+    1
+  ],
+  "status_word_values": {
+    "7": 24,
+    "24": 1,
+    "31": 1,
+    "27": 1,
+    "34": 1,
+    "29": 0,
+    "35": 0,
+    "36": 0
+  },
+  "icon": {
+    "atlas": "pvz_icons.obm",
+    "rect": [
+      114,
+      0,
+      40,
+      39
+    ],
+    "anchor": [
+      -5,
+      -6
+    ]
+  },
+  "textures": [
+    "pvz_football.obm"
+  ],
+  "sprite_descriptor": "pvz_football_descriptor.json",
+  "animations": {
+    "0": [
+      {
+        "opcode": 0,
+        "values": [
+          32
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          34
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          36
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          38
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "1": [
+      {
+        "opcode": 0,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          6
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          14
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "2": [
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "6": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          32
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          34
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          36
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          38
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "7": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          6
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          14
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "8": [
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_plastichit"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_plastichit2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gulp"
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "9": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "10": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat2"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "11": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "12": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          14
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          32
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "13": [
+      {
+        "opcode": 0,
+        "values": [
+          148
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          150
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          152
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          154
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          156
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          158
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          160
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          160
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          160
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          160
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          160
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "14": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          14
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          32
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "15": [
+      {
+        "opcode": 0,
+        "values": [
+          162
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          164
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          162
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          164
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          162
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "16": [
+      {
+        "opcode": 0,
+        "values": [
+          68
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          70
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          72
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          74
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "17": [
+      {
+        "opcode": 0,
+        "values": [
+          40
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          42
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          44
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "18": [
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "22": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          68
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          70
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          72
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          74
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "23": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          40
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          42
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          44
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "25": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "26": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat2"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "27": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "28": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          68
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "30": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          68
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "32": [
+      {
+        "opcode": 0,
+        "values": [
+          104
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          106
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          108
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          110
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "33": [
+      {
+        "opcode": 0,
+        "values": [
+          76
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          78
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          80
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          84
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          86
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          88
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          90
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "34": [
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          94
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          96
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          98
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          100
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          102
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          94
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          96
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          98
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          100
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          102
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "38": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          104
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          106
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          108
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          110
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "39": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          76
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          78
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          80
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          84
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          86
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          88
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          90
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "41": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          94
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          96
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          98
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          100
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          102
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "42": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          94
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          96
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          98
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          100
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          102
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          94
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat2"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          96
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          98
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          100
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          102
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          94
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          96
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          98
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          100
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          102
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "43": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          92
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "44": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          90
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          88
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          86
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          84
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          104
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "46": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          90
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          88
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          86
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          84
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          104
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "48": [
+      {
+        "opcode": 0,
+        "values": [
+          140
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          142
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          144
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          146
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "49": [
+      {
+        "opcode": 0,
+        "values": [
+          112
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          114
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          116
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          118
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          120
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          122
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          124
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          126
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "50": [
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          130
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          132
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          134
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          136
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          138
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          130
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          132
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          134
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          136
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          138
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "54": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          140
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          142
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          144
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          146
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "55": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          112
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          114
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          116
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          118
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          120
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          122
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          124
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          126
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "57": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          130
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          132
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          134
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          136
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          138
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "58": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          130
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          132
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          134
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          136
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          138
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          130
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat2"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          132
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          134
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          136
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          138
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          130
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_chomp2"
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_splat3"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          132
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          134
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          136
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          138
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "59": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          128
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "60": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 12,
+        "values": [
+          65,
+          0,
+          -2,
+          -44
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          112
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "62": [
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          242,
+          0,
+          -24,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          126
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          124
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          122
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          120
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          118
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 16,
+        "values": []
+      },
+      {
+        "opcode": 0,
+        "values": [
+          140
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "64": [
+      {
+        "opcode": 7,
+        "values": [
+          50,
+          -180,
+          0,
+          30
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          25
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          36
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "65": [
+      {
+        "opcode": 7,
+        "values": [
+          100,
+          -240,
+          0,
+          30
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 7,
+        "values": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          36
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "3": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "4": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "5": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "19": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "20": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "21": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "24": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "29": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "31": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "35": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "36": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "37": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "40": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "45": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "47": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "51": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "52": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "53": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "56": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "61": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "63": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ]
+  },
+  "localization": {
+    "ZS": {
+      "name": "橄榄球僵尸",
+      "description": "普通攻击：啃咬     特殊攻击：-\n身穿橄榄球护具的僵尸。\n移动非常快，头盔十分坚固。"
+    },
+    "ZT": {
+      "name": "橄欖球殭屍",
+      "description": "普通攻擊：啃咬     特殊攻擊：-\n身穿橄欖球護具的殭屍。\n移動非常快，頭盔十分堅固。"
+    },
+    "JP": {
+      "name": "アメフトゾンビ",
+      "description": "通常攻撃：かみつき     特殊攻撃：-\nアメフトの防具を着たゾンビ。\n動きがとても速く、ヘルメットは非常に頑丈。"
+    },
+    "EN": {
+      "name": "FOOTBALL ZOMBIE",
+      "description": "Normal attack: Bite     Special attack: -\nA zombie in football gear.\nVery fast, with a very sturdy helmet."
+    },
+    "ES": {
+      "name": "ZOMBI FUTBOLISTA",
+      "description": "Ataque normal: Mordisco     Ataque especial: -\nUn zombi con equipo de fútbol americano.\nMuy rápido y con un casco muy resistente."
+    },
+    "PT": {
+      "name": "ZUMBI JOGADOR",
+      "description": "Ataque normal: Mordida     Ataque especial: -\nUm zumbi com equipamento de futebol americano.\nMuito rápido e com um capacete muito resistente."
+    },
+    "KR": {
+      "name": "미식축구 좀비",
+      "description": "일반 공격：물기     특수 공격：-\n미식축구 보호구를 입은 좀비.\n매우 빠르고 헬멧이 아주 단단하다."
+    }
+  },
+  "tags": [
+    "pvz"
+  ],
+  "behaviors": [
+    {
+      "name": "hp_stage_animations",
+      "version": 1,
+      "params": {
+        "thresholds": [
+          [
+            29,
+            36
+          ],
+          [
+            11,
+            18
+          ],
+          [
+            5,
+            12
+          ]
+        ],
+        "transitions": [
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "front_nearest_target",
+      "version": 1,
+      "params": {}
+    },
+    {
+      "name": "stage_knockback_animation",
+      "version": 1,
+      "params": {}
+    },
+    {
+      "name": "armor_hit_sound",
+      "version": 1,
+      "params": {
+        "sounds": [
+          "s1xlv.pvz_plastichit",
+          "s1xlv.pvz_plastichit2"
+        ],
+        "until_stage": 3
+      }
+    },
+    {
+      "name": "kill_sound",
+      "version": 1,
+      "params": {
+        "sound": "s1xlv.pvz_gulp"
+      }
+    }
+  ]
+}

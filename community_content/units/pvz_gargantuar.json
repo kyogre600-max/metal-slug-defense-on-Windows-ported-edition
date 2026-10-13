@@ -1,0 +1,2027 @@
+{
+  "key": "s1xlv.pvz_gargantuar",
+  "base_id": 313,
+  "faction": 3,
+  "identity": "Zombie",
+  "shop_price": 250,
+  "available_from_start": true,
+  "ap": 300,
+  "hp_multiplier": [
+    75,
+    17
+  ],
+  "knockback_threshold_multiplier": [
+    75,
+    17
+  ],
+  "production_reference_id": 313,
+  "production_interval_multiplier": [
+    128,
+    65
+  ],
+  "damage_multiplier": [
+    5,
+    1
+  ],
+  "special_damage_multiplier": [
+    2,
+    1
+  ],
+  "move_speed_multiplier": [
+    402,
+    625
+  ],
+  "knockback_distance_multiplier": [
+    1,
+    1
+  ],
+  "status_word_values": {
+    "7": 52,
+    "24": 999,
+    "31": 999,
+    "27": 1,
+    "34": 1
+  },
+  "icon": {
+    "atlas": "pvz_icons.obm",
+    "rect": [
+      156,
+      0,
+      40,
+      40
+    ],
+    "anchor": [
+      -5,
+      -5
+    ]
+  },
+  "textures": [
+    "pvz_gargantuar.obm"
+  ],
+  "sprite_descriptor": "pvz_gargantuar_descriptor.json",
+  "animations": {
+    "0": [
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "1": [
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          6
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          14
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "2": [
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "6": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          28
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "7": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          6
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          14
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "9": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_lowgroan"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantuar_thump"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "10": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_lowgroan"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          16
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          18
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          22
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          24
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantuar_thump"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          26
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "11": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "12": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          0
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "13": [
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantudeath"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          70
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          72
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          74
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          76
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          78
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          80
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "15": [
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantudeath"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          70
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          72
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          74
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          76
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          78
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          80
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          82
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "16": [
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "17": [
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          32
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          34
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          36
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          38
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          40
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          42
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          44
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "18": [
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "22": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "23": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          32
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          34
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          36
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          38
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          40
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          42
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          44
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "25": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_lowgroan2"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantuar_thump"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          12
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "26": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_lowgroan2"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          48
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          50
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          52
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantuar_thump"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 4,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "27": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          30
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 5,
+        "values": []
+      }
+    ],
+    "28": [
+      {
+        "opcode": 3,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          60
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          62
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          5
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          64
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          6
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          66
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          3
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_imp"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          68
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          10
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "3": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "4": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "5": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "8": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "14": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "19": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "20": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "21": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "24": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "29": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "30": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ],
+    "31": [
+      {
+        "opcode": 0,
+        "values": [
+          -1
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          1
+        ]
+      },
+      {
+        "opcode": 21,
+        "values": []
+      }
+    ]
+  },
+  "localization": {
+    "ZS": {
+      "name": "巨人僵尸",
+      "description": "普通攻击：锤击     特殊攻击：重锤\n扛着电线杆的巨大僵尸。\n生命低于一半时会把背上的小鬼扔出去。"
+    },
+    "ZT": {
+      "name": "巨人殭屍",
+      "description": "普通攻擊：錘擊     特殊攻擊：重錘\n扛著電線桿的巨大殭屍。\n生命低於一半時會把背上的小鬼扔出去。"
+    },
+    "JP": {
+      "name": "ガルガンチュア",
+      "description": "通常攻撃：たたきつけ     特殊攻撃：強烈なたたきつけ\n電柱をかついだ巨大なゾンビ。\n体力が半分を切ると背中のインプを投げる。"
+    },
+    "EN": {
+      "name": "GARGANTUAR",
+      "description": "Normal attack: Smash     Special attack: Heavy smash\nA giant zombie wielding a telephone pole.\nThrows the imp on its back below half HP."
+    },
+    "ES": {
+      "name": "GARGANTÚA",
+      "description": "Ataque normal: Golpe     Ataque especial: Golpe pesado\nUn zombi gigante armado con un poste.\nLanza al diablillo de su espalda con menos de la mitad de vida."
+    },
+    "PT": {
+      "name": "GIGANTE",
+      "description": "Ataque normal: Pancada     Ataque especial: Pancada pesada\nUm zumbi gigante armado com um poste.\nArremessa o diabinho das costas abaixo de metade da vida."
+    },
+    "KR": {
+      "name": "거대 좀비",
+      "description": "일반 공격：내려치기     특수 공격：강하게 내려치기\n전봇대를 든 거대한 좀비.\n체력이 절반 아래가 되면 등에 업은 꼬마 좀비를 던진다."
+    }
+  },
+  "tags": [
+    "pvz"
+  ],
+  "behaviors": [
+    {
+      "name": "hp_stage_animations",
+      "version": 1,
+      "params": {
+        "thresholds": [
+          [
+            1,
+            2
+          ]
+        ],
+        "transitions": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "no_knockback",
+      "version": 1,
+      "params": {}
+    },
+    {
+      "name": "front_nearest_target",
+      "version": 1,
+      "params": {}
+    },
+    {
+      "name": "throw_child_on_stage",
+      "version": 1,
+      "params": {
+        "unit": "s1xlv.pvz_imp_flight",
+        "stage": 1,
+        "release_tick": 18
+      }
+    }
+  ],
+  "special_cooldown_multiplier": [
+    5,
+    2
+  ]
+}

@@ -96,7 +96,9 @@ def load_manifest(root):
     """读取内容索引 content.json（schema 3）与 units/ 逐单位文件，组装为既有 schema 2 结构的内存清单。
 
     单位按 UnitID 排序；加载器补回 id（content.json 的 unit_ids）与 icon.index（340+槽位，槽位为 UnitID−1024）；
-    组合包补回 shop_id。单位文件不得自行写定这两项。返回 (清单, 本体区段, 模组区段)。"""
+    组合包补回 shop_id。单位文件不得自行写定这两项。返回 (清单, 本体区段, 模组区段)。
+    content.json 的 disabled_units（可选，本体稳定键列表）暂不载入的本体单位：UnitID 保留，单位文件不读取，
+    社区进度与编队按停用模组的方式保留（编队格按稳定键暂存，重新载入后恢复）。"""
     index=json.loads((root/CONTENT_INDEX).read_text(encoding='utf-8'))
     if index.get('schema')!=3:raise ValueError('Unsupported community content index schema')
     if index.get('asset_digest')!='blake2b-256':raise ValueError('Unsupported community asset digest')
@@ -104,11 +106,15 @@ def load_manifest(root):
     unit_ids=index.get('unit_ids');content_ids.check_body_ids(unit_ids,body)
     folder=index.get('units_dir')
     if not isinstance(folder,str) or Path(folder).name!=folder:raise ValueError('Invalid unit folder')
-    units={}
+    disabled=index.get('disabled_units',[])
+    if not isinstance(disabled,list) or any(k not in unit_ids for k in disabled) or len(set(disabled))!=len(disabled):raise ValueError('Invalid disabled body units')
+    units={};skipped=set()
     for path in sorted((root/folder).glob('*.json')):
         data=json.loads(path.read_text(encoding='utf-8'))
         key=data.get('key') if isinstance(data,dict) else None
-        if key not in unit_ids or key in units:raise ValueError('Unregistered or duplicate body unit file: '+path.name)
+        if key not in unit_ids or key in units or key in skipped:raise ValueError('Unregistered or duplicate body unit file: '+path.name)
+        if key in disabled:
+            skipped.add(key);continue
         if 'id' in data or not isinstance(data.get('icon'),dict) or 'index' in data['icon']:raise ValueError('Unit files must not fix runtime identities: '+path.name)
         uid=unit_ids[key]
         unit={'key':key,'id':uid}
@@ -117,14 +123,14 @@ def load_manifest(root):
         if isinstance(unit.get('localization'),dict):unit['localization']=content_locale.fill(unit['localization'],'unit text')
         if ('atlas' in data['icon'])==('page' in data['icon']):raise ValueError('Unit icon requires either page 1 or an atlas: '+path.name)
         units[key]=unit
-    if set(units)!=set(unit_ids):raise ValueError('Missing body unit files: '+', '.join(sorted(set(unit_ids)-set(units))))
+    if set(units)!=set(unit_ids)-set(disabled):raise ValueError('Missing body unit files: '+', '.join(sorted(set(unit_ids)-set(disabled)-set(units))))
     # 特殊行为（M2）：按行为库校验 behaviors 并转换为原生安装使用的内部字段。
     behaviors.apply(units,behaviors.load_library())
     manifest={'schema':2,'original_android_version':index.get('original_android_version'),
               'units':sorted(units.values(),key=lambda u:u['id']),'assets':index['assets'],'unit_id_base':UNIT_ID_BASE}
     assign_icon_pages(manifest['units'])
     for name,value in index.items():
-        if name in manifest or name in ('unit_id_ranges','unit_ids','units_dir','asset_digest'):continue
+        if name in manifest or name in ('unit_id_ranges','unit_ids','units_dir','asset_digest','disabled_units'):continue
         if name=='unit_pack' and value:
             if 'shop_id' in value:raise ValueError('The unit pack shop ID is assigned by the loader')
             if isinstance(value.get('localization'),dict):value=dict(value,localization=content_locale.fill(value['localization'],'pack text'))
@@ -205,6 +211,8 @@ def check_references(u,by_key):
     if summoned is not None and (u['base_id']!=64 or summoned not in by_key or summoned==u['key'] or by_key[summoned].get('internal_only')):raise ValueError('Invalid mummy gate summon reference')
     preview=u.get('preview_unit_key')
     if preview is not None and (preview!=child or preview not in by_key):raise ValueError('Invalid unit preview reference')
+    thrown=u.get('throw_child_key')
+    if thrown is not None and (thrown not in by_key or not by_key[thrown].get('internal_only') or by_key[thrown]['base_id']!=160 or thrown==u['key']):raise ValueError('Invalid thrown child reference')
 
 def check_unit_assets(u,dims,descriptor_path,is_stock):
     """纹理、图标矩形与精灵描述符检查。dims：资源名 → (宽, 高)（含引用的原版图集）；descriptor_path：描述符文件名 → 路径；
@@ -242,6 +250,8 @@ def check_unit_assets(u,dims,descriptor_path,is_stock):
             if not 1<=len(desc[field])<=256 or any(len(r)!=5 or any(not isinstance(v,int) or not -2147483648<=v<=2147483647 for v in r) for r in desc[field]):raise ValueError('Invalid sprite collision bounds')
     flame=u.get('flame_interrupt')
     if flame and (flame['alternate_knockback_animation']+5>desc['script_count'] or any(v>=desc['script_count'] for v in flame['ending_bullet_animations'])):raise ValueError('Flame interruption animation outside sprite descriptor')
+    zombie=u.get('zombie_spec') or {}
+    if zombie.get('thresholds') and (not filename or 16*(len(zombie['thresholds'])+1)>desc['script_count']):raise ValueError('HP stage animations outside sprite descriptor')
     if 'recovery_animation' in u:
         value=u['recovery_animation']
         if u['base_id']!=61 or not filename or not isinstance(value,int) or isinstance(value,bool) or not 0<=value<desc['script_count']:raise ValueError('Invalid mummy recovery animation')
@@ -362,6 +372,11 @@ class CommunityContent:
         if self.sounds and (not hasattr(p.uc.lib,'msd_community_sound_version') or p.uc.lib.msd_community_sound_version()!=1):raise RuntimeError('Native core lacks custom sounds')
         if self.icon_pages and (not hasattr(p.uc.lib,'msd_community_icon_pages_version') or p.uc.lib.msd_community_icon_pages_version()!=1):raise RuntimeError('Native core lacks multi-page unit icons')
         p.uc.lib.msd_enable_community_content()
+        # 生命分档单位的钩子在启用社区内容时登记，版本函数在全部找到原生块后返回 1。
+        # 生命分档单位：核心版本 1 为首批 7 个钩子，2 另含前方最近敌人（front_nearest_target，标记 64）的 5 个钩子，
+        # 3 另含分档受击动作（stage_knockback_animation，标记 128），4 另含雪地步兵类（基准 182）的分档入口。
+        need=max([4 if u['base_id']==182 else 3 if u['zombie_spec']['flags']&128 else 2 if u['zombie_spec']['flags']&64 else 1 for u in self.units if u.get('zombie_spec')] or [0])
+        if need and (not hasattr(p.uc.lib,'msd_community_zombie_version') or p.uc.lib.msd_community_zombie_version()<need):raise RuntimeError('Native core lacks HP stage units')
         self.ready=False
 
     def stock_patches(self):
@@ -387,6 +402,10 @@ class CommunityContent:
         entries+=self.mod_sounds
         self.sound_ids=content_sounds.allocate(entries)
         self.sounds=entries;self.sound_files={}
+        # 条目 gain：宿主解码时按文件内容查表乘到采样上（native_audio.AudioCache，核心 msd_pcm_gain）。
+        self.p.sound_gains={Path(e['source']).read_bytes():float(e['gain']) for e in entries if e.get('gain',1)!=1}
+        cache=getattr(self.p,'native_audio_cache',None)
+        if cache is not None and entries:cache.prefetch([e['source'] for e in entries])   # 后台预先解码（同原版音效）
         for entry in entries:
             if self.sound_files.setdefault(entry['file'],entry['source'])!=entry['source']:raise ValueError('Duplicate sound file name: '+entry['file'])
             # 宿主按文件名提供音效文件；与原版资源同名会替换原版音效，不允许。
@@ -559,7 +578,7 @@ class CommunityContent:
                 value=struct.unpack_from('<i',row,off)[0]
                 if value>0:struct.pack_into('<i',row,off,(2*value*a+b)//(2*b))
             struct.pack_into('<i',row,0x378,u['faction']);rows+=row
-            child_key=u.get('child_unit_key') or u.get('summoned_unit_key')
+            child_key=u.get('child_unit_key') or u.get('summoned_unit_key') or u.get('throw_child_key')
             if child_key:
                 child=next(entry['id'] for entry in self.units if entry['key']==child_key)
                 struct.pack_into('<I',rows,len(rows)-0x390+0xa4,child)
@@ -684,7 +703,8 @@ class CommunityContent:
         unlocks=struct.pack('<'+'I'*n,*(512 if u is None or u.get('world_clear_reward') else 0xffffffff if u['available_from_start'] else u['shop_unlock_reference_id'] for u in units))
         fields+= (self.alloc(profiles),1,p.symbols['_ZTV10BattleUnit']+8,p.symbols['_ZTV12BattleBullet']+8,self.alloc(unlocks))
         landing_ids={u['key']:u['id'] for u in self.units}
-        landings=struct.pack('<'+'I'*n,*(landing_ids[u['landing_unit_key']] if u and u.get('landing_unit_key') else 0 for u in units))
+        # 落地映射：空降单位登记落地后的单位；投出子单位的生命分档单位登记被投出的飞行单位（原生均以固定 UnitID 45 生成）。
+        landings=struct.pack('<'+'I'*n,*(landing_ids[u.get('landing_unit_key') or u.get('throw_child_key')] if u and (u.get('landing_unit_key') or u.get('throw_child_key')) else 0 for u in units))
         display_ids=struct.pack('<'+'I'*n,*(landing_ids[u['child_unit_key']] if u and u.get('child_unit_key') else UNIT_ID_BASE+i for i,u in enumerate(units)))
         fields+=(pack_pointer,self.alloc(landings),self.alloc(display_ids))
         recoveries=struct.pack('<'+'I'*n,*((u or empty).get('recovery_animation',26) for u in units))
@@ -734,10 +754,33 @@ class CommunityContent:
         fields+=(self.get_time_table,)
         # 头部偏移 164：原生单位商店勋章不足时只提示、不询问前往商店（新单位界面的组合包页面期间由宿主置 1，U1c D45）。
         fields+=(0,)
+        # 头部偏移 168：生命分档单位（行为库 v3，src/community_content.cpp 的 ZSpec，28 个字）的逐槽指针表；无此类单位时为 0。
+        fields+=(self.install_zombie_specs(units),)
         p.write(HEADER,struct.pack('<%dI'%len(fields),*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==bytes(rows[:400*0x390])
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])
+
+    def install_zombie_specs(self,units):
+        specs=[(u or {}).get('zombie_spec') for u in units]
+        if not any(specs):return 0
+        pointers=[]
+        for spec in specs:
+            if not spec:pointers.append(0);continue
+            words=[0]*28;words[0]=spec['flags']
+            thresholds=spec.get('thresholds',[]);words[1]=len(thresholds)
+            for i,(a,b) in enumerate(thresholds):words[2+i]=a;words[8+i]=b
+            words[14]=sum(1<<(i+1) for i,flag in enumerate(spec.get('transitions',[])) if flag)
+            words[15]=spec.get('rage_stage',0)
+            words[16],words[17]=spec.get('rage_speed',[1,1]);words[18],words[19]=spec.get('rage_damage',[1,1])
+            armor=[self.sound_ids[k] for k in spec.get('armor_sounds',[])]
+            words[20]=armor[0] if armor else 0;words[21]=armor[1] if len(armor)>1 else words[20]
+            words[22]=spec.get('armor_until',0)
+            words[23]=self.sound_ids[spec['kill_sound']] if spec.get('kill_sound') else 0
+            words[24]=spec.get('throw_stage',0);words[25]=spec.get('release_tick',0)
+            words[26]=spec.get('flight_forward',0)&0xffffffff;words[27]=spec.get('flight_height',0)
+            pointers.append(self.alloc(struct.pack('<28I',*words)))
+        return self.alloc(struct.pack('<'+'I'*len(pointers),*pointers))
 
     def grant_world_clear_rewards(self):
         p=self.p

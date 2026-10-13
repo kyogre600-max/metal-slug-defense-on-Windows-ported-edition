@@ -3,8 +3,10 @@
 - 本体：community_content/content.json 的 "sounds" 列表，文件放在 community_content/。
 - 模组：mod.json 的 content.sounds 指向目录，其中每个 *.json 为音效条目列表；文件为模组资源（assets/，以 "<模组 id>_" 开头）。
 - 条目：{"key": 稳定键, "file": "<名称>.msdf", "type": "se"|"vo"|"bgm", "volume": 1–127（缺省 100）,
-  "loop": [开始秒, 结束秒]（仅 bgm，可选）}。本体键以 "s1xlv." 开头，模组键以 "<模组 id>." 开头。
-  文件为 MSDF（Ogg Vorbis 数据，以 OggS 开头），与原版音效文件相同。
+  "loop": [开始秒, 结束秒]（仅 bgm，可选）, "gain": 0.1–8（可选，缺省 1）}。本体键以 "s1xlv." 开头，模组键以 "<模组 id>." 开头。
+  文件为 MSDF（Ogg Vorbis 数据，以 OggS 开头），与原版音效文件相同；采样率与声道数不限（载入时转换为 16 kHz 立体声，核心 r52+）。
+- volume 为原生音量字（原版最大 127）；gain 在载入时乘到采样上，超过满幅 60% 的部分以 tanh 压缩而不削波
+  （核心 msd_pcm_gain，r53+），用于素材本身比原版音效轻的情形。
 - 引用：单位动作脚本 op23（播放音效）的参数可写音效键字符串，安装时换为分配的 SoundID。
   可见范围与单位引用相同：本体、本模组与所依赖模组。
 - 分配：原生音效表（GetSoundData，651 条，SoundID 0–1030）之外、原生缓存数组（SoundID 0–1031）之内的空闲区段
@@ -28,8 +30,8 @@ SOUND_OPCODE = 23
 
 def check_entry(entry, prefix, resolve):
     """单个音效条目的静态检查；prefix 为键前缀（'s1xlv' 或模组 id）；resolve(文件名) 返回路径或 None。"""
-    if not isinstance(entry, dict) or set(entry) - {'key', 'file', 'type', 'volume', 'loop'}:
-        raise ValueError('sound entries contain key, file, type, volume and loop')
+    if not isinstance(entry, dict) or set(entry) - {'key', 'file', 'type', 'volume', 'loop', 'gain'}:
+        raise ValueError('sound entries contain key, file, type, volume, loop and gain')
     key = entry.get('key')
     if not isinstance(key, str) or not KEY_PATTERN.fullmatch(key) or key.split('.', 1)[0] != prefix:
         raise ValueError(f'sound key {key!r} must start with "{prefix}."')
@@ -39,6 +41,9 @@ def check_entry(entry, prefix, resolve):
     volume = entry.get('volume', 100)
     if not isinstance(volume, int) or isinstance(volume, bool) or not 1 <= volume <= 127:
         raise ValueError(f'{key}: volume must be an integer 1–127')
+    gain = entry.get('gain', 1)
+    if not isinstance(gain, (int, float)) or isinstance(gain, bool) or not 0.1 <= gain <= 8:
+        raise ValueError(f'{key}: gain must be a number 0.1–8')
     loop = entry.get('loop')
     if loop is not None:
         if kind != 'bgm' or not (isinstance(loop, list) and len(loop) == 2 and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in loop)
@@ -74,9 +79,11 @@ def read_mod_sounds(folder, mod_id, assets):
 
 
 def sound_references(unit):
-    """单位动作脚本中以字符串写的音效键（op23）。"""
-    return [cmd['values'][0] for commands in unit.get('animations', {}).values() for cmd in commands
+    """单位动作脚本中以字符串写的音效键（op23）与行为参数中的音效键（生命分档单位的防具受击与击毙音效）。"""
+    refs = [cmd['values'][0] for commands in unit.get('animations', {}).values() for cmd in commands
             if cmd.get('opcode') == SOUND_OPCODE and cmd.get('values') and isinstance(cmd['values'][0], str)]
+    spec = unit.get('zombie_spec') or {}
+    return refs + list(spec.get('armor_sounds', [])) + ([spec['kill_sound']] if spec.get('kill_sound') else [])
 
 
 def check_unit_sounds(unit, visible):

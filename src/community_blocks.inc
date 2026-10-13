@@ -1865,4 +1865,17 @@ old_kt21_flame_knockback_limit=find_block(0x101e0b5du);register_block(0x101e0b5d
 old_kt21_flame_battle_reset=find_block(0x101e019du);register_block(0x101e019du,kt21_flame_battle_reset);
 old_ground_special_update=find_block(0x10192571u);register_block(0x10192571u,ground_special_update);
 old_icon_page_draw_hook=find_block(0x10136b15u);register_block(0x10136b15u,icon_page_draw_hook);
+if((old_zombie_stage_update=find_block(0x1017ca15u))){register_block(0x1017ca15u,zombie_stage_update);++zombie_hooks;}
+if((old_zombie_stage_remap=find_block(0x101de017u))){register_block(0x101de017u,zombie_stage_remap);++zombie_hooks;}
+if((old_zombie_throw=find_block(0x1017cac5u))){register_block(0x1017cac5u,zombie_throw);++zombie_hooks;}
+if((old_zombie_flight_start=find_block(0x101af7dbu))){register_block(0x101af7dbu,zombie_flight_start);++zombie_hooks;}
+if((old_zombie_no_knockback=find_block(0x1016f485u))){register_block(0x1016f485u,zombie_no_knockback);++zombie_hooks;}
+if((old_zombie_armor_hit=find_block(0x1016f4a3u))){register_block(0x1016f4a3u,zombie_armor_hit);++zombie_hooks;}
+if((old_zombie_kill_sound=find_block(0x1016f44du))){register_block(0x1016f44du,zombie_kill_sound);++zombie_hooks;}
+if((old_zombie_ahead_distance=find_block(0x101ded91u))){register_block(0x101ded91u,zombie_ahead_distance);++zombie_hooks;}
+if((old_zombie_ahead_block_p1=find_block(0x101df781u))){register_block(0x101df781u,zombie_ahead_block_p1);++zombie_hooks;}
+if((old_zombie_ahead_block_p2=find_block(0x101df7ebu))){register_block(0x101df7ebu,zombie_ahead_block_p2);++zombie_hooks;}
+if((old_zombie_ahead_move_right=find_block(0x101df1fbu))){register_block(0x101df1fbu,zombie_ahead_move_right);++zombie_hooks;}
+if((old_zombie_ahead_move_left=find_block(0x101df23bu))){register_block(0x101df23bu,zombie_ahead_move_left);++zombie_hooks;}
+if((old_zombie_stage_update_snow=find_block(0x1018805du))){register_block(0x1018805du,zombie_stage_update_snow);++zombie_hooks;}
 }

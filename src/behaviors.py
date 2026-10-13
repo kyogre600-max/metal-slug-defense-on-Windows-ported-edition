@@ -6,6 +6,7 @@
 特殊行为只由 C++ 实现；新增或扩展行为属于游戏本体更新（修改清单并重建核心）。"""
 from pathlib import Path
 import json
+import re
 
 LIBRARY_PATH = Path(__file__).resolve().parent / 'behavior_library.json'
 # 由行为生成、单位文件不得直接填写的内部字段。
@@ -13,7 +14,9 @@ INTERNAL_FIELDS = frozenset((
     'child_unit_key', 'preview_unit_key', 'construction_time_multiplier', 'summoned_unit_key',
     'summon_interval_multiplier', 'summon_interval_additional_multiplier', 'landing_unit_key',
     'shot_action_reference_id', 'recovery_animation', 'flame_interrupt', 'ground_special_attack',
-    'retained_special_weapon'))
+    'retained_special_weapon', 'zombie_spec', 'throw_child_key'))
+# 与 content_sounds.KEY_PATTERN 相同（音效稳定键）。
+SOUND_KEY_PATTERN = re.compile(r'[a-z][a-z0-9_]{1,31}\.[a-z0-9_][a-z0-9_.\-]{0,63}')
 
 
 def load_library(path=LIBRARY_PATH):
@@ -31,6 +34,19 @@ def load_library(path=LIBRARY_PATH):
 
 def _int(value):
     return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _length_ok(spec, value):
+    if 'length' in spec:
+        return len(value) == spec['length']
+    return spec.get('min_length', 0) <= len(value) <= spec.get('max_length', 2**31)
+
+
+def _rational_ok(spec, value):
+    if not (isinstance(value, list) and len(value) == 2 and all(_int(v) and 0 < v <= 10000 for v in value)):
+        return False
+    low, high = spec.get('min', [1, 10000]), spec.get('max', [10000, 1])
+    return not (value[0] * low[1] < low[0] * value[1] or value[0] * high[1] > high[0] * value[1])
 
 
 def _check_param(behavior, name, spec, value, units):
@@ -52,9 +68,19 @@ def _check_param(behavior, name, spec, value, units):
         if not _int(value) or not spec.get('min', -2**31) <= value <= spec.get('max', 2**31 - 1):
             raise ValueError(f'{where}: integer outside range')
     elif kind == 'int_list':
-        if (not isinstance(value, list) or len(value) != spec['length']
+        if (not isinstance(value, list) or not _length_ok(spec, value)
                 or any(not _int(v) or not spec.get('min', -2**31) <= v <= spec.get('max', 2**31 - 1) for v in value)):
-            raise ValueError(f'{where}: expected {spec["length"]} integers in range')
+            raise ValueError(f'{where}: expected {spec.get("length", "a list of")} integers in range')
+    elif kind == 'rational_list':
+        if not isinstance(value, list) or not _length_ok(spec, value) or not all(_rational_ok(spec, v) for v in value):
+            raise ValueError(f'{where}: expected a list of [numerator, denominator] in range')
+    elif kind == 'sound_key':
+        if not isinstance(value, str) or not SOUND_KEY_PATTERN.fullmatch(value):
+            raise ValueError(f'{where}: expected a sound key')
+    elif kind == 'sound_list':
+        if (not isinstance(value, list) or not _length_ok(spec, value)
+                or any(not isinstance(v, str) or not SOUND_KEY_PATTERN.fullmatch(v) for v in value)):
+            raise ValueError(f'{where}: expected a list of sound keys')
     else:
         raise ValueError(f'{where}: unsupported parameter type {kind}')
 
@@ -103,6 +129,29 @@ def resolve(unit, units, library):
         for needed in by_name[name].get('requires_behaviors', []):
             if needed not in resolved:
                 raise ValueError(f'{unit["key"]}: {name} requires behavior {needed}')
+    stages = resolved.get('hp_stage_animations')
+    if stages:
+        thresholds, transitions = stages['thresholds'], stages['transitions']
+        if len(transitions) != len(thresholds):
+            raise ValueError(f'{unit["key"]}: hp_stage_animations needs one transition flag per threshold')
+        if any(a[0] * b[1] <= b[0] * a[1] for a, b in zip(thresholds, thresholds[1:])):
+            raise ValueError(f'{unit["key"]}: hp_stage_animations thresholds must decrease')
+        if stages['rage_stage'] > len(thresholds):
+            raise ValueError(f'{unit["key"]}: rage_stage outside the stages')
+        if unit['base_id'] == 182 and (any(transitions) or stages['rage_stage']):
+            # 雪地步兵（BattleAction_ZakoSnow）不处理状态 80：过渡动作与狂暴只用于基准 313
+            raise ValueError(f'{unit["key"]}: base unit 182 supports in-place stages only (no transitions or rage)')
+        if 'stage_knockback_animation' in resolved and 'no_knockback' in resolved:
+            raise ValueError(f'{unit["key"]}: stage_knockback_animation cannot be combined with no_knockback')
+        armor = resolved.get('armor_hit_sound')
+        # until_stage 为档数 + 1 时所有档位都播放（2026-10-13 冰车：车身各档均为金属）
+        if armor and armor['until_stage'] > len(thresholds) + 1:
+            raise ValueError(f'{unit["key"]}: armor_hit_sound.until_stage outside the stages')
+        throw = resolved.get('throw_child_on_stage')
+        if throw and (throw['stage'] > len(thresholds) or not transitions[throw['stage'] - 1]):
+            raise ValueError(f'{unit["key"]}: throw_child_on_stage.stage must be a stage with a transition')
+        if throw and units[throw['unit']]['base_id'] != 160:
+            raise ValueError(f'{unit["key"]}: the thrown unit must use base unit 160')
     return resolved
 
 
@@ -135,7 +184,39 @@ def internal_fields(resolved):
         fields['ground_special_attack'] = True
     if 'retained_special_weapon' in resolved:
         fields['retained_special_weapon'] = True
+    zombie = {'flags': 0}
+    if 'hp_stage_animations' in resolved:
+        v = resolved['hp_stage_animations']
+        zombie.update(flags=zombie['flags'] | 1, thresholds=[list(t) for t in v['thresholds']],
+                      transitions=list(v['transitions']), rage_stage=v['rage_stage'],
+                      rage_speed=list(v['rage_speed_multiplier']), rage_damage=list(v['rage_damage_multiplier']))
+    if 'no_knockback' in resolved:
+        zombie['flags'] |= 2
+    if 'front_nearest_target' in resolved:
+        zombie['flags'] |= 64
+    if 'stage_knockback_animation' in resolved:
+        zombie['flags'] |= 128
+    if 'armor_hit_sound' in resolved:
+        v = resolved['armor_hit_sound']
+        zombie.update(flags=zombie['flags'] | 4, armor_sounds=list(v['sounds']), armor_until=v['until_stage'])
+    if 'kill_sound' in resolved:
+        zombie.update(flags=zombie['flags'] | 8, kill_sound=resolved['kill_sound']['sound'])
+    if 'throw_child_on_stage' in resolved:
+        v = resolved['throw_child_on_stage']
+        zombie.update(flags=zombie['flags'] | 16, throw_stage=v['stage'], release_tick=v['release_tick'])
+        fields['throw_child_key'] = v['unit']
+    if 'thrown_flight' in resolved:
+        v = resolved['thrown_flight']
+        zombie.update(flags=zombie['flags'] | 32, flight_forward=v['forward'], flight_height=v['height'])
+    if zombie['flags']:
+        fields['zombie_spec'] = zombie
     return fields
+
+
+def sound_keys(unit):
+    """行为参数中引用的音效键（生命分档单位的防具受击与击毙音效）。"""
+    spec = unit.get('zombie_spec') or {}
+    return list(spec.get('armor_sounds', [])) + ([spec['kill_sound']] if spec.get('kill_sound') else [])
 
 
 def apply(units_by_key, library):

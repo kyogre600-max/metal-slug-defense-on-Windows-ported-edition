@@ -31,9 +31,23 @@
     "s1xlv.green_mummy": 1040,
     "s1xlv.mummy_generator_mk2": 1041,
     "s1xlv.mummy_generator_mk2_box": 1042,
-    "s1xlv.kt21": 1043
+    "s1xlv.kt21": 1043,
+    "s1xlv.pvz_zombie": 1044,
+    "s1xlv.pvz_cone": 1045,
+    "s1xlv.pvz_bucket": 1046,
+    "s1xlv.pvz_newspaper": 1047,
+    "s1xlv.pvz_football": 1048,
+    "s1xlv.pvz_gargantuar": 1049,
+    "s1xlv.pvz_imp": 1050,
+    "s1xlv.pvz_imp_flight": 1051,
+    "s1xlv.pvz_zomboni": 1052
   },
   "units_dir": "units",
+  "disabled_units": [
+    "s1xlv.pvz_gargantuar",
+    "s1xlv.pvz_imp",
+    "s1xlv.pvz_imp_flight"
+  ],
   "asset_digest": "blake2b-256",
   "assets": {
     "future_heavy_b_out.obm": "975167f06425985fa8d5610e7e247d4ee92ab4c659fe2d59d57e381b8e06b07c",
@@ -59,7 +73,17 @@
     "mummy_generator_mk2.obm": null,
     "mummy_generator_builder.obm": null,
     "kt21_out.obm": null,
-    "kt21_sv001_effects.obm": null
+    "kt21_sv001_effects.obm": null,
+    "pvz_icons.obm": "492f7d83c5dd04aa604c2287a2508c679791090c0191ebccd4c0c908bfc48d5d",
+    "pvz_zombie.obm": "64d5fe9b0f1b9d329c92db1f2ecb230af696174a13e1c6a44cb9ba8c36e4ff48",
+    "pvz_cone.obm": "8054128325a2c99f8e373191b7c46cd5319df251701422b90d7a5f3f88a5188c",
+    "pvz_bucket.obm": "8109bf4f8a1a6be7e46232ac2d2d65b460f4a5609fcadace5f5137b8c9e53655",
+    "pvz_newspaper.obm": "aa1c0341f36c76e183cd1dcae115ef7ffcb406f7f6818ac47dc77c268b5bfb40",
+    "pvz_football.obm": "2fc2305cbb287e4487a67f959d2fd6d3c90161547ce2347015e43b87bcb4c4ec",
+    "pvz_gargantuar.obm": "0ed017a806171b090ecb74e436857f8873fed3c183f8eea6ee8d97f4b49e3c43",
+    "pvz_imp.obm": "efde62dd261b03462876674c9aa230959cebdb5e26494287140bb4a072c9c1e7",
+    "pvz_imp_flight.obm": "42d7076f7b8f184ef24fefb306cb2049eba434c5a3fc01716a1380e02d8d28d0",
+    "pvz_zomboni.obm": "e4e2f31c1dda36125a2c80a4c860d6c2d0dcdda8f2c9eb8d85df4e2dc412762b"
   },
   "unit_pack": {
     "key": "s1xlv.pf_infantry_pack",
@@ -120,5 +144,113 @@
         "description": "包含七种正规军步兵的单位组合包。"
       }
     }
-  }
+  },
+  "sounds": [
+    {
+      "key": "s1xlv.pvz_chomp",
+      "file": "pvz_chomp.msdf",
+      "type": "se",
+      "gain": 4.31
+    },
+    {
+      "key": "s1xlv.pvz_chomp2",
+      "file": "pvz_chomp2.msdf",
+      "type": "se",
+      "gain": 4.31
+    },
+    {
+      "key": "s1xlv.pvz_splat",
+      "file": "pvz_splat.msdf",
+      "type": "se",
+      "gain": 4.31
+    },
+    {
+      "key": "s1xlv.pvz_splat2",
+      "file": "pvz_splat2.msdf",
+      "type": "se",
+      "gain": 4.31
+    },
+    {
+      "key": "s1xlv.pvz_splat3",
+      "file": "pvz_splat3.msdf",
+      "type": "se",
+      "gain": 4.31
+    },
+    {
+      "key": "s1xlv.pvz_gulp",
+      "file": "pvz_gulp.msdf",
+      "type": "se",
+      "gain": 2.35
+    },
+    {
+      "key": "s1xlv.pvz_plastichit",
+      "file": "pvz_plastichit.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_plastichit2",
+      "file": "pvz_plastichit2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_shieldhit",
+      "file": "pvz_shieldhit.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_shieldhit2",
+      "file": "pvz_shieldhit2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_newspaper_rip",
+      "file": "pvz_newspaper_rip.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_newspaper_rarrgh",
+      "file": "pvz_newspaper_rarrgh.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_newspaper_rarrgh2",
+      "file": "pvz_newspaper_rarrgh2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_lowgroan",
+      "file": "pvz_lowgroan.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_lowgroan2",
+      "file": "pvz_lowgroan2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_gargantuar_thump",
+      "file": "pvz_gargantuar_thump.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_gargantudeath",
+      "file": "pvz_gargantudeath.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_imp",
+      "file": "pvz_imp.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_imp2",
+      "file": "pvz_imp2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_explosion",
+      "file": "pvz_explosion.msdf",
+      "type": "se"
+    }
+  ]
 }

@@ -72,7 +72,7 @@
 
 已注册单位的敌军身份由运行注册表解析。新增社区单位沿用 schema 2 的素材、动画、参数、名称、图标和稳定键约定，在关卡中填入其 `key` 即可。敌军名单与出击路径支持当前 1024–1029 及后续登记 ID；接口验证还使用了隔离登记的第七款单位 1030。
 
-社区单位容量（2026-10-10 M1 起）：本体 ID 1024–2047（`content.json` 的 `unit_ids`，只追加、不重排）、模组 2048–5119；ID 可以不连续，空位由加载器以未启用占位记录填充。单位文件不写 `id` 与 `icon.index`。图标写 `"page": 1`（`unit_icon_02.obm`）或 `"atlas": "<图集>.obm"`（图标页，页号由加载器分配，见 `docs/modding/M1B_ICON_PAGES_AND_SCALE_2026-10-10.md`）。缺失登记的 ID 继续由原生边界处理。特殊行为（修筑、召唤、投放、喷火、保留武器等）在单位文件中以 `behaviors` 组合，可用行为与参数见 `docs/modding/BEHAVIOR_CATALOG.md`（`content_tool.py list-behaviors`）。模组的目录结构、清单与启用方式见 `mods/README.md` 与 `docs/modding/M3_MOD_LOADER_2026-10-10.md`，发布前可运行 `content_tool.py check-mods`。单位注册与关卡登记属于两个步骤，关卡目录不会自动生成单位素材或独立行动类。完整单位素材约定见开发目录的 `CONTENT_EXTENSION_CONTRACT.txt` 与既有社区注册表。
+社区单位容量（2026-10-10 M1 起）：本体 ID 1024–2047（`content.json` 的 `unit_ids`，只追加、不重排）、模组 2048–5119；ID 可以不连续，空位由加载器以未启用占位记录填充。单位文件不写 `id` 与 `icon.index`。`content.json` 可选 `disabled_units`（本体稳定键列表）暂不载入对应本体单位：UnitID 保留、单位文件不读取，社区进度中的拥有与等级保留，编队格按稳定键暂存，移出列表后恢复（2026-10-13 起用于暂时停用 PVZ 巨人与小鬼）。图标写 `"page": 1`（`unit_icon_02.obm`）或 `"atlas": "<图集>.obm"`（图标页，页号由加载器分配，见 `docs/modding/M1B_ICON_PAGES_AND_SCALE_2026-10-10.md`）。缺失登记的 ID 继续由原生边界处理。特殊行为（修筑、召唤、投放、喷火、保留武器等）在单位文件中以 `behaviors` 组合，可用行为与参数见 `docs/modding/BEHAVIOR_CATALOG.md`（`content_tool.py list-behaviors`）。模组的目录结构、清单与启用方式见 `mods/README.md` 与 `docs/modding/M3_MOD_LOADER_2026-10-10.md`，发布前可运行 `content_tool.py check-mods`。单位注册与关卡登记属于两个步骤，关卡目录不会自动生成单位素材或独立行动类。完整单位素材约定见开发目录的 `CONTENT_EXTENSION_CONTRACT.txt` 与既有社区注册表。
 
 ## 4. 新场景、OBM 与 PNG
 
@@ -150,10 +150,11 @@ PNG 导入要求单帧、通道位深不超过 8 位的 RGB/RGBA、灰度或调�
 ```
 
 - 文件为 `.msdf`（Ogg Vorbis 数据），可用 `content_tool.py import-music <输入.ogg> <输出.msdf>` 生成并做解码检查；不得与原版资源同名。
-- `type` 为 `se`（缺省）、`vo`、`bgm`；`volume` 1–127（缺省 100）；`loop` 仅用于 `bgm`。
+- `type` 为 `se`（缺省）、`vo`、`bgm`；`volume` 1–127（缺省 100）；`loop` 仅用于 `bgm`；`gain` 0.1–8（缺省 1，核心 r53 起）在解码后放大或减小采样，超过满幅 60% 的部分柔和压缩，用于素材本身偏小声的情形。
 - 本体写在 `community_content/content.json` 的 `sounds` 列表（键 `s1xlv.`，文件放在 `community_content/`）；模组写在 `content.sounds` 目录的 `*.json` 列表中（键 `<模组 id>.`，文件放在模组 `assets/`）。
 - 单位动作脚本播放音效：`{"opcode": 23, "values": ["author_mod.cannon"]}`；关卡音乐：`"music": "author_mod.theme"`（类型须为 `bgm`）。只能引用本体、本模组与所依赖模组的音效。
 - SoundID 由游戏在原生音效表的空闲区段（32–99、165–199、523–799）中按加载顺序分配，本体与模组合计 380 个；使合计超限的模组被跳过。详见 `docs/modding/M6A_CUSTOM_SOUNDS_2026-10-10.md`。
+- 音频文件为 Ogg Vorbis，采样率与声道数不限：原生混音只输出 16 kHz 立体声，其他格式在载入时转换（核心 r52 起）。
 
 ## 8. 自制 EVENT（M6b）
 

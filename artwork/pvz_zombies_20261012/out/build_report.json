@@ -1,0 +1,227 @@
+{
+  "zombie": {
+    "atlas": [
+      256,
+      256
+    ],
+    "tiles": 50,
+    "rects": 50,
+    "frame_words": 100,
+    "scripts": 35
+  },
+  "cone": {
+    "atlas": [
+      512,
+      512
+    ],
+    "tiles": 108,
+    "rects": 108,
+    "frame_words": 216,
+    "scripts": 83
+  },
+  "bucket": {
+    "atlas": [
+      512,
+      512
+    ],
+    "tiles": 108,
+    "rects": 108,
+    "frame_words": 216,
+    "scripts": 83
+  },
+  "newspaper": {
+    "atlas": [
+      512,
+      512
+    ],
+    "tiles": 88,
+    "rects": 88,
+    "frame_words": 176,
+    "scripts": 66
+  },
+  "football": {
+    "atlas": [
+      512,
+      512
+    ],
+    "tiles": 83,
+    "rects": 83,
+    "frame_words": 166,
+    "scripts": 66
+  },
+  "gargantuar": {
+    "atlas": [
+      512,
+      512
+    ],
+    "tiles": 42,
+    "rects": 42,
+    "frame_words": 84,
+    "scripts": 32
+  },
+  "imp": {
+    "atlas": [
+      256,
+      256
+    ],
+    "tiles": 22,
+    "rects": 22,
+    "frame_words": 44,
+    "scripts": 16
+  },
+  "imp_flight": {
+    "atlas": [
+      256,
+      256
+    ],
+    "tiles": 4,
+    "rects": 4,
+    "frame_words": 8,
+    "scripts": 34
+  },
+  "zomboni": {
+    "atlas": [
+      1024,
+      512
+    ],
+    "tiles": 76,
+    "rects": 76,
+    "frame_words": 148,
+    "scripts": 80
+  },
+  "idle": {
+    "cone_idle_d1": {
+      "method": "patched",
+      "walk_frame": 6,
+      "diff_pixels": 192,
+      "match": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "cone_idle_d2": {
+      "method": "patched",
+      "walk_frame": 6,
+      "diff_pixels": 190,
+      "match": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "bucket_idle_d1": {
+      "method": "patched",
+      "walk_frame": 6,
+      "diff_pixels": 227,
+      "match": [
+        1.0,
+        0.971,
+        0.971,
+        0.971,
+        1.0
+      ]
+    },
+    "bucket_idle_d2": {
+      "method": "patched",
+      "walk_frame": 0,
+      "diff_pixels": 310,
+      "match": [
+        1.0,
+        0.958,
+        0.953,
+        0.958,
+        1.0
+      ]
+    },
+    "newspaper_idle_d1": {
+      "method": "patched",
+      "walk_frame": 6,
+      "diff_pixels": 34,
+      "match": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "newspaper_idle_d2": {
+      "method": "patched",
+      "walk_frame": 4,
+      "diff_pixels": 83,
+      "match": [
+        0.995,
+        0.995,
+        0.995,
+        0.995,
+        0.995,
+        0.995
+      ]
+    },
+    "newspaper_idle_rage": {
+      "method": "sway",
+      "frames": [
+        6,
+        0
+      ],
+      "diff_pixels": 616
+    },
+    "football_idle_d1": {
+      "method": "patched",
+      "walk_frame": 1,
+      "diff_pixels": 27,
+      "match": [
+        0.952,
+        0.952,
+        0.952,
+        0.952
+      ]
+    },
+    "football_idle_d2": {
+      "method": "patched",
+      "walk_frame": 6,
+      "diff_pixels": 290,
+      "match": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "football_idle_nohelmet": {
+      "method": "patched",
+      "walk_frame": 0,
+      "diff_pixels": 336,
+      "match": [
+        0.891,
+        0.891,
+        0.891,
+        0.889
+      ]
+    },
+    "gargantuar_idle_imp": {
+      "method": "breath",
+      "cut_row": -36,
+      "pixels": 3026
+    },
+    "gargantuar_idle_noimp": {
+      "method": "breath",
+      "cut_row": -30,
+      "pixels": 2708
+    },
+    "imp_idle": {
+      "method": "sway",
+      "frames": [
+        6,
+        7
+      ],
+      "diff_pixels": 287
+    }
+  }
+}

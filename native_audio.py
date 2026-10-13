@@ -5,19 +5,32 @@ import time
 import hashlib
 import threading
 from collections import OrderedDict
+from pathlib import Path
 from static_cpu import Context
+
+NATIVE_FORMAT=(16000,2)   # (rate, channels) of all 655 original .msdf sounds and of the output stream
 
 class AudioCache:
     def __init__(self,p):
-        self.lib=p.uc.lib;self.root=p.asset_cache.root
+        self.p=p;self.lib=p.uc.lib;self.root=p.asset_cache.root
         self.lock=threading.Lock();self.stop=threading.Event();self.data=OrderedDict()
         self.size=0;self.limit=128*1024*1024;self.hits=0;self.misses=0
         self.fn=self.lib.msd_vorbis_decode
         self.fn.argtypes=[C.c_void_p,C.c_int32,C.POINTER(C.c_int32),C.POINTER(C.c_int32),C.POINTER(C.c_void_p)]
         self.fn.restype=C.c_int32
         self.free=self.lib.msd_vorbis_free;self.free.argtypes=[C.c_void_p];self.free.restype=None
+        # The native mixer only outputs NATIVE_FORMAT PCM (all original sounds); community and mod sounds
+        # in other rates or mono are converted once here (msd_pcm_convert, core r52+), else they stay silent.
+        self.convert=getattr(self.lib,'msd_pcm_convert',None)
+        if self.convert is not None:
+            self.convert.argtypes=[C.c_void_p,C.c_int32,C.c_int32,C.c_int32,C.c_int32,C.POINTER(C.c_void_p)]
+            self.convert.restype=C.c_int32
+        # Content sound "gain" (content_sounds.py, p.sound_gains: file bytes -> gain), msd_pcm_gain in core r53+.
+        self.gain=getattr(self.lib,'msd_pcm_gain',None)
+        if self.gain is not None:
+            self.gain.argtypes=[C.c_void_p,C.c_int32,C.c_double];self.gain.restype=C.c_int32
         self.thread=threading.Thread(target=self.preload,name='MSD audio prefetch',daemon=True)
-        self.thread.start()
+        self.thread.start();self.threads=[self.thread]
 
     def obtain(self,raw):
         key=hashlib.sha256(raw).digest()
@@ -27,8 +40,20 @@ class AudioCache:
         channels=C.c_int32();rate=C.c_int32();output=C.c_void_p()
         frames=self.fn(raw,len(raw),C.byref(channels),C.byref(rate),C.byref(output))
         if frames<1:return frames
-        try:item=(frames,channels.value,rate.value,C.string_at(output.value,frames*channels.value*2))
-        finally:self.free(output)
+        pcm,count,rt,ch,converted=output,frames,rate.value,channels.value,C.c_void_p()
+        try:
+            if (rt,ch)!=NATIVE_FORMAT and self.convert is not None:
+                n=self.convert(output,frames,ch,rt,NATIVE_FORMAT[0],C.byref(converted))
+                if n>0:pcm,count,(rt,ch)=converted,n,NATIVE_FORMAT
+            gain=getattr(self.p,'sound_gains',{}).get(bytes(raw))
+            if gain and gain!=1 and self.gain is not None:self.gain(pcm,count*ch,float(gain))
+            item=(count,ch,rt,C.string_at(pcm.value,count*ch*2))
+        finally:
+            self.free(output)
+            if converted.value:self.free(converted)
+        return self.remember(key,item)
+
+    def remember(self,key,item):
         with self.lock:
             self.misses+=1
             if key not in self.data and len(item[3])<=self.limit:
@@ -47,8 +72,21 @@ class AudioCache:
                 self.obtain(path.read_bytes())
         except OSError:pass
 
+    def prefetch(self,paths):
+        # Community and mod sounds (community_content.load_sounds, after p.sound_gains is set) are decoded in the
+        # background like the original sounds; otherwise the first unit using them decodes and resamples them on
+        # the game thread (2026-10-13: up to about 0.9 s when opening a PVZ zombie in the unit menu).
+        def run():
+            for path in paths:
+                if self.stop.is_set():break
+                try:self.obtain(Path(path).read_bytes())
+                except OSError:pass
+        thread=threading.Thread(target=run,name='MSD content audio prefetch',daemon=True)
+        thread.start();self.threads.append(thread)
+
     def close(self):
-        self.stop.set();self.thread.join(timeout=1)
+        self.stop.set()
+        for thread in self.threads:thread.join(timeout=1)
 
 def bind(p):
     if os.environ.get('MSD_NATIVE_AUDIO','1')=='0' or not hasattr(p.uc.lib,'msd_bind_decoder'):return

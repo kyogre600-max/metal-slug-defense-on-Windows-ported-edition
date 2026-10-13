@@ -174,8 +174,212 @@ HOOK(pack_y,0x101654edu, if(pack_id(c,c.r[0])){ret(c,c.r[1]<3u?uint32_t(-30):0u)
 HOOK(pack_name,0x1016551du, uint32_t p=pack_id(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+40u+std::min(c.r[1],10u)*4u));return;})
 HOOK(pack_info,0x10165509u, uint32_t p=pack_id(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+84u+std::min(c.r[1],10u)*4u));return;})
 extern "C" __declspec(dllexport) uint32_t msd_community_unit_pack_version(){return 1u;}
-// 伞兵落地时，原生动作固定生成 UnitID 45；社区映射保留其正规军身份。
-HOOK(paratrooper_landing,0x101de225u, uint32_t uid=rd<uint32_t>(c,c.r[0]+0x128u);uint32_t p=record(c,uid);if(p&&rd<uint32_t>(c,p+4u)==160u&&c.r[1]==45u&&head(c,100)){uint32_t target=rd<uint32_t>(c,head(c,100)+(uid-U)*4u);if(target)c.r[1]=target;})
+// ---------- 生命分档单位（行为库 v3：hp_stage_animations 等，首批为 PVZ 僵尸；基准为原版 UnitID 313 BattleAction_ZombieBrain）----------
+// 头部 +168：逐槽 ZSpec 指针表（0 为无，无此类单位时整表为 0）。ZSpec 为 28 个 32 位字（community_content.py zombie_spec）：
+//  0 标记（1 生命分档 2 无击退 4 防具受击音效 8 击毙音效 16 投出子单位 32 被投出的飞行单位 64 前方最近敌人 128 分档受击动作）；1 分档数 n（≤6）；
+//  2..7 / 8..13 第 k 档阈值的分子 / 分母（生命 < 最大生命×分子/分母 时至少为第 k 档）；14 带过渡动作的档位位图；
+//  15 狂暴档（0 为无）；16/17 狂暴移速倍率；18/19 狂暴伤害倍率；20/21 防具受击音效 SoundID；22 防具在第几档前存在；
+//  23 击毙音效；24 投出子单位的档位；25 投出时刻（过渡动作的精灵帧计数）；26/27 被投出单位的起点前移与高度（世界坐标）。
+// 第 k 档的动作槽为原生槽号 + 16k（只对槽 0–2、6、7、9–12、14；槽 14 为分档受击动作，原生 ZombieBrain 不使用）。逐实例状态只保存在客体对象中：当前动作号（+0xc4）、
+// 状态副本序号（+0x300，狂暴为 1）与子对象指针（+0xfc，已投出），回滚快照随客体内存保存。
+bool msd_guest_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,uint32_t* result);
+static constexpr uint32_t Z_STAGE_SLOTS=0x5ec7u;
+static constexpr uint32_t Z_RESERVE_STATE=0x101dda28u,Z_PLAY_SE=0x101de1acu,Z_SUMMON_CHILD=0x101af74bu;
+static const uint8_t Z_LEN[24]={2,2,2,2,2,1,3,5,2,2,3,5,5,2,3,1,1,2,2,3,3,1,5,2};
+static uint32_t zspec(Context& c,uint32_t obj){
+ if(!active(c)||!head(c,168u)||!obj||rd<uint32_t>(c,obj)!=head(c,84u))return 0u;
+ uint32_t uid=rd<uint32_t>(c,obj+0x128u);if(!record(c,uid))return 0u;
+ return rd<uint32_t>(c,head(c,168u)+(uid-U)*4u);
+}
+static uint32_t zw(Context& c,uint32_t s,uint32_t i){return rd<uint32_t>(c,s+i*4u);}
+static int32_t z_stage_of_anim(Context& c,uint32_t s,int32_t anim){
+ if(anim<0)return -1;uint32_t k=uint32_t(anim)/16u,slot=uint32_t(anim)%16u;
+ if(k>zw(c,s,1)||!((Z_STAGE_SLOTS>>slot)&1u))return -1;return int32_t(k);
+}
+static uint32_t z_stage_of_hp(Context& c,uint32_t s,uint32_t obj){
+ int64_t hp=int32_t(rd<uint32_t>(c,obj+0x308u)),mx=int32_t(rd<uint32_t>(c,obj+0x304u));uint32_t n=std::min(zw(c,s,1),6u),k=0u;
+ for(uint32_t i=0;i<n;++i)if(hp*int64_t(zw(c,s,8u+i))<int64_t(zw(c,s,2u+i))*mx)k=i+1u;
+ return k;
+}
+static uint32_t z_next_transition(Context& c,uint32_t s,uint32_t d){
+ uint32_t n=std::min(zw(c,s,1),6u),m=zw(c,s,14);for(uint32_t k=d+1u;k<=n;++k)if((m>>k)&1u)return k;return n+1u;
+}
+// 动作请求的目标档位：不越过下一个带过渡动作的档位（过渡动作经状态 80 播放，槽 12 只由过渡请求）。
+static uint32_t z_target(Context& c,uint32_t s,uint32_t obj,uint32_t slot){
+ int32_t d=z_stage_of_anim(c,s,int32_t(rd<uint32_t>(c,obj+0xc4u)));if(d<0)d=0;
+ uint32_t hp=z_stage_of_hp(c,s,obj),t=z_next_transition(c,s,uint32_t(d));
+ if(slot==12u)return hp>=t?t:uint32_t(d);
+ return std::min(hp,t-1u);
+}
+// 同一动作换到另一档：保留脚本位置与等待计数，显示帧取新脚本在该位置之前最后一条 op0（各档同一动作的命令结构相同）。
+static void z_swap(Context& c,uint32_t obj,uint32_t anim,uint32_t target){
+ uint32_t next=anim%16u+16u*target,sprite=rd<uint32_t>(c,obj+0x5cu);if(!sprite)return;
+ uint32_t st=rd<uint32_t>(c,sprite+0x58u),desc=rd<uint32_t>(c,sprite+0x40u);if(!st||!desc)return;
+ if(rd<uint32_t>(c,st+0xcu)!=anim||next>=rd<uint32_t>(c,desc+0x1cu))return;
+ uint32_t script=rd<uint32_t>(c,rd<uint32_t>(c,desc+0x18u)+next*4u),index=rd<uint32_t>(c,st+0x10u),pos=0u;int32_t frame=-2;
+ while(pos<index){uint32_t op=rd<uint32_t>(c,script+pos*4u);if(op>23u)return;if(op==0u)frame=int32_t(rd<uint32_t>(c,script+pos*4u+4u));pos+=Z_LEN[op];}
+ if(pos!=index)return;
+ wr<uint32_t>(c,st+0xcu,next);if(frame!=-2)wr<uint32_t>(c,st+8u,uint32_t(frame));wr<uint32_t>(c,obj+0xc4u,next);
+}
+// 狂暴：状态副本 1 复制副本 0，移速（词 5，浮点）与普攻、绝招伤害（词 22、29）按倍率缩放，切换序号（不改特殊攻击计量）。
+static void z_apply_rage(Context& c,uint32_t s,uint32_t obj){
+ for(uint32_t i=0;i<0xecu;i+=4u)wr<uint32_t>(c,obj+0x214u+i,rd<uint32_t>(c,obj+0x128u+i));
+ uint32_t a=zw(c,s,16),b=zw(c,s,17);
+ if(a&&b)wr<float>(c,obj+0x214u+0x14u,rd<float>(c,obj+0x214u+0x14u)*float(a)/float(b));
+ a=zw(c,s,18);b=zw(c,s,19);
+ if(a&&b)for(uint32_t w:{22u,29u}){int64_t v=int32_t(rd<uint32_t>(c,obj+0x214u+w*4u));wr<uint32_t>(c,obj+0x214u+w*4u,uint32_t(int32_t(v*a/b)));}
+ wr<uint32_t>(c,obj+0x300u,1u);
+}
+// BattleAction_ZombieBrain::update 入口（r1 对象、r2 状态）：生命越过档位时，带过渡的档位预约状态 80，其余就地换档。
+static void z_update(Context& c){
+ uint32_t obj=c.r[1],state=c.r[2],s=zspec(c,obj);if(!s||!(zw(c,s,0)&1u))return;
+ if(state>=100u||int32_t(rd<uint32_t>(c,obj+0x308u))<=0)return;
+ int32_t anim=int32_t(rd<uint32_t>(c,obj+0xc4u)),d=z_stage_of_anim(c,s,anim);if(d<0)return;
+ uint32_t rage=zw(c,s,15);
+ if(rage&&uint32_t(d)>=rage&&!rd<uint32_t>(c,obj+0x300u))z_apply_rage(c,s,obj);
+ if(state==80u)return;
+ uint32_t hp=z_stage_of_hp(c,s,obj),t=z_next_transition(c,s,uint32_t(d));
+ if(hp>=t){msd_guest_call(c,Z_RESERVE_STATE,obj,80u,0u,0u,nullptr);return;}
+ uint32_t target=std::min(hp,t-1u);
+ if(target!=uint32_t(d))z_swap(c,obj,uint32_t(anim),target);
+}
+// 分档受击动作（行为库 v5：stage_knockback_animation，标记 128）：ZombieBrain 只在进入状态 80 的第一帧请求槽 12
+// （0x1017caaa）；此时没有待播的过渡（生命未越过下一个带过渡的档位）即为原生击退（BattleUnitDefault::damageAction
+// 预约），改为当前档的槽 14 + 16d，过渡动作不因受击重播。没有此标记时槽 12 照旧。
+static uint32_t z_remap(Context& c,uint32_t s,uint32_t obj,uint32_t slot){
+ if(slot==12u&&(zw(c,s,0)&128u)){
+  int32_t d=z_stage_of_anim(c,s,int32_t(rd<uint32_t>(c,obj+0xc4u)));if(d<0)d=0;
+  if(z_stage_of_hp(c,s,obj)<z_next_transition(c,s,uint32_t(d)))return 14u+16u*uint32_t(d);
+ }
+ return slot+16u*z_target(c,s,obj,slot);
+}
+HOOK(zombie_stage_update,0x1017ca15u, z_update(c);)
+// 雪地步兵类（基准 182，BattleAction_ZakoSnow::update 入口 0x1018805c，参数与 ZombieBrain::update 相同：r1 对象、r2 状态）：
+// 2026-10-13 冰车。宿主只允许不带过渡与狂暴的分档（behaviors.py），此处只会就地换档。
+HOOK(zombie_stage_update_snow,0x1018805du, z_update(c);)
+HOOK(zombie_stage_remap,0x101de017u,
+ uint32_t slot=c.r[1];
+ if(slot<16u&&slot!=14u&&((Z_STAGE_SLOTS>>slot)&1u)){uint32_t s=zspec(c,c.r[0]);if(s&&(zw(c,s,0)&1u))c.r[1]=z_remap(c,s,c.r[0],slot);}
+ )
+// ZombieBrain 状态 80 的尾块（0x1017cac4：mov r0,r6; mov r1,r4; movs r2,#0 后出栈并尾调用 actionMove）。
+// 投出子单位的档位过渡到达投出时刻且尚未投出时，按同一出栈改为尾调用 ParaTrooper::summonZakoBazooka(r1=对象)：
+// 原生在对象位置以本单位等级生成固定 UnitID 45（落地映射改为登记的子单位）并记入 +0xfc。该帧不调用 actionMove(…,0)。
+static bool z_throw(Context& c){
+ uint32_t obj=c.r[4],s=zspec(c,obj);if(!s||!(zw(c,s,0)&16u))return false;
+ if(rd<uint32_t>(c,obj+0xc4u)!=12u+16u*zw(c,s,24)||rd<uint32_t>(c,obj+0xfcu))return false;
+ uint32_t sprite=rd<uint32_t>(c,obj+0x5cu);if(!sprite||rd<uint32_t>(c,sprite+0x3cu)<zw(c,s,25))return false;
+ uint32_t sp=c.r[13];c.r[0]=c.r[6];c.r[1]=obj;
+ c.r[4]=rd<uint32_t>(c,sp);c.r[5]=rd<uint32_t>(c,sp+4u);c.r[6]=rd<uint32_t>(c,sp+8u);c.r[14]=rd<uint32_t>(c,sp+12u);c.r[13]=sp+16u;
+ c.pc=Z_SUMMON_CHILD;return true;
+}
+static Block old_zombie_throw;static void zombie_throw(Context& c){if(z_throw(c))return;old_zombie_throw(c);}
+// 被投出的飞行单位（基准 160 BattleAction_ParaTrooper）首帧：原生把高度固定为 75（空降起点），改为从投出者手中出发，
+// 并与原生空中单位一样不阻挡、不被选为目标。
+// 0x101af7da 为非浏览模式的高度写入块，跳到 0x101af802 继续原生首帧流程。
+static bool z_flight_start(Context& c){
+ uint32_t obj=c.r[4],s=zspec(c,obj);if(!s||!(zw(c,s,0)&32u))return false;
+ int32_t forward=int32_t(zw(c,s,26)),height=int32_t(zw(c,s,27));
+ float x=rd<float>(c,obj+0x8cu)+float(rd<uint32_t>(c,obj+0x78u)==0x5au?forward:-forward),y=rd<float>(c,obj+0x90u)-float(height);
+ wr<float>(c,obj+0x8cu,x);wr<float>(c,obj+0x94u,x);wr<float>(c,obj+0x90u,y);wr<float>(c,obj+0x98u,y);
+ // 飞行段不阻挡、不受伤、穿越前线（身体状态 +0x6c：2 Guard、8 DontToche、0x10 AreaThrough、0x40 NoTarget，同原生空中单位）。
+ wr<uint32_t>(c,obj+0x6cu,rd<uint32_t>(c,obj+0x6cu)|0x5au);
+ c.pc=0x101af803u;return true;
+}
+static Block old_zombie_flight_start;static void zombie_flight_start(Context& c){if(z_flight_start(c))return;old_zombie_flight_start(c);}
+// BattleUnitDefault::damageAction：0x1016f484 为受击后仍存活的分支（随后检查击退计量），0x1016f4a2 播放受击效果，
+// 0x1016f44c 为生命归零的分支（栈 +8 为攻击方）。
+static void z_armor_hit(Context& c){
+ uint32_t obj=c.r[4],s=zspec(c,obj);
+ if(!s||!(zw(c,s,0)&4u)||z_stage_of_hp(c,s,obj)>=zw(c,s,22))return;
+ // 两个音效按当前生命的第 6 位交替（受击伤害多为 8 的倍数，低位不变）。
+ uint32_t sid=zw(c,s,20u+((rd<uint32_t>(c,obj+0x308u)>>6)&1u));if(!sid)sid=zw(c,s,20);
+ if(sid)msd_guest_call(c,Z_PLAY_SE,obj,sid,0u,0u,nullptr);
+}
+static void z_kill_sound(Context& c){
+ uint32_t attacker=rd<uint32_t>(c,c.r[13]+8u),s=zspec(c,attacker);
+ if(s&&(zw(c,s,0)&8u)&&zw(c,s,23))msd_guest_call(c,Z_PLAY_SE,attacker,zw(c,s,23),0u,0u,nullptr);
+}
+HOOK(zombie_no_knockback,0x1016f485u, uint32_t s=zspec(c,c.r[4]);if(s&&(zw(c,s,0)&2u)){c.pc=0x1016f4a3u;return;})
+HOOK(zombie_armor_hit,0x1016f4a3u, z_armor_hit(c);)
+HOOK(zombie_kill_sound,0x1016f44du, z_kill_sound(c);)
+static bool z_throws(Context& c,uint32_t obj){uint32_t s=zspec(c,obj);return s&&(zw(c,s,0)&16u);}
+// 前方最近敌人（行为库 v4：front_nearest_target，ZSpec 标记 64）。原生 setHeadPositionUnit 每帧按横坐标为两队各取最前单位
+// （管理器 +0x30/+0x34 含 NoTarget，+0x38/+0x3c 不含；+0x30/+0x38 为队伍 0 的，+0x34/+0x3c 为队伍 1 的），
+// getNearEnemyDistance、unitControlTypeNoukin 的阻挡判定与 isUnitMovePossible 的移动限制只看对方最前单位。单位落到对方最前单位之后
+// （被投出的小鬼）时，距离为负，原生一直攻击而攻击框内没有敌人；与其重叠的对方单位也不能越过它移动，双方停在原地互相攻击不到。
+// 本单位或对方最前单位带此标记、且对方最前单位的中心在本单位中心之后时，改取本单位前方（中心不在其后）的对方单位中前缘最近者：
+// 资格同原生（存活，UnitID 0x8b/0x101/0x10c/0x10d 不检查；+0x64；身体状态非 Invisible 1、DontToche 8，攻击目标另排除 NoTarget 0x40），
+// 前缘相同时取 +0xf0、再取 +0x60 较大者。前方没有对方单位时按原生的“无对方单位”处理。其余情形保持原生。
+static constexpr uint32_t Z_AHEAD=64u;
+static bool z_ahead(Context& c,uint32_t obj){uint32_t s=zspec(c,obj);return s&&(zw(c,s,0)&Z_AHEAD);}
+// BattleObject::getWidthSize：精灵 +8（整数）乘 +0x28（浮点）后截断。
+static int32_t z_width(Context& c,uint32_t obj){
+ uint32_t sp=rd<uint32_t>(c,obj+0x5cu);
+ return int32_t(float(int32_t(rd<uint32_t>(c,sp+8u)))*rd<float>(c,sp+0x28u));
+}
+static bool z_candidate(Context& c,uint32_t e,uint32_t excluded){
+ if(!rd<uint8_t>(c,e+0x64u)||(rd<uint32_t>(c,e+0x6cu)&excluded))return false;
+ uint32_t vt=rd<uint32_t>(c,e),uid=0u,alive=0u;
+ msd_guest_call(c,rd<uint32_t>(c,vt+0x4cu),e,0u,0u,0u,&uid);
+ if(uid==0x8bu||uid==0x101u||uid==0x10cu||uid==0x10du)return true;
+ msd_guest_call(c,rd<uint32_t>(c,vt+0x5cu),e,0u,0u,0u,&alive);
+ return alive!=0u;
+}
+// 单位 u（队伍 team）前方的对方单位中前缘最近者（对方队伍链表：队伍 0 的对方为 +0x1c，队伍 1 的对方为 +0x18，环形）。
+static uint32_t z_nearest_ahead(Context& c,uint32_t manager,uint32_t u,uint32_t team,uint32_t excluded){
+ uint32_t head=rd<uint32_t>(c,manager+(team?0x18u:0x1cu));if(!head)return 0u;
+ float ux=rd<float>(c,u+0x8cu);uint32_t best=0u,bf=0u,bi=0u,e=head;int32_t bk=0;
+ for(uint32_t n=0;n<8192u;++n){
+  float ex=rd<float>(c,e+0x8cu);
+  if((team?ex<=ux:ex>=ux)&&z_candidate(c,e,excluded)){
+   float w=float(z_width(c,e));int32_t k=int32_t(team?ex+w:ex-w);
+   uint32_t f=rd<uint32_t>(c,e+0xf0u),i=rd<uint16_t>(c,e+0x60u);
+   if(!best||(team?k>bk:k<bk)||(k==bk&&(int32_t(f)>int32_t(bf)||(f==bf&&i>bi)))){best=e;bk=k;bf=f;bi=i;}
+  }
+  uint32_t next=rd<uint32_t>(c,e+0x124u);if(!next)break;e=next-0x11cu;if(e==head)break;
+ }
+ return best;
+}
+static bool z_front_behind(Context& c,uint32_t u,uint32_t f,uint32_t team){
+ if(!f)return false;
+ float ux=rd<float>(c,u+0x8cu),fx=rd<float>(c,f+0x8cu);
+ if(team?!(fx>ux):!(fx<ux))return false;
+ return z_ahead(c,u)||z_ahead(c,f);
+}
+// getNearEnemyDistance 入口（r0 管理器、r1 单位、r2 非 0 时扣除双方宽度）；计算次序同原生，结果截断为整数。
+static bool z_distance(Context& c){
+ uint32_t m=c.r[0],u=c.r[1],team=rd<uint32_t>(c,u+0x70u);
+ if(!z_front_behind(c,u,rd<uint32_t>(c,m+(team?0x38u:0x3cu)),team))return false;
+ uint32_t e=z_nearest_ahead(c,m,u,team,0x49u);
+ if(!e){ret(c,0x7fffffffu);return true;}
+ float ux=rd<float>(c,u+0x8cu),ex=rd<float>(c,e+0x8cu),d;
+ if(c.r[2]){float wu=float(z_width(c,u)),we=float(z_width(c,e));d=team?((ux-wu)-we)-ex:((ex-we)-wu)-ux;}
+ else d=team?ux-ex:ex-ux;
+ ret(c,uint32_t(int32_t(d)));return true;
+}
+static Block old_zombie_ahead_distance;static void zombie_ahead_distance(Context& c){if(z_distance(c))return;old_zombie_ahead_distance(c);}
+// unitControlTypeNoukin 的阻挡判定：0x1df780（队伍 0）与 0x1df7ea（队伍 1）入口处 r0 为管理器、r4 单位、
+// r5 对方最前单位（含 NoTarget）、r7 队伍；r5 为 0 时原生按无对方单位前进至战场边界。
+static void z_block_target(Context& c){
+ uint32_t u=c.r[4],team=c.r[7];
+ if(z_front_behind(c,u,c.r[5],team))c.r[5]=z_nearest_ahead(c,c.r[0],u,team,0x09u);
+}
+HOOK(zombie_ahead_block_p1,0x101df781u, z_block_target(c);)
+HOOK(zombie_ahead_block_p2,0x101df7ebu, z_block_target(c);)
+// BattleObjectManager::isUnitMovePossible（advanceFrame 移动后检查）：向前移动时不得越过对方最前单位（含 NoTarget）的后缘。
+// 0x1df1fa（向右）与 0x1df23a（向左）入口处 r0 为管理器、r3 队伍、r4 单位、r5 对方最前单位；r5 为 0 时只受战场边界限制。
+static void z_move_target(Context& c){
+ uint32_t u=c.r[4],team=c.r[3];
+ if(team<=1u&&z_front_behind(c,u,c.r[5],team))c.r[5]=z_nearest_ahead(c,c.r[0],u,team,0x09u);
+}
+HOOK(zombie_ahead_move_right,0x101df1fbu, z_move_target(c);)
+HOOK(zombie_ahead_move_left,0x101df23bu, z_move_target(c);)
+// 已登记的钩子数：首批 7 个全部找到时版本 1，另含前方最近敌人的 5 个时版本 2；宿主据此确认核心支持。
+static uint32_t zombie_hooks=0u;
+// 3：分档受击动作（标记 128，钩子数同 2）。4：另含雪地步兵类的分档入口（2026-10-13 冰车，共 13 个钩子）。
+extern "C" __declspec(dllexport) uint32_t msd_community_zombie_version(){return zombie_hooks==13u?4u:zombie_hooks==12u?3u:zombie_hooks==7u?1u:0u;}
+// 伞兵落地时，原生动作固定生成 UnitID 45；社区映射保留其正规军身份。投出子单位的生命分档单位同样经此映射（落地映射表登记子单位）。
+HOOK(paratrooper_landing,0x101de225u, uint32_t uid=rd<uint32_t>(c,c.r[0]+0x128u);uint32_t p=record(c,uid);if(p&&(rd<uint32_t>(c,p+4u)==160u||z_throws(c,c.r[0]))&&c.r[1]==45u&&head(c,100)){uint32_t target=rd<uint32_t>(c,head(c,100)+(uid-U)*4u);if(target)c.r[1]=target;})
 extern "C" __declspec(dllexport) uint32_t msd_community_paratrooper_landing_version(){return 1u;}
 // 属性面板显示实际作战单位；其他调用保留购买与拥有状态的原生标识。
 HOOK(menu_display_id,0x101652fdu, if(record(c,c.r[0])&&c.r[14]==0x101ecd31u&&head(c,104)){ret(c,rd<uint32_t>(c,head(c,104)+(c.r[0]-U)*4u));return;})
