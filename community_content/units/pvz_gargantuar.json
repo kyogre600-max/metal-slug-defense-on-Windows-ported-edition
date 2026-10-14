@@ -5,42 +5,45 @@
   "identity": "Zombie",
   "shop_price": 250,
   "available_from_start": true,
-  "ap": 300,
+  "ap": 350,
   "hp_multiplier": [
-    75,
+    100,
     17
   ],
   "knockback_threshold_multiplier": [
-    75,
+    100,
     17
   ],
   "production_reference_id": 313,
   "production_interval_multiplier": [
-    128,
-    65
+    63,
+    52
   ],
   "damage_multiplier": [
-    5,
-    1
+    7,
+    2
   ],
   "special_damage_multiplier": [
-    2,
+    1,
     1
   ],
   "move_speed_multiplier": [
-    402,
-    625
+    1608,
+    3125
   ],
   "knockback_distance_multiplier": [
     1,
     1
   ],
   "status_word_values": {
-    "7": 52,
+    "7": 32,
     "24": 999,
     "31": 999,
     "27": 1,
-    "34": 1
+    "34": 1,
+    "29": 0,
+    "35": 0,
+    "36": 0
   },
   "icon": {
     "atlas": "pvz_icons.obm",
@@ -64,7 +67,7 @@
       {
         "opcode": 0,
         "values": [
-          16
+          28
         ]
       },
       {
@@ -76,7 +79,7 @@
       {
         "opcode": 0,
         "values": [
-          28
+          30
         ]
       },
       {
@@ -100,7 +103,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -112,7 +115,7 @@
       {
         "opcode": 1,
         "values": [
-          3
+          4
         ]
       },
       {
@@ -124,7 +127,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -136,7 +139,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -160,7 +163,7 @@
       {
         "opcode": 1,
         "values": [
-          3
+          5
         ]
       },
       {
@@ -172,7 +175,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -280,7 +283,7 @@
       {
         "opcode": 0,
         "values": [
-          16
+          28
         ]
       },
       {
@@ -292,7 +295,7 @@
       {
         "opcode": 0,
         "values": [
-          28
+          30
         ]
       },
       {
@@ -322,7 +325,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -334,7 +337,7 @@
       {
         "opcode": 1,
         "values": [
-          3
+          4
         ]
       },
       {
@@ -346,7 +349,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -358,7 +361,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -382,7 +385,7 @@
       {
         "opcode": 1,
         "values": [
-          3
+          5
         ]
       },
       {
@@ -394,7 +397,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -680,36 +683,6 @@
     ],
     "13": [
       {
-        "opcode": 23,
-        "values": [
-          "s1xlv.pvz_gargantudeath"
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          70
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          4
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          72
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          4
-        ]
-      },
-      {
         "opcode": 0,
         "values": [
           74
@@ -766,13 +739,43 @@
       {
         "opcode": 1,
         "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          84
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          4
+        ]
+      },
+      {
+        "opcode": 23,
+        "values": [
+          "s1xlv.pvz_gargantuar_thump"
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          86
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
           30
         ]
       },
       {
         "opcode": 0,
         "values": [
-          82
+          86
         ]
       },
       {
@@ -796,7 +799,7 @@
       {
         "opcode": 0,
         "values": [
-          82
+          86
         ]
       },
       {
@@ -820,7 +823,7 @@
       {
         "opcode": 0,
         "values": [
-          82
+          86
         ]
       },
       {
@@ -844,7 +847,7 @@
       {
         "opcode": 0,
         "values": [
-          82
+          86
         ]
       },
       {
@@ -872,177 +875,63 @@
     ],
     "15": [
       {
-        "opcode": 23,
-        "values": [
-          "s1xlv.pvz_gargantudeath"
-        ]
-      },
-      {
         "opcode": 0,
         "values": [
-          70
+          88
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          12
         ]
       },
       {
         "opcode": 0,
         "values": [
-          72
+          90
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          3
         ]
       },
       {
         "opcode": 0,
         "values": [
-          74
+          88
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          12
         ]
       },
       {
         "opcode": 0,
         "values": [
-          76
+          90
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          3
         ]
       },
       {
         "opcode": 0,
         "values": [
-          78
+          88
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          80
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          4
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          82
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          30
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          82
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          20
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          -1
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          2
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          82
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          2
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          -1
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          2
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          82
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          2
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          -1
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          2
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
-          82
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          2
+          12
         ]
       },
       {
@@ -1066,7 +955,7 @@
       {
         "opcode": 0,
         "values": [
-          46
+          60
         ]
       },
       {
@@ -1078,7 +967,7 @@
       {
         "opcode": 0,
         "values": [
-          58
+          62
         ]
       },
       {
@@ -1096,25 +985,13 @@
       {
         "opcode": 0,
         "values": [
-          30
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          4
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
           32
         ]
       },
       {
         "opcode": 1,
         "values": [
-          3
+          5
         ]
       },
       {
@@ -1138,7 +1015,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -1150,7 +1027,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -1162,7 +1039,7 @@
       {
         "opcode": 1,
         "values": [
-          3
+          4
         ]
       },
       {
@@ -1174,13 +1051,25 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
         "opcode": 0,
         "values": [
           44
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          5
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
         ]
       },
       {
@@ -1198,25 +1087,13 @@
       {
         "opcode": 0,
         "values": [
-          46
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          3
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
           48
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          3
         ]
       },
       {
@@ -1240,7 +1117,7 @@
       {
         "opcode": 1,
         "values": [
-          8
+          4
         ]
       },
       {
@@ -1252,13 +1129,25 @@
       {
         "opcode": 1,
         "values": [
-          2
+          8
         ]
       },
       {
         "opcode": 0,
         "values": [
           56
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          2
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          58
         ]
       },
       {
@@ -1282,7 +1171,7 @@
       {
         "opcode": 0,
         "values": [
-          46
+          60
         ]
       },
       {
@@ -1294,7 +1183,7 @@
       {
         "opcode": 0,
         "values": [
-          58
+          62
         ]
       },
       {
@@ -1318,25 +1207,13 @@
       {
         "opcode": 0,
         "values": [
-          30
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          4
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
           32
         ]
       },
       {
         "opcode": 1,
         "values": [
-          3
+          5
         ]
       },
       {
@@ -1360,7 +1237,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -1372,7 +1249,7 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
@@ -1384,7 +1261,7 @@
       {
         "opcode": 1,
         "values": [
-          3
+          4
         ]
       },
       {
@@ -1396,13 +1273,25 @@
       {
         "opcode": 1,
         "values": [
-          4
+          5
         ]
       },
       {
         "opcode": 0,
         "values": [
           44
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          5
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          46
         ]
       },
       {
@@ -1432,25 +1321,13 @@
       {
         "opcode": 0,
         "values": [
-          46
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          3
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
           48
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          3
         ]
       },
       {
@@ -1474,13 +1351,25 @@
       {
         "opcode": 1,
         "values": [
-          8
+          4
         ]
       },
       {
         "opcode": 0,
         "values": [
           54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          8
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
         ]
       },
       {
@@ -1504,7 +1393,7 @@
       {
         "opcode": 0,
         "values": [
-          56
+          58
         ]
       },
       {
@@ -1540,25 +1429,13 @@
       {
         "opcode": 0,
         "values": [
-          46
-        ]
-      },
-      {
-        "opcode": 1,
-        "values": [
-          3
-        ]
-      },
-      {
-        "opcode": 0,
-        "values": [
           48
         ]
       },
       {
         "opcode": 1,
         "values": [
-          4
+          3
         ]
       },
       {
@@ -1582,13 +1459,25 @@
       {
         "opcode": 1,
         "values": [
-          20
+          4
         ]
       },
       {
         "opcode": 0,
         "values": [
           54
+        ]
+      },
+      {
+        "opcode": 1,
+        "values": [
+          20
+        ]
+      },
+      {
+        "opcode": 0,
+        "values": [
+          56
         ]
       },
       {
@@ -1612,7 +1501,7 @@
       {
         "opcode": 0,
         "values": [
-          56
+          58
         ]
       },
       {
@@ -1642,7 +1531,7 @@
       {
         "opcode": 0,
         "values": [
-          30
+          32
         ]
       },
       {
@@ -1666,7 +1555,7 @@
       {
         "opcode": 0,
         "values": [
-          60
+          64
         ]
       },
       {
@@ -1678,7 +1567,7 @@
       {
         "opcode": 0,
         "values": [
-          62
+          66
         ]
       },
       {
@@ -1690,7 +1579,7 @@
       {
         "opcode": 0,
         "values": [
-          64
+          68
         ]
       },
       {
@@ -1702,7 +1591,7 @@
       {
         "opcode": 0,
         "values": [
-          66
+          70
         ]
       },
       {
@@ -1720,7 +1609,7 @@
       {
         "opcode": 0,
         "values": [
-          68
+          72
         ]
       },
       {
@@ -1954,31 +1843,31 @@
   "localization": {
     "ZS": {
       "name": "巨人僵尸",
-      "description": "普通攻击：锤击     特殊攻击：重锤\n扛着电线杆的巨大僵尸。\n生命低于一半时会把背上的小鬼扔出去。"
+      "description": "普通攻击：锤击     特殊攻击：-\n扛着电线杆的巨大僵尸。\n生命低于一半时会把背上的小鬼扔出去。"
     },
     "ZT": {
       "name": "巨人殭屍",
-      "description": "普通攻擊：錘擊     特殊攻擊：重錘\n扛著電線桿的巨大殭屍。\n生命低於一半時會把背上的小鬼扔出去。"
+      "description": "普通攻擊：錘擊     特殊攻擊：-\n扛著電線桿的巨大殭屍。\n生命低於一半時會把背上的小鬼扔出去。"
     },
     "JP": {
       "name": "ガルガンチュア",
-      "description": "通常攻撃：たたきつけ     特殊攻撃：強烈なたたきつけ\n電柱をかついだ巨大なゾンビ。\n体力が半分を切ると背中のインプを投げる。"
+      "description": "通常攻撃：たたきつけ     特殊攻撃：-\n電柱をかついだ巨大なゾンビ。\n体力が半分を切ると背中のインプを投げる。"
     },
     "EN": {
       "name": "GARGANTUAR",
-      "description": "Normal attack: Smash     Special attack: Heavy smash\nA giant zombie wielding a telephone pole.\nThrows the imp on its back below half HP."
+      "description": "Normal attack: Smash     Special attack: -\nA giant zombie wielding a telephone pole.\nThrows the imp on its back below half HP."
     },
     "ES": {
       "name": "GARGANTÚA",
-      "description": "Ataque normal: Golpe     Ataque especial: Golpe pesado\nUn zombi gigante armado con un poste.\nLanza al diablillo de su espalda con menos de la mitad de vida."
+      "description": "Ataque normal: Golpe     Ataque especial: -\nUn zombi gigante armado con un poste.\nLanza al diablillo de su espalda con menos de la mitad de vida."
     },
     "PT": {
       "name": "GIGANTE",
-      "description": "Ataque normal: Pancada     Ataque especial: Pancada pesada\nUm zumbi gigante armado com um poste.\nArremessa o diabinho das costas abaixo de metade da vida."
+      "description": "Ataque normal: Pancada     Ataque especial: -\nUm zumbi gigante armado com um poste.\nArremessa o diabinho das costas abaixo de metade da vida."
     },
     "KR": {
       "name": "거대 좀비",
-      "description": "일반 공격：내려치기     특수 공격：강하게 내려치기\n전봇대를 든 거대한 좀비.\n체력이 절반 아래가 되면 등에 업은 꼬마 좀비를 던진다."
+      "description": "일반 공격：내려치기     특수 공격：-\n전봇대를 든 거대한 좀비.\n체력이 절반 아래가 되면 등에 업은 꼬마 좀비를 던진다."
     }
   },
   "tags": [
@@ -2019,9 +1908,5 @@
         "release_tick": 18
       }
     }
-  ],
-  "special_cooldown_multiplier": [
-    5,
-    2
   ]
 }

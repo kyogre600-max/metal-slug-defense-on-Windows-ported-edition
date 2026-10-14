@@ -26,6 +26,11 @@ SHOP_TYPE_UNIT = 2
 ACTION_TABLE_GOT = 0x109373f4
 # 建筑类：行动类为 Kouhei、Donou、Mortar_Kouhei、GuerrillaMortar_Kouhei（与 LAB AI 相同）。
 BUILDER_VTABLES = (0x10929950, 0x10929980, 0x1092b600, 0x1092b750)
+# 原生动作浏览点击时不演示特殊攻击的 UnitID（UnitActionViewerScreenTouch 0x20af64 按 getUnitID 逐个比较）：修筑、变身、
+# 召唤箱、内部部件等。社区单位按其基准单位判断。
+VIEWER_NO_SPECIAL = frozenset({5, 9, 10, 32, 33, 37, 64, 73, 74, 75, 76, 77, 78, 95, 108, 155, 160, 163, 167, 169, 171, 182,
+                               184, 207, 219, 244, 245, 246, 264, 281, 282, 304, 305, 306, 308, 316, 346, 348, 350, 352,
+                               355, 357, 366, 367, 369, 378, 392, 396})
 SORT_KEYS = ('uid', 'level', 'ap', 'price', 'hp', 'dps', 'value', 'knockback_threshold', 'name', 'newest')
 DETAIL_SORTS = {'hp', 'dps', 'value', 'knockback_threshold'}
 SHOP_TYPE_PACK = 4
@@ -168,6 +173,14 @@ class UnitCatalog:
                 entry['unlocked'] = bool(p.call('_ZN7AppMain24IsMenuShopEnableSaveDataE10MenuShopID', app, entry['shop_id']))
         return self.entries
 
+    def native_base(self, uid):
+        """原版单位为自身；社区单位为登记的基准单位（base_id）。"""
+        if uid < 400:
+            return uid
+        community = getattr(self.p, 'community', None)
+        unit = next((u for u in getattr(community, 'units', None) or () if u.get('id') == uid), None)
+        return unit.get('base_id', uid) if unit else uid
+
     def is_builder(self, uid):
         table = self.p.word(ACTION_TABLE_GOT)
         action = self.p.word(table + uid * 4) if table else 0
@@ -223,7 +236,10 @@ class UnitCatalog:
         attacks = {
             'near': near,
             'normal': group(22, 23, 24, 26, 27, 28, far_reach > 99, categories[0], far_reach),
-            'special': group(29, 30, 31, 33, 35, 37, _i32(raw, 29) > 0, categories[1]),
+            # 特殊攻击按原生判定：BattleUnit::isSpAttack（0x1e0e36）在词 36 为 0 时恒为否；原生动作浏览另有排除表。
+            # 不造成伤害的特殊攻击（召唤、防御、缩回壳里等，词 29 为 0）同样存在。
+            'special': group(29, 30, 31, 33, 35, 37,
+                             _i32(raw, 36) != 0 and self.native_base(uid) not in VIEWER_NO_SPECIAL, categories[1]),
         }
         attacks['special']['first_cooldown'] = _i32(raw, 36)
         attacks['special']['interval'] = _i32(raw, 34)      # 特殊攻击等待（词 34）；wait 为之后的冷却（词 35）

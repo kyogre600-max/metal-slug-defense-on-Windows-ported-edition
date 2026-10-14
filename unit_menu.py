@@ -493,7 +493,8 @@ class UnitMenu:
             sx = x + 60 + (i % 2) * 400
             sy = y + 346 + (i // 2) * 34
             value = (lambda s: s['hp'] if group == 'hp' else s['attacks'][group]['damage'])
-            present = group == 'hp' or now['attacks'][group]['present']
+            # 不造成伤害的攻击（例如只有防御或召唤的特殊攻击）显示“-”
+            present = group == 'hp' or (now['attacks'][group]['present'] and now['attacks'][group]['damage'] > 0)
             self.text(img, (sx, sy), label, 22, GRAY, 'lm', width=170)
             self.text(img, (sx + 230, sy), str(value(now)) if present else '-', 22, WHITE, 'rm')
             if after is not None and present:
@@ -645,7 +646,7 @@ class UnitMenu:
                   (self.tr('range'), str(a['normal']['range']) if a['normal']['range'] > 0 else '-'),
                   (self.tr('interval'), seconds(a['normal']['wait'])),
                   (self.tr('target'), target('normal'))]
-        special = [(self.tr('damage'), str(a['special']['damage'])),
+        special = [(self.tr('damage'), str(a['special']['damage']) if a['special']['damage'] > 0 else '-'),
                    (self.tr('force'), f'{a["special"]["knockback_force"]:.1f}'),
                    (self.tr('range'), str(a['special']['distance']) if a['special']['distance'] > 0 else '-'),
                    (self.tr('interval'), seconds(a['special'].get('interval', 0))),

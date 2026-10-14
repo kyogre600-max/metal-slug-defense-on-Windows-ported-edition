@@ -743,3 +743,23 @@ R1（初次实施）：以脚点为中心缩小 GL 视口绘制演示，每个�
 - 验证（`verification/unit_new_badge_20261014/driver_badge.py`，隔离存档，r57，未计算 SHA-256）：
   - 设上位 7、9 并重建主菜单，“單位”面板带 NEW；经本界面进入后位 7、9 清除，返回子页后无 NEW（截图对照 `runs/play_*/compare.png`）；重启后仍无 NEW。
   - 回归：U1b 驱动 32 项（经 `u1_motion_20261012/run_nolock.py`），`tests/test_unit_browser.py` 7 项。
+
+## 附录 H. 不造成伤害的特殊攻击缺少 ACTION 按钮（2026-10-15，宿主，核心保持 r59）
+
+- 用户报告：盾牌类单位的 ACTION 无法演示其特殊攻击，正规军盾牌兵正常。
+- 核查（隔离存档）：
+  - 原版盾牌兵（UnitID 8）与正规军盾牌兵（1030）的演示在 Lv0/1/10/40、直接切换与 UI 点击下状态序列、截图均相同。
+  - 盾牌游擊兵（113，说明“特殊攻擊：絕對防禦”）的 ACTION 没有特殊攻击按钮。原因：`unit_catalog.stats` 以词 29（绝招伤害）> 0 判定特殊攻击存在，该单位的特殊攻击不造成伤害（词 29 = 0）。
+- 原生判定（静态反汇编）：
+  - `BattleUnit::isSpAttack`（0x1e0e36）在词 36 为 0 时恒为否，与伤害无关。
+  - 原生动作浏览的点击演示（`UnitActionViewerScreenTouch` 0x20af64）对 48 个 UnitID 不预约状态 50（修筑、变身、召唤箱、内部部件等）。
+- 修正：
+  - `unit_catalog.py`（含 `src/` 镜像）：特殊攻击存在改为“词 36 ≠ 0 且不在上述排除表”，社区单位按基准单位判断（新增 `native_base`）。
+  - `unit_menu.py`（含镜像）：STATUS 的特殊攻击伤害与 LV UP 数值行在伤害为 0 时显示“-”。
+- 结果：
+  - 新显示特殊攻击按钮的单位：阿布爾．阿拔斯、食人花、娜迪雅、法國蝸牛、盾牌游擊兵、狙擊兵、雪地迫擊砲兵、HUNTER WALKER、椎 拳崇、假面兵、噁心貓、牆貓、黑牆貓等，另有 6 个内部单位。
+  - 不再显示特殊攻击的单位：说明为“特殊攻擊：-”的木星王者（78，原生排除表）与 Ｒ．菖蒲（P.M）（233，词 29 = 950、词 36 = 0），以及内部单位 CRABLOPS（腳）（316）与 391。
+  - 随游戏附带的 `unit_viewer_bounds.json`（含镜像）为上述 19 个条目补入 special 图像范围（`verification/u1_action_20261012/gen_special_bounds.py`、`verification/special_button_20261015/merge_special_bounds.py`），已有内容不变，打开时不现场测量。
+- 验证（隔离存档，r59，未计算 SHA-256）：
+  - `driver_shield.py`：113、36、91、295 的特殊攻击按钮与演示（召唤、缩回壳里、铁壁防御），8 与 1030 不变，沙包（5）与正规军迫擊砲兵（1036）仍无特殊攻击按钮。
+  - 回归：ACTION 14 项与 U1b 32 项（经 `u1_motion_20261012/run_nolock.py`）、演示性能 9 项（附带条目数改为 399 的副本 `driver_perf_399.py`）、U1c 29 项、`tests/test_unit_browser.py` 7 项。

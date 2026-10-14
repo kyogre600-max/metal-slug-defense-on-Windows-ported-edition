@@ -43,11 +43,6 @@
     "s1xlv.pvz_zomboni": 1052
   },
   "units_dir": "units",
-  "disabled_units": [
-    "s1xlv.pvz_gargantuar",
-    "s1xlv.pvz_imp",
-    "s1xlv.pvz_imp_flight"
-  ],
   "asset_digest": "blake2b-256",
   "assets": {
     "future_heavy_b_out.obm": "975167f06425985fa8d5610e7e247d4ee92ab4c659fe2d59d57e381b8e06b07c",
@@ -74,14 +69,14 @@
     "mummy_generator_builder.obm": null,
     "kt21_out.obm": null,
     "kt21_sv001_effects.obm": null,
-    "pvz_icons.obm": "492f7d83c5dd04aa604c2287a2508c679791090c0191ebccd4c0c908bfc48d5d",
-    "pvz_zombie.obm": "64d5fe9b0f1b9d329c92db1f2ecb230af696174a13e1c6a44cb9ba8c36e4ff48",
-    "pvz_cone.obm": "8054128325a2c99f8e373191b7c46cd5319df251701422b90d7a5f3f88a5188c",
-    "pvz_bucket.obm": "8109bf4f8a1a6be7e46232ac2d2d65b460f4a5609fcadace5f5137b8c9e53655",
+    "pvz_icons.obm": "dd150243ac0f550ce7d24cc77df670f4c56397bba8ffeea828e05cfdff6a2972",
+    "pvz_zombie.obm": "4871c401e97d0567af786067d61099629ef51b1f61627da74a905c09017cb28d",
+    "pvz_cone.obm": "fef821046ea7894b0c5bae701fb15bb5c8fb0cf1c86194a7758c8fc7b499a3a3",
+    "pvz_bucket.obm": "88a611f8d801096464344289d3619bfc150291cd3568fcbceeb975e30199f987",
     "pvz_newspaper.obm": "aa1c0341f36c76e183cd1dcae115ef7ffcb406f7f6818ac47dc77c268b5bfb40",
-    "pvz_football.obm": "2fc2305cbb287e4487a67f959d2fd6d3c90161547ce2347015e43b87bcb4c4ec",
-    "pvz_gargantuar.obm": "0ed017a806171b090ecb74e436857f8873fed3c183f8eea6ee8d97f4b49e3c43",
-    "pvz_imp.obm": "efde62dd261b03462876674c9aa230959cebdb5e26494287140bb4a072c9c1e7",
+    "pvz_football.obm": "7d3053f3d61142c331831850288aefe0e15a091067743961a861caf0631a2516",
+    "pvz_gargantuar.obm": "958bb2a279d38abac731d1d79eb313a8c71280ec6f1f1fbc700b6251828c3947",
+    "pvz_imp.obm": "fe5107d0246f2b535df89aedab42aae841681644d8bb5d4753eecf759bb03020",
     "pvz_imp_flight.obm": "42d7076f7b8f184ef24fefb306cb2049eba434c5a3fc01716a1380e02d8d28d0",
     "pvz_zomboni.obm": "e4e2f31c1dda36125a2c80a4c860d6c2d0dcdda8f2c9eb8d85df4e2dc412762b"
   },
@@ -230,11 +225,6 @@
     {
       "key": "s1xlv.pvz_gargantuar_thump",
       "file": "pvz_gargantuar_thump.msdf",
-      "type": "se"
-    },
-    {
-      "key": "s1xlv.pvz_gargantudeath",
-      "file": "pvz_gargantudeath.msdf",
       "type": "se"
     },
     {

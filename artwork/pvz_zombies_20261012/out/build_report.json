@@ -51,12 +51,12 @@
   },
   "gargantuar": {
     "atlas": [
-      512,
+      1024,
       512
     ],
-    "tiles": 42,
-    "rects": 42,
-    "frame_words": 84,
+    "tiles": 46,
+    "rects": 46,
+    "frame_words": 92,
     "scripts": 32
   },
   "imp": {
@@ -64,9 +64,9 @@
       256,
       256
     ],
-    "tiles": 22,
-    "rects": 22,
-    "frame_words": 44,
+    "tiles": 24,
+    "rects": 24,
+    "frame_words": 48,
     "scripts": 16
   },
   "imp_flight": {
@@ -204,16 +204,6 @@
         0.891,
         0.889
       ]
-    },
-    "gargantuar_idle_imp": {
-      "method": "breath",
-      "cut_row": -36,
-      "pixels": 3026
-    },
-    "gargantuar_idle_noimp": {
-      "method": "breath",
-      "cut_row": -30,
-      "pixels": 2708
     },
     "imp_idle": {
       "method": "sway",

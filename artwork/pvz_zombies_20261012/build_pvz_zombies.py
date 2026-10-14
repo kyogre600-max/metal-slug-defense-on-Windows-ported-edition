@@ -51,7 +51,8 @@ def op(code, *values):
 # ---------------------------------------------------------------- 素材读取
 def anims():
     main = json.loads((RESEARCH / 'anims.json').read_text(encoding='utf-8'))
-    garg = json.loads((RESEARCH / 'garg_jpg' / 'anims.json').read_text(encoding='utf-8'))
+    # 巨人：2026-10-15 起使用用户重新制作的素材表（garg_user/cut.py 切帧，锚点与交接表配准；结构同 garg_jpg/anims.json）
+    garg = json.loads((RESEARCH / 'garg_user' / 'anims.json').read_text(encoding='utf-8'))
     return main, garg
 
 
@@ -74,10 +75,12 @@ def copy_sources(main, garg):
     for name in ('imp_walk', 'imp_eat', 'imp_death', 'imp_fly'):
         for f in main['garg'][name]:
             put(RESEARCH / 'frames' / f['file'], SOURCE / f['file'])
-    # 巨人帧：2026-10-13 起以素材表分件按 JPG 姿势参照重新拼合（garg_parts/fit.py，像素只取自分件），画布与锚点同 JPG 帧。
+    # 巨人帧：2026-10-15 起为用户拼接的素材表（此前为 garg_parts/fit.py 的分件配准结果，用户判定不可用）。
     for seq in garg['anims'].values():
         for f in seq['frames']:
-            put(RESEARCH / 'garg_parts' / 'frames' / f['file'], SOURCE / 'gargantuar' / f['file'])
+            put(RESEARCH / 'garg_user' / 'frames' / f['file'], SOURCE / 'gargantuar' / f['file'])
+    for f in garg['imp_charred']:
+        put(RESEARCH / 'garg_user' / 'frames' / f['file'], SOURCE / 'gargantuar' / f['file'])
 
 
 def seq(main, key, name):
@@ -313,8 +316,9 @@ MOVE_SCALE_SLOW = (4489, 10000)
 # 修订六：除橄榄球外移速再 ×6/5（读报狂暴后的速度仍为 4.02，见 unit_file 的狂暴倍率换算），行走动画节奏同比加快。
 # 普通、路障、铁桶与读报为 MOVE_SCALE_SLOW × 6/5 = 13467/25000，加载器的有理数倍率要求分子分母不超过 10000，
 # 取 7/13（相差 0.04%，Lv40 1.292）；7/13 时读报的狂暴倍率为 871/280，狂暴后恰为 4.02。巨人与小鬼为 MOVE_SCALE × 6/5。
+# 2026-10-15 巨人移速再 ×4/5（用户指定，201/250 × 4/5 = 402/625，Lv40 1.544 → 1.235），行走动画节奏同比放慢；小鬼不变。
 MOVE_SCALE_BY_KIND = {'zombie': (7, 13), 'cone': (7, 13), 'bucket': (7, 13), 'newspaper': (7, 13),
-                      'football': (67, 125), 'gargantuar': (201, 250), 'imp': (201, 250)}
+                      'football': (67, 125), 'gargantuar': (402, 625), 'imp': (201, 250)}
 DMG_SCALE = {'gargantuar': (1, 1)}
 DMG_SCALE_DEFAULT = (5, 1)
 # 2026-10-13 修订四（用户指定，UNITS 中已改为对应的第一版设计值）：读报总生命 6000、本体同普通僵尸 1500（报纸 4500），
@@ -422,7 +426,7 @@ S = 's1xlv.'
 SND = {name: S + 'pvz_' + name for name in (
     'chomp', 'chomp2', 'splat', 'splat2', 'splat3', 'gulp', 'plastichit', 'plastichit2', 'shieldhit', 'shieldhit2',
     'newspaper_rip', 'newspaper_rarrgh', 'newspaper_rarrgh2', 'lowgroan', 'lowgroan2', 'gargantuar_thump',
-    'gargantudeath', 'imp', 'imp2', 'explosion')}
+    'imp', 'imp2', 'explosion')}
 # 冰车的爆炸音效：用户提供（2026-10-13，C:\\Users\\26839\\Downloads\\explosion.ogg，复制到 source/sounds/）
 SOUND_FILES = {'explosion': SOURCE / 'sounds' / 'explosion.ogg'}
 BITE_SOUNDS = [(SND['chomp'], SND['splat']), (SND['chomp2'], SND['splat2'])]
@@ -432,6 +436,9 @@ SPECIAL_BITE_SOUNDS = [(SND['chomp2'], SND['splat3']), (SND['chomp'], SND['splat
 # locust_bite、B4TKNIFE、KOF95_HIT）100 ms 短时最大均方根 × 音量字的中位数为 13248；PvZ 每次咬合同时播放的
 # chomp + splat 组合在增益 4.31（msd_pcm_gain，超过满幅 60% 以 tanh 压缩）下平均为 13257，单独播放的 gulp 为 2.35。
 SOUND_GAIN = {'chomp': 4.31, 'chomp2': 4.31, 'splat': 4.31, 'splat2': 4.31, 'splat3': 4.31, 'gulp': 2.35}
+# 音效类型（缺省 se；vo 走原生语音通道，与音效分开）。2026-10-15 曾把巨人倒地音效 gargantudeath（3.1 秒）设为 vo，
+# 以免混战中被啃咬、受击等音效取代；同日用户决定去掉该音效、改在倒地帧播放锤击落地音效，gargantudeath 不再登记。
+SOUND_TYPE = {}
 
 
 # 受击（击退，2026-10-13 修订四）：与僵尸（青年）槽 12 相同的减速滑行（op7 初速、每 tick 减速），KNOCKBACK_SLIDE tick 后停下，
@@ -478,10 +485,11 @@ def biter_block(sheet, block, idle, walk, walk_hold, eat, eat_hold, bites, trans
     sheet.scripts[base + 14] = knock
 
 
-def death_slots(sheet, frames, holds, first=(), linger=12):
-    """死亡（槽 13、15；状态 100/110 用 13，120 用 15；槽 14 为受击动作，槽 16 属于第 1 档）：倒地帧、末帧停留后闪烁消失。"""
+def death_slots(sheet, frames, holds, first=(), linger=12, events=None):
+    """死亡（槽 13、15；状态 100/110 用 13，120 用 15；槽 14 为受击动作，槽 16 属于第 1 档）：倒地帧、末帧停留后闪烁消失。
+    events 同 once（{帧序号: [命令]}，在该帧之前插入）。"""
     fr = [sheet.f(*x) for x in frames]
-    body = once(fr + [fr[-1]], list(holds) + [linger], first=first,
+    body = once(fr + [fr[-1]], list(holds) + [linger], first=first, events=events,
                 tail=[c for _ in range(3) for c in F(-1, 2) + F(fr[-1], 2)] + F(-1, 1))
     for slot in (13, 15):
         sheet.scripts[slot] = body
@@ -494,6 +502,12 @@ CHARRED_BLINK = [(0, 12), (1, 3), (0, 12), (1, 3), (0, 12)]
 
 def charred_script(sheet, main):
     fr = [sheet.f(*x) for x in seq(main, 'zombie', 'charred')]
+    return once([fr[i] for i, _ in CHARRED_BLINK], [h for _, h in CHARRED_BLINK], tail=F(-1, 1))
+
+
+def charred_blink(sheet, frames):
+    """巨人与小鬼的火焰击杀（槽 15）：用户素材表中的焦黑剪影（睁眼、闭眼，2026-10-15 补充闭眼帧），眨眼节奏同普通僵尸。"""
+    fr = [sheet.f(*x) for x in frames]
     return once([fr[i] for i, _ in CHARRED_BLINK], [h for _, h in CHARRED_BLINK], tail=F(-1, 1))
 
 
@@ -594,13 +608,15 @@ def build_newspaper(main):
     return sheet, STRIDE * blocks + 2, hit, [bite_rect(hit)]
 
 
-def build_imp(main):
+def build_imp(main, garg):
     sheet = Sheet()
     g = lambda name: seq(main, 'garg', name)
     walk, eat = g('imp_walk'), g('imp_eat')
     biter_block(sheet, 0, sway_idle(walk, 'imp_idle'), walk, 1, eat, 3, (3, 7), idle_hold=6,
                 move_scale=MOVE_SCALE_BY_KIND['imp'])
     death_slots(sheet, g('imp_death'), [3] * 6)
+    sheet.scripts[15] = charred_blink(sheet, [(SOURCE / 'gargantuar' / c['file'], int(c['ax']), int(c['ay']))
+                                              for c in garg['imp_charred']])
     hit = [-7, -34, 14, 34, 0]
     return sheet, STRIDE, hit, [bite_rect(hit)]
 
@@ -636,7 +652,8 @@ def build_gargantuar(garg):
     for block, suffix in enumerate(('_imp', '_noimp')):
         walk = [sheet.f(*x) for x in gs('walk' + suffix)]
         smash = [sheet.f(*x) for x in gs('smash' + suffix)]
-        idle = [sheet.f(*x) for x in breath_idle(gs('smash' + suffix)[0], 'gargantuar_idle' + suffix)]
+        # 待机（2026-10-15 用户指定）：素材表新增的两帧站立姿势交替（与行走第 9、10 号帧相同），取代此前的“呼吸”合成帧
+        idle = [sheet.f(*x) for x in gs('idle' + suffix)]
         base = STRIDE * block
         sheet.scripts[base + 0] = loop(idle, [8] * len(idle))
         sheet.scripts[base + 1] = loop(walk, slow_holds(len(walk), 3, MOVE_SCALE_BY_KIND['gargantuar']))
@@ -656,7 +673,9 @@ def build_gargantuar(garg):
     throw = [sheet.f(*x) for x in gs('throw')]
     sheet.scripts[STRIDE + 12] = once(throw, [4, 5, 6, 3, 10], first=[op(3, 1)], events={4: [op(23, SND['imp'])]})
     death = gs('death')
-    death_slots(sheet, death, [4, 4, 4, 4, 4, 4, 30], first=[op(23, SND['gargantudeath'])], linger=20)
+    # 2026-10-15 用户要求：去掉开头的倒地音效（gargantudeath），在身体砸到地面的第 7 帧（s47，第 24 tick）播放锤击落地音效
+    death_slots(sheet, death, [4, 4, 4, 4, 4, 4, 30], linger=20, events={6: [op(23, SND['gargantuar_thump'])]})
+    sheet.scripts[15] = charred_blink(sheet, gs('charred'))
     del impact
     # 锤击框：普通锤击从受击框前缘向前覆盖 SMASH_RANGE + REACH_MARGIN（原 74 只比开锤距离多 4 像素）；重锤范围更大
     hit = [-18, -78, 36, 78, 0]
@@ -894,13 +913,19 @@ UNITS = {
     'football': dict(ap=225, hp=[12, 1], dmg=[1, 10], move=[3, 1], interval=250, price=130,
                      thresholds=[[29, 36], [11, 18], [5, 12]], transitions=[0, 0, 1],
                      armor=([SND['plastichit'], SND['plastichit2']], 3)),
-    'gargantuar': dict(ap=300, hp=[10, 1], dmg=[5, 1], special=[2, 1], move=[4, 5], interval=1600, price=250,
-                       thresholds=[[1, 2]], transitions=[1], throw=1, special_cooldown=[5, 2]),
+    # 巨人（2026-10-15 用户指定，重新启用）：生命 Lv40 30000（UNITS 的 hp 经 HP_SCALE 换算为 [150,17]，僵尸（青年）3400 ×
+    # 150/17）、每锤 2100（普攻 600 × 7/2）、取消绝招、AP 350、再出击时间为冰车（210 tick）的 2.5 倍 525 tick
+    # （650 × 21/26，各等级相同）。勋章价格与移速保持。同日再修订：再出击时间延长 50%，650 × 63/52 = 787.5 向上取整 788 tick；
+    # 生命 Lv40 30000 → 20000（hp [20,1] → [40,3]，经 HP_SCALE 为 [100,17]，3400 × 100/17），移速见 MOVE_SCALE_BY_KIND。
+    'gargantuar': dict(ap=350, hp=[40, 3], dmg=[7, 2], move=[4, 5], interval_ratio=[63, 52], price=250,
+                       thresholds=[[1, 2]], transitions=[1], throw=1),
     'imp': dict(ap=50, hp=[3, 1], dmg=[1, 15], move=[11, 5], interval=60, price=30),
 }
 ORDER = ['zombie', 'cone', 'bucket', 'newspaper', 'football', 'gargantuar', 'imp', 'imp_flight', 'zomboni']
 BITE_RANGE = 24          # 状态词 7：开始啃咬的距离（验证时校准）
-SMASH_RANGE = 52         # 巨人开始锤击的距离
+# 巨人开始锤击的距离。2026-10-15 用户认为锤击范围过大，要求缩小到原来的 2/3：锤击框伸出自身受击框前缘的长度
+# SMASH_RANGE + REACH_MARGIN 由 60 改为 40（开锤距离 52 → 32，锤击框 x 由 −78 改为 −58），纵向不变。
+SMASH_RANGE = 32
 # 攻击判定框（2026-10-13 修订）：原生在双方受击框前缘的间距小于状态词 7 时停下攻击
 # （BattleObjectManager::getNearEnemyDistance = 中心距 − 双方 getWidthSize；getWidthSize 为首个 op3 受击框 |x|，
 # BattleSprite::setObjectSize）。攻击框须从本身受击框前缘向前覆盖这段距离再加余量，否则停在远处的目标
@@ -918,8 +943,7 @@ THROW_RELEASE_TICK = 18  # 投掷动作第 5 帧（4+5+6+3）
 
 def unit_file(kind, icon, texture, descriptor, animations):
     key = S + 'pvz_' + kind
-    text = {code: {'name': n, 'description': d if kind == 'gargantuar' else no_special(d)}
-            for code, (n, d) in TEXT[kind].items()}
+    text = {code: {'name': n, 'description': no_special(d)} for code, (n, d) in TEXT[kind].items()}
     if kind == 'imp_flight':
         return {
             'key': key, 'base_id': 160, 'faction': 3, 'identity': 'Zombie', 'shop_price': 10,
@@ -936,8 +960,7 @@ def unit_file(kind, icon, texture, descriptor, animations):
     smash = kind == 'gargantuar'
     targets = 999 if smash else 1
     words = {'7': SMASH_RANGE if smash else BITE_RANGE, '24': targets, '31': targets, '27': 1, '34': 1}
-    if not smash:
-        words.update({'29': 0, '35': 0, '36': 0})     # 无绝招：伤害与两个冷却为 0（同原版无绝招单位）
+    words.update({'29': 0, '35': 0, '36': 0})         # 无绝招：伤害与两个冷却为 0（同原版无绝招单位；巨人 2026-10-15 起同样取消）
     # 被投出的小鬼落到对方前线之后时，攻击距离与阻挡改以前方最近的对方单位计算（2026-10-13 修订三，避免无限啃食）
     behaviors = [{'name': 'front_nearest_target', 'version': 1, 'params': {}}]
     if smash:
@@ -970,8 +993,8 @@ def unit_file(kind, icon, texture, descriptor, animations):
         'shop_price': v['price'], 'available_from_start': True, 'ap': v['ap'],
         'hp_multiplier': hp, 'knockback_threshold_multiplier': threshold,
         'production_reference_id': 313,
-        'production_interval_multiplier': reduce_ratio(v['interval'] * INTERVAL_SCALE.get(kind, INTERVAL_SCALE_DEFAULT)[0],
-                                                       650 * INTERVAL_SCALE.get(kind, INTERVAL_SCALE_DEFAULT)[1]),
+        'production_interval_multiplier': v.get('interval_ratio') or reduce_ratio(
+            v['interval'] * INTERVAL_SCALE.get(kind, INTERVAL_SCALE_DEFAULT)[0], 650 * INTERVAL_SCALE.get(kind, INTERVAL_SCALE_DEFAULT)[1]),
         'damage_multiplier': scaled(v['dmg'], DMG_SCALE.get(kind, DMG_SCALE_DEFAULT)),
         'special_damage_multiplier': v.get('special', [1, 1]),    # 加载器必需字段；无绝招单位词 29 已为 0
         'move_speed_multiplier': scaled(v['move'], MOVE_SCALE_BY_KIND.get(kind, MOVE_SCALE)), 'knockback_distance_multiplier': [1, 1],
@@ -979,18 +1002,15 @@ def unit_file(kind, icon, texture, descriptor, animations):
         'icon': icon, 'textures': [texture], 'sprite_descriptor': descriptor, 'animations': animations,
         'localization': text, 'tags': ['pvz'], 'behaviors': behaviors,
     }
-    if smash:
-        # 绝招：巨人的重锤（普攻 2 倍）；冷却为僵尸（青年）的 5/2。
-        unit['special_cooldown_multiplier'] = v['special_cooldown']
     return unit
 
 
 # 冰车（2026-10-13 用户指定）：生命 Lv40 15000（雪地步兵 3600 × 25/6；2026-10-14 用户认为过强，由 24000 即 × 20/3 下调）、移速为橄榄球的 2/3（2.6 × 1608/1625 = 2.5728，
 # 两者实测每 tick 位移均等于移速值）、AP 250、勋章 250、再出击时间为橄榄球的 5/4（2026-10-13 实测后修订，
 # 原为基寇卡原版 750 tick；橄榄球 650 × 67/260 = 167.5 → 168 tick，冰车 650 × 67/208 = 209.375 → 210 tick）、
-# 碾压每秒 2400（词 15 Lv40 每帧 6 × 40/3 = 80）、攻击框为车体图像范围（见 build_zomboni）。击退门槛按第 6.1 节随生命倍率；
+# 碾压每秒 1200（词 15 Lv40 每帧 6 × 20/3 = 40；2026-10-15 用户要求减半，原为 40/3、每秒 2400）、攻击框为车体图像范围（见 build_zomboni）。击退门槛按第 6.1 节随生命倍率；
 # 雪地步兵的动作类出击即不被击退，门槛实际不使用。受击时播放金属音效（用户 2026-10-12：shieldhit 用于铁桶与冰车）。
-ZOMBONI = dict(ap=250, price=250, hp=[25, 6], dmg=[40, 3], move=[1608, 1625],
+ZOMBONI = dict(ap=250, price=250, hp=[25, 6], dmg=[20, 3], move=[1608, 1625],
                thresholds=[[4, 5], [3, 5], [2, 5], [1, 5]], armor=([SND['shieldhit'], SND['shieldhit2']], 5))
 
 
@@ -1047,7 +1067,7 @@ def main():
         'newspaper': lambda: build_newspaper(main_anims),
         'football': lambda: build_football(main_anims),
         'gargantuar': lambda: build_gargantuar(garg),
-        'imp': lambda: build_imp(main_anims),
+        'imp': lambda: build_imp(main_anims, garg),
         'imp_flight': lambda: build_imp_flight(main_anims),
         'zomboni': lambda: build_zomboni(main_anims),
     }
@@ -1090,7 +1110,7 @@ def main():
     for name, key in SND.items():
         target = f'pvz_{name}.msdf'
         shutil.copyfile(SOUND_FILES.get(name, SOUND_SOURCE / f'{name}.ogg'), CONTENT / target)
-        entry = {'key': key, 'file': target, 'type': 'se'}
+        entry = {'key': key, 'file': target, 'type': SOUND_TYPE.get(name, 'se')}
         if name in SOUND_GAIN:
             entry['gain'] = SOUND_GAIN[name]
         sounds.append(entry)
