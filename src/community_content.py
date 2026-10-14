@@ -374,8 +374,9 @@ class CommunityContent:
         p.uc.lib.msd_enable_community_content()
         # 生命分档单位的钩子在启用社区内容时登记，版本函数在全部找到原生块后返回 1。
         # 生命分档单位：核心版本 1 为首批 7 个钩子，2 另含前方最近敌人（front_nearest_target，标记 64）的 5 个钩子，
-        # 3 另含分档受击动作（stage_knockback_animation，标记 128），4 另含雪地步兵类（基准 182）的分档入口。
-        need=max([4 if u['base_id']==182 else 3 if u['zombie_spec']['flags']&128 else 2 if u['zombie_spec']['flags']&64 else 1 for u in self.units if u.get('zombie_spec')] or [0])
+        # 3 另含分档受击动作（stage_knockback_animation，标记 128），4 另含雪地步兵类（基准 182）的分档入口，
+        # 5 另含雪地步兵类爆炸死亡不生成血色效果（no_death_splash，标记 256，钩子数不变）。
+        need=max([5 if u['zombie_spec']['flags']&256 else 4 if u['base_id']==182 else 3 if u['zombie_spec']['flags']&128 else 2 if u['zombie_spec']['flags']&64 else 1 for u in self.units if u.get('zombie_spec')] or [0])
         if need and (not hasattr(p.uc.lib,'msd_community_zombie_version') or p.uc.lib.msd_community_zombie_version()<need):raise RuntimeError('Native core lacks HP stage units')
         self.ready=False
 

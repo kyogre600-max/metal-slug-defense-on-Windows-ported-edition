@@ -48,6 +48,10 @@ COCKPIT_BACK = 0x36d8                          # 原生底栏 BACK 按钮任务�
 SCENE_MAIN, SCENE_SHOP_INIT, SCENE_SHOP = 28, 38, 39
 POPUP_SCENES = range(119, 123)
 TUTORIAL_SHOP_UNIT = 15                        # SelectPanelMainMenuShop 选 UNIT 卡时的 DelTutorialData 序号
+# 原生面板的 NEW 标记为教学提示位（IsPanelNew：面板 0xf“單位”对应 9，面板 8“強化”对应 7）。位 7、9 在关卡结算时
+# （BattleEndGetStageResult）重新设上，进入单位强化场景时由 SC_CustomInit 清除（选面板时 SelectPanelMainMenu 另清 9）。
+# 本界面不进入场景 50，打开时同样清除，否则“單位（強化）”面板的 NEW 一直显示（2026-10-14）。
+TUTORIAL_CUSTOM_UNIT = (7, 9)
 BUTTON_SCALE = 2.25
 
 # 原生素材（图集, (x, y, w, h)）
@@ -1370,6 +1374,10 @@ class UnitBrowser:
                 if self.entry_mode == 'shop':
                     # 与原生 SelectPanelMainMenuShop 选 UNIT 卡相同：结束该卡的教学提示。
                     p.call('_ZN7AppMain15DelTutorialDataEi', p.app_instance(), TUTORIAL_SHOP_UNIT)
+                else:
+                    # 与原生进入单位强化场景（SC_CustomInit）相同：结束“強化”“單位”面板的 NEW 提示。
+                    for bit in TUTORIAL_CUSTOM_UNIT:
+                        p.call('_ZN7AppMain15DelTutorialDataEi', p.app_instance(), bit)
                 self.enter(self.entry_mode)
             return True
         return True

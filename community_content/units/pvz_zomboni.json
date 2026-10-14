@@ -14546,6 +14546,11 @@
         ],
         "until_stage": 5
       }
+    },
+    {
+      "name": "no_death_splash",
+      "version": 1,
+      "params": {}
     }
   ]
 }

@@ -1012,6 +1012,8 @@ def unit_file_zomboni(icon, texture, descriptor, animations):
             {'name': 'hp_stage_animations', 'version': 1,
              'params': {'thresholds': v['thresholds'], 'transitions': [0] * len(v['thresholds'])}},
             {'name': 'armor_hit_sound', 'version': 1, 'params': {'sounds': v['armor'][0], 'until_stage': v['armor'][1]}},
+            # 2026-10-15：以爆炸属性击毁时不生成原生雪地步兵的血色效果 0xff01（状态 110 按 100 处理）
+            {'name': 'no_death_splash', 'version': 1, 'params': {}},
         ],
     }
 

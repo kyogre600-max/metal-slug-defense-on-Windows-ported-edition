@@ -256,7 +256,12 @@ static uint32_t z_remap(Context& c,uint32_t s,uint32_t obj,uint32_t slot){
 HOOK(zombie_stage_update,0x1017ca15u, z_update(c);)
 // 雪地步兵类（基准 182，BattleAction_ZakoSnow::update 入口 0x1018805c，参数与 ZombieBrain::update 相同：r1 对象、r2 状态）：
 // 2026-10-13 冰车。宿主只允许不带过渡与狂暴的分档（behaviors.py），此处只会就地换档。
-HOOK(zombie_stage_update_snow,0x1018805du, z_update(c);)
+// 2026-10-15 冰车：ZakoSnow::update 的状态 110（爆炸属性死亡）与 100 都播放槽 13 并预约状态 140，110 另生成血色效果 0xff01。
+// 带 no_death_splash（标记 256）的单位把传入的状态 110 按 100 处理。
+static void z_snow_death(Context& c){
+ if(c.r[2]!=110u)return;uint32_t s=zspec(c,c.r[1]);if(s&&(zw(c,s,0)&256u))c.r[2]=100u;
+}
+HOOK(zombie_stage_update_snow,0x1018805du, z_update(c);z_snow_death(c);)
 HOOK(zombie_stage_remap,0x101de017u,
  uint32_t slot=c.r[1];
  if(slot<16u&&slot!=14u&&((Z_STAGE_SLOTS>>slot)&1u)){uint32_t s=zspec(c,c.r[0]);if(s&&(zw(c,s,0)&1u))c.r[1]=z_remap(c,s,c.r[0],slot);}
@@ -377,7 +382,20 @@ HOOK(zombie_ahead_move_left,0x101df23bu, z_move_target(c);)
 // 已登记的钩子数：首批 7 个全部找到时版本 1，另含前方最近敌人的 5 个时版本 2；宿主据此确认核心支持。
 static uint32_t zombie_hooks=0u;
 // 3：分档受击动作（标记 128，钩子数同 2）。4：另含雪地步兵类的分档入口（2026-10-13 冰车，共 13 个钩子）。
-extern "C" __declspec(dllexport) uint32_t msd_community_zombie_version(){return zombie_hooks==13u?4u:zombie_hooks==12u?3u:zombie_hooks==7u?1u:0u;}
+// 5：雪地步兵类入口另处理 no_death_splash（标记 256，2026-10-15，钩子数同 4）。
+extern "C" __declspec(dllexport) uint32_t msd_community_zombie_version(){return zombie_hooks==13u?5u:zombie_hooks==12u?3u:zombie_hooks==7u?1u:0u;}
+// 战场道具（UnitID 116/231/289/363）：BattleUnit::attack（0x1e093c）对道具在 0x1e0a0c 起比较攻击方 getUnitID，
+// 为 1、80、182（雪地步兵）时不造成命中；其他攻击方以当前状态的伤害组直接调用道具的 damage。社区单位的 UnitID 不在其中：
+// 基准 182 的冰车在行走状态（伤害组为 0）以零伤害反复命中道具，道具每次进入状态 60 并生成效果 0xff15（黄色火光），不被拾取。
+// 社区单位按其基准 UnitID（记录 +4）适用同一判断（2026-10-14）。
+static bool item_hit_exempt(Context& c){
+ uint32_t p=record(c,rd<uint32_t>(c,c.r[4]+0x128u));if(!p)return false;
+ uint32_t base=rd<uint32_t>(c,p+4u);if(base!=1u&&base!=80u&&base!=182u)return false;
+ c.pc=0x101e0a47u;return true;
+}
+static Block old_item_hit_base;static uint32_t item_hit_hooks=0u;
+static void item_hit_base(Context& c){if(item_hit_exempt(c))return;old_item_hit_base(c);}
+extern "C" __declspec(dllexport) uint32_t msd_community_item_exempt_version(){return item_hit_hooks==1u?1u:0u;}
 // 伞兵落地时，原生动作固定生成 UnitID 45；社区映射保留其正规军身份。投出子单位的生命分档单位同样经此映射（落地映射表登记子单位）。
 HOOK(paratrooper_landing,0x101de225u, uint32_t uid=rd<uint32_t>(c,c.r[0]+0x128u);uint32_t p=record(c,uid);if(p&&(rd<uint32_t>(c,p+4u)==160u||z_throws(c,c.r[0]))&&c.r[1]==45u&&head(c,100)){uint32_t target=rd<uint32_t>(c,head(c,100)+(uid-U)*4u);if(target)c.r[1]=target;})
 extern "C" __declspec(dllexport) uint32_t msd_community_paratrooper_landing_version(){return 1u;}

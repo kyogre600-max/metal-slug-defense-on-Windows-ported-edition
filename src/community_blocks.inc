@@ -1878,4 +1878,5 @@ if((old_zombie_ahead_block_p2=find_block(0x101df7ebu))){register_block(0x101df7e
 if((old_zombie_ahead_move_right=find_block(0x101df1fbu))){register_block(0x101df1fbu,zombie_ahead_move_right);++zombie_hooks;}
 if((old_zombie_ahead_move_left=find_block(0x101df23bu))){register_block(0x101df23bu,zombie_ahead_move_left);++zombie_hooks;}
 if((old_zombie_stage_update_snow=find_block(0x1018805du))){register_block(0x1018805du,zombie_stage_update_snow);++zombie_hooks;}
+if((old_item_hit_base=find_block(0x101e0a0du))){register_block(0x101e0a0du,item_hit_base);++item_hit_hooks;}
 }

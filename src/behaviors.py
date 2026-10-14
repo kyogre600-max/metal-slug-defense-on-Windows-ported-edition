@@ -196,6 +196,8 @@ def internal_fields(resolved):
         zombie['flags'] |= 64
     if 'stage_knockback_animation' in resolved:
         zombie['flags'] |= 128
+    if 'no_death_splash' in resolved:
+        zombie['flags'] |= 256
     if 'armor_hit_sound' in resolved:
         v = resolved['armor_hit_sound']
         zombie.update(flags=zombie['flags'] | 4, armor_sounds=list(v['sounds']), armor_until=v['until_stage'])

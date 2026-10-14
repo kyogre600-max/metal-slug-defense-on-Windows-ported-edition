@@ -1,4 +1,4 @@
-# 单位行为目录 / Unit behavior catalog（行为库版本 6）
+# 单位行为目录 / Unit behavior catalog（行为库版本 7）
 
 本文件由 `content_tool.py list-behaviors --markdown` 从 `behavior_library.json` 生成，请勿手工修改。
 Generated from `behavior_library.json` by `content_tool.py list-behaviors --markdown`; do not edit by hand.
@@ -232,4 +232,14 @@ Thrown flying unit: starts forward and height (world units) from the thrower ins
 | --- | --- | --- |
 | `forward` | int | default: 0; min: -1000; max: 1000 |
 | `height` | int | default: 0; min: 0; max: 1000 |
+
+## no_death_splash（v1）
+
+- 适用的原版基准单位 / base_id: 182
+
+雪地步兵类单位以爆炸属性（属性 2）被击毁时，原生 ZakoSnow 在状态 110 生成血色效果 0xff01，状态 110 与状态 100 只差这一项（两者都播放槽 13 并转入状态 140）。带此行为的单位按状态 100 处理，只播放本单位的死亡动作；火焰属性（状态 120）不变。
+
+When a snow-soldier-class unit is destroyed by an explosive attack (attribute 2), the native ZakoSnow code adds the red splash effect 0xff01 in state 110; that is the only difference from state 100 (both play slot 13 and move to state 140). Units with this behaviour are handled as state 100 and only play their own death animation; fire deaths (state 120) are unchanged.
+
+无参数 / no parameters.
 

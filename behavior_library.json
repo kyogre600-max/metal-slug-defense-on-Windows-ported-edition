@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "library_version": 6,
+  "library_version": 7,
   "param_types": {
     "unit_key": "单位稳定键；internal 为 true 时须为内部单位（internal_only），为 false 时须为可选单位",
     "rational": "[分子, 分母] 正整数倍率",
@@ -471,6 +471,18 @@
       "doc": {
         "ZS": "被投出的飞行单位：从投出者位置前方 forward、高 height 处出发（世界坐标），不使用空降的固定起始高度；飞行轨迹由精灵描述符槽 8 的脚本（op7）决定，落地后转为 para_drop_transform 指定的单位。",
         "EN": "Thrown flying unit: starts forward and height (world units) from the thrower instead of the fixed paratrooper drop height; the flight path comes from the slot 8 script (op7) of its sprite descriptor, and it turns into the para_drop_transform unit on landing."
+      }
+    },
+    {
+      "name": "no_death_splash",
+      "version": 1,
+      "base_classes": [
+        182
+      ],
+      "params": {},
+      "doc": {
+        "ZS": "雪地步兵类单位以爆炸属性（属性 2）被击毁时，原生 ZakoSnow 在状态 110 生成血色效果 0xff01，状态 110 与状态 100 只差这一项（两者都播放槽 13 并转入状态 140）。带此行为的单位按状态 100 处理，只播放本单位的死亡动作；火焰属性（状态 120）不变。",
+        "EN": "When a snow-soldier-class unit is destroyed by an explosive attack (attribute 2), the native ZakoSnow code adds the red splash effect 0xff01 in state 110; that is the only difference from state 100 (both play slot 13 and move to state 140). Units with this behaviour are handled as state 100 and only play their own death animation; fire deaths (state 120) are unchanged."
       }
     }
   ]

@@ -731,3 +731,15 @@ R1（初次实施）：以脚点为中心缩小 GL 视口绘制演示，每个�
 - 卡片的亮版为本界面延伸（原生卡片只有按钮有亮版），亮度待用户实机确认。
 - 过渡时长按原生帧数（30 FPS 下弹窗 5 帧约 0.17 秒，浏览大菜单与单位菜单之间 14 帧约 0.47 秒，翻页 9 帧约 0.3 秒）；过渡期间的点击不受理。
 - 后续：编队、活动勋章商店；FAVORITES 按钮框（D26）；西、葡、韩译文校对。
+
+## 附录 G. “單位（強化）”面板 NEW 标记不消失（2026-10-14，宿主，核心保持 r57）
+
+- 现象（用户截图）：主菜单 CUSTOMIZE 子页的“單位（強化）”面板一直带 NEW。
+- 原因（原始 APK 1.46.0 静态反汇编）：
+  - 主菜单面板的 NEW 不是“新单位”标记，而是教学提示位：`SC_MainMenuInit` 对每个面板调用 `IsPanelNew`（0x20167c），后者按面板号查 `IsTutorialData`。面板 0xf（`app+0x339c`，“單位”）对应位 9，面板 8（MENU 页“強化”）对应位 7；SHOP 页 UNIT 卡（面板 0x13，`app+0x33ac`）对应位 15。
+  - 位 7、9 在每次关卡结算（`BattleEndGetStageResult`）时设上；原生在选面板（`SelectPanelMainMenu` 清位 9）或进入单位强化场景（`SC_CustomInit` 清位 7、9）时清除。`DelTutorialData` 只在该位已设时清除并调用 `WriteMainSaveData`。
+  - U1b 起“單位”面板由本界面接管（抬起时宿主处理，原生不进入场景 50），位 7、9 从未清除。SHOP 页 UNIT 卡在 U1c 已按 `SelectPanelMainMenuShop` 清位 15；位 11（SHOP 底栏按钮）由原生 `SelectCockpitFuncShop` 清除，不受影响。
+- 修正（`unit_browser.py` 及 `src/` 镜像）：经“單位”面板打开本界面时调用原生 `DelTutorialData(7)`、`DelTutorialData(9)`（`TUTORIAL_CUSTOM_UNIT`），与 `SC_CustomInit` 相同。位 7、9 在之后的关卡结算时仍会按原生规则重新设上，进入本界面后清除。
+- 验证（`verification/unit_new_badge_20261014/driver_badge.py`，隔离存档，r57，未计算 SHA-256）：
+  - 设上位 7、9 并重建主菜单，“單位”面板带 NEW；经本界面进入后位 7、9 清除，返回子页后无 NEW（截图对照 `runs/play_*/compare.png`）；重启后仍无 NEW。
+  - 回归：U1b 驱动 32 项（经 `u1_motion_20261012/run_nolock.py`），`tests/test_unit_browser.py` 7 项。
