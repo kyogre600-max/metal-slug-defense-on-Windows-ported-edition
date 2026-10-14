@@ -7,12 +7,12 @@
   "available_from_start": true,
   "ap": 250,
   "hp_multiplier": [
-    20,
-    3
+    25,
+    6
   ],
   "knockback_threshold_multiplier": [
-    20,
-    3
+    25,
+    6
   ],
   "production_reference_id": 313,
   "production_interval_multiplier": [

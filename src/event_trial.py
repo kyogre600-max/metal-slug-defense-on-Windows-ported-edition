@@ -298,7 +298,8 @@ class EventTrial:
             self.p.call('_ZN7AppMain26SetContinueStageIDSaveDataEi',self.app,0)
         if self.p.word(HEADER+4) and self.active_battle:self.finish_battle()
         battle=self.p.word(self.app+0xc220) if self.active_battle else 0
-        if battle and self.last_scene in (110,120) and not self.p.read(battle+0x1c,1)[0] and not self.p.call('_ZN10BattleMain15isBattlePlayingEv',battle):
+        native_coop=bool(self.active_battle and self.active_battle.get('native_coop'))
+        if battle and not native_coop and self.last_scene in (110,120) and not self.p.read(battle+0x1c,1)[0] and not self.p.call('_ZN10BattleMain15isBattlePlayingEv',battle):
             # The preview finalizes defeat locally; the legacy paid-continue
             # popup depends on service state outside the isolated Event profile.
             self.finish_battle()
@@ -310,7 +311,34 @@ class EventTrial:
             if point!=self.state()['currency']:
                 state=self.state();state['currency']=point;state['score_peak']=max(state.get('score_peak',0),point)
                 self.dirty=True;self.flush()
+            self.track_native_coop()
         if self.overlay:self.draw()
+    def track_native_coop(self):
+        """合作活动（模式 6）的战斗经原生合作编队开战，不经 BattleInit_StageClearMode / SurvivalMode 的登记钩子，
+        并由原生 SC_BattleEnd 结算；原生把通关写入原生存档，而地图读取通关、时间与救出数的函数由核心钩子改读本活动的
+        独立进度，因此须由宿主记录（2026-10-14 修正：此前合作关卡通关后回到地图显示为未游玩）。
+        进入战斗场景 100 时按地图当前选择（app+0xc624/0xc628/0xc62c）登记关卡；离开场景 100 后、BattleMain 释放前
+        （场景 101–107，约 12 帧）读取胜负、时间与救出数。"""
+        p=self.p;app=self.app;scene=self.last_scene;battle=p.word(app+0xc220)
+        if scene==100 and battle and self.active_battle is None:
+            table=self.native_map.active_table();where=(p.word(app+0xc624),p.word(app+0xc628),p.word(app+0xc62c))
+            index=next((i for w,a,s,i in table['world_indices'] if (w,a,s)==where),None)
+            if index is None:return
+            self.active_battle={'index':index,'stage':self.data[self.selected]['stages'][index],'key':self.selected,
+                                'native_map':True,'native_coop':True}
+            p.log('HISTORICAL_NATIVE_COOP_BATTLE',self.selected,index)
+        elif scene!=100 and self.active_battle and self.active_battle.get('native_coop'):
+            record=self.active_battle;self.active_battle=None
+            if not battle:
+                p.log('HISTORICAL_NATIVE_COOP_RESULT_MISSING',record['key'],record['index']);return
+            won=bool(p.read(battle+0x1c,1)[0]);time=p.word(battle+0x48)
+            state=self.state();saved=state['stages'].setdefault(record['stage']['local_stage_key'],{'attempts':0,'wins':0})
+            saved['attempts']+=1;saved['wins']+=int(won)
+            if won:saved['captures']=saved.get('captures',0)+p.call('_ZN10BattleMain14getGetPrisonerEv',battle)
+            rank=self.native_map.save_result(record,won,time)
+            if won:self.apply_prisoner_rewards();self.apply_unit_rewards(record['stage'],saved)
+            self.dirty=True;self.flush()
+            p.log('HISTORICAL_BATTLE_RESULT',record['key'],{'won':won,'stage_id':record['stage']['id'],'rank':rank,'time':time,'native_coop':True})
     def flush(self):
         if not self.dirty:return
         atomic_bytes(self.progress_path,json.dumps(self.progress,ensure_ascii=False,indent=2).encode('utf-8'))

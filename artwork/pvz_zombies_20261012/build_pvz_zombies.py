@@ -676,7 +676,9 @@ def build_gargantuar(garg):
 ZOMBONI_STAGES = ('drive', 'drive_d1', 'drive_d2', 'drive_d3', 'drive_d4')
 ZOMBONI_CYCLE = 60
 ZOMBONI_HOLD = 2
-ZOMBONI_ATTACK = [0, -54, 80, 59, 7]     # 用户指定宽 80、高 59（雪地步兵雪球为 (0,-54,62,59)，同一起点放宽）
+# 攻击框（碾压）：2026-10-14 用户认为碾压过强，要求按冰车 sprite 的范围设计（原为用户指定的宽 80、高 59，自锚点向前）。
+# 原版雪地步兵的攻击框 (0,-54,62,59) 即其雪球图像的范围（雪球 x 4–66、y −48–0）；冰车同理取各档行驶帧不透明范围的并集，
+# 在 build_zomboni 中计算（现为 x −30–29、y −54–8，即 [-30,-54,59,62]），类型 7 同雪球。
 ZOMBONI_MIRROR = DERIVED / 'zomboni'
 # 帧格底边比车轮低 4 像素（僵尸帧为 0–1 像素）。2026-10-13 用户两次反馈冰车位置太高：先上移锚点 4（车轮与锚点平齐），
 # 用户再要求下压至少 8 像素，共上移 12（车轮低于锚点 8 个素材像素，屏幕上约 18 像素）。
@@ -704,7 +706,13 @@ def build_zomboni(main):
     zs = lambda name: zomboni_seq(main, name)
     holds = [ZOMBONI_HOLD] * ZOMBONI_CYCLE
     first_crush = None
+    extent = None     # 各档行驶帧不透明范围的并集（相对锚点），作为碾压攻击框
     for block, name in enumerate(ZOMBONI_STAGES):
+        for path, ax, ay in zs(name):
+            x0, y0, x1, y1 = Image.open(path).getbbox()
+            box = (x0 - ax, y0 - ay, x1 - ax, y1 - ay)
+            extent = box if extent is None else (min(extent[0], box[0]), min(extent[1], box[1]),
+                                                 max(extent[2], box[2]), max(extent[3], box[3]))
         fr = [sheet.f(*x) for x in zs(name)]
         cyc = [fr[i % len(fr)] for i in range(ZOMBONI_CYCLE)]
         base = STRIDE * block
@@ -734,7 +742,8 @@ def build_zomboni(main):
     path, ax, ay = zs('drive')[0]
     x0, y0, x1, y1 = Image.open(path).getbbox()
     hit = [x0 - ax + 2, y0 - ay + 2, x1 - x0 - 4, ay - y0 - 2, 0]
-    return sheet, STRIDE * len(ZOMBONI_STAGES), hit, [ZOMBONI_ATTACK]
+    attack = [extent[0], extent[1], extent[2] - extent[0], extent[3] - extent[1], 7]
+    return sheet, STRIDE * len(ZOMBONI_STAGES), hit, [attack]
 
 
 # ---------------------------------------------------------------- 头像（朝右，限于选单位格内框）
@@ -976,12 +985,12 @@ def unit_file(kind, icon, texture, descriptor, animations):
     return unit
 
 
-# 冰车（2026-10-13 用户指定）：生命 Lv40 24000（雪地步兵 3600 × 20/3）、移速为橄榄球的 2/3（2.6 × 1608/1625 = 2.5728，
+# 冰车（2026-10-13 用户指定）：生命 Lv40 15000（雪地步兵 3600 × 25/6；2026-10-14 用户认为过强，由 24000 即 × 20/3 下调）、移速为橄榄球的 2/3（2.6 × 1608/1625 = 2.5728，
 # 两者实测每 tick 位移均等于移速值）、AP 250、勋章 250、再出击时间为橄榄球的 5/4（2026-10-13 实测后修订，
 # 原为基寇卡原版 750 tick；橄榄球 650 × 67/260 = 167.5 → 168 tick，冰车 650 × 67/208 = 209.375 → 210 tick）、
-# 碾压每秒 2400（词 15 Lv40 每帧 6 × 40/3 = 80）、攻击框宽 80 高 59。击退门槛按第 6.1 节随生命倍率；
+# 碾压每秒 2400（词 15 Lv40 每帧 6 × 40/3 = 80）、攻击框为车体图像范围（见 build_zomboni）。击退门槛按第 6.1 节随生命倍率；
 # 雪地步兵的动作类出击即不被击退，门槛实际不使用。受击时播放金属音效（用户 2026-10-12：shieldhit 用于铁桶与冰车）。
-ZOMBONI = dict(ap=250, price=250, hp=[20, 3], dmg=[40, 3], move=[1608, 1625],
+ZOMBONI = dict(ap=250, price=250, hp=[25, 6], dmg=[40, 3], move=[1608, 1625],
                thresholds=[[4, 5], [3, 5], [2, 5], [1, 5]], armor=([SND['shieldhit'], SND['shieldhit2']], 5))
 
 
