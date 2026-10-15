@@ -89,6 +89,56 @@
     "frame_words": 148,
     "scripts": 80
   },
+  "jack": {
+    "atlas": [
+      1024,
+      512
+    ],
+    "tiles": 59,
+    "rects": 59,
+    "frame_words": 118,
+    "scripts": 16
+  },
+  "balloon": {
+    "atlas": [
+      512,
+      256
+    ],
+    "tiles": 75,
+    "rects": 81,
+    "frame_words": 162,
+    "scripts": 32
+  },
+  "gatling": {
+    "atlas": [
+      512,
+      256
+    ],
+    "tiles": 54,
+    "rects": 54,
+    "frame_words": 108,
+    "scripts": 19
+  },
+  "jalapeno": {
+    "atlas": [
+      256,
+      256
+    ],
+    "tiles": 29,
+    "rects": 283,
+    "frame_words": 314,
+    "scripts": 17
+  },
+  "squash": {
+    "atlas": [
+      256,
+      256
+    ],
+    "tiles": 40,
+    "rects": 47,
+    "frame_words": 110,
+    "scripts": 17
+  },
   "idle": {
     "cone_idle_d1": {
       "method": "patched",
@@ -212,6 +262,14 @@
         7
       ],
       "diff_pixels": 287
+    },
+    "balloon_idle": {
+      "method": "sway",
+      "frames": [
+        0,
+        1
+      ],
+      "diff_pixels": 31
     }
   }
 }

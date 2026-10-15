@@ -122,7 +122,9 @@ def resolve(unit, units, library):
                 raise ValueError(f'{unit["key"]}: {name} requires parameter {pname}')
             else:
                 value = pspec.get('default')
-            _check_param(name, pname, pspec, value, units)
+            # 缺省为 null 的可选参数（如 balloon_flight.launch_sound）省略时不校验
+            if value is not None or pspec.get('required') or 'default' not in pspec:
+                _check_param(name, pname, pspec, value, units)
             values[pname] = value
         resolved[name] = values
     for name in resolved:
@@ -147,6 +149,9 @@ def resolve(unit, units, library):
         # until_stage 为档数 + 1 时所有档位都播放（2026-10-13 冰车：车身各档均为金属）
         if armor and armor['until_stage'] > len(thresholds) + 1:
             raise ValueError(f'{unit["key"]}: armor_hit_sound.until_stage outside the stages')
+        if 'balloon_flight' in resolved and not transitions[0]:
+            # 气球飞行：第 1 档为放手与落地，须有过渡动作（2026-10-15）
+            raise ValueError(f'{unit["key"]}: balloon_flight needs a transition on stage 1')
         throw = resolved.get('throw_child_on_stage')
         if throw and (throw['stage'] > len(thresholds) or not transitions[throw['stage'] - 1]):
             raise ValueError(f'{unit["key"]}: throw_child_on_stage.stage must be a stage with a transition')
@@ -209,16 +214,32 @@ def internal_fields(resolved):
         fields['throw_child_key'] = v['unit']
     if 'thrown_flight' in resolved:
         v = resolved['thrown_flight']
-        zombie.update(flags=zombie['flags'] | 32, flight_forward=v['forward'], flight_height=v['height'])
+        zombie.update(flags=zombie['flags'] | 32, flight_forward=v['forward'], flight_height=v['height'],
+                      base_clearance=v['base_clearance'])
+    # 2026-10-15 新单位（行为库 v8）
+    if 'self_destruct_attack' in resolved:
+        zombie['flags'] |= 512
+        if resolved['self_destruct_attack']['unmirrored_from_tick'] >= 0:
+            zombie['unmirror_tick'] = resolved['self_destruct_attack']['unmirrored_from_tick']
+    if 'ground_only_attack' in resolved:
+        zombie['flags'] |= 1024
+    if 'walk_shoot' in resolved:
+        zombie.update(flags=zombie['flags'] | 2048, walk_range=resolved['walk_shoot']['range'])
+    if 'balloon_flight' in resolved:
+        v = resolved['balloon_flight']
+        zombie.update(flags=zombie['flags'] | 4096, pop_distance=v['pop_distance'])
+        if v['launch_sound']:
+            zombie['launch_sound'] = v['launch_sound']
     if zombie['flags']:
         fields['zombie_spec'] = zombie
     return fields
 
 
 def sound_keys(unit):
-    """行为参数中引用的音效键（生命分档单位的防具受击与击毙音效）。"""
+    """行为参数中引用的音效键（生命分档单位的防具受击、击毙与气球出场音效）。"""
     spec = unit.get('zombie_spec') or {}
-    return list(spec.get('armor_sounds', [])) + ([spec['kill_sound']] if spec.get('kill_sound') else [])
+    return (list(spec.get('armor_sounds', [])) + ([spec['kill_sound']] if spec.get('kill_sound') else [])
+            + ([spec['launch_sound']] if spec.get('launch_sound') else []))
 
 
 def apply(units_by_key, library):

@@ -40,7 +40,12 @@
     "s1xlv.pvz_gargantuar": 1049,
     "s1xlv.pvz_imp": 1050,
     "s1xlv.pvz_imp_flight": 1051,
-    "s1xlv.pvz_zomboni": 1052
+    "s1xlv.pvz_zomboni": 1052,
+    "s1xlv.pvz_jack": 1053,
+    "s1xlv.pvz_balloon": 1054,
+    "s1xlv.pvz_gatling": 1055,
+    "s1xlv.pvz_jalapeno": 1056,
+    "s1xlv.pvz_squash": 1057
   },
   "units_dir": "units",
   "asset_digest": "blake2b-256",
@@ -69,7 +74,7 @@
     "mummy_generator_builder.obm": null,
     "kt21_out.obm": null,
     "kt21_sv001_effects.obm": null,
-    "pvz_icons.obm": "dd150243ac0f550ce7d24cc77df670f4c56397bba8ffeea828e05cfdff6a2972",
+    "pvz_icons.obm": "368c2f6ac18e63d3fd2865828a80be368870b2ed5df088c3cf8f169e9cfa0464",
     "pvz_zombie.obm": "4871c401e97d0567af786067d61099629ef51b1f61627da74a905c09017cb28d",
     "pvz_cone.obm": "fef821046ea7894b0c5bae701fb15bb5c8fb0cf1c86194a7758c8fc7b499a3a3",
     "pvz_bucket.obm": "88a611f8d801096464344289d3619bfc150291cd3568fcbceeb975e30199f987",
@@ -78,7 +83,12 @@
     "pvz_gargantuar.obm": "958bb2a279d38abac731d1d79eb313a8c71280ec6f1f1fbc700b6251828c3947",
     "pvz_imp.obm": "fe5107d0246f2b535df89aedab42aae841681644d8bb5d4753eecf759bb03020",
     "pvz_imp_flight.obm": "42d7076f7b8f184ef24fefb306cb2049eba434c5a3fc01716a1380e02d8d28d0",
-    "pvz_zomboni.obm": "e4e2f31c1dda36125a2c80a4c860d6c2d0dcdda8f2c9eb8d85df4e2dc412762b"
+    "pvz_zomboni.obm": "e4e2f31c1dda36125a2c80a4c860d6c2d0dcdda8f2c9eb8d85df4e2dc412762b",
+    "pvz_jack.obm": "cab5814562bfe8012357f6a12b3ef3db26b333819665ebdf7f3ed16710fca2b5",
+    "pvz_balloon.obm": "49e0c8706e075013f061233ca835e6bfeaa83b0efeee7af286a62b58bbff9aad",
+    "pvz_gatling.obm": "0c003ed38c4c131845e1486acbdff9fd979f56835f340dcbd0a9a8f0980b137c",
+    "pvz_jalapeno.obm": "ef43fb9acfbbe109077dffc7a1cf6a477f492e48c4603be0758255c83b98a71c",
+    "pvz_squash.obm": "ea11ab96482ca5ac2d98cef940043040e65080a22949522c01440a30f6aa62b5"
   },
   "unit_pack": {
     "key": "s1xlv.pf_infantry_pack",
@@ -240,6 +250,51 @@
     {
       "key": "s1xlv.pvz_explosion",
       "file": "pvz_explosion.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.bgm_pvz_watery_graves",
+      "file": "bgm_pvz_watery_graves.msdf",
+      "type": "bgm",
+      "loop": [
+        79.806625,
+        179.725
+      ],
+      "gain": 1.5
+    },
+    {
+      "key": "s1xlv.bgm_pvz_zombotany",
+      "file": "bgm_pvz_zombotany.msdf",
+      "type": "bgm",
+      "loop": [
+        103.796,
+        178.245
+      ],
+      "gain": 1.85
+    },
+    {
+      "key": "s1xlv.pvz_jack_surprise",
+      "file": "pvz_jack_surprise.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_jalapeno",
+      "file": "pvz_jalapeno.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_squash_hmm",
+      "file": "pvz_squash_hmm.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_balloon_pop",
+      "file": "pvz_balloon_pop.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.pvz_ballooninflate",
+      "file": "pvz_ballooninflate.msdf",
       "type": "se"
     }
   ]

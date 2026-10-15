@@ -72,7 +72,7 @@
 
 已注册单位的敌军身份由运行注册表解析。新增社区单位沿用 schema 2 的素材、动画、参数、名称、图标和稳定键约定，在关卡中填入其 `key` 即可。敌军名单与出击路径支持当前 1024–1029 及后续登记 ID；接口验证还使用了隔离登记的第七款单位 1030。
 
-社区单位容量（2026-10-10 M1 起）：本体 ID 1024–2047（`content.json` 的 `unit_ids`，只追加、不重排）、模组 2048–5119；ID 可以不连续，空位由加载器以未启用占位记录填充。单位文件不写 `id` 与 `icon.index`。`content.json` 可选 `disabled_units`（本体稳定键列表）暂不载入对应本体单位：UnitID 保留、单位文件不读取，社区进度中的拥有与等级保留，编队格按稳定键暂存，移出列表后恢复（2026-10-13 起用于暂时停用 PVZ 巨人与小鬼）。图标写 `"page": 1`（`unit_icon_02.obm`）或 `"atlas": "<图集>.obm"`（图标页，页号由加载器分配，见 `docs/modding/M1B_ICON_PAGES_AND_SCALE_2026-10-10.md`）。缺失登记的 ID 继续由原生边界处理。特殊行为（修筑、召唤、投放、喷火、保留武器等）在单位文件中以 `behaviors` 组合，可用行为与参数见 `docs/modding/BEHAVIOR_CATALOG.md`（`content_tool.py list-behaviors`）。模组的目录结构、清单与启用方式见 `mods/README.md` 与 `docs/modding/M3_MOD_LOADER_2026-10-10.md`，发布前可运行 `content_tool.py check-mods`。单位注册与关卡登记属于两个步骤，关卡目录不会自动生成单位素材或独立行动类。完整单位素材约定见开发目录的 `CONTENT_EXTENSION_CONTRACT.txt` 与既有社区注册表。
+社区单位容量（2026-10-10 M1 起）：本体 ID 1024–2047（`content.json` 的 `unit_ids`，只追加、不重排）、模组 2048–5119；ID 可以不连续，空位由加载器以未启用占位记录填充。单位文件不写 `id` 与 `icon.index`。`content.json` 可选 `disabled_units`（本体稳定键列表）暂不载入对应本体单位：UnitID 保留、单位文件不读取，社区进度中的拥有与等级保留，编队格按稳定键暂存，移出列表后恢复（2026-10-13 起用于暂时停用 PVZ 巨人与小鬼）。图标写 `"page": 1`（`unit_icon_02.obm`）或 `"atlas": "<图集>.obm"`（图标页，页号由加载器分配，见 `docs/modding/M1B_ICON_PAGES_AND_SCALE_2026-10-10.md`）。缺失登记的 ID 继续由原生边界处理。特殊行为（修筑、召唤、投放、喷火、保留武器等）在单位文件中以 `behaviors` 组合，可用行为与参数见 `docs/modding/BEHAVIOR_CATALOG.md`（`content_tool.py list-behaviors`）。`status_word_values`（直接写入数据行的状态词）的值可为一个整数（六个等级锚点相同）或六个整数的列表（Lv1、Lv10、Lv20、Lv30、Lv40、Lv50 锚点，2026-10-15 起）。模组的目录结构、清单与启用方式见 `mods/README.md` 与 `docs/modding/M3_MOD_LOADER_2026-10-10.md`，发布前可运行 `content_tool.py check-mods`。单位注册与关卡登记属于两个步骤，关卡目录不会自动生成单位素材或独立行动类。完整单位素材约定见开发目录的 `CONTENT_EXTENSION_CONTRACT.txt` 与既有社区注册表。
 
 ## 4. 新场景、OBM 与 PNG
 
@@ -159,6 +159,10 @@ PNG 导入要求单帧、通道位深不超过 8 位的 RGB/RGBA、灰度或调�
 ## 8. 自制 EVENT（M6b）
 
 本体 EVENT 放在 `community_content/events/*.json`（键 `s1xlv.`），模组在 `content.events` 目录（键 `<模组 id>.`），每个文件一个 EVENT：名称、细则、作者、日期、可选 360×240 左屏图，以及 1–16 个区域（地图坐标与区域名）、每区域 1–5 个小关（标记偏移、预览帧与扩展世界关卡相同的战斗字段）。EVENT 出现在 EVENT 浏览页（按日期并入循环），经女教官基地进入原生活动地图；进度按关卡稳定键保存。目前支持 `clear_reward`（通关与首胜奖励）及人质类 `rescue`、`collaboration_rescue`、`parts`、`invitation`（小关 `prisoners`、区域 `reward`、`final_reward_units`，见 `docs/modding/M6B3_RESCUE_EVENTS_2026-10-10.md`），以及积分与商店类 `legacy_survival`、`current_cooperation`（代币兑换店 `shop`、活动勋章商店 `medal_shop`、分期 `part1`，见 `docs/modding/M6B4_POINTS_SHOP_EVENTS_2026-10-10.md`）。可选自制地图：`"map": {"image": ...}`（1440×709，替换活动地图的世界地图图层，区域 `position` 即该图上的像素坐标）与小关 `"thumbnail"`（128×56）。格式与示例见 `docs/modding/M6B1_CUSTOM_EVENTS_2026-10-10.md`、`docs/modding/M6B2_CUSTOM_EVENT_MAPS_2026-10-10.md`。
+
+出兵控制（2026-10-15，与历史活动关卡记录相同的原生字段）：小关可写 `"loop"`（出兵表计时到该帧时回到 0，历史活动为 1080 帧即 36 秒）；`"triggers"`（`when` 为 `time` 计时等于、`base_hp` 敌方据点生命低于百分比、`front` 我方最前单位与敌方据点距离小于；动作为 `spawn` 出兵、`jump` 设定出兵计时或 `strength` 追加关卡强化级数；`repeat` 缺省为每场一次；连同 loop 至多 32 条）；`"placed"`（开战时已在战场上的敌方单位，`x` 为战场横坐标）；`"items"`、`"item_level"`、`"prisoner_chance"`（道具与俘虏的放置表：每场随机取约 67% 的位置，俘虏与道具藏在战场中，攻击打中后现身；人质类玩法的俘虏只经此表出现，自制 EVENT 的俘虏为常规关卡的俘虏，需核心 r60 起）。说明见 `event_content.py` 文首与 `docs/pvz/PVZ_EVENT_PART1_2026-10-15.md`。
+
+地图与俘虏页（2026-10-15）：区域图标显示区域序号 1、2、3…（不再使用万圣节模板的“!”图标）；EVENT 可写 `"map_music"`（活动地图与俘虏页的 BGM，原生 SoundID 或 bgm 音效键；原版最新 EVENT 的地图 BGM 为 156，缺省时经典路由为 103）；人质类区域奖励可用 `"portrait_image"`（PNG/WebP，不超过 400×500，俘虏页立绘以图像底边中点对齐原生立绘的脚底位置）代替原生立绘编号 `portrait`，两者择一。
 
 语言规则（单位、组合包、EVENT 共用）：只写一种语言时全部语言使用该文本；部分翻译时未填写的语言使用英语，未写英语时使用第一种。
 

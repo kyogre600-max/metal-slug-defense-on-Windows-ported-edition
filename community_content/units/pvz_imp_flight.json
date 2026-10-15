@@ -966,7 +966,8 @@
       "version": 1,
       "params": {
         "forward": 56,
-        "height": 114
+        "height": 114,
+        "base_clearance": 16
       }
     }
   ]

@@ -14,6 +14,32 @@ from app_icon import WindowIcon, set_app_user_model_id
 from branding import load as load_branding
 TITLE=load_branding(ROOT)['application_name']
 
+def native_crash_details(p):
+    """原生核心停止时的诊断附录（写在 player_error.log 的 traceback 之后）：AOT 寄存器、客体栈中形似 Thumb 返回地址
+    的值（栈偏移与地址，可按 libAppMain.so 符号离线还原调用链）、当前场景与日志尾部。读取失败的项目跳过。"""
+    lines=['','--- native context ---']
+    try:
+        c=p.uc.ctx
+        lines.append(f'frame={p.frame} pc=0x{c.pc:08x} lr=0x{c.r[14]:08x} sp=0x{c.r[13]:08x} error_address=0x{c.error_address:08x}')
+        lines.append('r0-r12='+' '.join(f'{c.r[i]:08x}' for i in range(13)))
+        raw=p.read(c.r[13],0x1000)
+        found=[]
+        for offset in range(0,len(raw),4):
+            value=int.from_bytes(raw[offset:offset+4],'little')
+            if 0x10000000<=value<0x10900290 and value&1:found.append(f'+{offset:#x}:{value:08x}')
+        lines.append('stack_returns='+' '.join(found[:96]))
+    except Exception as error:lines.append('native context unavailable: '+repr(error))
+    try:
+        app=p.app_instance()
+        lines.append(f'scene={p.word(app+0x22bc)} state={p.word(app+0x22dc)}')
+    except Exception:pass
+    try:
+        log=Path(p.logfile.name)
+        tail=log.read_text(encoding='utf-8',errors='replace').splitlines()[-80:]
+        lines.append('--- log tail ('+log.name+') ---');lines.extend(line[:400] for line in tail)
+    except Exception:pass
+    return chr(10).join(lines)+chr(10)
+
 class Player:
     def __init__(self, self_test=False, audio_mode=None, fullscreen=None):
         self.self_test=self_test
@@ -244,7 +270,8 @@ class Player:
             if p:p.log('WINDOW_CLOSED_BY_USER')
         except Exception:
             self.error=traceback.format_exc()
-            (ROOT/'player_error.log').write_text(self.error,encoding='utf-8')
+            details=native_crash_details(p) if p and hasattr(p,'uc') else ''
+            (ROOT/'player_error.log').write_text(self.error+details,encoding='utf-8')
             if p:
                 p.log('WINDOW_ERROR',self.error)
                 if hasattr(p,'graphics'):

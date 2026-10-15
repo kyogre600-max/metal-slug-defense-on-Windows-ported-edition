@@ -68,7 +68,8 @@ def copy_sources(main, garg):
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, dst)
 
-    for key in ('zombie', 'cone', 'bucket', 'football', 'newspaper', 'zomboni'):
+    for key in ('zombie', 'cone', 'bucket', 'football', 'newspaper', 'zomboni',
+                'jack', 'balloon', 'gatling', 'jalapeno', 'squash', 'pea'):
         for frames in main[key].values():
             for f in frames:
                 put(RESEARCH / 'frames' / f['file'], SOURCE / f['file'])
@@ -292,8 +293,10 @@ def finish(sheet, script_count, hit, attacks):
         animations[str(slot)] = out
     for slot in range(script_count):
         animations.setdefault(str(slot), [op(0, -1), op(1, 1), op(21)])
+    # hit 为一个受击框（受击框 1）或多个受击框的元组（受击框 1、2…，2026-10-15 气球的飞行段用受击框 2）
+    hits = [[0, 0, 0, 0, 0], hit, [0, 0, 0, 0, 0]] if not isinstance(hit, tuple) else [[0, 0, 0, 0, 0]] + list(hit)
     desc = {'rects': rects, 'frames': words, 'script_count': script_count,
-            'hit_bounds': [[0, 0, 0, 0, 0], hit, [0, 0, 0, 0, 0]],
+            'hit_bounds': hits,
             'attack_bounds': [[0, 0, 0, 0, 0]] + attacks}
     return indexed_obm(page), desc, animations, page
 
@@ -426,7 +429,8 @@ S = 's1xlv.'
 SND = {name: S + 'pvz_' + name for name in (
     'chomp', 'chomp2', 'splat', 'splat2', 'splat3', 'gulp', 'plastichit', 'plastichit2', 'shieldhit', 'shieldhit2',
     'newspaper_rip', 'newspaper_rarrgh', 'newspaper_rarrgh2', 'lowgroan', 'lowgroan2', 'gargantuar_thump',
-    'imp', 'imp2', 'explosion')}
+    'imp', 'imp2', 'explosion',
+    'jack_surprise', 'jalapeno', 'squash_hmm', 'balloon_pop', 'ballooninflate')}   # 后 5 个为 2026-10-15 新单位
 # 冰车的爆炸音效：用户提供（2026-10-13，C:\\Users\\26839\\Downloads\\explosion.ogg，复制到 source/sounds/）
 SOUND_FILES = {'explosion': SOURCE / 'sounds' / 'explosion.ogg'}
 BITE_SOUNDS = [(SND['chomp'], SND['splat']), (SND['chomp2'], SND['splat2'])]
@@ -781,6 +785,12 @@ ICON_LAYOUT = {
     'imp': (('garg', 'imp_walk'), (24, 45)),          # 小鬼全身，站在内框底行（与原版头像相同）
     'gargantuar': (('gargantuar', 'walk_imp'), (16, 80)),   # 头部与背上的小鬼
     'zomboni': (('zomboni', 'drive'), (31, 74)),            # 驾驶员的头与冰车前部（车身下部被下边框挡住）
+    # 2026-10-15 新单位
+    'jack': (('jack', 'walk'), (24, 58)),
+    'balloon': (('balloon', 'fly'), (24, 52)),             # 头与气球的下半部分
+    'gatling': (('gatling', 'idle'), (25, 56)),
+    'jalapeno': (('jalapeno', 'walk'), (24, 56)),
+    'squash': (('squash', 'walk'), (24, 62)),
 }
 
 
@@ -799,9 +809,11 @@ def build_icons(main, garg):
     for key, ((unit, anim), foot) in ICON_LAYOUT.items():
         frame = garg_seq(garg, anim)[ICON_FRAME] if unit == 'gargantuar' else seq(main, unit, anim)[ICON_FRAME]
         icons[key] = icon_of(*frame, foot)
-    order = ('zombie', 'cone', 'bucket', 'newspaper', 'football', 'gargantuar', 'imp', 'zomboni')
+    order = ('zombie', 'cone', 'bucket', 'newspaper', 'football', 'gargantuar', 'imp', 'zomboni',
+             'jack', 'balloon', 'gatling', 'jalapeno', 'squash')
     width = sum(icons[k][0].width + 2 for k in order)
-    page = Image.new('RGBA', (256 if width <= 256 else 512, 64), (0, 0, 0, 0))   # 加入冰车后为 512 宽，已有头像位置不变
+    # 加入冰车后为 512 宽，2026-10-15 加入 5 个新单位后为 1024 宽；已有头像位置不变
+    page = Image.new('RGBA', (next(w for w in (256, 512, 1024) if width <= w), 64), (0, 0, 0, 0))
     rects = {}
     x = 0
     for key in order:
@@ -910,7 +922,8 @@ UNITS = {
                       thresholds=[[5, 6], [2, 3], [1, 2]], transitions=[0, 0, 1], rage=(3, [5, 2]), rage_damage=[3, 2]),
     # 橄榄球：本体 7500 + 头盔 10500（修订七；头盔受损两档在头盔失去 1/3、2/3 时，掉头盔在 5/12 时）；
     # 移速 ×4/5 写在 MOVE_SCALE_BY_KIND。
-    'football': dict(ap=225, hp=[12, 1], dmg=[1, 10], move=[3, 1], interval=250, price=130,
+    # 2026-10-15 用户要求削弱：再出击时间改为 8 秒（240 tick，650 × 24/65，各等级相同，未叠加阵营强化），原为 168 tick。
+    'football': dict(ap=225, hp=[12, 1], dmg=[1, 10], move=[3, 1], interval=250, interval_ratio=[24, 65], price=130,
                      thresholds=[[29, 36], [11, 18], [5, 12]], transitions=[0, 0, 1],
                      armor=([SND['plastichit'], SND['plastichit2']], 3)),
     # 巨人（2026-10-15 用户指定，重新启用）：生命 Lv40 30000（UNITS 的 hp 经 HP_SCALE 换算为 [150,17]，僵尸（青年）3400 ×
@@ -921,7 +934,8 @@ UNITS = {
                        thresholds=[[1, 2]], transitions=[1], throw=1),
     'imp': dict(ap=50, hp=[3, 1], dmg=[1, 15], move=[11, 5], interval=60, price=30),
 }
-ORDER = ['zombie', 'cone', 'bucket', 'newspaper', 'football', 'gargantuar', 'imp', 'imp_flight', 'zomboni']
+ORDER = ['zombie', 'cone', 'bucket', 'newspaper', 'football', 'gargantuar', 'imp', 'imp_flight', 'zomboni',
+         'jack', 'balloon', 'gatling', 'jalapeno', 'squash']      # 后 5 个为 2026-10-15 新单位（UnitID 1053–1057）
 BITE_RANGE = 24          # 状态词 7：开始啃咬的距离（验证时校准）
 # 巨人开始锤击的距离。2026-10-15 用户认为锤击范围过大，要求缩小到原来的 2/3：锤击框伸出自身受击框前缘的长度
 # SMASH_RANGE + REACH_MARGIN 由 60 改为 40（开锤距离 52 → 32，锤击框 x 由 −78 改为 −58），纵向不变。
@@ -940,6 +954,446 @@ def bite_rect(hit):
     return [x0, y0, -x0, -y0, 7]
 THROW_RELEASE_TICK = 18  # 投掷动作第 5 帧（4+5+6+3）
 
+# ---------------------------------------------------------------- 2026-10-15 新单位：小丑、气球、机枪豌豆、辣椒、倭瓜
+# 用户设定（Lv40；其他等级按僵尸（青年）曲线，生命与伤害的倍率以其 Lv40 生命 3400、普攻 600 为基准）：
+# - 小丑：AP 175、生命 9000、可击退、靠近敌人后自爆 4200（范围为原版自爆单位 HOPPER MECHA 普通爆炸框的 150%）；
+#   绝招为更大的爆炸 6300（范围再 ×150%），冷却 8 秒、出场 2 秒后可用；移速为普通僵尸的 120%。
+# - 气球：本体生命同路障（11250），气球生命 1120（2026-10-15 用户修订，原同普通 7500），AP 175、再出击 8 秒；飞行高度与爆竹红顶部持平（吉利塔与爆竹红打不到），
+#   飞行移速为橄榄球的 85%，飞到敌方据点前约 16 像素处放手落地，此后同普通僵尸（移速与伤害）；绝招为提前放手（出场 2 秒后可用），
+#   落地后不再有绝招。
+# - 机枪豌豆：AP 300、生命同铁桶、射速同 PvZ 原作（4 发一组，组间冷却；每组 1.5 秒），豌豆飞行速度同机枪小兵（UnitID 48，10.0），
+#   每颗 150；啃咬与移速同普通僵尸；再出击 6.7 秒；无绝招。边走边射（用户选定）。
+# - 辣椒：AP 200、生命同铁桶、移速为普通的 90%；接触敌人后对全场敌方地面单位与据点造成一次 600 的火焰伤害并消失；
+#   无绝招；再出击 11 秒。
+# - 倭瓜：生命同路障、移速为普通的 125%、AP 150；抵达前线后头部跳下压扁敌人（2100，范围同巨人锤击），随后身体倒下死亡；无绝招。
+# - 勋章价格（用户指定）：小丑 200、气球 180、机枪豌豆 250、辣椒 250、倭瓜 200。
+# 用户未给出的数值（暂定，待确认）：小丑与倭瓜的再出击时间 8 秒（240 tick，同气球）；击退门槛同其他僵尸 Lv40 60；
+# 伤害按等级曲线换算（倭瓜的“固定 2100”理解为 Lv40 数值）。
+NEW_KINDS = ('jack', 'balloon', 'gatling', 'jalapeno', 'squash')
+BALLOON_ALT = 85          # 气球飞行时脚底离地高度（素材像素）：爆竹红（UnitID 6）受击框顶为 −104，僵尸身体（约 −127 至 −85）与之持平
+BALLOON_POP = 16          # 放手距离：前缘与敌方据点前缘的间距（世界坐标，同 getNearEnemyDistance）
+GATLING_RANGE = 900       # 开始射击的距离（2026-10-15 用户指定 900；原为机枪小兵（UnitID 48）的远距开火距离 300）
+GATLING_PERIOD = 45       # 每组 4 发、组间冷却：PvZ 机枪豌豆每 1.5 秒（45 tick）射出一组
+GATLING_SHOTS = (0, 4, 8, 12)
+GATLING_FLASH = 2         # 发射后炮管伸出（开火姿势）的 tick 数
+PEA_SLOT, SPLAT_SLOT = 16, 17
+PEA_HALF = 5              # 豌豆图 10×10 的半高
+JALAPENO_BAND = 1024      # 火焰带宽度（素材像素）；以 1024 间隔在 −4096…4096 放 9 段，覆盖任何战场宽度（原版最宽 4096）
+FLAME_SLOT = 16
+# 小丑爆炸框：原版 HOPPER MECHA（UnitID 39）普通爆炸框 (−41,−87,90,103)、宽高 ×3/2，以单位为中心左右对称；绝招再 ×3/2。
+JACK_BLAST = [-68, -130, 135, 155, 7]
+JACK_BIG_BLAST = [-101, -196, 202, 232, 7]
+# 移速倍率（相对僵尸（青年）2.4）：普通僵尸为 7/13（1.292）
+NEW_MOVE = {'jack': (42, 65), 'gatling': (7, 13), 'jalapeno': (63, 130), 'squash': (35, 52),
+            'balloon': (3417, 2500)}        # 气球飞行：橄榄球 201/125 × 85% = 3417/2500（3.280）
+
+
+def float_bits(value):
+    return struct.unpack('<i', struct.pack('<f', value))[0]
+
+
+def place_offset(full, part, sx=(-24, 24), sy=(-70, 0)):
+    """part 帧（路径, ax, ay）在 full 帧中颜色完全相同像素最多的位置：返回 part 锚点相对 full 锚点的偏移 (dx, dy)。"""
+    fp, pp = anchored(*full), anchored(*part)
+    best = (-1, (0, 0))
+    for dx in range(sx[0], sx[1] + 1):
+        for dy in range(sy[0], sy[1] + 1):
+            n = sum(1 for (x, y), c in pp.items() if fp.get((x + dx, y + dy)) == c)
+            if n > best[0]:
+                best = (n, (dx, dy))
+    return best[1]
+
+
+def shifted(sheet, frame, dx, dy):
+    path, ax, ay = frame
+    return sheet.frame([(path, ax, ay, dx, dy)])
+
+
+# ---- 机枪豌豆：开火姿势（炮管伸出、头部前冲）只在素材的部分帧上。按领口（外套最上一行）把头部与身体分开，
+# 把开火帧的头部贴到任意姿势的身体上（或反之），使发射时刻与炮管动作一致。贴合以领口行与头盔后缘对齐。
+GATLING_DERIVED = DERIVED / 'gatling'
+
+
+def _jacket(c):
+    r, g, b, _ = c
+    return r > g + 10 and r > b + 15 and r < 170
+
+
+def _neck(px):
+    rows = {}
+    for (x, y), c in px.items():
+        if _jacket(c):
+            rows[y] = rows.get(y, 0) + 1
+    return min(y for y, n in rows.items() if n >= 3)
+
+
+def head_swap(body, donor, tag):
+    """body 的身体（领口及以下）+ donor 的头部（领口以上），写到 source/derived/gatling/；返回 (路径, ax, ay)。"""
+    pb, pd = anchored(*body), anchored(*donor)
+    nb, nd = _neck(pb), _neck(pd)
+    hb = [x for (x, y) in pb if y < nb]
+    hd = {k: c for k, c in pd.items() if k[1] < nd}
+    dx = max(hb) - max(x for x, _ in hd)
+    dy = nb - nd
+    out = {k: c for k, c in pb.items() if k[1] >= nb}
+    for (x, y), c in hd.items():
+        out[(x + dx, y + dy)] = c
+    return save_anchored(out, GATLING_DERIVED / f'{tag}.png')
+
+
+def muzzle(frame):
+    """开火姿势的炮口：头部最前（最左）一列的中点，返回 (前方距离, 高度)（相对脚底锚点，高度向下为正）。"""
+    px = anchored(*frame)
+    n = _neck(px)
+    head = [(x, y) for (x, y) in px if y < n]
+    x0 = min(x for x, _ in head)
+    ys = [y for x, y in head if x == x0]
+    return -x0, (min(ys) + max(ys)) // 2
+
+
+def gatling_frames(main):
+    walk, eat, idle = seq(main, 'gatling', 'walk_shoot'), seq(main, 'gatling', 'eat_shoot'), seq(main, 'gatling', 'idle')
+    wf, ef = (3, 6, 9, 12), (2, 5, 8, 11)          # 素材中炮管伸出的帧
+    near = lambda i: min(wf, key=lambda j: (abs(j - i), j))
+    calm_walk = [head_swap(walk[i], walk[i - 1], f'walk_calm_{i:02d}') if i in wf else walk[i] for i in range(len(walk))]
+    fire_walk = [walk[i] if i in wf else head_swap(walk[i], walk[near(i)], f'walk_fire_{i:02d}') for i in range(len(walk))]
+    calm_eat = [head_swap(eat[i], eat[i - 1], f'eat_calm_{i:02d}') if i in ef else eat[i] for i in range(len(eat))]
+    fire_idle = [head_swap(idle[i], walk[3], f'idle_fire_{i:02d}') for i in range(len(idle))]
+    return calm_walk, fire_walk, calm_eat, idle, fire_idle
+
+
+def gatling_cycle(sheet, calm, fire, first=(), shoot=True):
+    """一组射击周期（GATLING_PERIOD tick）：姿势均匀推进一个循环；GATLING_SHOTS 各 tick 前插入 op22 并显示开火姿势 GATLING_FLASH tick。"""
+    n = len(calm)
+    holds = [round((i + 1) * GATLING_PERIOD / n) - round(i * GATLING_PERIOD / n) for i in range(n)]
+    pose = [i for i, h in enumerate(holds) for _ in range(h)]
+    flash = {t + k for t in GATLING_SHOTS for k in range(GATLING_FLASH)}
+    out, run = list(first), None
+    for t in range(GATLING_PERIOD):
+        key = (pose[t], t in flash)
+        if t in GATLING_SHOTS and shoot:
+            fwd, height = muzzle(fire[pose[t]])
+            if run:
+                out += F(*run)
+                run = None
+            out.append(op(22, PEA_SLOT, SPLAT_SLOT, -fwd, height))
+        frame = sheet.f(*(fire if key[1] else calm)[key[0]])
+        if run and run[0] == frame:
+            run = (frame, run[1] + 1)
+        else:
+            if run:
+                out += F(*run)
+            run = (frame, 1)
+    out += F(*run)
+    return out + [op(5)]
+
+
+def build_gatling(main):
+    sheet = Sheet()
+    calm_walk, fire_walk, calm_eat, idle, fire_idle = gatling_frames(main)
+    sheet.scripts[0] = gatling_cycle(sheet, idle, fire_idle, shoot=False)
+    sheet.scripts[1] = gatling_cycle(sheet, calm_walk, fire_walk, shoot=False)
+    sheet.scripts[6] = gatling_cycle(sheet, idle, fire_idle, first=[op(3, 1)])
+    sheet.scripts[7] = gatling_cycle(sheet, calm_walk, fire_walk, first=[op(3, 1)])
+    eat = [sheet.f(*x) for x in calm_eat]
+    # 啃咬：14 帧 × 3 tick 咬两口（每 21 tick 一口，同普通僵尸 7 帧 × 3 tick 一口）
+    sheet.scripts[2] = once(eat, [3] * len(eat))
+    sheet.scripts[9] = bite(eat, 3, (3, 10), BITE_SOUNDS)
+    sheet.scripts[10] = bite(eat, 3, (3, 10), BITE_SOUNDS)
+    sheet.scripts[11] = loop(eat[:1], [1], first=[op(3, 1)])
+    sheet.scripts[12] = knockback_script([sheet.f(*x) for x in calm_walk], [sheet.f(*x) for x in idle])
+    head = seq(main, 'gatling', 'head')[0]
+    e_head = 18
+    sheet.scripts[e_head] = debris(sheet, *head, vx=50, vy=-180, g=30, fall_ticks=throw_ticks(44, -180, 30))
+    death_slots(sheet, seq(main, 'gatling', 'death'), [3] * 9, first=[op(12, e_head, 0, -2, -40)])
+    sheet.scripts[15] = charred_script(sheet, main)
+    # 豌豆与溅开以图像中心对准弹体位置（素材锚点为底边中点，下移半个图像高；2026-10-15 用户指出豌豆高于炮口）
+    pea_frame = seq(main, 'pea', 'pea')[0]
+    pea = shifted(sheet, pea_frame, 0, PEA_HALF)
+    sheet.scripts[PEA_SLOT] = [op(4, 2)] + F(pea, 2) + [op(5)]
+    splat = [shifted(sheet, x, 0, PEA_HALF) for x in seq(main, 'pea', 'splat')]
+    sheet.scripts[SPLAT_SLOT] = once(splat, [2] * len(splat), first=[op(4, -1)], tail=F(-1, 1))
+    hit = [-10, -46, 20, 46, 0]
+    return sheet, 19, hit, [bite_rect(hit), [-5, -5, 10, 10, 7]]
+
+
+def scaled_frame(frame, k, tag):
+    """小丑爆炸图按 k 倍最近邻放大（2026-10-15 用户要求：只用一个爆炸图，按爆炸范围放大），锚点同比例；写到 source/derived/jack/。"""
+    path, ax, ay = frame
+    img = Image.open(path).convert('RGBA')
+    out = img.resize((round(img.width * k), round(img.height * k)), Image.NEAREST)
+    dst = DERIVED / 'jack' / f'{tag}.png'
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    out.save(dst)
+    return (dst, int(round(ax * k)), int(round(ay * k)))
+
+
+def build_jack(main):
+    sheet = Sheet()
+    j = lambda name: seq(main, 'jack', name)
+    walk = [sheet.f(*x) for x in j('walk')]
+    idle = [sheet.f(*x) for x in j('idle')]
+    walk_h = slow_holds(len(walk), 2, NEW_MOVE['jack'])
+    sheet.scripts[0] = loop(idle, [4] * len(idle))
+    sheet.scripts[1] = loop(walk, walk_h)
+    sheet.scripts[6] = loop(idle, [4] * len(idle), first=[op(3, 1)])
+    sheet.scripts[7] = loop(walk, walk_h, first=[op(3, 1)])
+    pop = [sheet.f(*x) for x in j('pop')]
+    boom = j('explode')
+
+    def blast(k, rect):
+        # 单个爆炸图，按爆炸框放大 k 倍（素材最宽 93 像素：普通 ×1.5 约 140、绝招 ×2.25 约 209，对应爆炸框宽 135、202）
+        frames = [sheet.f(*scaled_frame(b, k, f'explode_{int(k * 100)}_{i:02d}')) for i, b in enumerate(boom)]
+        out = [op(3, 1)]
+        out += once(pop, [3] * (len(pop) - 1) + [6], events={2: [op(23, SND['jack_surprise'])]})[:-1]
+        out += [op(23, SND['explosion']), op(4, rect)] + F(frames[0], 2) + F(frames[1], 2) + [op(4, -1)]
+        for fr in frames[2:]:
+            out += F(fr, 2)
+        return out + F(-1, 1) + [op(21)]
+
+    sheet.scripts[2] = blast(1.5, 1)
+    sheet.scripts[8] = blast(1.5, 1)          # 普通攻击（自爆，HOPPER MECHA 流程的槽 8）
+    sheet.scripts[9] = blast(2.25, 2)         # 绝招（槽 9）
+    sheet.scripts[10] = blast(2.25, 2)
+    sheet.scripts[11] = loop(walk[:1], [1], first=[op(3, 1)])
+    sheet.scripts[12] = knockback_script(walk, idle)
+    death_slots(sheet, j('death'), [3] * 7)
+    sheet.scripts[15] = charred_script(sheet, main)
+    hit = [-10, -50, 20, 50, 0]
+    return sheet, STRIDE, hit, [JACK_BLAST, JACK_BIG_BLAST]
+
+
+def build_squash(main):
+    sheet = Sheet()
+    s = lambda name: seq(main, 'squash', name)
+    walk = [sheet.f(*x) for x in s('walk')]
+    idle = [sheet.f(*x) for x in s('idle')]
+    walk_h = slow_holds(len(walk), 3, NEW_MOVE['squash'])
+    sheet.scripts[0] = loop(idle, [4] * len(idle))
+    sheet.scripts[1] = loop(walk, walk_h)
+    sheet.scripts[6] = loop(idle, [4] * len(idle), first=[op(3, 1)])
+    sheet.scripts[7] = loop(walk, walk_h, first=[op(3, 1)])
+    angry = s('angry')
+    head, head_flat = s('head_angry')[0], s('head_flat')[0]
+    body = s('headless_stand')[0]
+    hx, hy = place_offset(angry[0], head)           # 头部在身体上的位置
+    tx = -30                                        # 压下的位置：压扁的头的中点（攻击框 x −49…0）
+    fall = s('death_headless')
+    # 压扁：生气抖动 16 tick（“嗯”的音效）→ 头部跳起向前 6 tick → 落下 2 tick，压扁的瞬间判定并播放落地音效 →
+    # 无头身体倒下（9 帧 × 3 tick），压扁的头留在原地 → 停留后闪烁消失（HOPPER MECHA 流程在动画结束时移除单位）。
+    out = [op(3, 1), op(23, SND['squash_hmm'])]
+    for i in range(8):
+        out += F(sheet.f(*angry[i % len(angry)]), 2)
+    import math
+    path = [(hx + (tx - hx) * t / 6.0, hy - 34 * math.sin(math.pi * t / 7.0)) for t in range(1, 7)]
+    path += [(tx, path[-1][1] / 2.0), (tx, 0)]       # 落下：头部底边落到地面
+    for x, y in path:
+        out += F(sheet.frame([body + (0, 0), head + (int(round(x)), int(round(y)))]), 1)
+    flat = head_flat + (tx, 0)
+    out += [op(4, 1), op(23, SND['gargantuar_thump'])]
+    out += F(sheet.frame([body + (0, 0), flat]), 2) + [op(4, -1)]
+    for k, f in enumerate(fall):
+        out += F(sheet.frame([f + (0, 0), flat]), 3)
+    last = sheet.frame([fall[-1] + (0, 0), flat])
+    out += F(last, 15)
+    for _ in range(3):
+        out += F(-1, 2) + F(last, 2)
+    out += F(-1, 1) + [op(21)]
+    for slot in (2, 8, 9, 10):
+        sheet.scripts[slot] = list(out)
+    sheet.scripts[11] = loop(walk[:1], [1], first=[op(3, 1)])
+    sheet.scripts[12] = knockback_script(walk, idle)
+    e_head = 16
+    sheet.scripts[e_head] = debris(sheet, *s('head')[0], vx=50, vy=-180, g=30, fall_ticks=throw_ticks(44, -180, 30))
+    death_slots(sheet, s('death'), [3] * 9, first=[op(12, e_head, 0, hx, hy)])
+    sheet.scripts[15] = charred_script(sheet, main)
+    hit = [-9, -56, 18, 56, 0]
+    smash = abs(hit[0]) + SMASH_RANGE + REACH_MARGIN     # 压扁范围：自受击框前缘向前 40，高 44（同巨人锤击）
+    return sheet, 17, hit, [[-smash, -44, smash, 44, 7]]
+
+
+def build_jalapeno(main):
+    sheet = Sheet()
+    jl = lambda name: seq(main, 'jalapeno', name)
+    walk = [sheet.f(*x) for x in jl('walk')]
+    idle = [sheet.f(*x) for x in jl('idle')]
+    walk_h = slow_holds(len(walk), 3, NEW_MOVE['jalapeno'])
+    sheet.scripts[0] = loop(idle, [4] * len(idle))
+    sheet.scripts[1] = loop(walk, walk_h)
+    sheet.scripts[6] = loop(idle, [4] * len(idle), first=[op(3, 1)])
+    sheet.scripts[7] = loop(walk, walk_h, first=[op(3, 1)])
+    fire = jl('fire')
+    # 火焰带为一行（2026-10-15 用户指定）：火焰图块（24 像素宽）横向排满 JALAPENO_BAND（43 个部件，加载器上限 64），
+    # 相位逐个错开；燃烧 15 帧（约 1 秒）后以小火苗熄灭。
+    cols = range(-JALAPENO_BAND // 2, JALAPENO_BAND // 2, 24)
+    band = [sheet.frame([fire[(k + f) % 5] + (x, 2) for k, x in enumerate(cols)]) for f in range(15)]
+    small = sheet.frame([fire[5] + (x, 2) for x in cols])
+    sheet.scripts[FLAME_SLOT] = once(band + [small, small], [2] * 15 + [3, 3], tail=F(-1, 1))
+    # 引燃：抖动 6 tick（辣椒燃烧音效）→ 全场判定（攻击框覆盖整个战场，行为 ground_only_attack 排除空中单位与道具）
+    # 并放出 9 段火焰带 → 本体消失（HOPPER MECHA 流程在动画结束时移除单位）。
+    w0 = jl('walk')[0]
+    out = [op(3, 1), op(23, SND['jalapeno'])]
+    for k in range(6):
+        out += F(shifted(sheet, w0, (-1, 1)[k % 2], 0), 1)
+    out += [op(4, 1)] + [op(12, FLAME_SLOT, 0, x, 0) for x in range(-4 * JALAPENO_BAND, 4 * JALAPENO_BAND + 1, JALAPENO_BAND)]
+    out += F(-1, 2) + [op(4, -1)] + F(-1, 2) + [op(21)]
+    for slot in (2, 8, 9, 10):
+        sheet.scripts[slot] = list(out)
+    sheet.scripts[11] = loop(walk[:1], [1], first=[op(3, 1)])
+    sheet.scripts[12] = knockback_script(walk, idle)
+    death_slots(sheet, jl('death'), [3] * 9)
+    sheet.scripts[15] = charred_script(sheet, main)
+    hit = [-9, -46, 18, 46, 0]
+    return sheet, 17, hit, [[-8000, -400, 16000, 420, 7]]
+
+
+def build_balloon(main):
+    sheet = Sheet()
+    b = lambda name: seq(main, 'balloon', name)
+    fly = [shifted(sheet, f, 0, -BALLOON_ALT) for f in b('fly')]
+    hold = [3] * len(fly)
+    # 第 0 档：飞行（受击框 2 位于空中）。槽 9/10/12/14 在飞行中不会被请求（不攻击、不被击退、无过渡），填入飞行动作。
+    for slot in (0, 1):
+        sheet.scripts[slot] = loop(fly, hold)
+    for slot in (6, 7, 9, 10):
+        sheet.scripts[slot] = loop(fly, hold, first=[op(3, 2)])
+    sheet.scripts[2] = once(fly, hold)
+    sheet.scripts[11] = loop(fly[:1], [1], first=[op(3, 2)])
+    for slot in (12, 14):
+        sheet.scripts[slot] = once(fly[:1], [1], first=[op(3, 2)])
+    # 第 1 档：落地后的普通僵尸行动。过渡动作（槽 28）：气球爆开（空中 3 帧）→ 下落 8 tick（自高处加速落下）→ 着地、
+    # 帽子落回头上、站起（12 帧 × 3 tick）。
+    pop = b('pop')
+    trans = [op(3, 1), op(23, SND['balloon_pop'])]
+    for i in range(3):
+        trans += F(shifted(sheet, pop[i], 0, -BALLOON_ALT), 2)
+    for t in range(1, 9):
+        dy = -int(round(BALLOON_ALT * (1 - (t / 8.0) ** 2)))
+        trans += F(shifted(sheet, pop[3 if t <= 4 else 4], 0, dy), 1)
+    for f in pop[5:]:
+        trans += F(sheet.f(*f), 3)
+    trans += [op(21)]
+    walk, eat = b('walk'), b('eat')
+    biter_block(sheet, 1, sway_idle(walk, 'balloon_idle'), walk, 2.5 * 7 / 13, eat, 5, (2,), transition=trans,
+                idle_hold=6, move_scale=(7, 13))
+    death_slots(sheet, b('death'), [2] * len(b('death')))
+    sheet.scripts[15] = charred_script(sheet, main)
+    hit = [-9, -46, 18, 46, 0]
+    air = [-12, -BALLOON_ALT - 52, 24, 52, 0]
+    return sheet, 2 * STRIDE, (hit, air), [bite_rect(hit)]
+
+
+TEXT.update({
+    'jack': {
+        'ZS': ('小丑僵尸', '普通攻击：自爆     特殊攻击：大爆炸\n转动玩偶盒的僵尸。\n靠近敌人后玩偶盒弹开并爆炸。'),
+        'ZT': ('小丑殭屍', '普通攻擊：自爆     特殊攻擊：大爆炸\n轉動玩偶盒的殭屍。\n靠近敵人後玩偶盒彈開並爆炸。'),
+        'JP': ('びっくり箱ゾンビ', '通常攻撃：自爆     特殊攻撃：大爆発\nびっくり箱を回すゾンビ。\n敵に近づくと箱が開いて爆発する。'),
+        'EN': ('JACK-IN-THE-BOX ZOMBIE', 'Normal attack: Self-destruct     Special attack: Big blast\nA zombie cranking a jack-in-the-box.\nThe box pops open and explodes near enemies.'),
+        'ES': ('ZOMBI CAJA SORPRESA', 'Ataque normal: Autodestrucción     Ataque especial: Gran explosión\nUn zombi que gira una caja sorpresa.\nLa caja se abre y explota cerca de los enemigos.'),
+        'PT': ('ZUMBI CAIXA-SURPRESA', 'Ataque normal: Autodestruição     Ataque especial: Grande explosão\nUm zumbi girando uma caixa-surpresa.\nA caixa se abre e explode perto dos inimigos.'),
+        'KR': ('깜짝상자 좀비', '일반 공격：자폭     특수 공격：대폭발\n깜짝상자를 돌리는 좀비.\n적에게 다가가면 상자가 열리며 폭발한다.'),
+    },
+    'balloon': {
+        'ZS': ('气球僵尸', '普通攻击：啃咬     特殊攻击：放掉气球\n乘着气球飞越敌人与建筑。\n在敌方据点前放掉气球，落地后开始啃咬。'),
+        'ZT': ('氣球殭屍', '普通攻擊：啃咬     特殊攻擊：放掉氣球\n乘著氣球飛越敵人與建築。\n在敵方據點前放掉氣球，落地後開始啃咬。'),
+        'JP': ('風船ゾンビ', '通常攻撃：かみつき     特殊攻撃：風船を手放す\n風船で敵や建物の上を飛び越える。\n敵拠点の手前で風船を放し、着地してかみつく。'),
+        'EN': ('BALLOON ZOMBIE', 'Normal attack: Bite     Special attack: Let go\nFloats over enemies and structures on a balloon.\nLets go in front of the enemy base and starts biting.'),
+        'ES': ('ZOMBI GLOBO', 'Ataque normal: Mordisco     Ataque especial: Soltar el globo\nVuela sobre enemigos y estructuras con un globo.\nLo suelta frente a la base enemiga y empieza a morder.'),
+        'PT': ('ZUMBI BALÃO', 'Ataque normal: Mordida     Ataque especial: Soltar o balão\nVoa sobre inimigos e estruturas com um balão.\nSolta o balão diante da base inimiga e começa a morder.'),
+        'KR': ('풍선 좀비', '일반 공격：물기     특수 공격：풍선 놓기\n풍선을 타고 적과 건물 위를 날아간다.\n적 거점 앞에서 풍선을 놓고 내려와 물어뜯는다.'),
+    },
+    'gatling': {
+        'ZS': ('机枪豌豆僵尸', '普通攻击：豌豆连射     特殊攻击：豌豆连射\n头上长着机枪豌豆的僵尸。\n一边前进一边连射豌豆，接触敌人后啃咬。'),
+        'ZT': ('機槍豌豆殭屍', '普通攻擊：豌豆連射     特殊攻擊：豌豆連射\n頭上長著機槍豌豆的殭屍。\n一邊前進一邊連射豌豆，接觸敵人後啃咬。'),
+        'JP': ('ガトリングピーゾンビ', '通常攻撃：豆の連射     特殊攻撃：豆の連射\nガトリングピーの頭をしたゾンビ。\n前進しながら豆を連射し、敵に触れるとかみつく。'),
+        'EN': ('GATLING PEA ZOMBIE', 'Normal attack: Pea barrage     Special attack: Pea barrage\nA zombie with a Gatling Pea for a head.\nFires peas while advancing and bites on contact.'),
+        'ES': ('ZOMBI GUISANTRALLADORA', 'Ataque normal: Ráfaga de guisantes     Ataque especial: Ráfaga de guisantes\nUn zombi con una guisantralladora por cabeza.\nDispara guisantes mientras avanza y muerde al contacto.'),
+        'PT': ('ZUMBI METRALHERVILHA', 'Ataque normal: Rajada de ervilhas     Ataque especial: Rajada de ervilhas\nUm zumbi com uma metralhervilha na cabeça.\nDispara ervilhas enquanto avança e morde ao encostar.'),
+        'KR': ('개틀링 완두 좀비', '일반 공격：완두 연사     특수 공격：완두 연사\n개틀링 완두 머리를 한 좀비.\n전진하며 완두를 연사하고, 적에게 닿으면 물어뜯는다.'),
+    },
+    'jalapeno': {
+        'ZS': ('辣椒僵尸', '普通攻击：烈焰     特殊攻击：烈焰\n头上长着火爆辣椒的僵尸。\n碰到敌人时引燃覆盖全场的火焰，随后消失。'),
+        'ZT': ('辣椒殭屍', '普通攻擊：烈焰     特殊攻擊：烈焰\n頭上長著火爆辣椒的殭屍。\n碰到敵人時引燃覆蓋全場的火焰，隨後消失。'),
+        'JP': ('ハラペーニョゾンビ', '通常攻撃：火炎     特殊攻撃：火炎\nハラペーニョの頭をしたゾンビ。\n敵に触れると戦場全体を炎で包み、消え去る。'),
+        'EN': ('JALAPENO ZOMBIE', 'Normal attack: Blaze     Special attack: Blaze\nA zombie with a Jalapeno for a head.\nOn touching an enemy it sets the whole field ablaze, then vanishes.'),
+        'ES': ('ZOMBI JALAPEÑO', 'Ataque normal: Llamarada     Ataque especial: Llamarada\nUn zombi con un jalapeño por cabeza.\nAl tocar a un enemigo incendia todo el campo y desaparece.'),
+        'PT': ('ZUMBI PIMENTA', 'Ataque normal: Labareda     Ataque especial: Labareda\nUm zumbi com uma pimenta jalapeño na cabeça.\nAo tocar um inimigo, incendeia todo o campo e desaparece.'),
+        'KR': ('할라피뇨 좀비', '일반 공격：화염     특수 공격：화염\n할라피뇨 머리를 한 좀비.\n적에게 닿으면 전장 전체를 불태우고 사라진다.'),
+    },
+    'squash': {
+        'ZS': ('倭瓜僵尸', '普通攻击：压扁     特殊攻击：压扁\n头上长着倭瓜的僵尸。\n抵达前线后倭瓜跳下压扁敌人，随后身体倒下。'),
+        'ZT': ('倭瓜殭屍', '普通攻擊：壓扁     特殊攻擊：壓扁\n頭上長著倭瓜的殭屍。\n抵達前線後倭瓜跳下壓扁敵人，隨後身體倒下。'),
+        'JP': ('スクワッシュゾンビ', '通常攻撃：押しつぶし     特殊攻撃：押しつぶし\nスクワッシュの頭をしたゾンビ。\n前線に着くと頭が飛びかかって敵を押しつぶし、体は倒れる。'),
+        'EN': ('SQUASH ZOMBIE', 'Normal attack: Crush     Special attack: Crush\nA zombie with a Squash for a head.\nAt the front line its head leaps off to crush enemies, then the body falls.'),
+        'ES': ('ZOMBI CALABAZA', 'Ataque normal: Aplastar     Ataque especial: Aplastar\nUn zombi con una calabaza por cabeza.\nEn el frente su cabeza salta y aplasta a los enemigos; luego el cuerpo cae.'),
+        'PT': ('ZUMBI ABÓBORA', 'Ataque normal: Esmagar     Ataque especial: Esmagar\nUm zumbi com uma abóbora na cabeça.\nNa linha de frente a cabeça salta e esmaga os inimigos; depois o corpo cai.'),
+        'KR': ('스쿼시 좀비', '일반 공격：짓누르기     특수 공격：짓누르기\n스쿼시 머리를 한 좀비.\n전선에 닿으면 머리가 뛰어올라 적을 짓누르고 몸은 쓰러진다.'),
+    },
+})
+
+# 数值（Lv40）。hp 为相对僵尸（青年）3400 的倍率，dmg 为相对其普攻 600 的倍率；interval_ratio 以 650 tick 为基准。
+NEW_UNITS = {
+    # 爆炸图带“SPROING!!”文字：爆炸开始（动作第 30 tick：玩偶盒弹开 9 帧共 30 tick）起按素材原朝向绘制，两侧文字都正读
+    'jack': dict(ap=175, price=200, hp=[45, 17], dmg=[7, 1], special=[3, 2], interval_ratio=[24, 65], has_special=True,
+                 words={'7': BITE_RANGE, '24': 999, '31': 999, '27': 1, '34': 1, '35': 240, '36': 60},
+                 behaviors=[{'name': 'self_destruct_attack', 'version': 1, 'params': {'unmirrored_from_tick': 30}}]),
+    'balloon': dict(ap=175, price=180, hp=[1237, 340], dmg=[1, 2], interval_ratio=[24, 65], has_special=True,   # Lv40 12370 = 本体 11250 + 气球 1120
+                    words={'7': BITE_RANGE, '24': 1, '31': 1, '27': 1, '34': 1, '29': 0, '35': 60, '36': 60}),
+    'gatling': dict(ap=300, price=250, hp=[75, 17], dmg=[1, 2], interval_ratio=[201, 650],
+                    # 豌豆：近距参数组（词 15–21）。伤害取僵尸（青年）普攻曲线的一半（运行时再 ×1/2，Lv40 150）；
+                    # 击退值 1.0、单体、弹速 10.0、等待 5 同机枪小兵（UnitID 48），行程 950（射程 900 + 50）
+                    words={'7': BITE_RANGE, '24': 1, '31': 1, '27': 1, '34': 1, '29': 0, '35': 0, '36': 0,
+                           '15': [100, 150, 200, 250, 300, 350], '16': float_bits(1.0), '17': 1,
+                           '18': float_bits(10.0), '19': GATLING_RANGE + 50, '20': 5},   # 行程为射程 + 50（同机枪小兵 300 / 350）
+                    behaviors=[{'name': 'walk_shoot', 'version': 1, 'params': {'range': GATLING_RANGE}}]),
+    'jalapeno': dict(ap=200, price=250, hp=[75, 17], dmg=[1, 1], interval_ratio=[33, 65], attributes={'normal': 1},
+                     words={'7': BITE_RANGE, '24': 999, '31': 999, '27': 1, '34': 1, '29': 0, '35': 0, '36': 0},
+                     behaviors=[{'name': 'self_destruct_attack', 'version': 1, 'params': {}},
+                                {'name': 'ground_only_attack', 'version': 1, 'params': {}}]),
+    'squash': dict(ap=150, price=200, hp=[225, 68], dmg=[7, 2], interval_ratio=[24, 65],
+                   words={'7': SMASH_RANGE, '24': 999, '31': 999, '27': 1, '34': 1, '29': 0, '35': 0, '36': 0},
+                   behaviors=[{'name': 'self_destruct_attack', 'version': 1, 'params': {}}]),
+}
+
+
+def balloon_rage():
+    from fractions import Fraction
+    f = (Fraction(*NEW_MOVE['gatling']) / Fraction(*NEW_MOVE['balloon'])).limit_denominator(10000)
+    return [f.numerator, f.denominator]
+
+
+def unit_file_new(kind, icon, texture, descriptor, animations):
+    v = NEW_UNITS[kind]
+    text = {code: {'name': n, 'description': d if v.get('has_special') else no_special(d)} for code, (n, d) in TEXT[kind].items()}
+    behaviors = list(v.get('behaviors', []))
+    if kind == 'balloon':
+        behaviors = [
+            {'name': 'hp_stage_animations', 'version': 1,
+             'params': {'thresholds': [[1125, 1237]], 'transitions': [1], 'rage_stage': 1,
+                        'rage_speed_multiplier': balloon_rage()}},
+            {'name': 'stage_knockback_animation', 'version': 1, 'params': {}},
+            {'name': 'balloon_flight', 'version': 1,
+             'params': {'pop_distance': BALLOON_POP, 'launch_sound': SND['ballooninflate']}},
+        ]
+    behaviors.append({'name': 'front_nearest_target', 'version': 1, 'params': {}})
+    if kind in ('balloon', 'gatling'):
+        behaviors.append({'name': 'kill_sound', 'version': 1, 'params': {'sound': SND['gulp']}})
+    unit = {
+        'key': S + 'pvz_' + kind, 'base_id': 313, 'faction': 3, 'identity': 'Zombie',
+        'shop_price': v['price'], 'available_from_start': True, 'ap': v['ap'],
+        'hp_multiplier': v['hp'], 'knockback_threshold_multiplier': KNOCKBACK_THRESHOLD_DEFAULT,
+        'production_reference_id': 313, 'production_interval_multiplier': v['interval_ratio'],
+        'damage_multiplier': v['dmg'], 'special_damage_multiplier': v.get('special', [1, 1]),
+        'move_speed_multiplier': list(NEW_MOVE[kind]), 'knockback_distance_multiplier': [1, 1],
+        'status_word_values': v['words'],
+        'icon': icon, 'textures': [texture], 'sprite_descriptor': descriptor, 'animations': animations,
+        'localization': text, 'tags': ['pvz'], 'behaviors': behaviors,
+    }
+    if 'attributes' in v:
+        unit['attack_attributes'] = v['attributes']
+    return unit
+
+
 
 def unit_file(kind, icon, texture, descriptor, animations):
     key = S + 'pvz_' + kind
@@ -954,7 +1408,7 @@ def unit_file(kind, icon, texture, descriptor, animations):
             'localization': text, 'menu_reference_id': 159, 'internal_only': True,
             'behaviors': [{'name': 'para_drop_transform', 'version': 1, 'params': {'landing_unit': S + 'pvz_imp'}},
                           {'name': 'thrown_flight', 'version': 1,
-                           'params': {'forward': 56, 'height': IMP_FLIGHT[3]}}],
+                           'params': {'forward': 56, 'height': IMP_FLIGHT[3], 'base_clearance': 16}}],
         }
     v = UNITS[kind]
     smash = kind == 'gargantuar'
@@ -1010,7 +1464,8 @@ def unit_file(kind, icon, texture, descriptor, animations):
 # 原为基寇卡原版 750 tick；橄榄球 650 × 67/260 = 167.5 → 168 tick，冰车 650 × 67/208 = 209.375 → 210 tick）、
 # 碾压每秒 1200（词 15 Lv40 每帧 6 × 20/3 = 40；2026-10-15 用户要求减半，原为 40/3、每秒 2400）、攻击框为车体图像范围（见 build_zomboni）。击退门槛按第 6.1 节随生命倍率；
 # 雪地步兵的动作类出击即不被击退，门槛实际不使用。受击时播放金属音效（用户 2026-10-12：shieldhit 用于铁桶与冰车）。
-ZOMBONI = dict(ap=250, price=250, hp=[25, 6], dmg=[20, 3], move=[1608, 1625],
+# 2026-10-15 用户要求削弱：再出击时间改为 18 秒（540 tick，650 × 54/65，各等级相同），不再随橄榄球换算（原为 210 tick）。
+ZOMBONI = dict(ap=250, price=250, hp=[25, 6], dmg=[20, 3], move=[1608, 1625], interval_ratio=[54, 65],
                thresholds=[[4, 5], [3, 5], [2, 5], [1, 5]], armor=([SND['shieldhit'], SND['shieldhit2']], 5))
 
 
@@ -1021,8 +1476,7 @@ def unit_file_zomboni(icon, texture, descriptor, animations):
         'shop_price': v['price'], 'available_from_start': True, 'ap': v['ap'],
         'hp_multiplier': v['hp'], 'knockback_threshold_multiplier': v['hp'],
         'production_reference_id': 313,
-        'production_interval_multiplier': reduce_ratio(UNITS['football']['interval'] * INTERVAL_SCALE['football'][0] * 5,
-                                                       650 * INTERVAL_SCALE['football'][1] * 4),
+        'production_interval_multiplier': v['interval_ratio'],
         'damage_multiplier': v['dmg'], 'special_damage_multiplier': [1, 1],
         'move_speed_multiplier': v['move'], 'knockback_distance_multiplier': [1, 1],
         'icon': icon, 'textures': [texture], 'sprite_descriptor': descriptor, 'animations': animations,
@@ -1070,6 +1524,11 @@ def main():
         'imp': lambda: build_imp(main_anims, garg),
         'imp_flight': lambda: build_imp_flight(main_anims),
         'zomboni': lambda: build_zomboni(main_anims),
+        'jack': lambda: build_jack(main_anims),
+        'balloon': lambda: build_balloon(main_anims),
+        'gatling': lambda: build_gatling(main_anims),
+        'jalapeno': lambda: build_jalapeno(main_anims),
+        'squash': lambda: build_squash(main_anims),
     }
     icon_page, icon_rects = build_icons(main_anims, garg)
     files, report = {}, {}
@@ -1081,10 +1540,14 @@ def main():
     for kind in ORDER:
         sheet, count, hit, attacks = builders[kind]()
         if kind != 'imp_flight':
-            # 槽 8（僵尸（青年）的动作类不使用）：只由 C++ 行为播放的音效（防具受击、击毙）。原生开战预载
+            # 槽 8（僵尸（青年）的动作类不使用）：只由 C++ 行为播放的音效（防具受击、击毙、气球出场）。原生开战预载
             # BattleSpriteFactory::readSounds 逐个脚本扫描到 op5/op21 为止，对其中 op23 调用 loadSound；该槽不会被播放。
-            spec = ZOMBONI if kind == 'zomboni' else UNITS[kind]
-            behavior_sounds = list(spec.get('armor', ([], 0))[0]) + ([SND['gulp']] if kind not in ('gargantuar', 'zomboni') else [])
+            # 自爆单位（小丑、辣椒、倭瓜）的槽 8 为普通攻击动作，不用于预载（其音效都写在动作脚本中）。
+            if kind in NEW_KINDS:
+                behavior_sounds = {'balloon': [SND['gulp'], SND['ballooninflate']], 'gatling': [SND['gulp']]}.get(kind, [])
+            else:
+                spec = ZOMBONI if kind == 'zomboni' else UNITS[kind]
+                behavior_sounds = list(spec.get('armor', ([], 0))[0]) + ([SND['gulp']] if kind not in ('gargantuar', 'zomboni') else [])
             if behavior_sounds:
                 sheet.scripts[8] = [op(23, k) for k in behavior_sounds] + [op(21)]
         obm, desc, animations, page = finish(sheet, count, hit, attacks)
@@ -1095,7 +1558,9 @@ def main():
         icon_kind = 'imp' if kind == 'imp_flight' else kind
         rect, anchor = icon_rects[icon_kind]
         icon = {'atlas': ICON_ATLAS, 'rect': rect, 'anchor': anchor}
-        unit = (unit_file_zomboni if kind == 'zomboni' else lambda *a: unit_file(kind, *a))(icon, texture, descriptor, animations)
+        maker = (unit_file_zomboni if kind == 'zomboni' else (lambda *a: unit_file_new(kind, *a)) if kind in NEW_KINDS
+                 else lambda *a: unit_file(kind, *a))
+        unit = maker(icon, texture, descriptor, animations)
         save_json(CONTENT / 'units' / f'pvz_{kind}.json', unit)
         key = unit['key']
         if key not in index['unit_ids']:

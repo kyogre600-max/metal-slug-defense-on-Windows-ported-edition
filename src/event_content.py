@@ -26,11 +26,16 @@
   "map": {"image": "author_mod_summer_map.png"}    可选：1440×709 的地图底图，替换原生活动地图的世界地图图层
   小关 "thumbnail": "author_mod_summer_s1.png"      可选：128×56 的小关缩略图（关卡信息窗口）
   地图坐标：区域 position 为世界地图图层（1440×709）上的像素坐标；区域总览以约 0.6529 倍绘制于 (9.9, 71.6)。
+  EVENT "map_music": SoundID 或 bgm 音效键        可选：活动地图（EventMSD 场景 158–160）与俘虏页的 BGM。原生按 WorldType
+      选择（自制 EVENT 使用的经典路由为 103，Survival 与合作路由为 156，猫咪为 152）；指定时宿主在当前 BGM 为 103 时改请求该 BGM。
+  区域图标：自制 EVENT 的区域在地图上显示数字图标 1–N（区域记录 +14 写 −1；原生非 −1 时为 Boss 图标）。
 
 人质类玩法（M6b-3）：
   小关 "prisoners": 0–10                            该关俘虏数（原生关卡记录词 7，地图标记的上限）
   区域 "reward": {"unit": 单位, "portrait": 0–40, "names": {...}, "info1": {...}, "info2": {...}}
                                                     区域俘虏奖励（俘虏页的人物、名称与说明；portrait 为原生俘虏图像编号）
+  区域 reward "portrait_image": PNG/WebP 文件名      可选：俘虏页立绘（宽 ≤ 400、高 ≤ 500）。下沿对齐原生立绘的底线，水平中心对齐
+      原生 0 号立绘；宿主为该区域分配一个未使用的原生立绘编号，并在俘虏页以 drawConv 替换表换入此图（与 portrait 不同时使用）。
   EVENT "final_reward_units": [单位, ...]            parts 收齐全部零件、invitation 收齐全部邀请函时给予
   - rescue / collaboration_rescue：区域内各关救出的俘虏合计达到上限时给予该区域奖励单位（原生俘虏页显示达成）。
     collaboration_rescue 为猫咪联动的救人质玩法；自制版本使用经典地图路由与自制地图（猫咪专用两页地图未采用）。
@@ -53,6 +58,21 @@
   "part1": {"areas": k, "shop": m, "names": {...}, "date": "...", "image": "..."}
     分期（与历史活动的 PART1/PART2 相同）：PART1 为前 k 个区域与前 m 个兑换商品，PART2 为完整 EVENT；
     浏览页显示两个入口，进度、代币与购买次数共用。names 缺省为 EVENT 名称加 “(PART1)”，date、image 缺省同 EVENT。
+
+出兵控制（2026-10-15，原生 BattleControllerEnemy::update 0x1ca044 / updateFirst 0x1c9e7e / runScriptAction 0x1c9f6c
+与 BattleScene::setupResourceAll 0x1d45f0 静态核对；与历史活动关卡记录的词 21–29 相同）：
+  小关 "loop": 1–32766            出兵表计时到该帧时回到 0（历史活动均为 1080，即 36 秒循环）；缺省不循环
+  小关 "triggers": [{"when": "time" | "base_hp" | "front", "value": n,
+                     "spawn": 名单序号 | "jump": 帧 | "strength": 级数, "repeat": false}]
+      time：出兵计时等于 n（0–32766）；base_hp：敌方据点生命低于 n%（1–100）；front：我方最前单位与敌方据点的
+      水平距离小于 n（0–20000）。spawn 出兵一次；jump 把出兵计时设为该帧；strength 给敌方追加关卡强化级数
+      （每级生命与攻击 +20%，与 strength_steps 相同）。repeat 为 false 时每场只触发一次。与 loop 合计至多 32 条。
+  小关 "placed": [{"enemy": 名单序号, "x": 战场横坐标}]       开战时已在战场上的敌方单位（至多 32 个）
+  小关 "items": [{"x": n, "y": 离地高度, "weight": 0–4}]       道具与俘虏的放置位置（至多 32 处）：每场随机取其中
+      约 67% 的位置；"prisoner_chance"（0–100）为每处出现俘虏的概率（weight 0–4 依次乘 1.4/1.2/1.0/0.9/0.8，
+      每出现一名俘虏概率减半，俘虏数不超过该关尚未救出的人数），其余为原生道具；"item_level" 为道具等级（1–200）。
+      人质类玩法的俘虏只经此表出现。
+  小关 "difficulty": 0–5            关卡信息窗的难度标签（关卡记录词 9，0 为 EASY；缺省沿用模板关卡）
 
 运行（M6b-1）：所有自制 EVENT 经女教官基地进入原生 EventMSD 地图（经典活动路由：WorldType 1、模式 3、原生世界 4，
 与万圣节相同，不触发专用画面）。关卡编号为 30000+1000×4+10×(区域+1)+小关+1，宿主按活动独立建表（选择活动时生效），
@@ -89,11 +109,18 @@ TEMPLATE_EVENT = 'halloween_2015'
 IMAGE_SIZE = (360, 240)
 MAX_AREAS, MAX_STAGES_PER_AREA = 16, 5
 DATE_PATTERN = re.compile(r'\d{4}-\d{2}-\d{2}')
-EVENT_FIELDS = {'schema', 'key', 'mode', 'names', 'details', 'publisher', 'date', 'order', 'image', 'map', 'areas',
+EVENT_FIELDS = {'schema', 'key', 'mode', 'names', 'details', 'publisher', 'date', 'order', 'image', 'map', 'map_music', 'areas',
                 'final_reward_units', 'survival', 'shop', 'medal_shop', 'part1'}
 AREA_FIELDS = {'key', 'names', 'position', 'stages', 'reward'}
 STAGE_FIELDS = {'key', 'marker', 'preview_frame', 'template', 'scene', 'music', 'stamina', 'reward_msp', 'enemy_base_hp',
-                'strength_steps', 'enemies', 'waves', 'reward_units', 'thumbnail', 'prisoners', 'survival_row'}
+                'strength_steps', 'enemies', 'waves', 'reward_units', 'thumbnail', 'prisoners', 'survival_row',
+                'loop', 'triggers', 'placed', 'items', 'item_level', 'prisoner_chance', 'difficulty'}
+# 出兵触发（关卡记录词 21/22，每条 20 字节：条件、值、动作、参数、可重复）：条件 0 计时相等、1 敌方据点生命百分比
+# 低于、2 我方最前单位与敌方据点距离小于；动作 0 出兵、1 设定出兵计时、2 追加强化级数。触发记录以 32 位掩码标记
+# 已触发，故每关至多 32 条。
+TRIGGER_WHEN = {'time': (0, 0, 32766), 'base_hp': (1, 1, 100), 'front': (2, 0, 20000)}
+TRIGGER_ACTIONS = ('spawn', 'jump', 'strength')
+MAX_TRIGGERS = 32
 # 自制地图（M6b-2）：原生 EventMSD 地图的世界地图图层由两个转换项组成（GraphicsOpt::drawConv 记录，
 # verification/m6b1_20261010/diag_draw.py）：0x10306ab4 为 (0,0) 起 823×680，0x10306ac4 为 617×709、锚点 x −823，
 # 合成 1440×709；区域总览以约 0.6529 倍绘制于 (9.9, 71.6)，区域放大时同一图层放大。小关缩略图为 128×56，
@@ -104,6 +131,16 @@ MAP_CONVS = (0x10306ab4, 0x10306ac4)
 THUMB_SIZE = (128, 56)
 THUMB_CONV_BASE = 0x10307bde
 REPLACE_MAGIC = 0x47505356
+# 俘虏页立绘（2026-10-15）：GT_PrisonerBustUpDraw（0x211e28）以 drawPict(GetPrisonerPictNo) 绘制，转换表 0x10304502 起每项
+# 16 字节、共 44 项（编号 0–43）。原生立绘按锚点放置：左上 = 绘制点 − 锚点；多数立绘下沿相同（−锚点y + 高 = 508），
+# 0 号立绘 (228×436，锚点 −30,−72) 的水平中心在 绘制点 + 144 处。自制立绘取同一底线与 0 号的水平中心。
+PORTRAIT_CONV_BASE = 0x10304502
+PORTRAIT_COUNT = 44
+PORTRAIT_MAX = (400, 500)
+PRISONER_SCENES = (62, 63, 64)       # SC_PrisonerInit / Loop / End
+POPUP_SCENES = (119, 120, 121, 122)
+MAP_SCENES = (158, 159, 160)
+MAX_REPLACEMENTS = 16                # drawConv 替换表容量（lab_hooks 第 22 版）
 
 
 def body_dir(root):
@@ -164,6 +201,12 @@ def check_event(raw, prefix, resolve):
         if not isinstance(art, dict) or set(art) != {'image'}:
             raise ValueError(f'{key}: map is {{"image": file}}')
         event['map_path'] = str(check_image(art['image'], resolve, MAP_SIZE, f'{key} map image'))
+    if 'map_music' in event:
+        music = event['map_music']
+        if type(music) is int:
+            integer(music, 1, 1030, f'{key} map_music')
+        elif not isinstance(music, str):
+            raise ValueError(f'{key}: map_music is an original SoundID or a bgm sound key')
     areas = event.get('areas')
     if not isinstance(areas, list) or not 1 <= len(areas) <= MAX_AREAS:
         raise ValueError(f'{key}: areas must list 1–{MAX_AREAS} areas (original EventMSD capacity)')
@@ -196,7 +239,7 @@ def check_event(raw, prefix, resolve):
             check_stage(stage, area['key'])
             if 'thumbnail' in stage:
                 stage['thumbnail_path'] = str(check_image(stage['thumbnail'], resolve, THUMB_SIZE, f'{stage["key"]} thumbnail'))
-        check_area_reward(area, mode)
+        check_area_reward(area, mode, resolve)
         if mode not in PRISONER_MODES and any(s.get('prisoners', 0) for s in stages):
             raise ValueError(f'{area["key"]}: prisoners are used by rescue, collaboration_rescue, parts and invitation events')
         for item in [area] + stages:
@@ -295,7 +338,7 @@ def check_shops(event, mode):
             raise ValueError(f'{key}: medal_shop available is "event", {{"stage": key}} or {{"score": n}}')
 
 
-def check_area_reward(area, mode):
+def check_area_reward(area, mode, resolve=None):
     reward = area.get('reward')
     with_prisoners = any(s.get('prisoners', 0) for s in area.get('stages', []) if isinstance(s, dict))
     if reward is None:
@@ -307,14 +350,29 @@ def check_area_reward(area, mode):
             return
     if mode not in PRISONER_MODES:
         raise ValueError(f'{area["key"]}: area rewards are used by rescue, collaboration_rescue, parts and invitation events')
-    if not isinstance(reward, dict) or set(reward) - {'unit', 'portrait', 'names', 'info1', 'info2'}:
-        raise ValueError(f'{area["key"]}: reward contains unit, portrait, names, info1 and info2')
+    if not isinstance(reward, dict) or set(reward) - {'unit', 'portrait', 'portrait_image', 'names', 'info1', 'info2'}:
+        raise ValueError(f'{area["key"]}: reward contains unit, portrait, portrait_image, names, info1 and info2')
     if mode in ('parts', 'invitation'):
         if 'unit' in reward:
             raise ValueError(f'{area["key"]}: {mode} areas give no unit; the unit is final_reward_units')
     else:
         check_unit_ref(reward.get('unit'), area['key'])
     integer(reward.get('portrait', 0), 0, 40, f'{area["key"]} reward portrait')
+    if 'portrait_image' in reward:
+        if 'portrait' in reward:
+            raise ValueError(f'{area["key"]}: reward uses portrait or portrait_image, not both')
+        name = reward['portrait_image']
+        if (resolve is None or not isinstance(name, str) or Path(name).name != name
+                or Path(name).suffix.lower() not in ('.png', '.webp')):
+            raise ValueError(f'{area["key"]}: portrait_image must be a .png or .webp file name')
+        source = resolve(name)
+        if source is None:
+            raise ValueError(f'{area["key"]}: missing portrait_image {name}')
+        from PIL import Image
+        with Image.open(source) as image:
+            if not (1 <= image.width <= PORTRAIT_MAX[0] and 1 <= image.height <= PORTRAIT_MAX[1]):
+                raise ValueError(f'{area["key"]}: portrait_image must be at most {PORTRAIT_MAX[0]}×{PORTRAIT_MAX[1]}')
+        reward['portrait_image_path'] = str(source)
     for field in ('names', 'info1', 'info2'):
         if field == 'names' or field in reward:
             reward[field] = content_locale.fill(reward.get(field), f'{area["key"]} reward {field}')
@@ -370,6 +428,49 @@ def check_stage(stage, area_key):
             raise ValueError(f'{k}: waves contain tick and enemy')
         previous = integer(wave['tick'], previous + 1, 32766, f'{k} wave tick (ascending)')
         integer(wave['enemy'], 0, len(enemies) - 1, f'{k} wave enemy index')
+    if 'loop' in stage:
+        integer(stage['loop'], 1, 32766, f'{k} loop')
+    triggers = stage.get('triggers', [])
+    if not isinstance(triggers, list) or len(triggers) + ('loop' in stage) > MAX_TRIGGERS:
+        raise ValueError(f'{k}: triggers list up to {MAX_TRIGGERS} entries (loop counts as one)')
+    for trigger in triggers:
+        actions = [a for a in TRIGGER_ACTIONS if isinstance(trigger, dict) and a in trigger]
+        if (not isinstance(trigger, dict) or len(actions) != 1 or trigger.get('when') not in TRIGGER_WHEN
+                or set(trigger) - {'when', 'value', 'repeat', *TRIGGER_ACTIONS}):
+            raise ValueError(f'{k}: triggers contain when (time, base_hp or front), value, one of spawn/jump/strength and optional repeat')
+        _, low, high = TRIGGER_WHEN[trigger['when']]
+        integer(trigger.get('value'), low, high, f'{k} {trigger["when"]} trigger value')
+        if not isinstance(trigger.get('repeat', False), bool):
+            raise ValueError(f'{k}: trigger repeat is true or false')
+        action = actions[0]
+        if action == 'spawn':
+            integer(trigger['spawn'], 0, len(enemies) - 1, f'{k} trigger spawn index')
+        elif action == 'jump':
+            integer(trigger['jump'], 0, 32766, f'{k} trigger jump tick')
+        else:
+            integer(trigger['strength'], 1, 100, f'{k} trigger strength')
+    placed = stage.get('placed', [])
+    if not isinstance(placed, list) or len(placed) > 32:
+        raise ValueError(f'{k}: placed lists up to 32 units')
+    for unit in placed:
+        if not isinstance(unit, dict) or set(unit) != {'enemy', 'x'}:
+            raise ValueError(f'{k}: placed units contain enemy and x')
+        integer(unit['enemy'], 0, len(enemies) - 1, f'{k} placed enemy index')
+        integer(unit['x'], -65536, 65534, f'{k} placed x')
+    items = stage.get('items', [])
+    if not isinstance(items, list) or len(items) > 32:
+        raise ValueError(f'{k}: items list up to 32 positions')
+    for item in items:
+        if not isinstance(item, dict) or set(item) != {'x', 'y', 'weight'}:
+            raise ValueError(f'{k}: items contain x, y and weight')
+        integer(item['x'], 0, 20000, f'{k} item x')
+        integer(item['y'], 0, 1000, f'{k} item height')
+        integer(item['weight'], 0, 4, f'{k} item weight')
+    integer(stage.get('item_level', 1), 1, 200, f'{k} item_level')
+    integer(stage.get('prisoner_chance', 0), 0, 100, f'{k} prisoner_chance')
+    integer(stage.get('difficulty', 0), 0, 5, f'{k} difficulty')
+    if stage.get('prisoners', 0) and stage.get('prisoner_chance', 0) and not items:
+        raise ValueError(f'{k}: prisoners appear only at item positions; add items')
     rewards = stage.get('reward_units', [])
     if not isinstance(rewards, list) or len(rewards) > 8:
         raise ValueError(f'{k}: reward_units lists up to 8 units')
@@ -411,6 +512,8 @@ def references(event):
     for row in event.get('shop', []) + event.get('medal_shop', []):
         if isinstance(row.get('unit'), str):
             yield 'unit', row['unit']
+    if isinstance(event.get('map_music'), str):
+        yield 'sound', event['map_music']
 
 
 def check_references(event, units, sounds, scenes, visible):
@@ -421,7 +524,7 @@ def check_references(event, units, sounds, scenes, visible):
         if key not in known or not visible(prefix):
             raise ValueError(f'{event["key"]}: {kind} {key} is not registered or not visible')
         if kind == 'sound' and sounds[key] != 'bgm':
-            raise ValueError(f'{event["key"]}: stage music {key} must be a bgm sound')
+            raise ValueError(f'{event["key"]}: music {key} must be a bgm sound')
 
 
 def read_folder(folder, prefix, resolve):
@@ -477,6 +580,31 @@ def build_mission(trial, stage, sid, ids):
     words[20] = len(waves)
     for off in (21, 22, 23, 24, 28, 29):
         words[off] = 0
+    # 出兵触发（词 21/22）：BattleControllerEnemy::update 逐帧检查，runScriptAction 执行动作。
+    conds = [(0, stage['loop'], 1, 0, 1)] if 'loop' in stage else []
+    for trigger in stage.get('triggers', []):
+        action = next(a for a in TRIGGER_ACTIONS if a in trigger)
+        conds.append((TRIGGER_WHEN[trigger['when']][0], trigger['value'], TRIGGER_ACTIONS.index(action), trigger[action],
+                      int(trigger.get('repeat', False))))
+    if conds:
+        words[21] = trial.blob(b''.join(struct.pack('<iiiiB3x', *c) for c in conds))
+        words[22] = len(conds)
+    # 开战时的敌方单位（词 23/24，updateFirst）：名单序号 int8、横坐标/2 int16。
+    placed = stage.get('placed', [])
+    if placed:
+        words[23] = trial.blob(b''.join(struct.pack('<bxh', u['enemy'], u['x'] >> 1) for u in placed))
+        words[24] = len(placed)
+    # 道具与俘虏放置表（词 28/29，setupResourceAll）；词 26 道具等级、词 27 俘虏出现概率。
+    items = stage.get('items', [])
+    if items:
+        words[28] = trial.blob(b''.join(struct.pack('<3i', i['x'], i['y'], i['weight']) for i in items))
+        words[29] = len(items)
+    if 'item_level' in stage:
+        words[26] = stage['item_level']
+    if 'prisoner_chance' in stage:
+        words[27] = stage['prisoner_chance']
+    if 'difficulty' in stage:
+        words[9] = stage['difficulty']          # GetStageLevel 读取的难度标签
     return struct.pack('<30I', *words)
 
 
@@ -489,18 +617,29 @@ def compile_event(trial, event, templates, ids):
     key = event['key']
     area_template, marker_template = templates
     rows, data_stages, areas = [], [], []
-    art = {'map': event.get('map_path'), 'thumbs': {}}
+    art = {'map': event.get('map_path'), 'thumbs': {}, 'portraits': {}}
     prisoners = {}
     index = 0
+    # 俘虏页立绘图像：为各区域分配未被本 EVENT 原生立绘使用的编号（同时可见的两页立绘各用一个转换项）。
+    taken = {a.get('reward', {}).get('portrait', 0) for a in event['areas']
+             if 'reward' in a and 'portrait_image_path' not in a['reward']}
+    free = iter(n for n in range(PORTRAIT_COUNT) if n not in taken)
     for a, area in enumerate(event['areas']):
         raw = bytearray(area_template)
         struct.pack_into('<ii', raw, 4, *area['position'])
+        # +14 为 GetAreaBoss：−1 时地图显示区域编号图标（GT_EventMSDAreaIconDraw 画 0x69 + 区域序号），
+        # 万圣节模板为 23（Boss 图标“!”）。
+        struct.pack_into('<h', raw, 14, -1)
         pid = PRISONER_BASE + a if 'reward' in area else -1
         struct.pack_into('<hH', raw, 16, pid, len(area['stages']))
         if pid >= 0:
             reward = area['reward']
             unit = unit_id(reward['unit'], ids) if 'unit' in reward else 0xffffffff
-            words = (pid, reward.get('portrait', 0), 0xffffffff, 1, unit, 0xffffffff)
+            portrait = reward.get('portrait', 0)
+            if 'portrait_image_path' in reward:
+                portrait = next(free)
+                art['portraits'][portrait] = reward['portrait_image_path']
+            words = (pid, portrait, 0xffffffff, 1, unit, 0xffffffff)
             # 俘虏页文字按原生语言编号排列（prisoner_text 以语言编号取下标）。
             order = [ids['languages'][i] for i in range(11)]
             prisoners[str(pid)] = {'raw_hex': struct.pack('<6I', *words).hex(),
@@ -530,7 +669,9 @@ def compile_event(trial, event, templates, ids):
     trial.data[key] = {'event_key': key, 'controller': mode, 'currency': currency, 'stages': data_stages,
                        'shop': {'rows': shop_rows(trial, event, ids)}, 'custom': True,
                        'final_reward_units': [unit_id(u, ids) for u in event.get('final_reward_units', [])],
-                       'hud': SURVIVAL_TEMPLATES.get(event.get('survival', {}).get('template'))}
+                       'hud': SURVIVAL_TEMPLATES.get(event.get('survival', {}).get('template')),
+                       'map_music': (None if 'map_music' not in event else event['map_music'] if type(event['map_music']) is int
+                                     else ids['sounds'][event['map_music']])}
     trial.tables[key] = {'missions': trial.blob(b''.join(rows)), 'count': len(rows)}
     if mode in SURVIVAL_MODES:
         trial.tables[key].update(survival_tables(trial, event, [s['id'] for s in data_stages]))
@@ -540,7 +681,7 @@ def compile_event(trial, event, templates, ids):
     trial.catalog.append({'event_key': key, 'title_zh': event['names']['ZS'], 'stage_count': len(rows),
                           'controller': event['mode'], 'currency': None, 'custom': True})
     trial.custom_maps[key] = {'world_count': 1, 'areas': areas, 'prisoners': prisoners, 'custom': True}
-    if art['map'] or art['thumbs']:
+    if art['map'] or art['thumbs'] or art['portraits']:
         trial.custom_art[key] = art
     entry = {'event_key': key, 'date': event['date'], 'order': event.get('order', 0), 'names': event['names'],
              'details': event.get('details'), 'publisher': event['publisher'],
@@ -696,12 +837,14 @@ def install(trial):
 
 
 class MapArt:
-    """自制地图图层与小关缩略图（M6b-2）：所选自制 EVENT 的原生地图场景（158–160）中写入 drawConv 替换表，离开时清除。"""
+    """自制地图图层与小关缩略图（M6b-2）：所选自制 EVENT 的原生地图场景（158–160）中写入 drawConv 替换表，离开时清除。
+    俘虏页立绘（2026-10-15）：俘虏页（场景 62–64，以及其上的原生弹窗 119–122）中换入区域奖励的 portrait_image。"""
 
     def __init__(self, trial):
         self.t = trial
         self.images = {}
         self.written = None
+        self.base_scene = 0
 
     def image(self, path):
         if path not in self.images:
@@ -711,9 +854,16 @@ class MapArt:
                 self.images[path] = create_native_image(self.t.p, source.convert('RGBA'))
         return self.images[path]
 
-    def entries(self, art):
+    def entries(self, art, prisoner_page=False):
         p = self.t.p
         rows = []
+        if prisoner_page:
+            for pict, path in sorted(art.get('portraits', {}).items()):
+                image = self.image(path)
+                from PIL import Image
+                with Image.open(path) as source:
+                    w, h = source.size
+                rows.append((PORTRAIT_CONV_BASE + 16 * pict, image, (0, 0, w, h, w // 2 - 144, h - 508, 0, 0)))
         if art['map']:
             image = self.image(art['map'])
             for conv in MAP_CONVS:
@@ -721,9 +871,10 @@ class MapArt:
                 # 作者底图为单张 1440×709：第二个转换项的源矩形从 x=823 起（与锚点 −823 对应）。
                 rows.append((conv, image, (-ax, 0, w, h, ax, ay, flags, 0)))
         area = p.word(p.app_instance() + 0xc628)
-        for slot, path in sorted(art['thumbs'].get(area, {}).items()):
-            rows.append((THUMB_CONV_BASE + 16 * slot, self.image(path), (0, 0) + THUMB_SIZE + (0, 0, 0, 0)))
-        return rows
+        if not prisoner_page:
+            for slot, path in sorted(art['thumbs'].get(area, {}).items()):
+                rows.append((THUMB_CONV_BASE + 16 * slot, self.image(path), (0, 0) + THUMB_SIZE + (0, 0, 0, 0)))
+        return rows[:MAX_REPLACEMENTS]
 
     def update(self):
         t, p = self.t, self.t.p
@@ -731,20 +882,25 @@ class MapArt:
         header = lab.LAB_HEADER + 0xb40
         app = p.app_instance()
         art = t.custom_art.get(t.selected) if t.selected else None
-        active = bool(art and app and t.native_map.active and p.word(app + 0x22bc) in (158, 159, 160))
+        scene = p.word(app + 0x22bc) if app else 0
+        if scene not in POPUP_SCENES:
+            self.base_scene = scene
+        # 原生弹窗（119–122）画在所在场景之上：按弹窗之前的场景判断。
+        prisoner_page = self.base_scene in PRISONER_SCENES
+        active = bool(art and app and t.native_map.active and (self.base_scene in MAP_SCENES or prisoner_page))
         if not active:
             if self.written is not None:
                 if p.word(header) == REPLACE_MAGIC:
                     p.put(header, 0)
                 self.written = None
             return
-        rows = self.entries(art)
+        rows = self.entries(art, prisoner_page)
         if rows == self.written:
             return
-        for i, (conv, image, rect) in enumerate(rows[:8]):
+        for i, (conv, image, rect) in enumerate(rows):
             e = header + 0x10 + i * 32
             p.put(e, conv); p.put(e + 4, 0); p.put(e + 8, image); p.put(e + 12, 0)
             p.write(e + 16, struct.pack('<8h', *rect))
-        p.put(header + 4, min(8, len(rows)))
+        p.put(header + 4, len(rows))
         p.put(header, REPLACE_MAGIC)
         self.written = rows

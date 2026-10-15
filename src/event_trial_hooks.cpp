@@ -440,6 +440,13 @@ SHOP_HOOK(hud_item_frames,0x101dade5u,{
     uint32_t table=active(c)?rd<uint32_t>(c,H+220):0u;
     if(table&&c.r[8]==c.r[13]+0xb0u)for(uint32_t i=0;i<9u*16u;i+=4u)wr<uint32_t>(c,c.r[8]+i,rd<uint32_t>(c,table+i));
 })
+// 俘虏单位（2026-10-15）：BattleScene::setupResourceAll 在放置表位置生成俘虏候选对象时，WorldType 1（经典活动路由）
+// 固定生成 UnitID 289（巨灵战车零件，0x1d4e32），其余情形生成常规关卡的俘虏 UnitID 231（0x1d4e76）。H+224 非零
+// （宿主选择自制 EVENT 时写入）时改走常规分支；俘虏类型（+0x54）、现身与救出计数沿用原生。
+SHOP_HOOK(regular_prisoner,0x101d4e27u,if(active(c)&&rd<uint32_t>(c,H+224)){c.r[3]=0u;c.pc=0x101d4e77u;return;})
+// 结算画面的俘虏图标（2026-10-15，r61）：BattleResultScene::initialize 在模式 3（经典活动路由）下除一周年外把图标类型
+// （+0x188）设为 2，生成 UnitID 289（巨灵战车零件）的精灵；常规关卡为类型 0（SpriteID 0 的常规俘虏）。H+224 非零时直接设为 0。
+SHOP_HOOK(regular_prisoner_result,0x101d18d9u,if(active(c)&&rd<uint32_t>(c,H+224)){wr<uint32_t>(c,c.r[4]+0x188u,0u);c.pc=0x101d198bu;return;})
 SHOP_HOOK(map_stage_new,0x10167ff1u,if(stage_wt(c,true)){ret(c,0);return;})
 SHOP_HOOK(map_stage_new_delete,0x1016807du,if(stage_wt(c,true)){ret(c,0);return;})
 SHOP_HOOK(map_area_new,0x10168659u,if(map_wt(c,c.r[3],true)){ret(c,0);return;})
@@ -496,6 +503,7 @@ SHOP_HOOK(selector_chosen,0x1020e805u,if(rd<uint32_t>(c,H+124)){
 SHOP_HOOK(selector_cost_icon,0x102005ddu,if(rd<uint32_t>(c,H+124)&&c.r[14]==0x1020e9c5u){ret(c,0);return;})
 SHOP_HOOK(selector_cost_number,0x101c4935u,if(rd<uint32_t>(c,H+124)&&c.r[14]==0x1020ea05u){ret(c,0);return;})
 extern "C" __declspec(dllexport) uint32_t msd_custom_event_shop_version(){return 1u;}
+extern "C" __declspec(dllexport) uint32_t msd_custom_event_prisoner_version(){return 2u;}
 extern "C" __declspec(dllexport) void msd_enable_historical_event_hooks(){
     static bool done=false;if(done)return;done=true;
     original_end=find_block(0x101ea099u);
@@ -531,6 +539,7 @@ extern "C" __declspec(dllexport) void msd_enable_historical_event_hooks(){
     INSTALL(map_prisoner_button_draw,0x102003bdu);
     INSTALL(base_shop_panel,0x1021d63du);
     INSTALL(hud_item_atlas,0x101c3badu);INSTALL(hud_item_frames,0x101dade5u);
+    INSTALL(regular_prisoner,0x101d4e27u);INSTALL(regular_prisoner_result,0x101d18d9u);
     INSTALL(map_world_init,0x10215009u);INSTALL(map_bgm,0x101663c1u);
     INSTALL(map_background,0x102146cdu);
     INSTALL(cat_world_draw,0x10213b35u);

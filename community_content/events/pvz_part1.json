@@ -1,0 +1,2726 @@
+{
+  "schema": 1,
+  "key": "s1xlv.pvz_part1",
+  "mode": "rescue",
+  "names": {
+    "EN": "PVZ EVENT"
+  },
+  "image": "pvz_part1_cover.png",
+  "publisher": "S1XLV",
+  "date": "2026-10-14",
+  "order": 0,
+  "map_music": 156,
+  "areas": [
+    {
+      "key": "s1xlv.pvz_part1.us_east",
+      "position": [
+        1159,
+        280
+      ],
+      "names": {
+        "EN": "EASTERN USA",
+        "ZT": "美國・東部",
+        "ZS": "美国・东部",
+        "JP": "アメリカ・東部",
+        "ES": "ESTE DE EE. UU.",
+        "PT": "LESTE DOS EUA",
+        "KR": "미국 동부",
+        "FR": "EST DES ÉTATS-UNIS",
+        "IT": "STATI UNITI ORIENTALI",
+        "RU": "ВОСТОК США"
+      },
+      "reward": {
+        "unit": "s1xlv.pvz_imp",
+        "portrait_image": "pvz_part1_portrait_imp.png",
+        "names": {
+          "ZS": "小鬼僵尸",
+          "ZT": "小鬼殭屍",
+          "JP": "インプ",
+          "EN": "IMP",
+          "ES": "DIABLILLO",
+          "PT": "DIABINHO",
+          "KR": "꼬마 좀비"
+        },
+        "info1": {
+          "EN": "If all prisoners of war are freed,",
+          "JP": "捕虜がすべて解放されれば",
+          "KR": "포로를 모두 해방하면,",
+          "ES": "Si liberas a todos los prisioneros de guerra...",
+          "PT": "Se todos os prisioneiros forem libertados,",
+          "ZS": "只要解放所有俘虏",
+          "ZT": "只要解放所有俘虜"
+        },
+        "info2": {
+          "EN": "IMP will be available!",
+          "JP": "「インプ」が使用可能！",
+          "KR": "꼬마 좀비 사용 가능!",
+          "ES": "¡DIABLILLO estará disponible!",
+          "PT": "DIABINHO se tornará disponível!",
+          "ZS": "就能使用「小鬼僵尸」！",
+          "ZT": "就能使用「小鬼殭屍」！"
+        }
+      },
+      "stages": [
+        {
+          "key": "s1xlv.pvz_part1.us_east.s1",
+          "marker": [
+            -338,
+            -55
+          ],
+          "thumbnail": "pvz_part1_day.png",
+          "template": 1011,
+          "scene": 116,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 20,
+          "reward_msp": 3000,
+          "enemy_base_hp": 3000,
+          "strength_steps": 0,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zombie",
+              "level": 5
+            }
+          ],
+          "waves": [
+            {
+              "tick": 150,
+              "enemy": 0
+            },
+            {
+              "tick": 500,
+              "enemy": 0
+            },
+            {
+              "tick": 850,
+              "enemy": 0
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 0,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 500,
+              "spawn": 0
+            },
+            {
+              "when": "front",
+              "value": 480,
+              "spawn": 0
+            }
+          ],
+          "prisoners": 1,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.us_east.s2",
+          "marker": [
+            -132,
+            -2
+          ],
+          "thumbnail": "pvz_part1_day.png",
+          "template": 1011,
+          "scene": 116,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 20,
+          "reward_msp": 3000,
+          "enemy_base_hp": 5000,
+          "strength_steps": 0,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zombie",
+              "level": 10
+            },
+            {
+              "unit": "s1xlv.pvz_cone",
+              "level": 10
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 330,
+              "enemy": 1
+            },
+            {
+              "tick": 520,
+              "enemy": 0
+            },
+            {
+              "tick": 760,
+              "enemy": 1
+            },
+            {
+              "tick": 950,
+              "enemy": 0
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 0,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 500,
+              "spawn": 1
+            },
+            {
+              "when": "front",
+              "value": 480,
+              "spawn": 0
+            }
+          ],
+          "prisoners": 1,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.us_east.s3",
+          "marker": [
+            75,
+            -97
+          ],
+          "thumbnail": "pvz_part1_day.png",
+          "template": 1011,
+          "scene": 116,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 20,
+          "reward_msp": 3000,
+          "enemy_base_hp": 8000,
+          "strength_steps": 0,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zombie",
+              "level": 15
+            },
+            {
+              "unit": "s1xlv.pvz_cone",
+              "level": 15
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 15
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 300,
+              "enemy": 1
+            },
+            {
+              "tick": 500,
+              "enemy": 2
+            },
+            {
+              "tick": 700,
+              "enemy": 0
+            },
+            {
+              "tick": 900,
+              "enemy": 1
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 1,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 500,
+              "spawn": 2
+            },
+            {
+              "when": "front",
+              "value": 480,
+              "spawn": 1
+            }
+          ],
+          "prisoners": 2,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.us_east.s4",
+          "marker": [
+            240,
+            36
+          ],
+          "thumbnail": "pvz_part1_day.png",
+          "template": 1011,
+          "scene": 116,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 20,
+          "reward_msp": 3000,
+          "enemy_base_hp": 30000,
+          "strength_steps": 0,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zombie",
+              "level": 20
+            },
+            {
+              "unit": "s1xlv.pvz_cone",
+              "level": 20
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 20
+            },
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 20
+            }
+          ],
+          "waves": [
+            {
+              "tick": 100,
+              "enemy": 0
+            },
+            {
+              "tick": 280,
+              "enemy": 1
+            },
+            {
+              "tick": 460,
+              "enemy": 3
+            },
+            {
+              "tick": 640,
+              "enemy": 0
+            },
+            {
+              "tick": 820,
+              "enemy": 2
+            },
+            {
+              "tick": 1000,
+              "enemy": 0
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 2,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 30,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 29,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 28,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 27,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 26,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 25,
+              "spawn": 2
+            }
+          ],
+          "prisoners": 2,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        }
+      ]
+    },
+    {
+      "key": "s1xlv.pvz_part1.us_central",
+      "position": [
+        1068,
+        277
+      ],
+      "names": {
+        "EN": "CENTRAL USA",
+        "ZT": "美國・中部",
+        "ZS": "美国・中部",
+        "JP": "アメリカ・中部",
+        "ES": "CENTRO DE EE. UU.",
+        "PT": "CENTRO DOS EUA",
+        "KR": "미국 중부",
+        "FR": "CENTRE DES ÉTATS-UNIS",
+        "IT": "STATI UNITI CENTRALI",
+        "RU": "ЦЕНТР США"
+      },
+      "reward": {
+        "unit": "s1xlv.pvz_newspaper",
+        "portrait_image": "pvz_part1_portrait_newspaper.png",
+        "names": {
+          "ZS": "读报僵尸",
+          "ZT": "讀報殭屍",
+          "JP": "新聞ゾンビ",
+          "EN": "NEWSPAPER ZOMBIE",
+          "ES": "ZOMBI LECTOR",
+          "PT": "ZUMBI JORNAL",
+          "KR": "신문 좀비"
+        },
+        "info1": {
+          "EN": "If all prisoners of war are freed,",
+          "JP": "捕虜がすべて解放されれば",
+          "KR": "포로를 모두 해방하면,",
+          "ES": "Si liberas a todos los prisioneros de guerra...",
+          "PT": "Se todos os prisioneiros forem libertados,",
+          "ZS": "只要解放所有俘虏",
+          "ZT": "只要解放所有俘虜"
+        },
+        "info2": {
+          "EN": "NEWSPAPER ZOMBIE will be available!",
+          "JP": "「新聞ゾンビ」が使用可能！",
+          "KR": "신문 좀비 사용 가능!",
+          "ES": "¡ZOMBI LECTOR estará disponible!",
+          "PT": "ZUMBI JORNAL se tornará disponível!",
+          "ZS": "就能使用「读报僵尸」！",
+          "ZT": "就能使用「讀報殭屍」！"
+        }
+      },
+      "stages": [
+        {
+          "key": "s1xlv.pvz_part1.us_central.s1",
+          "marker": [
+            -338,
+            -55
+          ],
+          "thumbnail": "pvz_part1_dusk.png",
+          "template": 1011,
+          "scene": 117,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 30,
+          "reward_msp": 5000,
+          "enemy_base_hp": 12500,
+          "strength_steps": 0,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_cone",
+              "level": 30
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 30
+            },
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 30
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 30
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 330,
+              "enemy": 1
+            },
+            {
+              "tick": 540,
+              "enemy": 0
+            },
+            {
+              "tick": 750,
+              "enemy": 2
+            },
+            {
+              "tick": 960,
+              "enemy": 3
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 2,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 500,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 480,
+              "spawn": 3
+            }
+          ],
+          "prisoners": 3,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.us_central.s2",
+          "marker": [
+            -132,
+            -2
+          ],
+          "thumbnail": "pvz_part1_dusk.png",
+          "template": 1011,
+          "scene": 117,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 30,
+          "reward_msp": 5000,
+          "enemy_base_hp": 15000,
+          "strength_steps": 2,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 330,
+              "enemy": 1
+            },
+            {
+              "tick": 540,
+              "enemy": 2
+            },
+            {
+              "tick": 750,
+              "enemy": 0
+            },
+            {
+              "tick": 960,
+              "enemy": 3
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 3,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 2
+            }
+          ],
+          "prisoners": 3,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.us_central.s3",
+          "marker": [
+            75,
+            -97
+          ],
+          "thumbnail": "pvz_part1_dusk.png",
+          "template": 1011,
+          "scene": 117,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 30,
+          "reward_msp": 5000,
+          "enemy_base_hp": 17500,
+          "strength_steps": 3,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 360,
+              "enemy": 2
+            },
+            {
+              "tick": 600,
+              "enemy": 1
+            },
+            {
+              "tick": 840,
+              "enemy": 3
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 4,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 4
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 4
+            }
+          ],
+          "prisoners": 5,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.us_central.s4",
+          "marker": [
+            240,
+            36
+          ],
+          "thumbnail": "pvz_part1_dusk.png",
+          "template": 1011,
+          "scene": 117,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 30,
+          "reward_msp": 5000,
+          "enemy_base_hp": 50000,
+          "strength_steps": 5,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 100,
+              "enemy": 0
+            },
+            {
+              "tick": 300,
+              "enemy": 1
+            },
+            {
+              "tick": 500,
+              "enemy": 0
+            },
+            {
+              "tick": 700,
+              "enemy": 1
+            },
+            {
+              "tick": 900,
+              "enemy": 2
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 650,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 20,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 19,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 18,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 17,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 16,
+              "spawn": 0
+            }
+          ],
+          "prisoners": 7,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 3,
+              "x": 1180
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "s1xlv.pvz_part1.canada",
+      "position": [
+        1196,
+        157
+      ],
+      "names": {
+        "EN": "CANADA",
+        "ZT": "加拿大",
+        "ZS": "加拿大",
+        "JP": "カナダ",
+        "ES": "CANADÁ",
+        "PT": "CANADÁ",
+        "KR": "캐나다",
+        "FR": "CANADA",
+        "IT": "CANADA",
+        "RU": "КАНАДА"
+      },
+      "reward": {
+        "unit": "s1xlv.pvz_squash",
+        "portrait_image": "pvz_part1_portrait_squash.png",
+        "names": {
+          "ZS": "倭瓜僵尸",
+          "ZT": "倭瓜殭屍",
+          "JP": "スクワッシュゾンビ",
+          "EN": "SQUASH ZOMBIE",
+          "ES": "ZOMBI CALABAZA",
+          "PT": "ZUMBI ABÓBORA",
+          "KR": "스쿼시 좀비"
+        },
+        "info1": {
+          "EN": "If all prisoners of war are freed,",
+          "JP": "捕虜がすべて解放されれば",
+          "KR": "포로를 모두 해방하면,",
+          "ES": "Si liberas a todos los prisioneros de guerra...",
+          "PT": "Se todos os prisioneiros forem libertados,",
+          "ZS": "只要解放所有俘虏",
+          "ZT": "只要解放所有俘虜"
+        },
+        "info2": {
+          "EN": "SQUASH ZOMBIE will be available!",
+          "JP": "「スクワッシュゾンビ」が使用可能！",
+          "KR": "스쿼시 좀비 사용 가능!",
+          "ES": "¡ZOMBI CALABAZA estará disponible!",
+          "PT": "ZUMBI ABÓBORA se tornará disponível!",
+          "ZS": "就能使用「倭瓜僵尸」！",
+          "ZT": "就能使用「倭瓜殭屍」！"
+        }
+      },
+      "stages": [
+        {
+          "key": "s1xlv.pvz_part1.canada.s1",
+          "marker": [
+            -338,
+            -55
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 40,
+          "reward_msp": 6000,
+          "enemy_base_hp": 20000,
+          "strength_steps": 3,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zombie",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_cone",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 100,
+              "enemy": 0
+            },
+            {
+              "tick": 250,
+              "enemy": 1
+            },
+            {
+              "tick": 400,
+              "enemy": 2
+            },
+            {
+              "tick": 550,
+              "enemy": 3
+            },
+            {
+              "tick": 700,
+              "enemy": 0
+            },
+            {
+              "tick": 850,
+              "enemy": 4
+            },
+            {
+              "tick": 1000,
+              "enemy": 1
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 3,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 5
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 4
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 5
+            }
+          ],
+          "prisoners": 4,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100
+        },
+        {
+          "key": "s1xlv.pvz_part1.canada.s2",
+          "marker": [
+            -132,
+            -2
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 40,
+          "reward_msp": 6000,
+          "enemy_base_hp": 22500,
+          "strength_steps": 3,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_squash",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 1
+            },
+            {
+              "tick": 330,
+              "enemy": 3
+            },
+            {
+              "tick": 540,
+              "enemy": 0
+            },
+            {
+              "tick": 750,
+              "enemy": 2
+            },
+            {
+              "tick": 960,
+              "enemy": 3
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 3,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 0
+            }
+          ],
+          "prisoners": 4,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 0,
+              "x": 1180
+            },
+            {
+              "enemy": 0,
+              "x": 1120
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.canada.s3",
+          "marker": [
+            75,
+            -97
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 40,
+          "reward_msp": 6000,
+          "enemy_base_hp": 25000,
+          "strength_steps": 3,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_newspaper",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_squash",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 300,
+              "enemy": 4
+            },
+            {
+              "tick": 480,
+              "enemy": 3
+            },
+            {
+              "tick": 660,
+              "enemy": 1
+            },
+            {
+              "tick": 840,
+              "enemy": 0
+            },
+            {
+              "tick": 1000,
+              "enemy": 4
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 4,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 2
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 4
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 1
+            }
+          ],
+          "prisoners": 6,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 2,
+              "x": 1180
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.canada.s4",
+          "marker": [
+            240,
+            36
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 40,
+          "reward_msp": 6000,
+          "enemy_base_hp": 60000,
+          "strength_steps": 4,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_squash",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 100,
+              "enemy": 0
+            },
+            {
+              "tick": 300,
+              "enemy": 1
+            },
+            {
+              "tick": 500,
+              "enemy": 2
+            },
+            {
+              "tick": 700,
+              "enemy": 0
+            },
+            {
+              "tick": 900,
+              "enemy": 3
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 4,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 650,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 630,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 20,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 19,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 18,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 17,
+              "spawn": 3
+            }
+          ],
+          "prisoners": 7,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 2,
+              "x": 1180
+            },
+            {
+              "enemy": 2,
+              "x": 1120
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "s1xlv.pvz_part1.uk",
+      "position": [
+        92,
+        205
+      ],
+      "names": {
+        "EN": "UNITED KINGDOM",
+        "ZT": "英國",
+        "ZS": "英国",
+        "JP": "イギリス",
+        "ES": "REINO UNIDO",
+        "PT": "REINO UNIDO",
+        "KR": "영국",
+        "FR": "ROYAUME-UNI",
+        "IT": "REGNO UNITO",
+        "RU": "ВЕЛИКОБРИТАНИЯ"
+      },
+      "reward": {
+        "unit": "s1xlv.pvz_jalapeno",
+        "portrait_image": "pvz_part1_portrait_jalapeno.png",
+        "names": {
+          "ZS": "辣椒僵尸",
+          "ZT": "辣椒殭屍",
+          "JP": "ハラペーニョゾンビ",
+          "EN": "JALAPENO ZOMBIE",
+          "ES": "ZOMBI JALAPEÑO",
+          "PT": "ZUMBI PIMENTA",
+          "KR": "할라피뇨 좀비"
+        },
+        "info1": {
+          "EN": "If all prisoners of war are freed,",
+          "JP": "捕虜がすべて解放されれば",
+          "KR": "포로를 모두 해방하면,",
+          "ES": "Si liberas a todos los prisioneros de guerra...",
+          "PT": "Se todos os prisioneiros forem libertados,",
+          "ZS": "只要解放所有俘虏",
+          "ZT": "只要解放所有俘虜"
+        },
+        "info2": {
+          "EN": "JALAPENO ZOMBIE will be available!",
+          "JP": "「ハラペーニョゾンビ」が使用可能！",
+          "KR": "할라피뇨 좀비 사용 가능!",
+          "ES": "¡ZOMBI JALAPEÑO estará disponible!",
+          "PT": "ZUMBI PIMENTA se tornará disponível!",
+          "ZS": "就能使用「辣椒僵尸」！",
+          "ZT": "就能使用「辣椒殭屍」！"
+        }
+      },
+      "stages": [
+        {
+          "key": "s1xlv.pvz_part1.uk.s1",
+          "marker": [
+            -338,
+            -55
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 50,
+          "reward_msp": 8000,
+          "enemy_base_hp": 30000,
+          "strength_steps": 4,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_squash",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 0
+            },
+            {
+              "tick": 330,
+              "enemy": 1
+            },
+            {
+              "tick": 540,
+              "enemy": 2
+            },
+            {
+              "tick": 750,
+              "enemy": 0
+            },
+            {
+              "tick": 960,
+              "enemy": 3
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 4,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 1
+            }
+          ],
+          "prisoners": 6,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 2,
+              "x": 1180
+            },
+            {
+              "enemy": 0,
+              "x": 1120
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.uk.s2",
+          "marker": [
+            -132,
+            -2
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 50,
+          "reward_msp": 8000,
+          "enemy_base_hp": 32500,
+          "strength_steps": 4,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 3
+            },
+            {
+              "tick": 330,
+              "enemy": 2
+            },
+            {
+              "tick": 540,
+              "enemy": 0
+            },
+            {
+              "tick": 750,
+              "enemy": 3
+            },
+            {
+              "tick": 960,
+              "enemy": 1
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 4,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 1
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 2
+            }
+          ],
+          "prisoners": 6,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 0,
+              "x": 1180
+            },
+            {
+              "enemy": 2,
+              "x": 1120
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.uk.s3",
+          "marker": [
+            75,
+            -97
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 50,
+          "reward_msp": 8000,
+          "enemy_base_hp": 35000,
+          "strength_steps": 5,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jack",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 4
+            },
+            {
+              "tick": 330,
+              "enemy": 2
+            },
+            {
+              "tick": 540,
+              "enemy": 3
+            },
+            {
+              "tick": 750,
+              "enemy": 4
+            },
+            {
+              "tick": 960,
+              "enemy": 1
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 4
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 3
+            }
+          ],
+          "prisoners": 7,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 0,
+              "x": 1180
+            },
+            {
+              "enemy": 0,
+              "x": 1120
+            },
+            {
+              "enemy": 0,
+              "x": 1060
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.uk.s4",
+          "marker": [
+            240,
+            36
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_watery_graves",
+          "stamina": 50,
+          "reward_msp": 8000,
+          "enemy_base_hp": 70000,
+          "strength_steps": 5,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jack",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 100,
+              "enemy": 0
+            },
+            {
+              "tick": 300,
+              "enemy": 2
+            },
+            {
+              "tick": 500,
+              "enemy": 3
+            },
+            {
+              "tick": 700,
+              "enemy": 4
+            },
+            {
+              "tick": 900,
+              "enemy": 1
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 650,
+              "spawn": 5
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 5
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 4
+            },
+            {
+              "when": "base_hp",
+              "value": 20,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 19,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 18,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 17,
+              "spawn": 1
+            }
+          ],
+          "prisoners": 7,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 5,
+              "x": 1180
+            },
+            {
+              "enemy": 5,
+              "x": 1120
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "s1xlv.pvz_part1.alaska",
+      "position": [
+        870,
+        137
+      ],
+      "names": {
+        "EN": "ALASKA",
+        "ZT": "阿拉斯加",
+        "ZS": "阿拉斯加",
+        "JP": "アラスカ",
+        "ES": "ALASKA",
+        "PT": "ALASCA",
+        "KR": "알래스카",
+        "FR": "ALASKA",
+        "IT": "ALASKA",
+        "RU": "АЛЯСКА"
+      },
+      "reward": {
+        "unit": "s1xlv.pvz_jack",
+        "portrait_image": "pvz_part1_portrait_jack.png",
+        "names": {
+          "ZS": "小丑僵尸",
+          "ZT": "小丑殭屍",
+          "JP": "びっくり箱ゾンビ",
+          "EN": "JACK-IN-THE-BOX ZOMBIE",
+          "ES": "ZOMBI CAJA SORPRESA",
+          "PT": "ZUMBI CAIXA-SURPRESA",
+          "KR": "깜짝상자 좀비"
+        },
+        "info1": {
+          "EN": "If all prisoners of war are freed,",
+          "JP": "捕虜がすべて解放されれば",
+          "KR": "포로를 모두 해방하면,",
+          "ES": "Si liberas a todos los prisioneros de guerra...",
+          "PT": "Se todos os prisioneiros forem libertados,",
+          "ZS": "只要解放所有俘虏",
+          "ZT": "只要解放所有俘虜"
+        },
+        "info2": {
+          "EN": "JACK-IN-THE-BOX ZOMBIE will be available!",
+          "JP": "「びっくり箱ゾンビ」が使用可能！",
+          "KR": "깜짝상자 좀비 사용 가능!",
+          "ES": "¡ZOMBI CAJA SORPRESA estará disponible!",
+          "PT": "ZUMBI CAIXA-SURPRESA se tornará disponível!",
+          "ZS": "就能使用「小丑僵尸」！",
+          "ZT": "就能使用「小丑殭屍」！"
+        }
+      },
+      "stages": [
+        {
+          "key": "s1xlv.pvz_part1.alaska.s1",
+          "marker": [
+            -338,
+            -55
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_zombotany",
+          "stamina": 60,
+          "reward_msp": 10000,
+          "enemy_base_hp": 40000,
+          "strength_steps": 5,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jack",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 4
+            },
+            {
+              "tick": 330,
+              "enemy": 2
+            },
+            {
+              "tick": 540,
+              "enemy": 1
+            },
+            {
+              "tick": 750,
+              "enemy": 4
+            },
+            {
+              "tick": 960,
+              "enemy": 0
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 3
+            }
+          ],
+          "prisoners": 7,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 1,
+              "x": 1180
+            },
+            {
+              "enemy": 1,
+              "x": 1120
+            },
+            {
+              "enemy": 1,
+              "x": 1060
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.alaska.s2",
+          "marker": [
+            -132,
+            -2
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_zombotany",
+          "stamina": 60,
+          "reward_msp": 10000,
+          "enemy_base_hp": 45000,
+          "strength_steps": 6,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jack",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 1
+            },
+            {
+              "tick": 330,
+              "enemy": 2
+            },
+            {
+              "tick": 540,
+              "enemy": 4
+            },
+            {
+              "tick": 750,
+              "enemy": 1
+            },
+            {
+              "tick": 960,
+              "enemy": 0
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 4
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 0
+            }
+          ],
+          "prisoners": 7,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 0,
+              "x": 1180
+            },
+            {
+              "enemy": 0,
+              "x": 1120
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.alaska.s3",
+          "marker": [
+            75,
+            -97
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_zombotany",
+          "stamina": 60,
+          "reward_msp": 10000,
+          "enemy_base_hp": 50000,
+          "strength_steps": 7,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jack",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 120,
+              "enemy": 4
+            },
+            {
+              "tick": 330,
+              "enemy": 1
+            },
+            {
+              "tick": 540,
+              "enemy": 2
+            },
+            {
+              "tick": 750,
+              "enemy": 4
+            },
+            {
+              "tick": 960,
+              "enemy": 0
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 600,
+              "spawn": 3
+            },
+            {
+              "when": "front",
+              "value": 580,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 4
+            }
+          ],
+          "prisoners": 8,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 0,
+              "x": 1180
+            },
+            {
+              "enemy": 0,
+              "x": 1120
+            }
+          ]
+        },
+        {
+          "key": "s1xlv.pvz_part1.alaska.s4",
+          "marker": [
+            240,
+            36
+          ],
+          "thumbnail": "pvz_part1_field3.png",
+          "template": 1011,
+          "scene": 118,
+          "music": "s1xlv.bgm_pvz_zombotany",
+          "stamina": 60,
+          "reward_msp": 10000,
+          "enemy_base_hp": 100000,
+          "strength_steps": 8,
+          "enemies": [
+            {
+              "unit": "s1xlv.pvz_zomboni",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jack",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gargantuar",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            }
+          ],
+          "waves": [
+            {
+              "tick": 100,
+              "enemy": 3
+            },
+            {
+              "tick": 300,
+              "enemy": 4
+            },
+            {
+              "tick": 500,
+              "enemy": 1
+            },
+            {
+              "tick": 700,
+              "enemy": 0
+            },
+            {
+              "tick": 900,
+              "enemy": 5
+            }
+          ],
+          "loop": 1080,
+          "difficulty": 5,
+          "triggers": [
+            {
+              "when": "front",
+              "value": 650,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 50,
+              "spawn": 2
+            },
+            {
+              "when": "base_hp",
+              "value": 49,
+              "spawn": 0
+            },
+            {
+              "when": "base_hp",
+              "value": 20,
+              "spawn": 3
+            },
+            {
+              "when": "base_hp",
+              "value": 19,
+              "spawn": 1
+            },
+            {
+              "when": "base_hp",
+              "value": 18,
+              "spawn": 4
+            },
+            {
+              "when": "base_hp",
+              "value": 17,
+              "spawn": 5
+            }
+          ],
+          "prisoners": 8,
+          "items": [
+            {
+              "x": 411,
+              "y": 24,
+              "weight": 2
+            },
+            {
+              "x": 562,
+              "y": 80,
+              "weight": 2
+            },
+            {
+              "x": 791,
+              "y": 4,
+              "weight": 2
+            },
+            {
+              "x": 426,
+              "y": 182,
+              "weight": 2
+            },
+            {
+              "x": 640,
+              "y": 207,
+              "weight": 2
+            },
+            {
+              "x": 716,
+              "y": 122,
+              "weight": 2
+            }
+          ],
+          "item_level": 15,
+          "prisoner_chance": 100,
+          "placed": [
+            {
+              "enemy": 5,
+              "x": 1180
+            },
+            {
+              "enemy": 5,
+              "x": 1120
+            },
+            {
+              "enemy": 5,
+              "x": 1060
+            },
+            {
+              "enemy": 5,
+              "x": 1000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

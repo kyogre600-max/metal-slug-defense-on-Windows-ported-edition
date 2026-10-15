@@ -175,7 +175,7 @@ HOOK(pack_name,0x1016551du, uint32_t p=pack_id(c,c.r[0]);if(p){ret(c,rd<uint32_t
 HOOK(pack_info,0x10165509u, uint32_t p=pack_id(c,c.r[0]);if(p){ret(c,rd<uint32_t>(c,p+84u+std::min(c.r[1],10u)*4u));return;})
 extern "C" __declspec(dllexport) uint32_t msd_community_unit_pack_version(){return 1u;}
 // ---------- 生命分档单位（行为库 v3：hp_stage_animations 等，首批为 PVZ 僵尸；基准为原版 UnitID 313 BattleAction_ZombieBrain）----------
-// 头部 +168：逐槽 ZSpec 指针表（0 为无，无此类单位时整表为 0）。ZSpec 为 28 个 32 位字（community_content.py zombie_spec）：
+// 头部 +168：逐槽 ZSpec 指针表（0 为无，无此类单位时整表为 0）。ZSpec 为 33 个 32 位字（community_content.py zombie_spec；字 28–32 与标记 512–4096 见下文“2026-10-15 新 PvZ 单位”）：
 //  0 标记（1 生命分档 2 无击退 4 防具受击音效 8 击毙音效 16 投出子单位 32 被投出的飞行单位 64 前方最近敌人 128 分档受击动作）；1 分档数 n（≤6）；
 //  2..7 / 8..13 第 k 档阈值的分子 / 分母（生命 < 最大生命×分子/分母 时至少为第 k 档）；14 带过渡动作的档位位图；
 //  15 狂暴档（0 为无）；16/17 狂暴移速倍率；18/19 狂暴伤害倍率；20/21 防具受击音效 SoundID；22 防具在第几档前存在；
@@ -253,7 +253,9 @@ static uint32_t z_remap(Context& c,uint32_t s,uint32_t obj,uint32_t slot){
  }
  return slot+16u*z_target(c,s,obj,slot);
 }
-HOOK(zombie_stage_update,0x1017ca15u, z_update(c);)
+static bool z_self_destruct(Context& c,uint32_t s);static bool z_balloon(Context& c,uint32_t s);
+// 入口：自爆单位（标记 512）的攻击状态与气球飞行段（标记 4096）先处理，其余照旧做生命分档。
+HOOK(zombie_stage_update,0x1017ca15u, {uint32_t s=zspec(c,c.r[1]);if(s&&(z_self_destruct(c,s)||z_balloon(c,s)))return;} z_update(c);)
 // 雪地步兵类（基准 182，BattleAction_ZakoSnow::update 入口 0x1018805c，参数与 ZombieBrain::update 相同：r1 对象、r2 状态）：
 // 2026-10-13 冰车。宿主只允许不带过渡与狂暴的分档（behaviors.py），此处只会就地换档。
 // 2026-10-15 冰车：ZakoSnow::update 的状态 110（爆炸属性死亡）与 100 都播放槽 13 并预约状态 140，110 另生成血色效果 0xff01。
@@ -352,8 +354,11 @@ static bool z_front_behind(Context& c,uint32_t u,uint32_t f,uint32_t team){
  return z_ahead(c,u)||z_ahead(c,f);
 }
 // getNearEnemyDistance 入口（r0 管理器、r1 单位、r2 非 0 时扣除双方宽度）；计算次序同原生，结果截断为整数。
+static bool z_balloon_flying(Context& c,uint32_t u);
 static bool z_distance(Context& c){
  uint32_t m=c.r[0],u=c.r[1],team=rd<uint32_t>(c,u+0x70u);
+ // 气球飞行段不以任何敌方单位为攻击目标（不在空中啃咬），飞到敌方据点前由 z_balloon 放手落地。
+ if(z_balloon_flying(c,u)){ret(c,0x7fffffffu);return true;}
  if(!z_front_behind(c,u,rd<uint32_t>(c,m+(team?0x38u:0x3cu)),team))return false;
  uint32_t e=z_nearest_ahead(c,m,u,team,0x49u);
  if(!e){ret(c,0x7fffffffu);return true;}
@@ -379,11 +384,141 @@ static void z_move_target(Context& c){
 }
 HOOK(zombie_ahead_move_right,0x101df1fbu, z_move_target(c);)
 HOOK(zombie_ahead_move_left,0x101df23bu, z_move_target(c);)
+// ---------- 2026-10-15 新 PvZ 单位（行为库 v8：小丑、气球、机枪豌豆、辣椒、倭瓜；被投出的小鬼在敌方据点前落地）----------
+// ZSpec 扩为 33 个字：28 行进射击的射程（walk_shoot），29 气球自动放手的距离，30 气球出场音效 SoundID，
+// 31 被投出的飞行单位与敌方据点前缘的最小间距（thrown_flight.base_clearance，0 为不限制），32 自爆动作按素材原朝向绘制的起始 tick + 1。
+bool msd_guest_call_stack(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,
+                          const uint32_t* stack,uint32_t stack_words,uint32_t* result);
+static constexpr uint32_t Z_SELF_DESTRUCT=512u,Z_GROUND_ONLY=1024u,Z_WALK_SHOOT=2048u,Z_BALLOON=4096u;
+// BattleObjectManager 单例（getInstance 0x1de618 返回 0x977f4c+4）；getKyotenUnitImpl 为 [管理器 + (队伍+6)×4]。
+static constexpr uint32_t Z_MANAGER=0x10977f50u;
+static constexpr uint32_t Z_HOPPER_UPDATE=0x101840ddu,Z_NEAR_DISTANCE=0x101ded90u,Z_ADD_BULLET=0x1017e3f0u;
+// BattleGameMaster 单例（getInstance 0x1cdb48 返回 0x9606f8+4）；+0x4828 为 5 时为原生动作浏览（单位菜单 ACTION），场上没有敌人。
+static constexpr uint32_t Z_GAME_MASTER=0x109606fcu;
+static bool z_viewer(Context& c){return rd<uint32_t>(c,Z_GAME_MASTER+0x4828u)==5u;}
+// 单位 u 前缘与敌方据点前缘的间距（与 getNearEnemyDistance 扣除双方宽度时的算法相同）。
+static bool z_base_gap(Context& c,uint32_t u,float& gap){
+ uint32_t team=rd<uint32_t>(c,u+0x70u);if(team>1u)return false;
+ uint32_t b=rd<uint32_t>(c,Z_MANAGER+(7u-team)*4u);if(!b||!rd<uint32_t>(c,b+0x5cu)||!rd<uint32_t>(c,u+0x5cu))return false;
+ float ux=rd<float>(c,u+0x8cu),bx=rd<float>(c,b+0x8cu),wu=float(z_width(c,u)),wb=float(z_width(c,b));
+ gap=team?((ux-wu)-wb)-bx:((bx-wb)-wu)-ux;return true;
+}
+// 自爆（self_destruct_attack，标记 512）：状态 30/40/50/140 交给原版 HOPPER MECHA（UnitID 39）的
+// BattleAction_Hoppermecha::update（0x1840dc）：30/40 播放槽 8、50 播放槽 9，并置 NoTarget、DontToche、DontSpAttack，
+// 预约状态 140；140 在动画播完后 BattleObject::kill（不经死亡流程）。状态 140 的优先级高于受击（80）与死亡（100–130），
+// 爆炸动作不会被打断。伤害取进入动作时的攻击组（setAnimationID 在状态 30/40/50 时写入对象 +0x88）。
+// ZSpec 字 32（self_destruct_attack.unmirrored_from_tick + 1）：状态 140 中精灵帧计数（+0x3c）达到该值后，把精灵的当前朝向
+// （+0x10）设为素材朝向（+0x48），图像不再随队伍镜像（BattleObject::isImageMirrorRendring 比较这两个字段）；单位朝向（+0x78）不变。
+// 动作浏览中不移除：动作播完（对象 +0xc9 为 0）后恢复绘制朝向与身体状态（NoTarget、DontToche、DontSpAttack），强制回到待机，
+// 由单位菜单重新演示（同其他单位）。
+static bool z_self_destruct(Context& c,uint32_t s){
+ uint32_t st=c.r[2],obj=c.r[1];
+ if(!(zw(c,s,0)&Z_SELF_DESTRUCT)||(st!=30u&&st!=40u&&st!=50u&&st!=140u))return false;
+ uint32_t sp=rd<uint32_t>(c,obj+0x5cu);
+ if(st==140u&&zw(c,s,32)){
+  if(sp&&rd<uint32_t>(c,sp+0x3cu)+1u>=zw(c,s,32))wr<uint32_t>(c,sp+0x10u,rd<uint32_t>(c,sp+0x48u));
+ }
+ if(st==140u&&z_viewer(c)&&!rd<uint8_t>(c,obj+0xc9u)){
+  if(sp)wr<uint32_t>(c,sp+0x10u,rd<uint32_t>(c,obj+0x78u));
+  wr<uint32_t>(c,obj+0x6cu,rd<uint32_t>(c,obj+0x6cu)&~0x4cu);
+  msd_guest_call(c,Z_RESERVE_STATE,obj,10u,1u,0u,nullptr);
+  c.pc=c.r[14];return true;
+ }
+ c.pc=Z_HOPPER_UPDATE;return true;
+}
+// 气球飞行（balloon_flight，标记 4096，须与生命分档同用）：第 0 档为飞行段，生命降到第 1 个档位（气球打破）、
+// 前缘与敌方据点前缘的间距不超过 ZSpec 字 29、或发动绝招时放手，经状态 80 播放第 1 档的过渡动作（爆开与落下）。
+// 飞行段置身体状态 DontToche 8、AreaThrough 0x10、NoTarget 0x40、NockbackGuard 0x80（同原生空中单位：不被选为目标、
+// 不阻挡、不被阻挡、不被击退），高度由精灵描述符的受击框与帧位置表达；落地后清除这些状态，并置 DontSpAttack 4（不再有绝招）。
+// 主动放手时生命截到第 1 个档位以下（气球部分的生命作废，同 PvZ 原作）。出场首帧播放 ZSpec 字 30 的音效。
+// 飞行段的判定：身体状态已有 AreaThrough，或生命仍在第 0 档且未进入死亡状态（出场首帧尚未经过 z_balloon 设置身体状态，
+// 原生行动控制在同一帧已查询攻击距离；2026-10-15 修正：敌人已在出生点附近时，气球在首帧进入攻击状态 40，
+// 飞行段的攻击槽为循环动作，状态 40 不结束，气球停在出生点）。
+static bool z_balloon_flying(Context& c,uint32_t u){
+ uint32_t s=zspec(c,u);if(!s||!(zw(c,s,0)&Z_BALLOON))return false;
+ if(rd<uint32_t>(c,u+0x6cu)&0x10u)return true;
+ return rd<uint32_t>(c,u+0x7cu)<100u&&int32_t(rd<uint32_t>(c,u+0x308u))>0&&z_stage_of_hp(c,s,u)==0u;
+}
+static void z_balloon_pop(Context& c,uint32_t s,uint32_t obj){
+ int64_t mx=int32_t(rd<uint32_t>(c,obj+0x304u)),cap=(int64_t(zw(c,s,2))*mx-1)/int64_t(zw(c,s,8));
+ if(int32_t(rd<uint32_t>(c,obj+0x308u))>cap)wr<uint32_t>(c,obj+0x308u,uint32_t(int32_t(cap)));
+}
+static bool z_balloon(Context& c,uint32_t s){
+ uint32_t obj=c.r[1],state=c.r[2];
+ if(!(zw(c,s,0)&Z_BALLOON)||state>=100u||int32_t(rd<uint32_t>(c,obj+0x308u))<=0)return false;
+ int32_t d=z_stage_of_anim(c,s,int32_t(rd<uint32_t>(c,obj+0xc4u)));
+ uint32_t body=rd<uint32_t>(c,obj+0x6cu);
+ if(d<=0&&state!=80u&&z_stage_of_hp(c,s,obj)==0u){
+  if(!(body&0x10u)&&zw(c,s,30))msd_guest_call(c,Z_PLAY_SE,obj,zw(c,s,30),0u,0u,nullptr);
+  wr<uint32_t>(c,obj+0x6cu,body|0xd8u);
+  float gap=0.0f;
+  // 动作浏览的近距离攻击演示（状态 30/40）：先放手落地，此后在地面上演示啃咬
+  bool demo=z_viewer(c)&&(state==30u||state==40u);
+  if(state==50u||demo||(z_base_gap(c,obj,gap)&&gap<=float(int32_t(zw(c,s,29))))){
+   z_balloon_pop(c,s,obj);
+   // 绝招：不播放原生的特殊攻击动作，直接经状态 80 放手
+   if(state==50u||demo){msd_guest_call(c,Z_RESERVE_STATE,obj,80u,0u,0u,nullptr);c.pc=c.r[14];return true;}
+   return false;
+  }
+  // 飞行段不攻击：已处于攻击状态（30/40）时强制回到行进（状态 20）。飞行段的攻击槽为循环动作，状态 40 不会自行结束。
+  if(state==30u||state==40u){msd_guest_call(c,Z_RESERVE_STATE,obj,20u,1u,0u,nullptr);c.pc=c.r[14];return true;}
+  return false;
+ }
+ wr<uint32_t>(c,obj+0x6cu,(body&~0xd8u)|4u);
+ return false;
+}
+// 行进射击（walk_shoot，标记 2048）：动作脚本 op22[弹体槽, 命中槽, x, y]（x、y 为素材坐标，同原生）经 BattleObject::onEventBulletShot
+// 调用 BattleAction_ZombieBrain::shotBullet（0x17e308：r1 对象，r2 弹体槽，r3 / 栈 [0] 为已换算朝向与比例的 x、y，栈 [4] 为命中槽）。
+// 只在待机或行进（状态 10、20）且最近的敌方单位前缘距离不超过 ZSpec 字 28 时发射（动作浏览中没有敌人，不检查距离）；位置的取法同原生 shotBullet，
+// 以近距参数组（状态 30：词 15–21，伤害、击退值、目标数、弹速、行程）调用
+// addBullet(对象, x, y, 0, 弹体槽, 命中槽, 命中槽, 30)（0x17e3f0）。原版僵尸（青年）的吐出攻击仍走原生路径。
+static bool z_walk_shot(Context& c){
+ uint32_t obj=c.r[1],s=zspec(c,obj);if(!s||!(zw(c,s,0)&Z_WALK_SHOOT))return false;
+ uint32_t state=rd<uint32_t>(c,obj+0x7cu),sp=c.r[13],action=c.r[0],anim=c.r[2],x=c.r[3];
+ uint32_t y=rd<uint32_t>(c,sp),hit=rd<uint32_t>(c,sp+4u);
+ c.pc=c.r[14];
+ if(state!=10u&&state!=20u)return true;
+ uint32_t d=0u;
+ if(!z_viewer(c)&&(!msd_guest_call(c,Z_NEAR_DISTANCE,Z_MANAGER,obj,1u,0u,&d)||int32_t(d)>int32_t(zw(c,s,28))))return true;
+ const uint32_t stack[5]={0u,anim,hit,hit,30u};
+ msd_guest_call_stack(c,Z_ADD_BULLET,action,obj,x,y,stack,5u,nullptr);
+ return true;
+}
+static Block old_zombie_walk_shot;static void zombie_walk_shot(Context& c){if(z_walk_shot(c))return;old_zombie_walk_shot(c);}
+// 只打地面（ground_only_attack，标记 1024）：BattleUnit::attack 入口（r0 攻击方、r1 目标）。目标为空中单位
+// （身体状态 NoTarget 0x40）或战场道具（UnitID 116/231/289/363）时不命中。
+static bool z_ground_only(Context& c){
+ uint32_t s=zspec(c,c.r[0]);if(!s||!(zw(c,s,0)&Z_GROUND_ONLY))return false;
+ uint32_t t=c.r[1];bool skip=(rd<uint32_t>(c,t+0x6cu)&0x40u)!=0u;
+ if(!skip){
+  uint32_t uid=0u;msd_guest_call(c,rd<uint32_t>(c,rd<uint32_t>(c,t)+0x4cu),t,0u,0u,0u,&uid);
+  skip=uid==0x74u||uid==0xe7u||uid==0x121u||uid==0x16bu;
+ }
+ if(!skip)return false;
+ c.pc=c.r[14];return true;
+}
+static Block old_zombie_ground_only;static void zombie_ground_only(Context& c){if(z_ground_only(c))return;old_zombie_ground_only(c);}
+// 被投出的飞行单位的据点前落地（thrown_flight.base_clearance，ZSpec 字 31）：BattleAction_ParaTrooper::update 入口
+// （r1 对象、r2 状态）。首帧初始化（对象 +0x1c 非 0）之后的飞行状态 20–50 中，前缘与敌方据点前缘的间距小于该值时，
+// 把位置退回到该间距处并清除水平运动（同 clearMoveActionParamsXOnly），随后垂直落下；落地后照常转为
+// para_drop_transform 指定的单位。避免被投出的小鬼越过或嵌入敌方据点。
+static void z_flight_clearance(Context& c){
+ uint32_t obj=c.r[1],state=c.r[2],s=zspec(c,obj);
+ if(!s||!(zw(c,s,0)&32u)||!zw(c,s,31)||!rd<uint32_t>(c,obj+0x1cu)||state<20u||state>50u)return;
+ float gap=0.0f;if(!z_base_gap(c,obj,gap))return;
+ float need=float(int32_t(zw(c,s,31)));if(gap>=need)return;
+ float x=rd<float>(c,obj+0x8cu)+(rd<uint32_t>(c,obj+0x70u)?need-gap:gap-need);
+ wr<float>(c,obj+0x8cu,x);wr<float>(c,obj+0x94u,x);
+ wr<uint32_t>(c,obj+0x9cu,0u);wr<uint32_t>(c,obj+0xa4u,0u);wr<uint32_t>(c,obj+0xacu,0u);
+}
+HOOK(zombie_flight_clearance,0x101af795u, z_flight_clearance(c);)
 // 已登记的钩子数：首批 7 个全部找到时版本 1，另含前方最近敌人的 5 个时版本 2；宿主据此确认核心支持。
 static uint32_t zombie_hooks=0u;
 // 3：分档受击动作（标记 128，钩子数同 2）。4：另含雪地步兵类的分档入口（2026-10-13 冰车，共 13 个钩子）。
 // 5：雪地步兵类入口另处理 no_death_splash（标记 256，2026-10-15，钩子数同 4）。
-extern "C" __declspec(dllexport) uint32_t msd_community_zombie_version(){return zombie_hooks==13u?5u:zombie_hooks==12u?3u:zombie_hooks==7u?1u:0u;}
+// 6：2026-10-15 新单位（自爆 512、只打地面 1024、行进射击 2048、气球飞行 4096、被投出单位的据点前落地），
+//    另含 ZombieBrain::shotBullet、BattleUnit::attack 与 ParaTrooper::update 入口 3 个钩子（共 16 个）；ZSpec 33 字。
+extern "C" __declspec(dllexport) uint32_t msd_community_zombie_version(){return zombie_hooks==16u?6u:zombie_hooks==13u?5u:zombie_hooks==12u?3u:zombie_hooks==7u?1u:0u;}
 // 战场道具（UnitID 116/231/289/363）：BattleUnit::attack（0x1e093c）对道具在 0x1e0a0c 起比较攻击方 getUnitID，
 // 为 1、80、182（雪地步兵）时不造成命中；其他攻击方以当前状态的伤害组直接调用道具的 damage。社区单位的 UnitID 不在其中：
 // 基准 182 的冰车在行走状态（伤害组为 0）以零伤害反复命中道具，道具每次进入状态 60 并生成效果 0xff15（黄色火光），不被拾取。

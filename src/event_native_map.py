@@ -139,6 +139,12 @@ class NativeEventMap:
         if not hasattr(self,'art'):
             import event_content;self.art=event_content.MapArt(t)
         self.art.update()
+        # 活动地图 BGM（event_content 的 map_music）：原生在闸门结束时按 WorldType 请求地图 BGM（经典路由为 103），
+        # 当前 BGM 为 103 时改请求指定的 BGM（活动地图与俘虏页）。
+        music=t.data.get(t.selected,{}).get('map_music') if t.selected else None
+        if music and self.active and not t.active_battle and self.art.base_scene in (158,159,160,62,63,64):
+            from lab_ui import current_bgm,play_bgm
+            if current_bgm(p)==103:play_bgm(p,music);p.log('EVENT_MAP_MUSIC',t.selected,music)
         if self.active and not t.active_battle:
             p.put(HEADER+176,int(self.has_prisoners(p.word(app+0xc624)-self.routes[t.selected]['world_shift'] if p.word(HEADER+84) else p.word(app+0xb1ec))))
             if p.word(HEADER+180):
@@ -154,6 +160,15 @@ class NativeEventMap:
             if legacy and not p.word(HEADER+84):
                 ex=p.call('_ZN10BattleInfo17getExSurvivalInfoEi',t.info,s['id']);p.put(app+0xb9a4,p.word(ex+8))
             p.log('HISTORICAL_NATIVE_MAP_BATTLE',t.selected,s['id'])
+        # 原生单人关卡不设定敌方控制器的同阵营编队加成开关（+0x3a0；BattleStartSetStatusEnemy 只在 Wi-Fi 对战中调用），
+        # 该字节为 operator new 分配的未初始化内容：为真时 BattleController::onEventUnitCreate 出兵的单位另加数据行 +0x37c
+        # 的百分比生命（僵尸为 10%），随堆的复用而时有时无。自制 EVENT 战斗中写为 0，敌方生命按关卡强化级数计算（2026-10-15）。
+        record=t.active_battle
+        custom=record and record.get('native_map') and t.data[t.selected].get('custom')
+        if custom and not record.get('faction_flag_cleared') and p.word(app+0x22bc)==100 and p.word(app+0xc220):
+            ctrl=p.call('_ZN10BattleMain18getEnemyControllerEv',p.word(app+0xc220))
+            if ctrl:
+                p.log('EVENT_ENEMY_FACTION_FLAG',p.read(ctrl+0x3a0,1)[0]);p.write(ctrl+0x3a0,bytes(1));record['faction_flag_cleared']=True
     def save_result(self,record,won,time):
         t=self.t;p=self.p;table=self.active_table();saved=t.state()['stages'][record['stage']['local_stage_key']]
         if won:saved['best_time']=min(saved.get('best_time') or time,time)

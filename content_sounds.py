@@ -5,7 +5,10 @@
 - 条目：{"key": 稳定键, "file": "<名称>.msdf", "type": "se"|"vo"|"bgm", "volume": 1–127（缺省 100）,
   "loop": [开始秒, 结束秒]（仅 bgm，可选）, "gain": 0.1–8（可选，缺省 1）}。本体键以 "s1xlv." 开头，模组键以 "<模组 id>." 开头。
   文件为 MSDF（Ogg Vorbis 数据，以 OggS 开头），与原版音效文件相同；采样率与声道数不限（载入时转换为 16 kHz 立体声，核心 r52+）。
-- volume 为原生音量字（原版最大 127）；gain 在载入时乘到采样上，超过满幅 60% 的部分以 tanh 压缩而不削波
+- volume 为原生音量（记录第 12 字节的高字节，原版最大 127）；低字节为循环次数（CMediaSound::CreatePlayerFromFile 存入 +0xc4，
+  CAudioPresenter::loopCheck 以负值为无限循环）：原版 BGM 均为 0xFF，bgm 条目同样写入 0xFF，按 loop 区间无限循环，
+  se 与 vo 为 0（2026-10-15 修正：此前 bgm 写 0，播放到循环终点即停止）。
+  gain 在载入时乘到采样上，超过满幅 60% 的部分以 tanh 压缩而不削波
   （核心 msd_pcm_gain，r53+），用于素材本身比原版音效轻的情形。
 - 引用：单位动作脚本 op23（播放音效）的参数可写音效键字符串，安装时换为分配的 SoundID。
   可见范围与单位引用相同：本体、本模组与所依赖模组。
@@ -79,11 +82,12 @@ def read_mod_sounds(folder, mod_id, assets):
 
 
 def sound_references(unit):
-    """单位动作脚本中以字符串写的音效键（op23）与行为参数中的音效键（生命分档单位的防具受击与击毙音效）。"""
+    """单位动作脚本中以字符串写的音效键（op23）与行为参数中的音效键（防具受击、击毙与气球出场音效）。"""
     refs = [cmd['values'][0] for commands in unit.get('animations', {}).values() for cmd in commands
             if cmd.get('opcode') == SOUND_OPCODE and cmd.get('values') and isinstance(cmd['values'][0], str)]
     spec = unit.get('zombie_spec') or {}
-    return refs + list(spec.get('armor_sounds', [])) + ([spec['kill_sound']] if spec.get('kill_sound') else [])
+    return (refs + list(spec.get('armor_sounds', [])) + ([spec['kill_sound']] if spec.get('kill_sound') else [])
+            + ([spec['launch_sound']] if spec.get('launch_sound') else []))
 
 
 def check_unit_sounds(unit, visible):
@@ -132,6 +136,6 @@ def install(content, entries, ids):
         raw = bytearray(p.read(source, RECORD_SIZE))
         loop = entry.get('loop') or (0, 0)
         struct.pack_into('<Iff', raw, 0, p.cstr(entry['file']), float(loop[0]), float(loop[1]))
-        struct.pack_into('<III', raw, 12, entry.get('volume', 100) * 256, sid, kind)
+        struct.pack_into('<III', raw, 12, entry.get('volume', 100) * 256 + (0xff if kind == 0 else 0), sid, kind)
         table[sid] = content.alloc(raw)
     return content.alloc(struct.pack(f'<{NATIVE_SOUND_SLOTS}I', *table)), len(entries)

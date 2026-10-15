@@ -174,7 +174,9 @@ def check_unit(u):
         ratio(u.get(key,[1,1]))
     ratio(u.get('special_cooldown_multiplier',[1,1]))
     for word,value in u.get('status_word_values',{}).items():
-        if not word.isdigit() or int(word) not in ANCHOR_INDEX or int(word) in (1,2,3,4,5,13,14) or not isinstance(value,int) or isinstance(value,bool) or not -2147483648<=value<=2147483647:raise ValueError('Invalid absolute status word')
+        # 单个整数写入六个等级锚点；也可写六个整数的列表，依次为 Lv1、Lv10、Lv20、Lv30、Lv40、Lv50 锚点（2026-10-15）。
+        values=value if isinstance(value,list) and len(value)==6 else [value]
+        if not word.isdigit() or int(word) not in ANCHOR_INDEX or int(word) in (1,2,3,4,5,13,14) or any(not isinstance(v,int) or isinstance(v,bool) or not -2147483648<=v<=2147483647 for v in values):raise ValueError('Invalid absolute status word')
     flame=u.get('flame_interrupt')
     if flame is not None:
         bullets=flame.get('ending_bullet_animations')
@@ -376,7 +378,8 @@ class CommunityContent:
         # 生命分档单位：核心版本 1 为首批 7 个钩子，2 另含前方最近敌人（front_nearest_target，标记 64）的 5 个钩子，
         # 3 另含分档受击动作（stage_knockback_animation，标记 128），4 另含雪地步兵类（基准 182）的分档入口，
         # 5 另含雪地步兵类爆炸死亡不生成血色效果（no_death_splash，标记 256，钩子数不变）。
-        need=max([5 if u['zombie_spec']['flags']&256 else 4 if u['base_id']==182 else 3 if u['zombie_spec']['flags']&128 else 2 if u['zombie_spec']['flags']&64 else 1 for u in self.units if u.get('zombie_spec')] or [0])
+        # 6 另含 2026-10-15 新单位的行为（自爆 512、只打地面 1024、行进射击 2048、气球飞行 4096、被投出单位的据点前落地）与 33 字 ZSpec。
+        need=max([6 if u['zombie_spec']['flags']&(512|1024|2048|4096) or u['zombie_spec'].get('base_clearance') else 5 if u['zombie_spec']['flags']&256 else 4 if u['base_id']==182 else 3 if u['zombie_spec']['flags']&128 else 2 if u['zombie_spec']['flags']&64 else 1 for u in self.units if u.get('zombie_spec')] or [0])
         if need and (not hasattr(p.uc.lib,'msd_community_zombie_version') or p.uc.lib.msd_community_zombie_version()<need):raise RuntimeError('Native core lacks HP stage units')
         self.ready=False
 
@@ -571,7 +574,8 @@ class CommunityContent:
                     if value>0:struct.pack_into('<i',row,off,(value*a+b-1)//b)
             # 登记的状态词绝对值写入六个等级锚点（例如开火距离及脚本控制弹体的速度与目的距离）。
             for word,value in u.get('status_word_values',{}).items():
-                for off in anchor_offsets(int(word)):struct.pack_into('<i',row,off,value)
+                values=value if isinstance(value,list) else [value]*6
+                for off,v in zip(anchor_offsets(int(word)),values):struct.pack_into('<i',row,off,v)
             # 击退门槛为状态词 4（原生插值后乘 100 作为击退计量）；六个等级锚点按倍率四舍五入。
             # 非正值（原版 -1）表示每次受击均击退，计量不回填，该标记保持原值。
             a,b=u.get('knockback_threshold_multiplier',[1,1])
@@ -755,7 +759,7 @@ class CommunityContent:
         fields+=(self.get_time_table,)
         # 头部偏移 164：原生单位商店勋章不足时只提示、不询问前往商店（新单位界面的组合包页面期间由宿主置 1，U1c D45）。
         fields+=(0,)
-        # 头部偏移 168：生命分档单位（行为库 v3，src/community_content.cpp 的 ZSpec，28 个字）的逐槽指针表；无此类单位时为 0。
+        # 头部偏移 168：生命分档单位（行为库 v3 起，src/community_content.cpp 的 ZSpec，33 个字）的逐槽指针表；无此类单位时为 0。
         fields+=(self.install_zombie_specs(units),)
         p.write(HEADER,struct.pack('<%dI'%len(fields),*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
@@ -768,7 +772,7 @@ class CommunityContent:
         pointers=[]
         for spec in specs:
             if not spec:pointers.append(0);continue
-            words=[0]*28;words[0]=spec['flags']
+            words=[0]*33;words[0]=spec['flags']
             thresholds=spec.get('thresholds',[]);words[1]=len(thresholds)
             for i,(a,b) in enumerate(thresholds):words[2+i]=a;words[8+i]=b
             words[14]=sum(1<<(i+1) for i,flag in enumerate(spec.get('transitions',[])) if flag)
@@ -780,7 +784,13 @@ class CommunityContent:
             words[23]=self.sound_ids[spec['kill_sound']] if spec.get('kill_sound') else 0
             words[24]=spec.get('throw_stage',0);words[25]=spec.get('release_tick',0)
             words[26]=spec.get('flight_forward',0)&0xffffffff;words[27]=spec.get('flight_height',0)
-            pointers.append(self.alloc(struct.pack('<28I',*words)))
+            # 2026-10-15：28 行进射击的射程，29 气球放手距离，30 气球出场音效，31 被投出单位与敌方据点前缘的最小间距
+            words[28]=spec.get('walk_range',0);words[29]=spec.get('pop_distance',0)
+            words[30]=self.sound_ids[spec['launch_sound']] if spec.get('launch_sound') else 0
+            words[31]=spec.get('base_clearance',0)
+            # 32：自爆动作开始后按素材原朝向绘制的起始 tick + 1（0 为不改变）
+            words[32]=spec['unmirror_tick']+1 if 'unmirror_tick' in spec else 0
+            pointers.append(self.alloc(struct.pack('<33I',*words)))
         return self.alloc(struct.pack('<'+'I'*len(pointers),*pointers))
 
     def grant_world_clear_rewards(self):

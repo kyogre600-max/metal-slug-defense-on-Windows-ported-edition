@@ -1,4 +1,4 @@
-# 单位行为目录 / Unit behavior catalog（行为库版本 7）
+# 单位行为目录 / Unit behavior catalog（行为库版本 8）
 
 本文件由 `content_tool.py list-behaviors --markdown` 从 `behavior_library.json` 生成，请勿手工修改。
 Generated from `behavior_library.json` by `content_tool.py list-behaviors --markdown`; do not edit by hand.
@@ -224,14 +224,15 @@ When the unit enters stage (which must have a transition), it throws the given i
 - 适用的原版基准单位 / base_id: 160
 - 需要行为 / requires behaviors: para_drop_transform
 
-被投出的飞行单位：从投出者位置前方 forward、高 height 处出发（世界坐标），不使用空降的固定起始高度；飞行轨迹由精灵描述符槽 8 的脚本（op7）决定，落地后转为 para_drop_transform 指定的单位。
+被投出的飞行单位：从投出者位置前方 forward、高 height 处出发（世界坐标），不使用空降的固定起始高度；飞行轨迹由精灵描述符槽 8 的脚本（op7）决定，落地后转为 para_drop_transform 指定的单位。base_clearance 大于 0 时，飞行中前缘与敌方据点前缘的间距不小于该值（世界坐标）：将越过时停在该处并垂直落下，避免越过或嵌入敌方据点（2026-10-15 起被投出的小鬼为 16）。
 
-Thrown flying unit: starts forward and height (world units) from the thrower instead of the fixed paratrooper drop height; the flight path comes from the slot 8 script (op7) of its sprite descriptor, and it turns into the para_drop_transform unit on landing.
+Thrown flying unit: starts forward and height (world units) from the thrower instead of the fixed paratrooper drop height; the flight path comes from the slot 8 script (op7) of its sprite descriptor, and it turns into the para_drop_transform unit on landing. With base_clearance above 0 the flying unit keeps at least that gap (world units) between its front edge and the enemy base front edge: when it would pass that point it stops there and drops straight down, so it never lands inside or behind the enemy base (16 for the thrown imp since 2026-10-15).
 
 | 参数 / parameter | 类型 / type | 约束 / constraints |
 | --- | --- | --- |
 | `forward` | int | default: 0; min: -1000; max: 1000 |
 | `height` | int | default: 0; min: 0; max: 1000 |
+| `base_clearance` | int | default: 0; min: 0; max: 1000 |
 
 ## no_death_splash（v1）
 
@@ -242,4 +243,52 @@ Thrown flying unit: starts forward and height (world units) from the thrower ins
 When a snow-soldier-class unit is destroyed by an explosive attack (attribute 2), the native ZakoSnow code adds the red splash effect 0xff01 in state 110; that is the only difference from state 100 (both play slot 13 and move to state 140). Units with this behaviour are handled as state 100 and only play their own death animation; fire deaths (state 120) are unchanged.
 
 无参数 / no parameters.
+
+## self_destruct_attack（v1）
+
+- 适用的原版基准单位 / base_id: 313
+
+自爆：进入攻击（状态 30/40）与特殊攻击（状态 50）时按原版 HOPPER MECHA（UnitID 39）的流程处理：普通攻击播放槽 8、特殊攻击播放槽 9，动作开始即不被选为目标、不阻挡、不能再发动绝招，动作播完后单位消失（不经死亡流程，对方不获得击毁奖励）；动作中不会被击退或打断。伤害取动作开始时的攻击组（普通攻击为词 22、特殊攻击为词 29），攻击框与音效写在这两个槽的脚本中。unmirrored_from_tick ≥ 0 时，攻击动作开始后第该 tick 起按素材原朝向绘制（不随队伍翻转，单位朝向与判定不变；用于带文字的爆炸图）。
+
+Self-destruct: attacks (states 30/40) and the special (state 50) follow the native HOPPER MECHA (UnitID 39) flow: the normal attack plays slot 8 and the special plays slot 9; from the start the unit is no longer targeted, does not block and cannot use its special, and it disappears when the animation ends (no death flow, no kill reward for the enemy). It cannot be knocked back or interrupted meanwhile. Damage uses the attack group active when the animation starts (word 22 for the normal attack, word 29 for the special); attack boxes and sounds go in the two slot scripts. With unmirrored_from_tick ≥ 0, from that tick of the attack animation the sprite is drawn in its original art direction (not flipped by team; the unit direction and hit boxes are unchanged), for explosion art that contains text.
+
+| 参数 / parameter | 类型 / type | 约束 / constraints |
+| --- | --- | --- |
+| `unmirrored_from_tick` | int | default: -1; min: -1; max: 1000 |
+
+## ground_only_attack（v1）
+
+- 适用的原版基准单位 / base_id: 313
+
+本单位的攻击不命中空中单位（身体状态 NoTarget）与战场道具（UnitID 116、231、289、363），只打地面单位与据点。
+
+This unit's attacks never hit air units (body state NoTarget) or stage items (UnitID 116, 231, 289, 363); they hit ground units and the base only.
+
+无参数 / no parameters.
+
+## walk_shoot（v1）
+
+- 适用的原版基准单位 / base_id: 313
+
+行进射击：待机与行进（状态 10、20）的动作脚本中的 op22[弹体槽, 命中槽, x, y]（x、y 为素材坐标，同原生）在最近的敌方单位前缘距离不超过 range 时发射弹体，否则不发射；射击节奏由脚本中 op22 的位置决定。弹体的伤害、击退值、目标数、弹速与行程取近距参数组（词 15–21，可用 status_word_values 写入六个等级锚点），接触敌人后的啃咬照常使用普通攻击组。
+
+Shooting while walking: op22[bullet slot, hit slot, x, y] (art coordinates, as in native scripts) in the idle and walk scripts (states 10 and 20) fires a bullet when the nearest enemy front edge is within range, and does nothing otherwise; the firing rhythm comes from where op22 sits in the scripts. Bullet damage, knockback value, target count, speed and travel come from the short-range group (words 15–21, settable per level anchor with status_word_values); biting on contact uses the normal attack group as usual.
+
+| 参数 / parameter | 类型 / type | 约束 / constraints |
+| --- | --- | --- |
+| `range` | int | required: true; min: 1; max: 4000 |
+
+## balloon_flight（v1）
+
+- 适用的原版基准单位 / base_id: 313
+- 需要行为 / requires behaviors: hp_stage_animations
+
+气球飞行：生命分档的第 0 档为飞行段（第 1 档须有过渡动作，即放手与落地）。飞行中不被选为目标、不阻挡、不被阻挡、不被击退，也不攻击任何敌人；高度由动作脚本的受击框（op3）与帧位置表达。前缘与敌方据点前缘的间距不超过 pop_distance、生命降到第 1 档或发动绝招时放手（主动放手时生命截到第 1 档以下），播放第 1 档的过渡动作后按地面单位行动，此后不再有绝招。launch_sound 为出场时的音效（可省略）。
+
+Balloon flight: HP stage 0 is the flying phase (stage 1 needs a transition: letting go and landing). While flying the unit is not targeted, does not block, is not blocked, is not knocked back and attacks nothing; its height comes from the hit boxes (op3) and frame positions in the scripts. It lets go when its front edge is within pop_distance of the enemy base front edge, when HP drops to stage 1, or when the special is used (letting go early cuts HP below stage 1); after the stage 1 transition it acts as a ground unit and has no special any more. launch_sound plays when it enters the field (optional).
+
+| 参数 / parameter | 类型 / type | 约束 / constraints |
+| --- | --- | --- |
+| `pop_distance` | int | default: 16; min: 0; max: 1000 |
+| `launch_sound` | sound_key | default: null |
 

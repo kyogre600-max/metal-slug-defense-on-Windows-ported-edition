@@ -21,6 +21,9 @@ def recover_transaction(saves):
         else:atomic_bytes(path,base64.b64decode(raw,validate=True))
     journal.unlink();return True
 class EventTrial:
+    # 2026-10-15：活动战败沿用原生接关流程（接关确认窗，可花勋章再战；取消后确认脱离战斗），结算仍在原生结束战斗时由
+    # event_end 钩子交给宿主。此前接关窗出现即由宿主结算，战败画面直接黑场转回地图。False 时恢复旧行为。
+    NATIVE_CONTINUE=True
     def __init__(self,p,root):
         self.p=p;self.root=Path(root);self.app=0;self.overlay=None;self.selected=None
         self.catalog=json.loads((self.root/'historical_events/catalog.json').read_text(encoding='utf-8'))['events']
@@ -233,6 +236,9 @@ class EventTrial:
         if self.has_shop():self.prepare_native_shop()
         p.put(HEADER+48,len(self.medal_rows()))
         self.prepare_item_hud()
+        # 自制 EVENT 的俘虏为常规关卡的俘虏（UnitID 231）；原生经典活动路由（WorldType 1）生成巨灵战车零件（UnitID 289），
+        # 核心钩子 regular_prisoner 在 H+224 非零时改走常规分支（2026-10-15）。
+        p.put(HEADER+224,1 if self.data[key].get('custom') else 0)
         if enter:
             p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
             p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
@@ -299,7 +305,7 @@ class EventTrial:
         if self.p.word(HEADER+4) and self.active_battle:self.finish_battle()
         battle=self.p.word(self.app+0xc220) if self.active_battle else 0
         native_coop=bool(self.active_battle and self.active_battle.get('native_coop'))
-        if battle and not native_coop and self.last_scene in (110,120) and not self.p.read(battle+0x1c,1)[0] and not self.p.call('_ZN10BattleMain15isBattlePlayingEv',battle):
+        if battle and not native_coop and not self.NATIVE_CONTINUE and self.last_scene in (110,120) and not self.p.read(battle+0x1c,1)[0] and not self.p.call('_ZN10BattleMain15isBattlePlayingEv',battle):
             # The preview finalizes defeat locally; the legacy paid-continue
             # popup depends on service state outside the isolated Event profile.
             self.finish_battle()
@@ -410,7 +416,7 @@ class EventTrial:
         self.native_selector.disable()
         for i,raw in enumerate(self.original_groups):p.write(self.groups+i*8,raw)
         p.write(self.db+0x20,self.original_survival)
-        p.write(HEADER,b'\0'*224)
+        p.write(HEADER,b'\0'*228)
         if self.selected is not None and self.original_currency is not None:
             p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',self.app,self.original_currency)
         self.selected=None;self.selected_phase=None;self.overlay=None;self.native_shop_active=False;self.active_battle=None

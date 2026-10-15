@@ -37,7 +37,7 @@ LABELS = {'ZT': ('開始', '細則', '上一個', '下一個'), 'ZS': ('开始',
 DETAIL = {'ZT': ('發行商', '發行日期', '擴充', '合作'), 'ZS': ('发行商', '发行日期', '扩展', '合作'),
           'JP': ('発行', '配信日', '追加配信', 'コラボ'), 'KR': ('발행사', '배포일', '추가 배포', '콜라보'),
           'EN': ('Publisher', 'Release', 'Expansion', 'Partner')}
-# 自制 EVENT 细则：作者（发行者）与来源（模组 id）分别显示，官方历史活动沿用 SNK PLAYMORE CORPORATION。
+# 自制 EVENT 细则：模组 EVENT 显示作者（发行者）与来源（模组 id），本体 EVENT 同官方历史活动显示发行商。
 CUSTOM_DETAIL = {'ZT': ('作者', '模組'), 'ZS': ('作者', '模组'), 'JP': ('作者', 'MOD'), 'KR': ('제작자', '모드'),
                  'EN': ('Author', 'Mod')}
 VS_LABELS = {'對戰', '対戦', '대전', 'VERSUS', 'ВЕРСУС', 'Wi-Fi對戰', 'Wi-Fi対戦', 'Wi-Fi 대전', 'Wi-Fi VS', 'Wi-Fi V/S', 'Wi-Fi ВЕР'}
@@ -322,9 +322,11 @@ class EventBrowser:
         when = f"{event['date']} ({event['platform']})" if event.get('platform') else event['date']
         lines = [f"{publisher}: {self.meta['publisher']}", f"{release}: {when}"]
         if event.get('publisher'):
+            # 本体 EVENT（正式版本体内容）与历史活动相同写“发行商”；模组 EVENT 写作者与模组 id。
             author, mod = CUSTOM_DETAIL[lang]
-            lines = [f"{author}: {event['publisher']}", f"{release}: {when}"]
-            if event.get('source', 'body') != 'body':
+            body = event.get('source', 'body') == 'body'
+            lines = [f"{publisher if body else author}: {event['publisher']}", f"{release}: {when}"]
+            if not body:
                 lines.append(f"{mod}: {event['source']}")
             if event.get('details'):
                 lines += ['', event['details'][self.locale()]]

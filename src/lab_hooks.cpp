@@ -1842,6 +1842,11 @@ void install_se_hooks(){
 bool msd_guest_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,uint32_t* result){
     return guest_call(c,fn,a0,a1,a2,a3,nullptr,0,result);
 }
+// 同上，另带栈参数（第 5 个起的参数，按 32 位字依次放在栈顶；2026-10-15 机枪豌豆僵尸发射豌豆用 addBullet 的 9 个参数）。
+bool msd_guest_call_stack(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,
+                          const uint32_t* stack,uint32_t stack_words,uint32_t* result){
+    return guest_call(c,fn,a0,a1,a2,a3,stack,stack_words,result);
+}
 // 联机回滚（netplay.cpp）：本文件中跨帧保留、参与战斗、AI 决策或音效队列的静态状态，随客体内存快照保存与恢复；
 // 仅在单次原生调用内有效的绘制遍标记（pass、in_ui 等）与布局缓存不在其中。
 void msd_lab_netplay_state(StateIO& io){
