@@ -294,6 +294,14 @@ SHOP_HOOK(map_music_request,0x101c677du,if(active(c)&&rd<uint32_t>(c,H+164)&&c.r
     uint32_t scene=rd<uint32_t>(c,c.r[0]+0x22bc);
     if(scene==99u||scene==100u)c.r[1]=rd<uint32_t>(c,H+164);
 })
+// 自制 EVENT 的活动地图 BGM（2026-10-16，r64）：原生在活动地图（SC_EventMSDStageLoop 四个入口状态，闸门结束时）与俘虏页
+// （SC_PrisonerLoop 状态 0）经 Sound_RequestPlayBGMEx2 按 WorldType 与模式请求 BGM（经典路由两处均为 103）。宿主此前在原生请求 103
+// 之后再请求指定 BGM，地图与俘虏页之间每次切换音乐都从头播放。H+228 非零时为宿主写入的指定 SoundID，只替换这五个调用点（按返回
+// 地址）的参数；请求与正在播放的 BGM 相同时原生 Sound_PlayBGM 不重新播放（0x1c7408），切换时音乐连续。
+static bool map_bgm_callsite(uint32_t lr){
+    switch(lr&~1u){case 0x101f8f4au:case 0x101f8f84u:case 0x101f8fbeu:case 0x101f8ff8u:case 0x1021294eu:return true;default:return false;}
+}
+SHOP_HOOK(custom_map_bgm,0x101c8581u,if(eventmsd(c)&&rd<uint32_t>(c,H+228)&&map_bgm_callsite(c.r[14]))c.r[1]=rd<uint32_t>(c,H+228);)
 // 猫咪共享图集经独立绘制任务映射到原生世界几何。旧普通地图使用槽 29–31；
 // EventMSD 使用槽 28。真实任务的中心、比例、父链及触点矩形保持原生状态。
 SHOP_HOOK(cat_world_draw,0x10213b35u,if(event_map(c)&&rd<uint32_t>(c,H+156)){
@@ -504,6 +512,7 @@ SHOP_HOOK(selector_cost_icon,0x102005ddu,if(rd<uint32_t>(c,H+124)&&c.r[14]==0x10
 SHOP_HOOK(selector_cost_number,0x101c4935u,if(rd<uint32_t>(c,H+124)&&c.r[14]==0x1020ea05u){ret(c,0);return;})
 extern "C" __declspec(dllexport) uint32_t msd_custom_event_shop_version(){return 1u;}
 extern "C" __declspec(dllexport) uint32_t msd_custom_event_prisoner_version(){return 2u;}
+extern "C" __declspec(dllexport) uint32_t msd_custom_event_map_bgm_version(){return 1u;}
 extern "C" __declspec(dllexport) void msd_enable_historical_event_hooks(){
     static bool done=false;if(done)return;done=true;
     original_end=find_block(0x101ea099u);
@@ -545,7 +554,7 @@ extern "C" __declspec(dllexport) void msd_enable_historical_event_hooks(){
     INSTALL(cat_world_draw,0x10213b35u);
     INSTALL(cat_event_background,0x101f56f5u);INSTALL(cat_event_info_zoom,0x101f778du);
     INSTALL(cat_event_paging_init,0x101f739du);INSTALL(cat_event_world_origin,0x10213a6du);
-    INSTALL(map_music_request,0x101c677du);
+    INSTALL(map_music_request,0x101c677du);INSTALL(custom_map_bgm,0x101c8581u);
     INSTALL(cat_area_labels,0x10200161u);
     INSTALL(map_mission,0x101d09fdu);INSTALL(map_world_enable,0x101664adu);
     INSTALL(map_area_enable,0x10166471u);INSTALL(map_area_open,0x10166597u);

@@ -63,6 +63,8 @@ OPENING_X = [1180, 1120, 1060, 1000]
 
 def stage(area, slot, *, level, roster, waves, triggers=(), placed=(), base_hp, prisoners, strength=0, difficulty=0):
     key = f'{KEY}.{area["id"]}.s{slot + 1}'
+    # 开门单位不在出兵名单中时追加到敌军名单末尾，只供开战放置使用（出兵表与触发不引用）。
+    roster = list(roster) + [unit for unit in dict.fromkeys(placed) if unit not in roster]
     index = {unit: i for i, unit in enumerate(roster)}
     entry = {
         'key': key, 'marker': list(MARKERS[slot]), 'thumbnail': area['thumbnail'],
@@ -123,59 +125,61 @@ CENTRAL_STAGES = [
                     ('base_hp', 17, NEWSPAPER), ('base_hp', 16, NEWSPAPER)]),
 ]
 # 第三至五大关：敌军全部 Lv40；强度系数 60% 为 3 级（每级 +20%），依此类推。
+# 开门单位（2026-10-16 用户修订）：3-1 无、3-2 普通、3-3 路障、3-4 铁桶；4-1 无、4-2 铁桶、4-3 读报、4-4 橄榄球；
+# 5-1 橄榄球、5-2 机枪豌豆、5-3 辣椒 4 只、5-4 巨人。
 CANADA_STAGES = [
     stage(CANADA, 0, level=40, difficulty=3, strength=3, roster=[NORMAL, CONE, BUCKET, NEWSPAPER, FOOTBALL, ZOMBONI],
           base_hp=20000, prisoners=4,
           waves=[(100, NORMAL), (250, CONE), (400, BUCKET), (550, NEWSPAPER), (700, NORMAL), (850, FOOTBALL), (1000, CONE)],
           triggers=[('front', 600, ZOMBONI), ('front', 580, FOOTBALL), ('base_hp', 50, ZOMBONI)]),
     stage(CANADA, 1, level=40, difficulty=3, strength=3, roster=[NEWSPAPER, BUCKET, FOOTBALL, SQUASH],
-          base_hp=22500, prisoners=4, placed=[NEWSPAPER, NEWSPAPER],
+          base_hp=22500, prisoners=4, placed=[NORMAL],
           waves=[(120, BUCKET), (330, SQUASH), (540, NEWSPAPER), (750, FOOTBALL), (960, SQUASH)],
           triggers=[('front', 600, SQUASH), ('front', 580, FOOTBALL), ('base_hp', 50, NEWSPAPER), ('base_hp', 49, NEWSPAPER)]),
     stage(CANADA, 2, level=40, difficulty=4, strength=3, roster=[NEWSPAPER, FOOTBALL, ZOMBONI, SQUASH, GATLING],
-          base_hp=25000, prisoners=6, placed=[ZOMBONI],
+          base_hp=25000, prisoners=6, placed=[CONE],
           waves=[(120, NEWSPAPER), (300, GATLING), (480, SQUASH), (660, FOOTBALL), (840, NEWSPAPER), (1000, GATLING)],
           triggers=[('front', 600, ZOMBONI), ('front', 580, SQUASH), ('base_hp', 50, GATLING), ('base_hp', 49, FOOTBALL)]),
     stage(CANADA, 3, level=40, difficulty=4, strength=4, roster=[FOOTBALL, SQUASH, GATLING, JALAPENO],
-          base_hp=60000, prisoners=7, placed=[GATLING, GATLING],
+          base_hp=60000, prisoners=7, placed=[BUCKET],
           waves=[(100, FOOTBALL), (300, SQUASH), (500, GATLING), (700, FOOTBALL), (900, JALAPENO)],
           triggers=[('front', 650, JALAPENO), ('front', 630, SQUASH), ('base_hp', 50, GATLING), ('base_hp', 49, GATLING),
                     ('base_hp', 20, FOOTBALL), ('base_hp', 19, FOOTBALL), ('base_hp', 18, FOOTBALL), ('base_hp', 17, JALAPENO)]),
 ]
 UK_STAGES = [
     stage(UK, 0, level=40, difficulty=4, strength=4, roster=[FOOTBALL, SQUASH, GATLING, JALAPENO],
-          base_hp=30000, prisoners=6, placed=[GATLING, FOOTBALL],
+          base_hp=30000, prisoners=6,
           waves=[(120, FOOTBALL), (330, SQUASH), (540, GATLING), (750, FOOTBALL), (960, JALAPENO)],
           triggers=[('front', 600, JALAPENO), ('front', 580, GATLING), ('base_hp', 50, SQUASH)]),
     stage(UK, 1, level=40, difficulty=4, strength=4, roster=[GATLING, JALAPENO, FOOTBALL, BALLOON],
-          base_hp=32500, prisoners=6, placed=[GATLING, FOOTBALL],
+          base_hp=32500, prisoners=6, placed=[BUCKET],
           waves=[(120, BALLOON), (330, FOOTBALL), (540, GATLING), (750, BALLOON), (960, JALAPENO)],
           triggers=[('front', 600, JALAPENO), ('front', 580, BALLOON), ('base_hp', 50, GATLING), ('base_hp', 49, FOOTBALL)]),
     stage(UK, 2, level=40, difficulty=5, strength=5, roster=[GATLING, JALAPENO, FOOTBALL, BALLOON, JACK],
-          base_hp=35000, prisoners=7, placed=[GATLING, GATLING, GATLING],
+          base_hp=35000, prisoners=7, placed=[NEWSPAPER],
           waves=[(120, JACK), (330, FOOTBALL), (540, BALLOON), (750, JACK), (960, JALAPENO)],
           triggers=[('front', 600, JACK), ('front', 580, JALAPENO), ('base_hp', 50, GATLING), ('base_hp', 49, BALLOON)]),
     stage(UK, 3, level=40, difficulty=5, strength=5, roster=[GATLING, JALAPENO, FOOTBALL, BALLOON, JACK, GARGANTUAR],
-          base_hp=70000, prisoners=7, placed=[GARGANTUAR, GARGANTUAR],
+          base_hp=70000, prisoners=7, placed=[FOOTBALL],
           waves=[(100, GATLING), (300, FOOTBALL), (500, BALLOON), (700, JACK), (900, JALAPENO)],
           triggers=[('front', 650, GARGANTUAR), ('base_hp', 50, GARGANTUAR), ('base_hp', 49, JACK),
                     ('base_hp', 20, FOOTBALL), ('base_hp', 19, FOOTBALL), ('base_hp', 18, BALLOON), ('base_hp', 17, JALAPENO)]),
 ]
 ALASKA_STAGES = [
     stage(ALASKA, 0, level=40, difficulty=5, strength=5, roster=[JALAPENO, GATLING, BALLOON, GARGANTUAR, JACK],
-          base_hp=40000, prisoners=7, placed=[GATLING, GATLING, GATLING],
+          base_hp=40000, prisoners=7, placed=[FOOTBALL],
           waves=[(120, JACK), (330, BALLOON), (540, GATLING), (750, JACK), (960, JALAPENO)],
           triggers=[('front', 600, GARGANTUAR), ('front', 580, JALAPENO), ('base_hp', 50, GARGANTUAR)]),
     stage(ALASKA, 1, level=40, difficulty=5, strength=6, roster=[ZOMBONI, GATLING, BALLOON, GARGANTUAR, JACK],
-          base_hp=45000, prisoners=7, placed=[ZOMBONI, ZOMBONI],
+          base_hp=45000, prisoners=7, placed=[GATLING],
           waves=[(120, GATLING), (330, BALLOON), (540, JACK), (750, GATLING), (960, ZOMBONI)],
           triggers=[('front', 600, GARGANTUAR), ('front', 580, JACK), ('base_hp', 50, GARGANTUAR), ('base_hp', 49, ZOMBONI)]),
     stage(ALASKA, 2, level=40, difficulty=5, strength=7, roster=[ZOMBONI, JACK, BALLOON, GARGANTUAR, FOOTBALL],
-          base_hp=50000, prisoners=8, placed=[ZOMBONI, ZOMBONI],
+          base_hp=50000, prisoners=8, placed=[JALAPENO, JALAPENO, JALAPENO, JALAPENO],
           waves=[(120, FOOTBALL), (330, JACK), (540, BALLOON), (750, FOOTBALL), (960, ZOMBONI)],
           triggers=[('front', 600, GARGANTUAR), ('front', 580, JACK), ('base_hp', 50, GARGANTUAR), ('base_hp', 49, FOOTBALL)]),
     stage(ALASKA, 3, level=40, difficulty=5, strength=8, roster=[ZOMBONI, JACK, GARGANTUAR, FOOTBALL, GATLING, JALAPENO],
-          base_hp=100000, prisoners=8, placed=[JALAPENO, JALAPENO, JALAPENO, JALAPENO],
+          base_hp=100000, prisoners=8, placed=[GARGANTUAR],
           waves=[(100, FOOTBALL), (300, GATLING), (500, JACK), (700, ZOMBONI), (900, JALAPENO)],
           triggers=[('front', 650, GARGANTUAR), ('base_hp', 50, GARGANTUAR), ('base_hp', 49, ZOMBONI),
                     ('base_hp', 20, FOOTBALL), ('base_hp', 19, JACK), ('base_hp', 18, GATLING), ('base_hp', 17, JALAPENO)]),

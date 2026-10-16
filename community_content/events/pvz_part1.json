@@ -1190,6 +1190,10 @@
             {
               "unit": "s1xlv.pvz_squash",
               "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_zombie",
+              "level": 40
             }
           ],
           "waves": [
@@ -1275,12 +1279,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 0,
+              "enemy": 4,
               "x": 1180
-            },
-            {
-              "enemy": 0,
-              "x": 1120
             }
           ]
         },
@@ -1317,6 +1317,10 @@
             },
             {
               "unit": "s1xlv.pvz_gatling",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_cone",
               "level": 40
             }
           ],
@@ -1407,7 +1411,7 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 2,
+              "enemy": 5,
               "x": 1180
             }
           ]
@@ -1441,6 +1445,10 @@
             },
             {
               "unit": "s1xlv.pvz_jalapeno",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
               "level": 40
             }
           ],
@@ -1547,12 +1555,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 2,
+              "enemy": 4,
               "x": 1180
-            },
-            {
-              "enemy": 2,
-              "x": 1120
             }
           ]
         }
@@ -1715,17 +1719,7 @@
             }
           ],
           "item_level": 15,
-          "prisoner_chance": 100,
-          "placed": [
-            {
-              "enemy": 2,
-              "x": 1180
-            },
-            {
-              "enemy": 0,
-              "x": 1120
-            }
-          ]
+          "prisoner_chance": 100
         },
         {
           "key": "s1xlv.pvz_part1.uk.s2",
@@ -1756,6 +1750,10 @@
             },
             {
               "unit": "s1xlv.pvz_balloon",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_bucket",
               "level": 40
             }
           ],
@@ -1842,12 +1840,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 0,
+              "enemy": 4,
               "x": 1180
-            },
-            {
-              "enemy": 2,
-              "x": 1120
             }
           ]
         },
@@ -1884,6 +1878,10 @@
             },
             {
               "unit": "s1xlv.pvz_jack",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_newspaper",
               "level": 40
             }
           ],
@@ -1970,16 +1968,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 0,
+              "enemy": 5,
               "x": 1180
-            },
-            {
-              "enemy": 0,
-              "x": 1120
-            },
-            {
-              "enemy": 0,
-              "x": 1060
             }
           ]
         },
@@ -2121,12 +2111,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 5,
+              "enemy": 2,
               "x": 1180
-            },
-            {
-              "enemy": 5,
-              "x": 1120
             }
           ]
         }
@@ -2216,6 +2202,10 @@
             {
               "unit": "s1xlv.pvz_jack",
               "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_football",
+              "level": 40
             }
           ],
           "waves": [
@@ -2296,16 +2286,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 1,
+              "enemy": 5,
               "x": 1180
-            },
-            {
-              "enemy": 1,
-              "x": 1120
-            },
-            {
-              "enemy": 1,
-              "x": 1060
             }
           ]
         },
@@ -2428,12 +2410,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 0,
+              "enemy": 1,
               "x": 1180
-            },
-            {
-              "enemy": 0,
-              "x": 1120
             }
           ]
         },
@@ -2470,6 +2448,10 @@
             },
             {
               "unit": "s1xlv.pvz_football",
+              "level": 40
+            },
+            {
+              "unit": "s1xlv.pvz_jalapeno",
               "level": 40
             }
           ],
@@ -2556,12 +2538,20 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 0,
+              "enemy": 5,
               "x": 1180
             },
             {
-              "enemy": 0,
+              "enemy": 5,
               "x": 1120
+            },
+            {
+              "enemy": 5,
+              "x": 1060
+            },
+            {
+              "enemy": 5,
+              "x": 1000
             }
           ]
         },
@@ -2703,20 +2693,8 @@
           "prisoner_chance": 100,
           "placed": [
             {
-              "enemy": 5,
+              "enemy": 2,
               "x": 1180
-            },
-            {
-              "enemy": 5,
-              "x": 1120
-            },
-            {
-              "enemy": 5,
-              "x": 1060
-            },
-            {
-              "enemy": 5,
-              "x": 1000
             }
           ]
         }

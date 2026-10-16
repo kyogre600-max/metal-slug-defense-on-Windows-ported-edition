@@ -139,12 +139,7 @@ class NativeEventMap:
         if not hasattr(self,'art'):
             import event_content;self.art=event_content.MapArt(t)
         self.art.update()
-        # 活动地图 BGM（event_content 的 map_music）：原生在闸门结束时按 WorldType 请求地图 BGM（经典路由为 103），
-        # 当前 BGM 为 103 时改请求指定的 BGM（活动地图与俘虏页）。
-        music=t.data.get(t.selected,{}).get('map_music') if t.selected else None
-        if music and self.active and not t.active_battle and self.art.base_scene in (158,159,160,62,63,64):
-            from lab_ui import current_bgm,play_bgm
-            if current_bgm(p)==103:play_bgm(p,music);p.log('EVENT_MAP_MUSIC',t.selected,music)
+        # 活动地图 BGM（event_content 的 map_music）由核心钩子 custom_map_bgm 在原生请求时替换（H+228，event_trial.select 写入）。
         if self.active and not t.active_battle:
             p.put(HEADER+176,int(self.has_prisoners(p.word(app+0xc624)-self.routes[t.selected]['world_shift'] if p.word(HEADER+84) else p.word(app+0xb1ec))))
             if p.word(HEADER+180):

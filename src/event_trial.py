@@ -239,6 +239,9 @@ class EventTrial:
         # 自制 EVENT 的俘虏为常规关卡的俘虏（UnitID 231）；原生经典活动路由（WorldType 1）生成巨灵战车零件（UnitID 289），
         # 核心钩子 regular_prisoner 在 H+224 非零时改走常规分支（2026-10-15）。
         p.put(HEADER+224,1 if self.data[key].get('custom') else 0)
+        # 自制 EVENT 的活动地图 BGM（event_content 的 map_music）：核心钩子 custom_map_bgm 在活动地图与俘虏页的原生 BGM 请求中
+        # 以 H+228 代替按 WorldType 选择的 SoundID，切换两画面时音乐连续（2026-10-16，r64）。
+        p.put(HEADER+228,(self.data[key].get('map_music') or 0) if self.data[key].get('custom') else 0)
         if enter:
             p.call('_ZN7AppMain12SceneEndFuncEi',self.app,p.word(self.app+0x22bc))
             p.call('_ZN7AppMain23SC_WiFiMenuInit_TagTeamEv',self.app)
@@ -416,7 +419,7 @@ class EventTrial:
         self.native_selector.disable()
         for i,raw in enumerate(self.original_groups):p.write(self.groups+i*8,raw)
         p.write(self.db+0x20,self.original_survival)
-        p.write(HEADER,b'\0'*228)
+        p.write(HEADER,b'\0'*232)
         if self.selected is not None and self.original_currency is not None:
             p.call('_ZN7AppMain24SetSurvivalPointSaveDataEi',self.app,self.original_currency)
         self.selected=None;self.selected_phase=None;self.overlay=None;self.native_shop_active=False;self.active_battle=None
