@@ -205,6 +205,19 @@ void cockpit_push(Context& c){
     }
     old_cockpit_push(c);
 }
+// 第 24 版：关卡结算画面（BattleResultScene 构造函数 0x1d38a4 起）在游戏类型 1/6/9 把战斗结果 +0x10 写入
+// +0x130（显示 Twitter 图标）与 +0x179（显示 NEO GEO / More Apps 图标）。本移植没有这两项服务：按下 Twitter
+// 范围（原生 x -40…184、y ≤ 144）后 onTouchEnded 调用未实现的 Java twitterIsTokenEnable，游戏停止。
+// 写 +0x179 的两个入口块中先清 +0x130，并令写入 +0x179 的值为 0；绘制与触点只按这两个字节判断，图标不再显示也不再受理。
+Block old_result_icons_set,old_result_icons_zero;
+void result_icons_set(Context& c){
+    wr<uint8_t>(c,c.r[4]+0x130u,0u);c.r[3]=0u;           // b_101d38be：r3 即将写入 +0x179，之后由原块重新读取
+    old_result_icons_set(c);
+}
+void result_icons_zero(Context& c){
+    wr<uint8_t>(c,c.r[4]+0x130u,0u);                      // b_101d38bc：原块本身写入 0
+    old_result_icons_zero(c);
+}
 void menu_layout(Context& c){
     uint32_t app=c.r[0];
     old_menu_layout(c);                                    // 保留原块的分配、寄存器与后续控制流
@@ -1869,7 +1882,7 @@ extern "C" __declspec(dllexport) uint32_t msd_netplay_take_actions(uint32_t* out
     if(dropped){*dropped=net_action_dropped;net_action_dropped=0;}
     return n;
 }
-extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 23u;}
+extern "C" __declspec(dllexport) uint32_t msd_lab_hooks_version(){return 24u;}
 extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     static bool installed=false;
     if(installed)return;
@@ -1886,6 +1899,8 @@ extern "C" __declspec(dllexport) void msd_enable_lab_hooks(){
     old_cap_item=find_block(0x101d74f9u);register_block(0x101d74f9u,cap_item);
     old_menu_layout=find_block(MENU_LAYOUT);register_block(MENU_LAYOUT,menu_layout);
     old_cockpit_push=find_block(0x101ff51bu);register_block(0x101ff51bu,cockpit_push);
+    old_result_icons_set=find_block(0x101d38bfu);register_block(0x101d38bfu,result_icons_set);
+    old_result_icons_zero=find_block(0x101d38bdu);register_block(0x101d38bdu,result_icons_zero);
     old_menu_button_draw=find_block(0x102003bdu);register_block(0x102003bdu,menu_button_draw);
     old_menu_button_tail=find_block(0x1020047bu);register_block(0x1020047bu,menu_button_tail);
     install_ui_hooks();

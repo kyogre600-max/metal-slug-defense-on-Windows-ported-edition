@@ -12,7 +12,8 @@ from window_layout import game_point, fit_rect, WIDTH, HEIGHT
 from app_icon import WindowIcon, set_app_user_model_id
 
 from branding import load as load_branding
-TITLE=load_branding(ROOT)['application_name']
+BRANDING=load_branding(ROOT)
+TITLE=BRANDING['application_name']
 
 def native_crash_details(p):
     """原生核心停止时的诊断附录（写在 player_error.log 的 traceback 之后）：AOT 寄存器、客体栈中形似 Thumb 返回地址
@@ -40,6 +41,67 @@ def native_crash_details(p):
     except Exception:pass
     return chr(10).join(lines)+chr(10)
 
+# 出错提示框的文字（游戏停止、窗口启动失败、请求发送错误记录）。键为原生语言编号 app+0x3d64：
+# 0 英 1 日 2 韩 3 西 4 葡 5 法 7 意 8 简中 9 繁中 10 俄。游戏语言不可用时按 Windows 显示语言，再按英语。
+ISSUES_URL='https://github.com/sprievs7up/metal-slug-defense-on-Windows-ported-edition/issues'
+ERROR_TEXT={
+    0:('The game has stopped running. Your saved progress is kept.','The game window could not be started.',
+       'Please send the error log player_error.log to the author (for example through GitHub Issues on the project page) so the cause can be found:'),
+    1:('ゲームの実行が停止しました。保存済みの進行状況はそのまま残ります。','ゲームウィンドウを起動できませんでした。',
+       '原因を調べるため、エラーログ player_error.log を作者に送ってください（プロジェクトページの GitHub Issues から報告できます）：'),
+    2:('게임 실행이 중지되었습니다. 저장된 진행 상황은 그대로 남아 있습니다.','게임 창을 시작하지 못했습니다.',
+       '원인을 확인할 수 있도록 오류 기록 player_error.log 파일을 제작자에게 보내 주세요(프로젝트 페이지의 GitHub Issues에서 보고할 수 있습니다):'),
+    3:('El juego dejó de funcionar. Tu progreso guardado se conserva.','No se pudo iniciar la ventana del juego.',
+       'Envía el registro de errores player_error.log al autor (por ejemplo, en GitHub Issues en la página del proyecto) para poder encontrar la causa:'),
+    4:('O jogo parou de funcionar. Seu progresso salvo foi mantido.','Não foi possível iniciar a janela do jogo.',
+       'Envie o registro de erros player_error.log ao autor (por exemplo, pelo GitHub Issues na página do projeto) para que a causa possa ser encontrada:'),
+    5:("Le jeu s'est arrêté. Votre progression sauvegardée est conservée.",'Impossible de démarrer la fenêtre du jeu.',
+       "Envoyez le journal d'erreurs player_error.log à l'auteur (par exemple via GitHub Issues sur la page du projet) afin d'en trouver la cause :"),
+    7:('Il gioco si è interrotto. I progressi salvati vengono mantenuti.','Impossibile avviare la finestra del gioco.',
+       "Invia il registro degli errori player_error.log all'autore (ad esempio tramite GitHub Issues nella pagina del progetto) per individuarne la causa:"),
+    8:('游戏已停止运行。已保存的进度仍会保留。','游戏窗口启动失败。',
+       '请把错误记录 player_error.log 发给作者（可在项目页面的 GitHub Issues 反馈），以便查明原因：'),
+    9:('遊戲已停止運行。已儲存的進度仍會保留。','遊戲視窗啟動失敗。',
+       '請將錯誤記錄 player_error.log 傳送給作者（可在專案頁面的 GitHub Issues 回報），以便找出原因：'),
+    10:('Игра остановилась. Сохранённый прогресс не потерян.','Не удалось запустить окно игры.',
+        'Отправьте журнал ошибок player_error.log автору (например, через GitHub Issues на странице проекта), чтобы найти причину:'),
+}
+
+def game_language(p):
+    """当前游戏语言编号；只读客体内存、不调用原生代码（原生核心停止后也可读），读取失败或无对应文字时为 None。"""
+    try:
+        app=p.app_instance()
+        value=p.word(app+0x3d64) if app else None
+    except Exception:return None
+    return value if value in ERROR_TEXT else None
+
+def windows_language():
+    """Windows 显示语言对应的原生语言编号；无对应文字时为 None。"""
+    try:langid=int(ctypes.windll.kernel32.GetUserDefaultUILanguage())
+    except Exception:return None
+    if langid&0x3ff==0x04:return 9 if langid in (0x0404,0x0c04,0x1404,0x7c04) else 8
+    return {0x09:0,0x11:1,0x12:2,0x0a:3,0x16:4,0x0c:5,0x10:7,0x19:10}.get(langid&0x3ff)
+
+def error_message(kind,language=None):
+    """kind 为 'stopped'（游戏线程出错）或 'start_failed'（窗口启动失败）。"""
+    if language not in ERROR_TEXT:language=windows_language()
+    stopped,start_failed,send=ERROR_TEXT.get(language,ERROR_TEXT[0])
+    return (stopped if kind=='stopped' else start_failed)+'\n\n'+send+'\n'+str(ROOT/'player_error.log')+'\n\n'+ISSUES_URL
+
+def error_header(p=None):
+    """player_error.log 的第一行：程序名与版本、实际载入的核心（无 Probe 时取 core_runtime.json）、Windows 版本、时间。
+    读取失败的项目跳过。"""
+    items=[BRANDING['application_name']+' '+BRANDING['display_version']]
+    try:
+        library=getattr(getattr(p,'uc',None),'library_path',None)
+        items.append('core '+(Path(library).name if library else json.loads((ROOT/'core_runtime.json').read_text(encoding='utf-8'))['library']))
+    except Exception:pass
+    try:
+        v=sys.getwindowsversion();items.append(f'Windows {v.major}.{v.minor}.{v.build}')
+    except Exception:pass
+    items.append(time.strftime('%Y-%m-%d %H:%M:%S'))
+    return ' | '.join(items)+'\n\n'
+
 class Player:
     def __init__(self, self_test=False, audio_mode=None, fullscreen=None):
         self.self_test=self_test
@@ -51,6 +113,7 @@ class Player:
         self.events=queue.Queue()
         self.ready=False
         self.error=None
+        self.language=None   # 最近一次读到的游戏语言编号，供出错提示框使用（游戏线程出错后不再读取）
         self.done=False
         self.frames=0
         self.fps=0.0
@@ -245,6 +308,9 @@ class Player:
                         p.touch_event(5,*motion)
                 p.step_frame()
                 self.frames=p.frame
+                if p.frame%30==1:
+                    language=game_language(p)
+                    if language is not None:self.language=language
                 if p.frame==140:
                     # 标题截图属于诊断输出：窗口最小化（帧缓冲 0×0）等情形下跳过，不中止运行。
                     try:p.graphics.capture(ROOT/('ui_test_title.png' if self.self_test else 'player_title.png'))
@@ -271,7 +337,7 @@ class Player:
         except Exception:
             self.error=traceback.format_exc()
             details=native_crash_details(p) if p and hasattr(p,'uc') else ''
-            (ROOT/'player_error.log').write_text(self.error+details,encoding='utf-8')
+            (ROOT/'player_error.log').write_text(error_header(p)+self.error+details,encoding='utf-8')
             if p:
                 p.log('WINDOW_ERROR',self.error)
                 if hasattr(p,'graphics'):
@@ -371,7 +437,7 @@ class Player:
                 glfw.poll_events();self.worker.join(0.05)
             self.write_status('error' if self.error else 'closed')
             if self.error and not self.self_test:
-                ctypes.windll.user32.MessageBoxW(None,'游戏运行已停止。已提交的存档仍保留。\n\n错误记录：'+str(ROOT/'player_error.log'),TITLE,0x10)
+                ctypes.windll.user32.MessageBoxW(None,error_message('stopped',self.language),TITLE,0x10)
             return 1 if self.error else 0
         finally:
             # 所有退出路径均等待渲染线程结束，再释放其使用的窗口与图形上下文。
@@ -391,8 +457,8 @@ if __name__=='__main__':
     try:sys.exit(Player('--self-test' in sys.argv,audio_mode='silent' if '--mute' in sys.argv else None,
                         fullscreen=False if '--windowed' in sys.argv else True if '--fullscreen' in sys.argv else None).run())
     except Exception:
-        error=traceback.format_exc();(ROOT/'player_error.log').write_text(error,encoding='utf-8')
+        error=traceback.format_exc();(ROOT/'player_error.log').write_text(error_header()+error,encoding='utf-8')
         if '--self-test' not in sys.argv:
-            ctypes.windll.user32.MessageBoxW(None,'游戏窗口启动失败。错误记录：\n'+str(ROOT/'player_error.log'),TITLE,0x10)
+            ctypes.windll.user32.MessageBoxW(None,error_message('start_failed'),TITLE,0x10)
         if sys.stderr:sys.stderr.write(error)
         sys.exit(1)
