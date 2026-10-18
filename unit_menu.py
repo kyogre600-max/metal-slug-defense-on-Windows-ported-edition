@@ -632,7 +632,9 @@ class UnitMenu:
         basic = [('LV', lv), ('AP', str(s['ap'])), ('HP', str(s['hp'])),
                  (self.tr('redeploy'), seconds(s['production_interval'])),
                  (self.tr('knockback_res'), '-' if threshold <= 0 else f'{threshold:g}'),
-                 (self.tr('move'), f'{s["move_speed"]:.2f}'), (self.tr('reward'), f'{s["ap_reward"]} AP')]
+                 # 不移动的单位（建筑等）同原生信息窗口（移速 ≤0 显示横线）显示“-”
+                 (self.tr('move'), f'{s["move_speed"]:.2f}' if s['move_speed'] > 0 else '-'),
+                 (self.tr('reward'), f'{s["ap_reward"]} AP')]
         a = s['attacks']
 
         def target(group):
@@ -669,7 +671,8 @@ class UnitMenu:
 
     # —— ACTION ——
     def categories(self):
-        a = self.stats(self.info()['level'] or 1)['attacks']
+        # 按购买的单位本身判定（修筑类在演示中先建成再攻击），STATUS 等数值另取实际作战的单位（unit_catalog.stats）
+        a = self.stats(self.info()['level'] or 1)['action_attacks']
         return [name for name in ACTION_ORDER if name == 'neutral' or a[name]['present']]
 
     def compose_action(self, img):

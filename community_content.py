@@ -158,6 +158,8 @@ def check_unit(u):
     if (not isinstance(u['shop_price'],int) or isinstance(u['shop_price'],bool)
             or not (0<=u['shop_price']<=32767 if reward is not None else 0<u['shop_price']<=32767)
             or not 0<u['ap']<=100000):raise ValueError('Unit price/AP outside supported range')
+    cost=u.get('upgrade_cost_base')
+    if cost is not None and (not isinstance(cost,int) or isinstance(cost,bool) or not 0<cost<=100000):raise ValueError('Invalid upgrade cost base')
     if u['icon']['page']!=1 and not (u['icon']['page']>=ICON_PAGE_FIRST and isinstance(u['icon'].get('atlas'),str)):raise ValueError('Community icons must use unit_icon_02 or an icon page atlas')
     ratio(u['hp_multiplier'])
     if not isinstance(u['production_reference_id'],int) or not 0<u['production_reference_id']<400:raise ValueError('Invalid production reference unit')
@@ -185,7 +187,7 @@ def check_unit(u):
     for group,reference in u.get('attack_parameter_references',{}).items():
         if group not in ('normal','special') or reference.get('group') not in ('normal','special') or not isinstance(reference.get('unit_id'),int) or not 0<reference['unit_id']<400:raise ValueError('Invalid attack parameter reference')
     for group,attribute in u.get('attack_attributes',{}).items():
-        if group not in ('normal','special') or not isinstance(attribute,int) or isinstance(attribute,bool) or attribute not in range(5):raise ValueError('Invalid native attack attribute')
+        if group not in ('melee','normal','special') or not isinstance(attribute,int) or isinstance(attribute,bool) or attribute not in range(5):raise ValueError('Invalid native attack attribute')
     if 'shot_action_reference_id' in u and (u['base_id']!=61 or u['shot_action_reference_id']!=157):raise ValueError('Unsupported mummy projectile action reference')
     grounded=u.get('ground_special_attack',False)
     if not isinstance(grounded,bool) or (grounded and u['base_id']!=3):raise ValueError('Unsupported grounded special attack')
@@ -254,6 +256,10 @@ def check_unit_assets(u,dims,descriptor_path,is_stock):
     if flame and (flame['alternate_knockback_animation']+5>desc['script_count'] or any(v>=desc['script_count'] for v in flame['ending_bullet_animations'])):raise ValueError('Flame interruption animation outside sprite descriptor')
     zombie=u.get('zombie_spec') or {}
     if zombie.get('thresholds') and (not filename or 16*(len(zombie['thresholds'])+1)>desc['script_count']):raise ValueError('HP stage animations outside sprite descriptor')
+    # 2026-10-18 炸药与按属性的死亡（基准 221）：登记的动作槽须在描述符内；绝招等距落点的弹体槽同样。
+    slots=[zombie.get(k) for k in ('blast_slot','fuse_slot','death_explosion','death_fire','death_normal_variant','death_explosion_variant','death_fire_variant') if k in zombie]
+    if zombie.get('spread_count'):slots+=[zombie['spread_first']+i for i in range(zombie['spread_count'])]
+    if slots and (not filename or any(not 0<=v<desc['script_count'] for v in slots)):raise ValueError('Behavior animation outside sprite descriptor')
     if 'recovery_animation' in u:
         value=u['recovery_animation']
         if u['base_id']!=61 or not filename or not isinstance(value,int) or isinstance(value,bool) or not 0<=value<desc['script_count']:raise ValueError('Invalid mummy recovery animation')
@@ -381,6 +387,9 @@ class CommunityContent:
         # 6 另含 2026-10-15 新单位的行为（自爆 512、只打地面 1024、行进射击 2048、气球飞行 4096、被投出单位的据点前落地）与 33 字 ZSpec。
         need=max([6 if u['zombie_spec']['flags']&(512|1024|2048|4096) or u['zombie_spec'].get('base_clearance') else 5 if u['zombie_spec']['flags']&256 else 4 if u['base_id']==182 else 3 if u['zombie_spec']['flags']&128 else 2 if u['zombie_spec']['flags']&64 else 1 for u in self.units if u.get('zombie_spec')] or [0])
         if need and (not hasattr(p.uc.lib,'msd_community_zombie_version') or p.uc.lib.msd_community_zombie_version()<need):raise RuntimeError('Native core lacks HP stage units')
+        # 2026-10-18 炸药（lob_blast，标记 8192）与按攻击属性的死亡（death_by_attribute，标记 16384）：基准 221 的 3 个钩子。
+        if any(u['zombie_spec']['flags']&(8192|16384) for u in self.units if u.get('zombie_spec')) and (not hasattr(p.uc.lib,'msd_community_hunter_version') or p.uc.lib.msd_community_hunter_version()<1):raise RuntimeError('Native core lacks dynamite and attribute deaths')
+        if any(u['zombie_spec'].get(k) for u in self.units if u.get('zombie_spec') for k in ('death_normal_variant','death_explosion_variant','death_fire_variant')) and p.uc.lib.msd_community_hunter_version()<2:raise RuntimeError('Native core lacks death animation variants')
         self.ready=False
 
     def stock_patches(self):
@@ -511,6 +520,8 @@ class CommunityContent:
             for off in (4,0xa8,0x12c,0x1b0,0x234,0x2b8):struct.pack_into('<i',row,off,u['ap'])
             # 击毁 AP 返还（状态词 13）与 Wi-Fi 对战 RP（状态词 14）的六个等级锚点固定为本单位 AP 的 10%，向下取整（原版多数单位采用同一关系）。
             for off in (0x34,0xc4,0x148,0x1cc,0x250,0x2d4,0x38,0xc8,0x14c,0x1d0,0x254,0x2d8):struct.pack_into('<i',row,off,u['ap']//10)
+            # 强化费用基数 P（数据行 +0x354，非等级字段）：单次强化 MSP = P×(3L+5)；原生 AI 也以此值计单位战力。
+            if 'upgrade_cost_base' in u:struct.pack_into('<i',row,0x354,u['upgrade_cost_base'])
             # 有理数生命值在原生等级插值完成后缩放，避免中间等级的重复取整。
             if isinstance(u['hp_multiplier'],int):
                 for off in (12,0xb0,0x134,0x1b8,0x23c,0x2c0):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*u['hp_multiplier'])
@@ -524,9 +535,9 @@ class CommunityContent:
                         row[dest:dest+4]=original[reference['unit_id']*0x390+origin:reference['unit_id']*0x390+origin+4]
                 attribute=28 if group=='normal' else 37;source_attribute=28 if reference['group']=='normal' else 37
                 row[attribute*4:attribute*4+4]=original[reference['unit_id']*0x390+source_attribute*4:reference['unit_id']*0x390+source_attribute*4+4]
-            # 原生攻击属性为非等级字段：普攻词 28、绝招词 37；1 表示火焰。
+            # 原生攻击属性为非等级字段：近距词 21、普攻词 28、绝招词 37；1 表示火焰，2 表示爆炸（决定被击杀单位的死亡状态 120 / 110）。
             for group,attribute in u.get('attack_attributes',{}).items():
-                struct.pack_into('<i',row,(28 if group=='normal' else 37)*4,attribute)
+                struct.pack_into('<i',row,{'melee':21,'normal':28,'special':37}[group]*4,attribute)
             for field,words in (('normal_projectile_distance_multiplier',(26,)),('special_projectile_distance_multiplier',(33,)),
                                 ('summon_interval_multiplier',(38,39)),('construction_time_multiplier',(38,))):
                 a,b=ratio(u.get(field,[1,1]))
@@ -759,7 +770,7 @@ class CommunityContent:
         fields+=(self.get_time_table,)
         # 头部偏移 164：原生单位商店勋章不足时只提示、不询问前往商店（新单位界面的组合包页面期间由宿主置 1，U1c D45）。
         fields+=(0,)
-        # 头部偏移 168：生命分档单位（行为库 v3 起，src/community_content.cpp 的 ZSpec，33 个字）的逐槽指针表；无此类单位时为 0。
+        # 头部偏移 168：生命分档等行为（行为库 v3 起，src/community_content.cpp 的 ZSpec，39 个字）的逐槽指针表；无此类单位时为 0。
         fields+=(self.install_zombie_specs(units),)
         p.write(HEADER,struct.pack('<%dI'%len(fields),*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
@@ -772,7 +783,7 @@ class CommunityContent:
         pointers=[]
         for spec in specs:
             if not spec:pointers.append(0);continue
-            words=[0]*33;words[0]=spec['flags']
+            words=[0]*42;words[0]=spec['flags']
             thresholds=spec.get('thresholds',[]);words[1]=len(thresholds)
             for i,(a,b) in enumerate(thresholds):words[2+i]=a;words[8+i]=b
             words[14]=sum(1<<(i+1) for i,flag in enumerate(spec.get('transitions',[])) if flag)
@@ -790,7 +801,15 @@ class CommunityContent:
             words[31]=spec.get('base_clearance',0)
             # 32：自爆动作开始后按素材原朝向绘制的起始 tick + 1（0 为不改变）
             words[32]=spec['unmirror_tick']+1 if 'unmirror_tick' in spec else 0
-            pointers.append(self.alloc(struct.pack('<33I',*words)))
+            # 2026-10-18（基准 221）：33 碰到敌人时的爆炸槽，34 落地后的引信与爆炸槽，35/36 绝招等距落点的首个弹体槽与颗数，
+            # 37/38 爆炸属性与火焰属性击杀时的死亡槽
+            words[33]=spec.get('blast_slot',0);words[34]=spec.get('fuse_slot',0)
+            words[35]=spec.get('spread_first',0);words[36]=spec.get('spread_count',0)
+            words[37]=spec.get('death_explosion',0);words[38]=spec.get('death_fire',0)
+            # 39–41：普通、爆炸、火焰死亡的另一版本（死亡时横坐标取整为奇数时播放；0 为不使用）
+            words[39]=spec.get('death_normal_variant',0);words[40]=spec.get('death_explosion_variant',0)
+            words[41]=spec.get('death_fire_variant',0)
+            pointers.append(self.alloc(struct.pack('<42I',*words)))
         return self.alloc(struct.pack('<'+'I'*len(pointers),*pointers))
 
     def grant_world_clear_rewards(self):

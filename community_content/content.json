@@ -45,14 +45,17 @@
     "s1xlv.pvz_balloon": 1054,
     "s1xlv.pvz_gatling": 1055,
     "s1xlv.pvz_jalapeno": 1056,
-    "s1xlv.pvz_squash": 1057
+    "s1xlv.pvz_squash": 1057,
+    "s1xlv.mv280c": 1058,
+    "s1xlv.giant_hunter_walker": 1059,
+    "s1xlv.hunter": 1060
   },
   "units_dir": "units",
   "asset_digest": "blake2b-256",
   "assets": {
-    "future_heavy_b_out.obm": "975167f06425985fa8d5610e7e247d4ee92ab4c659fe2d59d57e381b8e06b07c",
-    "future_m15a_out1.obm": "4e893cf6ce4fa74dd495ca5fe88f30ff71c0fa2e29cd74f271344c56bb1211a0",
-    "future_m15a_out2.obm": "c8a5a2cd542407361dde99792df498eccc4f43f5e8e1f5f5da1dd8599102a0b4",
+    "future_heavy_b_out.obm": "24aa34becb38dd41cf87cac22f9dd5bc4f78298625a7baae35a28bd8fabf5c1c",
+    "future_m15a_out1.obm": "db4c387646bd5fc8f793be94307071b8acebb0b66545ebcad9ca9fb26754dc3d",
+    "future_m15a_out2.obm": "5044357a57589c63961b8bd3dcc3e18dff2b455abb55d83c1a6b47bc324948dc",
     "sarubia_future.obm": "71a8ea782ef64ccc1736669ab1fc24003cd741e7c86f91e1ee67f009e105564f",
     "unit_icon_02.obm": null,
     "di_cokka_yellow.obm": "d638c78783d9dc9f58f6e08cd4b5799d93c6b666728d0515a5ff47e7651c4d18",
@@ -88,7 +91,11 @@
     "pvz_balloon.obm": "49e0c8706e075013f061233ca835e6bfeaa83b0efeee7af286a62b58bbff9aad",
     "pvz_gatling.obm": "0c003ed38c4c131845e1486acbdff9fd979f56835f340dcbd0a9a8f0980b137c",
     "pvz_jalapeno.obm": "ef43fb9acfbbe109077dffc7a1cf6a477f492e48c4603be0758255c83b98a71c",
-    "pvz_squash.obm": "ea11ab96482ca5ac2d98cef940043040e65080a22949522c01440a30f6aa62b5"
+    "pvz_squash.obm": "ea11ab96482ca5ac2d98cef940043040e65080a22949522c01440a30f6aa62b5",
+    "mv280c_out.obm": "6ff5d6b9820e2ce1456def5e6ec96e79eb1db4c49b0af3bb616245769d6b103b",
+    "mv280c_bullet_out.obm": "cf4b5b7629132f1685362c0c9903f76b4f4470b22e6262014e4171db78cd7e3c",
+    "giant_hunter_walker.obm": "389ee97a404bc0bd29f0464b5cd5b1ac3beb122e0e95a712d1bda109ed24953d",
+    "hunter.obm": "927ae30147a19942a2c543bef9f084c572cc574c30a791fce3722883e28a1adb"
   },
   "unit_pack": {
     "key": "s1xlv.pf_infantry_pack",
@@ -295,6 +302,56 @@
     {
       "key": "s1xlv.pvz_ballooninflate",
       "file": "pvz_ballooninflate.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.ghw_launcher",
+      "file": "ghw_launcher.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.ghw_death",
+      "file": "ghw_death.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_death1",
+      "file": "hunter_death1.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_death2",
+      "file": "hunter_death2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_blast1",
+      "file": "hunter_blast1.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_blast2",
+      "file": "hunter_blast2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_fire1",
+      "file": "hunter_fire1.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_fire2",
+      "file": "hunter_fire2.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_throw",
+      "file": "hunter_throw.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.hunter_melee",
+      "file": "hunter_melee.msdf",
       "type": "se"
     }
   ]

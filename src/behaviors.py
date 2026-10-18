@@ -230,6 +230,21 @@ def internal_fields(resolved):
         zombie.update(flags=zombie['flags'] | 4096, pop_distance=v['pop_distance'])
         if v['launch_sound']:
             zombie['launch_sound'] = v['launch_sound']
+    # 2026-10-18 Hunter（行为库 v9，基准 221 原住民（鸟））：ZSpec 字 33–38
+    if 'lob_blast' in resolved:
+        v = resolved['lob_blast']
+        zombie.update(flags=zombie['flags'] | 8192, blast_slot=v['blast_animation'], fuse_slot=v['fuse_animation'],
+                      spread_first=v['special_spread_first'], spread_count=v['special_spread_count'])
+    if 'death_by_attribute' in resolved:
+        v = resolved['death_by_attribute']
+        zombie.update(flags=zombie['flags'] | 16384, death_explosion=v['explosion_animation'],
+                      death_fire=v['fire_animation'])
+        # 行为库 v10：三种死亡的另一版本（ZSpec 字 39–41，0 为不使用）
+        for param, key in (('normal_variant_animation', 'death_normal_variant'),
+                           ('explosion_variant_animation', 'death_explosion_variant'),
+                           ('fire_variant_animation', 'death_fire_variant')):
+            if v[param]:
+                zombie[key] = v[param]
     if zombie['flags']:
         fields['zombie_spec'] = zombie
     return fields

@@ -74,6 +74,9 @@
       每出现一名俘虏概率减半，俘虏数不超过该关尚未救出的人数），其余为原生道具；"item_level" 为道具等级（1–200）。
       人质类玩法的俘虏只经此表出现。
   小关 "difficulty": 0–5            关卡信息窗的难度标签（关卡记录词 9，0 为 EASY；缺省沿用模板关卡）
+  小关 "rank_times": [S, A, B, C, D] 评级时间（秒，1–3600，逐项递增；关卡记录词 11–15）：通关用时不超过 S、A、B、C
+      依次评为该级，超过 C 为 D（D 只记录在词 15，与原版数据相同，原生评级不读取）；缺省沿用模板关卡
+      （1011 为 18/35/55/85/86）。
 
 运行（M6b-1）：所有自制 EVENT 经女教官基地进入原生 EventMSD 地图（经典活动路由：WorldType 1、模式 3、原生世界 4，
 与万圣节相同，不触发专用画面）。关卡编号为 30000+1000×4+10×(区域+1)+小关+1，宿主按活动独立建表（选择活动时生效），
@@ -115,7 +118,7 @@ EVENT_FIELDS = {'schema', 'key', 'mode', 'names', 'details', 'publisher', 'date'
 AREA_FIELDS = {'key', 'names', 'position', 'stages', 'reward'}
 STAGE_FIELDS = {'key', 'marker', 'preview_frame', 'template', 'scene', 'music', 'stamina', 'reward_msp', 'enemy_base_hp',
                 'strength_steps', 'enemies', 'waves', 'reward_units', 'thumbnail', 'prisoners', 'survival_row',
-                'loop', 'triggers', 'placed', 'items', 'item_level', 'prisoner_chance', 'difficulty'}
+                'loop', 'triggers', 'placed', 'items', 'item_level', 'prisoner_chance', 'difficulty', 'rank_times'}
 # 出兵触发（关卡记录词 21/22，每条 20 字节：条件、值、动作、参数、可重复）：条件 0 计时相等、1 敌方据点生命百分比
 # 低于、2 我方最前单位与敌方据点距离小于；动作 0 出兵、1 设定出兵计时、2 追加强化级数。触发记录以 32 位掩码标记
 # 已触发，故每关至多 32 条。
@@ -470,6 +473,14 @@ def check_stage(stage, area_key):
     integer(stage.get('item_level', 1), 1, 200, f'{k} item_level')
     integer(stage.get('prisoner_chance', 0), 0, 100, f'{k} prisoner_chance')
     integer(stage.get('difficulty', 0), 0, 5, f'{k} difficulty')
+    if 'rank_times' in stage:
+        times = stage['rank_times']
+        if not (isinstance(times, list) and len(times) == 5):
+            raise ValueError(f'{k}: rank_times is [S, A, B, C, D] in seconds')
+        for t in times:
+            integer(t, 1, 3600, f'{k} rank_times')
+        if any(a >= b for a, b in zip(times, times[1:])):
+            raise ValueError(f'{k}: rank_times must increase from S to D')
     if stage.get('prisoners', 0) and stage.get('prisoner_chance', 0) and not items:
         raise ValueError(f'{k}: prisoners appear only at item positions; add items')
     rewards = stage.get('reward_units', [])
@@ -606,6 +617,8 @@ def build_mission(trial, stage, sid, ids):
         words[27] = stage['prisoner_chance']
     if 'difficulty' in stage:
         words[9] = stage['difficulty']          # GetStageLevel 读取的难度标签
+    if 'rank_times' in stage:
+        words[11:16] = stage['rank_times']      # GetStageRank 与 battleFinish 依次比较词 11–14（S/A/B/C，秒），超过 C 为 D
     return struct.pack('<30I', *words)
 
 

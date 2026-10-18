@@ -45,7 +45,9 @@ SHOP_UNIT_CARD = 0x33ac                        # 主菜单 SHOP 子页的 UNIT �
 # 主菜单子页（场景 28 的状态）→ (入口任务槽, 原生任务函数, 模式)
 ENTRIES = {3: (CUSTOMIZE_UNIT_PANEL, 'GT_MenuPanel', 'custom'), 4: (SHOP_UNIT_CARD, 'GT_MenuGenrePanel', 'shop')}
 COCKPIT_BACK = 0x36d8                          # 原生底栏 BACK 按钮任务（附录 A.5）
+COCKPIT_CUSTOMIZE = 0x3704                     # 编队页底栏 CUSTOMIZE（SelectCockpitDeck：场景 50 原生强化）
 SCENE_MAIN, SCENE_SHOP_INIT, SCENE_SHOP = 28, 38, 39
+SCENE_DECK_INIT, SCENE_DECK, SCENE_DECK_END = 54, 55, 56   # SC_DeckInit / SC_DeckLoop / SC_DeckEnd
 POPUP_SCENES = range(119, 123)
 TUTORIAL_SHOP_UNIT = 15                        # SelectPanelMainMenuShop 选 UNIT 卡时的 DelTutorialData 序号
 # 原生面板的 NEW 标记为教学提示位（IsPanelNew：面板 0xf“單位”对应 9，面板 8“強化”对应 7）。位 7、9 在关卡结算时
@@ -94,7 +96,7 @@ CONV_MENU_PARTS = 0x1031c900                   # ConvMenuParts（16 字节：x,y
 CONV_POSITION = 0x1030a1c0                     # position_icon.obm 转换表 53（阵营 0–5）
 MENU_TABLE_LITERAL = (0x101652d0, 0x101652b4)  # GetMenuUnitData 的菜单表（320 行 × 20 字节，+10 头像序号）
 ICON_PAGES = {0: 'unit_icon_01.obm', 1: 'unit_icon_02.obm'}
-BUTTONS = {'back': 30, 'sort': 101, 'free': 120, 'map': 118}   # 底栏原生按钮（ConvMenuParts）
+BUTTONS = {'back': 30, 'sort': 101, 'deck': 106, 'free': 120, 'map': 118}   # 底栏原生按钮（ConvMenuParts）
 CELL_TINT = (0, 80, 50)                        # D18
 GAUGE_FRAME_RANGE = 0.6                        # D27
 GAUGE_COLORS = ((200, 84, 0), (255, 166, 0), (226, 110, 0), (255, 204, 0))   # D24：升级中、充满
@@ -514,7 +516,8 @@ class UnitBrowser:
         self.packs_native = False             # 原生组合包页面（PACK，D33）显示中：本界面暂停绘制
         self.saved_catalog = None             # 组合包页面期间暂存的原生商品目录（社区头部 +44 / +48）
         self.pack_list = None
-        self.back_press = None                # 组合包页面上原生 BACK 的按压（宿主受理）
+        self.back_press = None                # 组合包 / 编队页面上原生底栏按钮的按压（宿主受理）：{'slot','task','cancelled'}
+        self.deck_native = False              # 原生编队页（DECK，D53）显示中：本界面暂停绘制
         self.layers = {}                      # 最近一次合成的各画面分层：'grid' / 'menu' → {'chrome', 卡片或面板, 'page'}
         self.gl = None                        # 动效与按下白光的纹理层（unit_motion.Layers）
         self.motion = None                    # 进行中的过渡（unit_motion.Motion）
@@ -821,7 +824,9 @@ class UnitBrowser:
         s = self.settings
         packs = self.mode == 'shop' and bool(self.pack_available())
         if names is None:
-            names = ['back', 'favorites'] + (['pack'] if packs else []) + ['sort']
+            # 强化：BACK、FAVORITES、DECK、SORT（D53）；商店：BACK、FAVORITES、（PACK）、SORT（D33）
+            names = (['back', 'favorites'] + (['deck'] if self.mode == 'custom' else [])
+                     + (['pack'] if packs else []) + ['sort'])
         key = (self.mode, tuple(names), s['favorites_only'])
         if key in self.static_layers:
             return self.static_layers[key]
@@ -1133,6 +1138,8 @@ class UnitBrowser:
                     self.on_pack()
                 else:
                     self.enter_packs()
+            elif which == 'deck':
+                self.enter_deck()
             elif which == 'sort':
                 self.panel = 'sort'
                 self.search_focus = False
@@ -1184,8 +1191,12 @@ class UnitBrowser:
     def wants_text(self):
         return self.open and self.panel == 'sort' and self.search_focus
 
+    def native_page(self):
+        """原生页面（组合包页面或编队页）显示中：本界面暂停绘制与输入，只受理该页的 BACK 等（pack_touch / deck_touch）。"""
+        return self.packs_native or self.deck_native
+
     def wants_keys(self):
-        return (self.open and not self.packs_native) or self.busy()
+        return (self.open and not self.native_page()) or self.busy()
 
     def busy(self):
         """进入或离开的闸门动画进行中（期间不接受输入）。"""
@@ -1208,6 +1219,8 @@ class UnitBrowser:
             return self.entry_touch(action, x, y)
         if self.packs_native:
             return self.pack_touch(action, x, y)
+        if self.deck_native:
+            return self.deck_touch(action, x, y)
         if self.locked():
             return True
         if self.in_menu():
@@ -1237,7 +1250,7 @@ class UnitBrowser:
     def key(self, name):
         """键盘：←/→ 翻页（单位菜单中为上一个 / 下一个单位）、↑/↓ 滚动 ACTION 说明条、Enter 确定（面板中关闭面板）、
         Backspace 删除搜索字。"""
-        if not self.open or self.busy() or self.packs_native or self.locked():
+        if not self.open or self.busy() or self.native_page() or self.locked():
             return
         if self.in_menu():
             if self.menu.panel is None and name in ('left', 'right'):
@@ -1257,7 +1270,7 @@ class UnitBrowser:
                 play_se(self.p, SE_DECIDE)
 
     def wheel(self, dy):
-        if self.packs_native or self.locked():
+        if self.native_page() or self.locked():
             return
         if self.in_menu():
             if self.open and self.menu.panel is None and dy and not self.busy():
@@ -1284,6 +1297,14 @@ class UnitBrowser:
             if self.pack_page_ready():
                 play_se(self.p, SE_CLOSE)
                 self.return_from_packs()
+            return True
+        if self.deck_native:
+            # 原生编队页：Esc 与页面的 BACK 相同（回到本界面）；原生弹窗显示中交给原生。
+            if self.pack_scene() in POPUP_SCENES:
+                return False
+            if self.deck_page_ready():
+                play_se(self.p, SE_CLOSE)
+                self.return_from_deck()
             return True
         if sound:
             play_se(self.p, SE_CLOSE)
@@ -1531,7 +1552,7 @@ class UnitBrowser:
         from cockpit_hold import instance
         task = press['task']
         app = self.p.app_instance()
-        if task and app and self.p.word(app + COCKPIT_BACK) == task:
+        if task and app and self.p.word(app + press.get('slot', COCKPIT_BACK)) == task:
             instance(self.p).release(task)
         if not keep:
             self.back_press = None
@@ -1560,6 +1581,112 @@ class UnitBrowser:
         self.packs_native = False
         self.set_open(False)
         self.p.log('UNIT_BROWSER_PACKS_LEFT', scene, self.p.frame)
+
+    # ---------- 编队（D53：强化浏览大菜单的 DECK） ----------
+    def enter_deck(self):
+        """DECK：闸门合拢后进入原生编队页（场景 54，与主菜单 CUSTOMIZE 子页“牌組”面板相同的场景），本界面暂停绘制。
+        编队页的 BACK、CUSTOMIZE 与 Esc 由宿主受理，经闸门回到本界面（deck_touch、return_from_deck）；其余底栏按钮
+        （OPTION、SHOP、MEDAL）、SORT 与拖放编队均为原生，经 OPTION、SHOP、MEDAL 离开时本界面关闭（watch_deck）。"""
+        if self.deck_native or self.mode != 'custom':
+            return
+
+        def go():
+            p = self.p
+            app = p.app_instance()
+            if self.menu is not None:
+                self.menu.close()
+            self.deck_native = True
+            # 编队页的原生 BACK（未经宿主受理时）经 SelectCockpitFuncBack 回到主菜单初始化（b16c 为 0），按 b168 回到 CUSTOMIZE 子页。
+            p.put(app + 0xb16c, 0)
+            p.put(app + 0xb168, 3)
+            p.call('_ZN7AppMain12SceneEndFuncEi', app, p.word(app + 0x22bc))
+            p.call('_ZN7AppMain11ChangeExeSTEi', app, SCENE_DECK_INIT)   # SC_DeckInit 以 SetShutterOpen 开闸
+            self.shutter.release()
+            p.log('UNIT_BROWSER_DECK_ENTER', p.frame)
+        self.shutter.close(go)
+
+    def deck_page_ready(self):
+        """原生编队页已开闸且无弹窗：场景 55，闸门任务槽为空，闭合标记已清除。"""
+        p = self.p
+        app = p.app_instance()
+        if self.pack_scene() != SCENE_DECK:
+            return False
+        if any(p.word(app + 0x3820 + 4 * i) for i in range(4)):
+            return False
+        return p.read(app + 0xc21d, 1)[0] == 0
+
+    def deck_touch(self, action, x, y):
+        """原生编队页：底栏 BACK 与 CUSTOMIZE 由宿主受理（按下期间以 cockpit_hold 保持原生青色框与三灯，原生不选择），
+        在按钮内抬起时经闸门回到本界面；其余触点交给原生（编队、拖放、SORT 与其他底栏按钮）。"""
+        from cockpit_hold import instance
+        p = self.p
+        app = p.app_instance()
+        size = (round(60 * BUTTON_SCALE), round(48 * BUTTON_SCALE))
+        # 编队页底栏 6 个按钮等距（BACK、OPTION、SHOP、MEDAL、CUSTOMIZE、SORT），与本界面底栏同一行、同样的两端位置。
+        lefts = {COCKPIT_BACK: BAR_LEFT, COCKPIT_CUSTOMIZE: round(BAR_LEFT + (BAR_RIGHT - BAR_LEFT) * 4 / 5)}
+
+        def inside(slot):
+            left = lefts[slot]
+            return left <= x < left + size[0] and BAR_Y <= y < BAR_Y + size[1]
+        press = self.back_press
+        if action == 1:
+            self.release_back_press()
+            slot = next((s for s in lefts if inside(s)), None)
+            if slot is None or not self.deck_page_ready():
+                return False
+            task = p.word(app + slot)
+            if not task:
+                return False
+            self.back_press = {'slot': slot, 'task': task, 'cancelled': False}
+            instance(p).hold(task)
+            return True
+        if press is None:
+            return False
+        if action == 5:
+            if not inside(press['slot']) and not press['cancelled']:
+                press['cancelled'] = True
+                self.release_back_press(keep=True)
+            return True
+        if action == 3:
+            slot = press['slot']
+            activate = inside(slot) and not press['cancelled'] and self.deck_page_ready()
+            self.release_back_press()
+            if activate:
+                play_se(p, SE_CLOSE if slot == COCKPIT_BACK else SE_DECIDE)
+                self.return_from_deck()
+        return True
+
+    def return_from_deck(self):
+        """闸门合拢后结束编队页（SC_DeckEnd 释放编队页对象；编队在页内即时写入存档），在本界面之下重建主菜单
+        （直接调用 SC_MainMenuInit，CUSTOMIZE 子页），重新读取拥有状态与等级后显示本界面，再开闸。
+        SC_MainMenuInit 末尾的 SetShutterOpen 进入原生开闸状态（ChangeNT 18，由 SC_ShutterOpen 推进闸门任务），
+        原生闸门会画在本界面之下；改为 ChangeNT 0（app+0x22c8），由本界面的闸门推进并画在本界面之上。"""
+        self.release_back_press()
+
+        def done():
+            p = self.p
+            app = p.app_instance()
+            p.put(app + 0xb160, 27)                  # SC_DeckEnd 末尾的 ChangeST(b160)
+            p.call('_ZN7AppMain12SceneEndFuncEi', app, p.word(app + 0x22bc))
+            p.put(app + 0xb168, 3)
+            p.put(app + 0xb16c, 0)
+            p.call('_ZN7AppMain15SC_MainMenuInitEv', app)
+            p.put(app + 0x22c8, 0)
+            self.deck_native = False
+            self.refresh()
+            self.shutter.open()
+            p.log('UNIT_BROWSER_DECK_RETURN', p.frame)
+        self.shutter.close(done)
+
+    def watch_deck(self):
+        """原生编队页经 OPTION、SHOP、MEDAL 离开（或原生 BACK 未经宿主受理）：本界面关闭，之后按原生流程显示。"""
+        scene = self.pack_scene()
+        if scene in (SCENE_DECK_INIT, SCENE_DECK, SCENE_DECK_END) or scene in POPUP_SCENES or self.busy():
+            return
+        self.release_back_press()
+        self.deck_native = False
+        self.set_open(False)
+        self.p.log('UNIT_BROWSER_DECK_LEFT', scene, self.p.frame)
 
     def menu_touch(self, action, x, y):
         """单位菜单：按下登记，在同一区域抬起时执行；模态面板外的点击视为取消（与原生弹窗相同）。"""
@@ -1618,6 +1745,8 @@ class UnitBrowser:
     def draw(self):
         if self.open and self.packs_native:
             self.watch_packs()
+        elif self.open and self.deck_native:
+            self.watch_deck()
         elif self.open:
             self.draw_page()
             if self.in_menu() and not self.motion_drawn:  # 过渡的各帧（含最后一帧）不演示，下一帧开始

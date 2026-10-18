@@ -8,6 +8,15 @@ This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds 
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+**Update 26.10.4**
+
+- Added **three new units from Metal Slug 6**: MV-280C, GIANT HUNTER WALKER and HUNTER.
+- Fine-tuned the PVZ EVENT: adjusted the clear times for each rank (S rank within 0:45 in areas 1–2, 1:30 in area 3, 1:55 in area 4 and 2:25 in area 5).
+
+**Update 26.10.3**
+
+- Added the PVZ EVENT and several new units from PVZ. Go play them now!
+
 **Update 26.10.2**
 
 - Redesigned the unit browsing and purchase screens, and added a unit favorites feature (test).
@@ -124,6 +133,15 @@ Esta edición añade controles de teclado y un **formato 16:9**. Los fondos ampl
 
 **La energía (stamina) se recupera a 1 punto por segundo.** La versión original de Android recupera 1 punto por minuto.
 
+**Actualización 26.10.4**
+
+- Se añadieron **tres unidades nuevas de Metal Slug 6**: MV-280C, CAZADOR CAMINANTE GIGANTE (GIANT HUNTER WALKER) y CAZADOR (HUNTER).
+- Se ajustó el PVZ EVENT: se cambiaron los tiempos necesarios para cada rango (rango S en 0:45 en las zonas 1 y 2, 1:30 en la zona 3, 1:55 en la zona 4 y 2:25 en la zona 5).
+
+**Actualización 26.10.3**
+
+- Se añadieron el PVZ EVENT y varias unidades nuevas de PVZ. ¡Ve a jugarlos!
+
 **Actualización 26.10.2**
 
 - Se rediseñaron las pantallas de exploración y compra de unidades, y se añadió una función de unidades favoritas (en prueba).
@@ -239,6 +257,15 @@ Los mundos configurables, los enemigos comunitarios registrados, y los escenario
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+**26.10.4 更新**
+
+- 新增**三个来自《合金弹头6》的单位**：MV-280C、巨型HUNTER WALKER、猎人（HUNTER）
+- 对 PVZ EVENT 进行了微调：调整了各评价所需的通关时间（S 评价：第一、二大关 45 秒内，第三大关 1:30 内，第四大关 1:55 内，第五大关 2:25 内）
+
+**26.10.3 更新**
+
+- 现已经加入PVZ EVENT以及一些来自PVZ的新unit，快去游玩吧
 
 **26.10.2 更新**
 

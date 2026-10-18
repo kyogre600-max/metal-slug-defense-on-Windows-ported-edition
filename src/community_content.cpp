@@ -512,6 +512,121 @@ static void z_flight_clearance(Context& c){
  wr<uint32_t>(c,obj+0x9cu,0u);wr<uint32_t>(c,obj+0xa4u,0u);wr<uint32_t>(c,obj+0xacu,0u);
 }
 HOOK(zombie_flight_clearance,0x101af795u, z_flight_clearance(c);)
+// 原住民（鸟）类（基准 221，BattleAction_NativeBird）的两个行为（2026-10-18 Hunter，行为库 v9；ZSpec 字 33–38）。
+// 炸药（lob_blast，标记 8192）：原生 BattleAction_NativeBird::shotBullet（0x17fdd8）以 addBulletNotAim 发射槽 26，
+// 把状态参数 0x16 写入弹体 +0x34；BulletAction_NativeBird::update（0x19fc3c）首帧按发射高度求竖直初速（飞行时间固定）、
+// 按 +0x34 求水平速度，使弹体落在该距离处；碰到敌人（BattleBulletDefault::attackAction 预约状态 60）或落地
+// （adjustHitGround 后预约状态 60）后，状态 60 与 200 的下一帧直接移除，不爆炸。
+// 带此标记的单位：
+// - 绝招弹体：op22 的弹体槽在 [字 35, 字 35 + 字 36) 内时改由本钩子发射（弹体动画取 op22 的槽），第 i 颗（0 起）的
+//   落点距离为 本单位当前状态词 33（绝招弹体目的距离）×(i+1)/字 36，即在射程内等距分布、最远一颗落在射程处，
+//   射程随等级或倍率改变时落点随之改变。其余 op22（普通攻击）照旧走原生路径（落点为状态参数 0x16）。
+// - 飞行：原生每帧以整数横移（水平速度定点数右移 8 位），各颗的落点只能是飞行帧数（约 37）的整数倍，5 颗不能等距。
+//   原生首帧初始化并移动一次后（对象 +0x1c 非 0），本钩子接管飞行：按剩余距离（+0x34 的目的距离减去首帧已移动的整数步）
+//   与按原生的竖直运动（actionMoveY(vy)、vy += 1.32）推算的剩余帧数求出浮点横移，记入 +0x30（原生的累加量，接管后不再使用），
+//   +0x1c 记为 2；之后每帧 actionMoveX(横移)、actionMoveY(vy)、vy += 1.32，adjustHitGround 着地时预约状态 61。
+//   落点距离（自投出点）因此等于目的距离（误差在 1 个世界单位内）。
+// - 落地：弹体的框碰到地面时原生调用 BulletAction_NativeBird::hitGround（0x16d8e8，预约状态 60），本钩子改为预约状态 61；
+//   弹体中心到达地面时 update 自身的 adjustHitGround 也预约 60（位置已贴地）。碰到敌人时 BattleBulletDefault::attackAction
+//   （0x175e04）预约 60（位置在空中）。
+// - 弹体进入状态 61、或进入状态 60 且位置在地面（y 不低于 BattleStage::getAltitude 减 1）的第一帧：位置贴到地面，播放字 34 的槽
+//   （引信燃烧后爆炸）；进入其余状态 60 或 200 的第一帧：播放字 33 的槽（碰到敌人，立即爆炸）。之后不移动，动画播完
+//   （对象 +0xc9 为 0）时 kill，同原生迫击炮弹 BulletAction_Mortar::update（0x185c5c）。爆炸的攻击框、目标数与音效写在这两个槽的脚本中。
+// 按攻击属性区分死亡（death_by_attribute，标记 16384）：NativeBird::update 的死亡状态 100/110/120 都在第一帧请求槽 12
+// （着地后槽 13，动画播完 kill）；状态 110（爆炸属性）改为字 37 的槽、120（火焰属性）改为字 38 的槽，100 照旧。
+// 字 39–41（2026-10-18 R4）为状态 100/110/120 的另一版本（非 0 时）：死亡第一帧单位横坐标（+0x8c）取整为奇数时播放该版本。
+// 只由当时的位置决定，不用随机数（不改变其他随机数的序列），回放与联机时双方相同。
+static constexpr uint32_t L_BLAST=8192u,L_DEATH=16384u;
+static constexpr uint32_t L_NOT_AIM=0x1017f728u,L_ACTION_GOT=0x10936b08u,L_SET_ANIM=0x101de016u,L_KILL=0x101dd86cu,
+ L_STAGE=0x101e1ae0u,L_ALTITUDE=0x101e1c72u;
+static uint32_t bspec(Context& c,uint32_t obj){
+ if(!active(c)||!head(c,168u)||!obj)return 0u;
+ uint32_t vt=rd<uint32_t>(c,obj);if(vt!=head(c,84u)&&vt!=head(c,88u))return 0u;
+ uint32_t uid=rd<uint32_t>(c,obj+0x128u);if(!record(c,uid))return 0u;
+ return rd<uint32_t>(c,head(c,168u)+(uid-U)*4u);
+}
+// shotBullet 入口：r0 动作、r1 对象、r2 弹体槽、r3 / 栈 [0] 为 x、y，栈 [4] 为命中槽。
+static bool l_shot(Context& c){
+ uint32_t obj=c.r[1],s=zspec(c,obj);if(!s||!(zw(c,s,0)&L_BLAST))return false;
+ uint32_t slot=c.r[2],first=zw(c,s,35),count=zw(c,s,36);
+ if(!count||slot<first||slot>=first+count)return false;
+ uint32_t sp=c.r[13],bullet=0u;
+ const uint32_t stack[4]={rd<uint32_t>(c,sp+4u),slot,rd<uint32_t>(c,L_ACTION_GOT),0u};
+ msd_guest_call_stack(c,L_NOT_AIM,c.r[0],obj,c.r[3],rd<uint32_t>(c,sp),stack,4u,&bullet);
+ if(bullet){
+  uint32_t st=obj+0x128u+0xecu*rd<uint32_t>(c,obj+0x300u);
+  int64_t range=int32_t(rd<uint32_t>(c,st+33u*4u));
+  wr<uint32_t>(c,bullet+0x34u,uint32_t(int32_t(range*int64_t(slot-first+1u)/int64_t(count))));
+ }
+ c.pc=c.r[14];return true;
+}
+static Block old_hunter_shot;static void hunter_shot(Context& c){if(l_shot(c))return;old_hunter_shot(c);}
+// BulletAction_NativeBird::update 入口：r1 弹体、r2 状态、r3 进入该状态后的帧数。
+static bool l_blast_bullet(Context& c,uint32_t b){
+ if(rd<uint32_t>(c,b)!=head(c,88u))return 0u;
+ uint32_t s=bspec(c,b);return s&&(zw(c,s,0)&L_BLAST)?s:0u;
+}
+static constexpr uint32_t L_MOVE_X=0x101dde10u,L_MOVE_Y=0x101dde4eu,L_ADJUST_GROUND=0x1019af50u;
+static constexpr float L_GRAVITY=1.32f;
+static uint32_t l_bits(float f){uint32_t u;std::memcpy(&u,&f,4);return u;}
+static int32_t l_altitude(Context& c,float x){
+ uint32_t stage=0u,alt=0u;
+ if(!msd_guest_call(c,L_STAGE,0u,0u,0u,0u,&stage)||!stage||!msd_guest_call(c,L_ALTITUDE,stage,uint32_t(int32_t(x)),1u,0u,&alt))return 0x7fffffff;
+ return int32_t(alt);
+}
+static void l_flight(Context& c,uint32_t b){
+ float dir=rd<uint32_t>(c,b+0x78u)==0x5au?1.0f:-1.0f;
+ if(rd<uint32_t>(c,b+0x1cu)==1u){
+  int32_t moved=int32_t(rd<uint32_t>(c,b+0x2cu))>>8;
+  float rest=float(int32_t(rd<uint32_t>(c,b+0x34u))-moved),x=rd<float>(c,b+0x8cu),y=rd<float>(c,b+0x90u),vy=rd<float>(c,b+0x3cu);
+  float ground=float(l_altitude(c,x+dir*rest));int n=0;
+  while(n<600){y+=vy;vy+=L_GRAVITY;++n;if(y>=ground)break;}
+  wr<float>(c,b+0x30u,rest>0.0f?rest/float(n):0.0f);wr<uint32_t>(c,b+0x1cu,2u);
+ }
+ msd_guest_call(c,L_MOVE_X,b,l_bits(dir*rd<float>(c,b+0x30u)),0u,0xffffffffu,nullptr);
+ float vy=rd<float>(c,b+0x3cu);
+ msd_guest_call(c,L_MOVE_Y,b,l_bits(vy),0u,0xffffffffu,nullptr);
+ wr<float>(c,b+0x3cu,vy+L_GRAVITY);
+ uint32_t landed=0u;
+ if(msd_guest_call(c,L_ADJUST_GROUND,c.r[0],b,0u,0u,&landed)&&landed)msd_guest_call(c,Z_RESERVE_STATE,b,61u,0u,0u,nullptr);
+}
+static bool l_bullet(Context& c){
+ uint32_t b=c.r[1],state=c.r[2];
+ uint32_t s=l_blast_bullet(c,b)?bspec(c,b):0u;if(!s)return false;
+ if(state!=60u&&state!=61u&&state!=200u){
+  if(!rd<uint32_t>(c,b+0x1cu))return false;      // 原生首帧：初始化竖直初速与水平速度并移动一次
+  l_flight(c,b);c.pc=c.r[14];return true;
+ }
+ if(c.r[3]==0u){
+  uint32_t slot=zw(c,s,33),stage=0u,alt=0u;
+  if(state!=200u&&msd_guest_call(c,L_STAGE,0u,0u,0u,0u,&stage)&&stage&&
+     msd_guest_call(c,L_ALTITUDE,stage,uint32_t(int32_t(rd<float>(c,b+0x8cu))),1u,0u,&alt)&&
+     (state==61u||rd<float>(c,b+0x90u)>=float(int32_t(alt))-1.0f)){
+   slot=zw(c,s,34);
+   wr<float>(c,b+0x90u,float(int32_t(alt)));wr<float>(c,b+0x98u,float(int32_t(alt)));
+  }
+  msd_guest_call(c,L_SET_ANIM,b,slot,0u,1u,nullptr);
+ }else if(!rd<uint8_t>(c,b+0xc9u))msd_guest_call(c,L_KILL,b,0u,0u,0u,nullptr);
+ c.pc=c.r[14];return true;
+}
+static Block old_hunter_bullet;static void hunter_bullet(Context& c){if(l_bullet(c))return;old_hunter_bullet(c);}
+// BulletAction_NativeBird::hitGround 入口（r1 弹体）：带 lob_blast 的弹体改为预约状态 61（落地）。
+static bool l_ground(Context& c){
+ uint32_t b=c.r[1];if(!l_blast_bullet(c,b))return false;
+ msd_guest_call(c,Z_RESERVE_STATE,b,61u,0u,0u,nullptr);c.pc=c.r[14];return true;
+}
+static Block old_hunter_ground;static void hunter_ground(Context& c){if(l_ground(c))return;old_hunter_ground(c);}
+HOOK(hunter_death_slot,0x101de017u,
+ if(c.r[1]==12u){uint32_t s=zspec(c,c.r[0]);
+  if(s&&(zw(c,s,0)&L_DEATH)){uint32_t st=rd<uint32_t>(c,c.r[0]+0x7cu);
+   bool odd=(int32_t(rd<float>(c,c.r[0]+0x8cu))&1)!=0;
+   uint32_t base=st==110u?zw(c,s,37):st==120u?zw(c,s,38):st==100u?12u:0u;
+   uint32_t alt=st==100u?zw(c,s,39):st==110u?zw(c,s,40):st==120u?zw(c,s,41):0u;
+   if(odd&&alt)c.r[1]=alt;else if(base)c.r[1]=base;}}
+ )
+static uint32_t hunter_hooks=0u;
+// 版本 1：炸药与按属性的死亡；版本 2（r66）：三种死亡的另一版本（ZSpec 字 39–41）。
+extern "C" __declspec(dllexport) uint32_t msd_community_hunter_version(){return hunter_hooks==4u?2u:0u;}
 // 已登记的钩子数：首批 7 个全部找到时版本 1，另含前方最近敌人的 5 个时版本 2；宿主据此确认核心支持。
 static uint32_t zombie_hooks=0u;
 // 3：分档受击动作（标记 128，钩子数同 2）。4：另含雪地步兵类的分档入口（2026-10-13 冰车，共 13 个钩子）。

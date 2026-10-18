@@ -1882,4 +1882,8 @@ if((old_zombie_walk_shot=find_block(0x1017e309u))){register_block(0x1017e309u,zo
 if((old_zombie_ground_only=find_block(0x101e093du))){register_block(0x101e093du,zombie_ground_only);++zombie_hooks;}
 if((old_zombie_flight_clearance=find_block(0x101af795u))){register_block(0x101af795u,zombie_flight_clearance);++zombie_hooks;}
 if((old_item_hit_base=find_block(0x101e0a0du))){register_block(0x101e0a0du,item_hit_base);++item_hit_hooks;}
+if((old_hunter_shot=find_block(0x1017fdd9u))){register_block(0x1017fdd9u,hunter_shot);++hunter_hooks;}
+if((old_hunter_bullet=find_block(0x1019fc3du))){register_block(0x1019fc3du,hunter_bullet);++hunter_hooks;}
+if((old_hunter_death_slot=find_block(0x101de017u))){register_block(0x101de017u,hunter_death_slot);++hunter_hooks;}
+if((old_hunter_ground=find_block(0x1016d8e9u))){register_block(0x1016d8e9u,hunter_ground);++hunter_hooks;}
 }

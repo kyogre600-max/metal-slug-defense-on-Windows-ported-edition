@@ -1,4 +1,4 @@
-# 单位行为目录 / Unit behavior catalog（行为库版本 8）
+# 单位行为目录 / Unit behavior catalog（行为库版本 10）
 
 本文件由 `content_tool.py list-behaviors --markdown` 从 `behavior_library.json` 生成，请勿手工修改。
 Generated from `behavior_library.json` by `content_tool.py list-behaviors --markdown`; do not edit by hand.
@@ -291,4 +291,35 @@ Balloon flight: HP stage 0 is the flying phase (stage 1 needs a transition: lett
 | --- | --- | --- |
 | `pop_distance` | int | default: 16; min: 0; max: 1000 |
 | `launch_sound` | sound_key | default: null |
+
+## lob_blast（v1）
+
+- 适用的原版基准单位 / base_id: 221
+
+炸药（原住民（鸟）类）：投出的弹体碰到敌人时立即播放 blast_animation（爆炸），落在地面时播放 fuse_animation（引信燃烧后爆炸），动画播完后消失（同原生迫击炮弹）；原生弹体碰到敌人或落地后直接消失、不爆炸。爆炸的攻击框、目标数（状态词 24/31）与音效写在这两个槽的脚本中，伤害与攻击属性取投出时的攻击组（普通攻击词 22/28，特殊攻击词 29/37）。special_spread_count 大于 0 时，动作脚本中 op22 的弹体槽在 special_spread_first 起连续 special_spread_count 个槽内的弹体（通常在特殊攻击中同时投出）以该槽为弹体动画，第 i 颗（1 起）落在 状态词 33（绝招弹体目的距离）× i / special_spread_count 处，即在射程内等距分布，射程随等级或倍率改变时落点随之改变；其余 op22 照旧，落在原生的普通攻击目的距离处（弹体动画为槽 26）。
+
+Dynamite (NATIVE(BIRD) class): a thrown projectile that touches an enemy plays blast_animation (explodes at once); one that lands on the ground plays fuse_animation (the fuse burns, then it explodes); it disappears when the animation ends, as the native mortar shell does. Native projectiles of this class disappear on contact or landing without exploding. Put the blast attack box, target count (words 24/31) and sounds in these two slots; damage and attack attribute come from the attack group active at the throw (normal: words 22/28, special: words 29/37). With special_spread_count > 0, op22 calls whose bullet slot lies in the special_spread_count slots starting at special_spread_first (usually thrown together in the special attack) use that slot as the projectile animation, and the i-th one (from 1) lands at word 33 (special projectile target distance) × i / special_spread_count: evenly spread up to the range, following any change of the range by level or multipliers. Other op22 calls keep the native path and land at the native normal-attack target distance (projectile slot 26).
+
+| 参数 / parameter | 类型 / type | 约束 / constraints |
+| --- | --- | --- |
+| `blast_animation` | int | required: true; min: 0; max: 255 |
+| `fuse_animation` | int | required: true; min: 0; max: 255 |
+| `special_spread_first` | int | default: 0; min: 0; max: 255 |
+| `special_spread_count` | int | default: 0; min: 0; max: 16 |
+
+## death_by_attribute（v1）
+
+- 适用的原版基准单位 / base_id: 221
+
+按攻击属性区分死亡动作（原住民（鸟）类）：原生的死亡状态 100（普通）、110（爆炸属性击杀）、120（火焰属性击杀）都播放槽 12；带此行为时 110 改为 explosion_animation、120 改为 fire_animation，100 仍为槽 12（同叛军步兵等小兵的三种死亡）。动作播完后单位消失。三个 *_variant_animation 非 0 时为对应死亡的另一版本（通常只换死亡语音）：死亡时单位横坐标取整为奇数则播放该版本，偶数则播放前者；只由当时的位置决定，回放与联机时双方结果相同。
+
+Death animation by attack attribute (NATIVE(BIRD) class): the native death states 100 (normal), 110 (killed by an explosive attack) and 120 (killed by fire) all play slot 12. With this behaviour state 110 plays explosion_animation and 120 plays fire_animation, while 100 keeps slot 12, like the three deaths of rebel infantry. The unit disappears when the animation ends. A non-zero *_variant_animation is another version of that death (usually only the death voice differs): it plays when the unit's x coordinate, truncated to an integer, is odd at death, and the base version plays when it is even. The choice depends only on the position at that moment, so replays and both sides of an online match agree.
+
+| 参数 / parameter | 类型 / type | 约束 / constraints |
+| --- | --- | --- |
+| `explosion_animation` | int | required: true; min: 0; max: 255 |
+| `fire_animation` | int | required: true; min: 0; max: 255 |
+| `normal_variant_animation` | int | default: 0; min: 0; max: 255 |
+| `explosion_variant_animation` | int | default: 0; min: 0; max: 255 |
+| `fire_variant_animation` | int | default: 0; min: 0; max: 255 |
 

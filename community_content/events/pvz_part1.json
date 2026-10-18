@@ -97,6 +97,13 @@
           ],
           "loop": 1080,
           "difficulty": 0,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -193,6 +200,13 @@
           ],
           "loop": 1080,
           "difficulty": 0,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -293,6 +307,13 @@
           ],
           "loop": 1080,
           "difficulty": 1,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -401,6 +422,13 @@
           ],
           "loop": 1080,
           "difficulty": 2,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -587,6 +615,13 @@
           ],
           "loop": 1080,
           "difficulty": 2,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -691,6 +726,13 @@
           ],
           "loop": 1080,
           "difficulty": 3,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -795,6 +837,13 @@
           ],
           "loop": 1080,
           "difficulty": 4,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -899,6 +948,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            45,
+            50,
+            55,
+            60,
+            75
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1107,6 +1163,13 @@
           ],
           "loop": 1080,
           "difficulty": 3,
+          "rank_times": [
+            90,
+            95,
+            100,
+            105,
+            120
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1220,6 +1283,13 @@
           ],
           "loop": 1080,
           "difficulty": 3,
+          "rank_times": [
+            90,
+            95,
+            100,
+            105,
+            120
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1352,6 +1422,13 @@
           ],
           "loop": 1080,
           "difficulty": 4,
+          "rank_times": [
+            90,
+            95,
+            100,
+            105,
+            120
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1476,6 +1553,13 @@
           ],
           "loop": 1080,
           "difficulty": 4,
+          "rank_times": [
+            90,
+            95,
+            100,
+            105,
+            120
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1668,6 +1752,13 @@
           ],
           "loop": 1080,
           "difficulty": 4,
+          "rank_times": [
+            115,
+            120,
+            125,
+            130,
+            145
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1781,6 +1872,13 @@
           ],
           "loop": 1080,
           "difficulty": 4,
+          "rank_times": [
+            115,
+            120,
+            125,
+            130,
+            145
+          ],
           "triggers": [
             {
               "when": "front",
@@ -1909,6 +2007,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            115,
+            120,
+            125,
+            130,
+            145
+          ],
           "triggers": [
             {
               "when": "front",
@@ -2037,6 +2142,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            115,
+            120,
+            125,
+            130,
+            145
+          ],
           "triggers": [
             {
               "when": "front",
@@ -2232,6 +2344,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            145,
+            150,
+            155,
+            160,
+            175
+          ],
           "triggers": [
             {
               "when": "front",
@@ -2351,6 +2470,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            145,
+            150,
+            155,
+            160,
+            175
+          ],
           "triggers": [
             {
               "when": "front",
@@ -2479,6 +2605,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            145,
+            150,
+            155,
+            160,
+            175
+          ],
           "triggers": [
             {
               "when": "front",
@@ -2619,6 +2752,13 @@
           ],
           "loop": 1080,
           "difficulty": 5,
+          "rank_times": [
+            145,
+            150,
+            155,
+            160,
+            175
+          ],
           "triggers": [
             {
               "when": "front",

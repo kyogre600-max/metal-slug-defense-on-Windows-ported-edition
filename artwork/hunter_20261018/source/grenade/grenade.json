@@ -1,0 +1,82 @@
+[
+ {
+  "file": "grenade_00.png",
+  "ax": 16,
+  "ay": 32,
+  "size": [
+   32,
+   32
+  ],
+  "native_frame": 282
+ },
+ {
+  "file": "grenade_01.png",
+  "ax": 16,
+  "ay": 32,
+  "size": [
+   32,
+   32
+  ],
+  "native_frame": 284
+ },
+ {
+  "file": "grenade_02.png",
+  "ax": 15,
+  "ay": 30,
+  "size": [
+   31,
+   30
+  ],
+  "native_frame": 286
+ },
+ {
+  "file": "grenade_03.png",
+  "ax": 15,
+  "ay": 31,
+  "size": [
+   31,
+   31
+  ],
+  "native_frame": 288
+ },
+ {
+  "file": "grenade_04.png",
+  "ax": 14,
+  "ay": 33,
+  "size": [
+   30,
+   31
+  ],
+  "native_frame": 290
+ },
+ {
+  "file": "grenade_05.png",
+  "ax": 14,
+  "ay": 33,
+  "size": [
+   30,
+   31
+  ],
+  "native_frame": 292
+ },
+ {
+  "file": "grenade_06.png",
+  "ax": 14,
+  "ay": 34,
+  "size": [
+   30,
+   30
+  ],
+  "native_frame": 294
+ },
+ {
+  "file": "grenade_07.png",
+  "ax": 14,
+  "ay": 35,
+  "size": [
+   30,
+   29
+  ],
+  "native_frame": 296
+ }
+]

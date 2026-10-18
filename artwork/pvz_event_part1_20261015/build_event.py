@@ -25,6 +25,8 @@
 接近敌方据点时追加新登场的僵尸；大关最后一关的据点生命较高，据点生命降低时追加大波。道具放置表沿用该活动。
 代理提出、未经用户指定的数值：各关出兵表与触发、据点生命、体力与 MSP（第二大关 30 / 5000，第三至五大关 40 / 6000、
 50 / 8000、60 / 10000）、难度标签、开门单位的位置（敌方据点前 120 起每只间隔 60）。
+评级时间（2026-10-18 用户设定）：S 为第一、二大关 45 秒，第三大关 90 秒，第四大关 115 秒，第五大关 145 秒；
+A / B / C / D 依次为 S 加 5 / 10 / 15 / 30 秒（关卡字段 rank_times）。
 用法：windows_runtime/python.exe artwork/pvz_event_part1_20261015/build_event.py
 """
 from pathlib import Path
@@ -61,6 +63,11 @@ MARKERS = [(-338, -55), (-132, -2), (75, -97), (240, 36)]
 OPENING_X = [1180, 1120, 1060, 1000]
 
 
+def rank_times(s):
+    """评级时间（秒）：S 由各大关设定，A/B/C/D 依次为 S+5/+10/+15/+30（用户 2026-10-18 设定）。"""
+    return [s, s + 5, s + 10, s + 15, s + 30]
+
+
 def stage(area, slot, *, level, roster, waves, triggers=(), placed=(), base_hp, prisoners, strength=0, difficulty=0):
     key = f'{KEY}.{area["id"]}.s{slot + 1}'
     # 开门单位不在出兵名单中时追加到敌军名单末尾，只供开战放置使用（出兵表与触发不引用）。
@@ -72,7 +79,7 @@ def stage(area, slot, *, level, roster, waves, triggers=(), placed=(), base_hp, 
         'stamina': area['stamina'], 'reward_msp': area['msp'], 'enemy_base_hp': base_hp, 'strength_steps': strength,
         'enemies': [{'unit': unit, 'level': level} for unit in roster],
         'waves': [{'tick': tick, 'enemy': index[unit]} for tick, unit in waves],
-        'loop': LOOP, 'difficulty': difficulty,
+        'loop': LOOP, 'difficulty': difficulty, 'rank_times': rank_times(area['rank_s']),
         'triggers': [dict(when=when, value=value, spawn=index[unit]) for when, value, unit in triggers],
         'prisoners': prisoners,
         'items': [{'x': x, 'y': y, 'weight': w} for x, y, w in CAT_ITEMS], 'item_level': 15, 'prisoner_chance': 100,
@@ -82,11 +89,11 @@ def stage(area, slot, *, level, roster, waves, triggers=(), placed=(), base_hp, 
     return entry
 
 
-EAST = {'id': 'us_east', 'scene': 116, 'stamina': 20, 'msp': 3000, 'thumbnail': 'pvz_part1_day.png', 'music': WATERY}
-CENTRAL = {'id': 'us_central', 'scene': 117, 'stamina': 30, 'msp': 5000, 'thumbnail': 'pvz_part1_dusk.png', 'music': WATERY}
-CANADA = {'id': 'canada', 'scene': 118, 'stamina': 40, 'msp': 6000, 'thumbnail': 'pvz_part1_field3.png', 'music': WATERY}
-UK = {'id': 'uk', 'scene': 118, 'stamina': 50, 'msp': 8000, 'thumbnail': 'pvz_part1_field3.png', 'music': WATERY}
-ALASKA = {'id': 'alaska', 'scene': 118, 'stamina': 60, 'msp': 10000, 'thumbnail': 'pvz_part1_field3.png', 'music': ZOMBOTANY}
+EAST = {'id': 'us_east', 'scene': 116, 'stamina': 20, 'msp': 3000, 'thumbnail': 'pvz_part1_day.png', 'music': WATERY, 'rank_s': 45}
+CENTRAL = {'id': 'us_central', 'scene': 117, 'stamina': 30, 'msp': 5000, 'thumbnail': 'pvz_part1_dusk.png', 'music': WATERY, 'rank_s': 45}
+CANADA = {'id': 'canada', 'scene': 118, 'stamina': 40, 'msp': 6000, 'thumbnail': 'pvz_part1_field3.png', 'music': WATERY, 'rank_s': 90}
+UK = {'id': 'uk', 'scene': 118, 'stamina': 50, 'msp': 8000, 'thumbnail': 'pvz_part1_field3.png', 'music': WATERY, 'rank_s': 115}
+ALASKA = {'id': 'alaska', 'scene': 118, 'stamina': 60, 'msp': 10000, 'thumbnail': 'pvz_part1_field3.png', 'music': ZOMBOTANY, 'rank_s': 145}
 
 # 触发：('front', n, 单位) 我方最前单位与敌方据点距离小于 n 时出兵一次；('base_hp', n, 单位) 敌方据点生命低于 n% 时出兵一次。
 # 同一时刻追加多只时阈值依次相差 20 或 1，使其分帧出现、不重叠。

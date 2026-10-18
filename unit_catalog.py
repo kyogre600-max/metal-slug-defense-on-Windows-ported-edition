@@ -71,6 +71,8 @@ class UnitCatalog:
         self.by_key = {}
         self.language = None
         self.details = {}
+        self.unit_details = {}          # (UnitID, 等级) → 该单位自身的数值（unit_stats）
+        self.displays = {}              # UnitID → 显示数值所用的单位（display_uid）
         self.scratch = None
         self.create_scratch = None
 
@@ -206,8 +208,45 @@ class UnitCatalog:
                p.call('_ZN10BattleInfo11getInstanceEv'), uid, level - 1, self.create_scratch)
         return p.read(self.create_scratch, CREATE_SIZE)
 
+    def display_uid(self, uid):
+        """显示数值所用的单位。原生信息窗口 AppMain::SetUnitInfoParam（0x1eccfc）的生命与移速取自 GetMenuUnitID（菜单
+        数据字 1）：修筑类单位为建成后的建筑，空降、架设类为落地或架好后的单位（例如沙包 5→4、金屬要塞 367→366、
+        傘兵 159→160）；没有菜单数据时原生返回 2，此处取自身。社区单位同第 30 节 menu_display_id 钩子，取 child_unit_key
+        登记的子单位（例如正規軍傘兵 1034→1037、木乃伊召喚箱 MKII 1041→1042），没有时为自身。"""
+        value = self.displays.get(uid)
+        if value is None:
+            p = self.p
+            if uid >= 400:
+                units = getattr(getattr(p, 'community', None), 'units', None) or ()
+                unit = next((u for u in units if u.get('id') == uid), None)
+                child = unit.get('child_unit_key') if unit else None
+                value = next((u['id'] for u in units if child and u.get('key') == child), uid)
+            else:
+                value = p.call('_Z13GetMenuUnitID6UnitID', uid) if p.call('_Z15GetMenuUnitData6UnitID', uid) else uid
+            self.displays[uid] = value
+        return value
+
     def stats(self, uid, level=40):
+        """界面显示的数值（STATUS、LV UP、排序与攻击筛选）。生命、击退门槛、移速、击毁返还与各攻击组取 display_uid
+        的单位（实际在战场上作战的单位），AP 与再出击等待取购买的单位本身（原生信息窗口同此）；action_attacks 为单位
+        本身的攻击组，ACTION 的按钮按它决定（原生动作浏览演示的是购买的单位，修筑类先建成再演示）。"""
         cached = self.details.get((uid, level))
+        if cached is not None:
+            return cached
+        own = self.unit_stats(uid, level)
+        display = self.display_uid(uid)
+        if display == uid:
+            result = dict(own, display_uid=uid, action_attacks=own['attacks'])
+        else:
+            result = dict(self.unit_stats(display, level), uid=uid, ap=own['ap'],
+                          production_interval=own['production_interval'], builder=own['builder'],
+                          display_uid=display, action_attacks=own['attacks'])
+        self.details[(uid, level)] = result
+        return result
+
+    def unit_stats(self, uid, level=40):
+        """UnitID 自身的数值（不经 display_uid）。"""
+        cached = self.unit_details.get((uid, level))
         if cached is not None:
             return cached
         raw = self.status(uid, level)
@@ -262,7 +301,7 @@ class UnitCatalog:
             'attack_range': {'near': _i32(raw, 6), 'far': _i32(raw, 7)},
             'attacks': attacks, 'dps': dps, 'value': value, 'builder': builder,
         }
-        self.details[(uid, level)] = result
+        self.unit_details[(uid, level)] = result
         return result
 
     # ---------- 查询 ----------
