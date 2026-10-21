@@ -14,7 +14,7 @@ INTERNAL_FIELDS = frozenset((
     'child_unit_key', 'preview_unit_key', 'construction_time_multiplier', 'summoned_unit_key',
     'summon_interval_multiplier', 'summon_interval_additional_multiplier', 'landing_unit_key',
     'shot_action_reference_id', 'recovery_animation', 'flame_interrupt', 'ground_special_attack',
-    'retained_special_weapon', 'zombie_spec', 'throw_child_key'))
+    'retained_special_weapon', 'zombie_spec', 'throw_child_key', 'native_action', 'second_form_key'))
 # 与 content_sounds.KEY_PATTERN 相同（音效稳定键）。
 SOUND_KEY_PATTERN = re.compile(r'[a-z][a-z0-9_]{1,31}\.[a-z0-9_][a-z0-9_.\-]{0,63}')
 
@@ -189,6 +189,11 @@ def internal_fields(resolved):
         fields['ground_special_attack'] = True
     if 'retained_special_weapon' in resolved:
         fields['retained_special_weapon'] = True
+    # 2026-10-21 钢铁哨兵（行为库 v12）：原生保留的 IRON SLIDER 动作类；第二形态单位号写入数据行子单位字（不改菜单显示）。
+    if 'iron_slider' in resolved:
+        fields.update(native_action='IronSlider', second_form_key=resolved['iron_slider']['second_form'])
+    if 'iron_slider_second_form' in resolved:
+        fields['native_action'] = 'IronSlider_2'
     zombie = {'flags': 0}
     if 'hp_stage_animations' in resolved:
         v = resolved['hp_stage_animations']
@@ -245,6 +250,9 @@ def internal_fields(resolved):
                            ('fire_variant_animation', 'death_fire_variant')):
             if v[param]:
                 zombie[key] = v[param]
+    # 2026-10-21 效果贴地（行为库 v11，ZSpec 字 42）：辣椒僵尸的火焰带沿地形绘制
+    if 'ground_hugging_effect' in resolved:
+        zombie.update(flags=zombie['flags'] | 32768, hug_animation=resolved['ground_hugging_effect']['animation'])
     if zombie['flags']:
         fields['zombie_spec'] = zombie
     return fields

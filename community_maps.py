@@ -67,7 +67,9 @@ def install(content,info,db):
   bid=s['base_id'];row=bytearray(old[bid*0x1c:(bid+1)*0x1c])
   struct.pack_into('<II',row,0,s['id'],p.cstr(s['texture']))
   if 'bounds' in s:
-   left,right=s['bounds'];points=s.get('terrain',[[0,0],[2*(right-left),0]])
+   left,right=s['bounds'];points=[list(point) for point in s.get('terrain',[[0,0],[2*(right-left),0]])]
+   # 原版地形数组以 x=9999 的点结束（三参数高度查询以后继点 x>8000 为止）；自制地形补同一终止点（2026-10-19）。
+   if points[-1][0]<9999:points.append([9999,points[-1][1]])
    struct.pack_into('<iii',row,8,left,right,alloc(b''.join(struct.pack('<ii',*point) for point in points)))
    bases=s.get('bases',[min(68,(right-left)//4),right-left-47])
    struct.pack_into('<ii',row,20,*bases)

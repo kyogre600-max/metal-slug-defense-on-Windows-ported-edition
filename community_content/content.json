@@ -48,7 +48,10 @@
     "s1xlv.pvz_squash": 1057,
     "s1xlv.mv280c": 1058,
     "s1xlv.giant_hunter_walker": 1059,
-    "s1xlv.hunter": 1060
+    "s1xlv.hunter": 1060,
+    "s1xlv.iron_cab": 1061,
+    "s1xlv.iron_sentinel": 1062,
+    "s1xlv.iron_sentinel_form2": 1063
   },
   "units_dir": "units",
   "asset_digest": "blake2b-256",
@@ -95,7 +98,10 @@
     "mv280c_out.obm": "6ff5d6b9820e2ce1456def5e6ec96e79eb1db4c49b0af3bb616245769d6b103b",
     "mv280c_bullet_out.obm": "cf4b5b7629132f1685362c0c9903f76b4f4470b22e6262014e4171db78cd7e3c",
     "giant_hunter_walker.obm": "389ee97a404bc0bd29f0464b5cd5b1ac3beb122e0e95a712d1bda109ed24953d",
-    "hunter.obm": "927ae30147a19942a2c543bef9f084c572cc574c30a791fce3722883e28a1adb"
+    "hunter.obm": "927ae30147a19942a2c543bef9f084c572cc574c30a791fce3722883e28a1adb",
+    "iron_cab.obm": "51e35d3b8f56d522cd53944bfcf9f49d18b77dca92ec595734f6ce52957af80c",
+    "iron_sentinel_0.obm": "2b67754bf6cdf98978180725c407fe398bb1ca3dc24166dcbf1bb6f6496b238a",
+    "iron_sentinel_1.obm": "f48fa134945c31ec7f3753e6d0bc2df50951dd0a1d1e6017ddc73b10ec905935"
   },
   "unit_pack": {
     "key": "s1xlv.pf_infantry_pack",
@@ -156,6 +162,12 @@
         "description": "包含七种正规军步兵的单位组合包。"
       }
     }
+  },
+  "engineer_hp": {
+    "mode": "hp",
+    "percent": 5,
+    "minimum": 300,
+    "units": {}
   },
   "sounds": [
     {
@@ -353,6 +365,69 @@
       "key": "s1xlv.hunter_melee",
       "file": "hunter_melee.msdf",
       "type": "se"
+    },
+    {
+      "key": "s1xlv.ironcab_bomb",
+      "file": "ironcab_bomb.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.ironcab_charge",
+      "file": "ironcab_charge.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.ironcab_laser",
+      "file": "ironcab_laser.msdf",
+      "type": "se"
+    },
+    {
+      "key": "s1xlv.bgm_ms6_m1_1",
+      "file": "bgm_ms6_m1_1.msdf",
+      "type": "bgm",
+      "loop": [
+        5.587302,
+        92.348254
+      ]
+    },
+    {
+      "key": "s1xlv.bgm_ms6_m1_2",
+      "file": "bgm_ms6_m1_2.msdf",
+      "type": "bgm",
+      "loop": [
+        3.465578,
+        78.894104
+      ]
+    },
+    {
+      "key": "s1xlv.bgm_ms6_m1_boss",
+      "file": "bgm_ms6_m1_boss.msdf",
+      "type": "bgm",
+      "loop": [
+        6.384036,
+        93.384875
+      ]
+    },
+    {
+      "key": "s1xlv.isentinel_walk",
+      "file": "isentinel_walk.msdf",
+      "type": "se",
+      "volume": 35
+    },
+    {
+      "key": "s1xlv.isentinel_knockback",
+      "file": "isentinel_knockback.msdf",
+      "type": "se",
+      "volume": 110
+    },
+    {
+      "key": "s1xlv.bgm_ms6_m2",
+      "file": "bgm_ms6_m2.msdf",
+      "type": "bgm",
+      "loop": [
+        1.597823,
+        81.597778
+      ]
     }
   ]
 }

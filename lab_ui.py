@@ -70,6 +70,7 @@ TEXT = {
     'world_9': ('裏地圖 1', '里地图 1', '裏マップ 1', 'EX MAP 1'),
     'world_10': ('裏地圖 2', '里地图 2', '裏マップ 2', 'EX MAP 2'),
     'world_11': ('裏地圖 3', '里地图 3', '裏マップ 3', 'EX MAP 3'),
+    'world_ura': ('裏地圖 {}', '里地图 {}', '裏マップ {}', 'EX MAP {}'),
     'stage_no': ('{} {}-{}', '{} {}-{}', '{} {}-{}', '{} {}-{}'),
     'base_short': ('據點', '据点', '拠点', 'BASE'),
     'copy_enemy': ('複製敵方', '复制敌方', '敵軍をコピー', 'COPY ENEMY'),
@@ -270,6 +271,13 @@ def T(p, key, *args):
     index = ('ZT', 'ZS', 'JP', 'EN').index(lang(p))
     text = TEXT[key][index]
     return text.format(*args) if args else text
+
+
+def world_name(p, world):
+    """地图选择器的世界名称：世界号 0–2 为地图 1–3，9 起为里地图 1 起（12 为里地图 4，扩展页同此编号）。"""
+    if f'world_{world}' in TEXT:
+        return T(p, f'world_{world}')
+    return T(p, 'world_ura', world - 8)
 
 
 def play_se(p, sound):

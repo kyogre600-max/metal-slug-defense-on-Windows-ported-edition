@@ -1,6 +1,6 @@
 static const char BEHAVIOR_MANIFEST[]=R"MSD({
   "schema": 1,
-  "library_version": 10,
+  "library_version": 12,
   "param_types": {
     "unit_key": "单位稳定键；internal 为 true 时须为内部单位（internal_only），为 false 时须为可选单位",
     "rational": "[分子, 分母] 正整数倍率",
@@ -645,6 +645,64 @@ static const char BEHAVIOR_MANIFEST[]=R"MSD({
       "doc": {
         "ZS": "按攻击属性区分死亡动作（原住民（鸟）类）：原生的死亡状态 100（普通）、110（爆炸属性击杀）、120（火焰属性击杀）都播放槽 12；带此行为时 110 改为 explosion_animation、120 改为 fire_animation，100 仍为槽 12（同叛军步兵等小兵的三种死亡）。动作播完后单位消失。三个 *_variant_animation 非 0 时为对应死亡的另一版本（通常只换死亡语音）：死亡时单位横坐标取整为奇数则播放该版本，偶数则播放前者；只由当时的位置决定，回放与联机时双方结果相同。",
         "EN": "Death animation by attack attribute (NATIVE(BIRD) class): the native death states 100 (normal), 110 (killed by an explosive attack) and 120 (killed by fire) all play slot 12. With this behaviour state 110 plays explosion_animation and 120 plays fire_animation, while 100 keeps slot 12, like the three deaths of rebel infantry. The unit disappears when the animation ends. A non-zero *_variant_animation is another version of that death (usually only the death voice differs): it plays when the unit's x coordinate, truncated to an integer, is odd at death, and the base version plays when it is even. The choice depends only on the position at that moment, so replays and both sides of an online match agree."
+      }
+    },
+    {
+      "name": "ground_hugging_effect",
+      "version": 1,
+      "base_classes": [
+        313
+      ],
+      "requires_fields": [
+        "sprite_descriptor"
+      ],
+      "params": {
+        "animation": {
+          "type": "int",
+          "required": true,
+          "min": 0,
+          "max": 255
+        }
+      },
+      "doc": {
+        "ZS": "效果贴地：本单位以动作脚本 op12 生成的独立效果中，动作号为 animation 的效果在绘制时，各分件按其中心所在横坐标的战场地形高度上下平移（保持分件相对效果原点的纵向偏移），横向排开的火焰等效果因此沿坡道铺在地表上，不穿入地形，也不悬空。只改变绘制位置，效果对象的坐标、攻击框以及回放与联机的状态不变；动作浏览中按原样绘制。",
+        "EN": "Ground-hugging effect: among the independent effects this unit creates with op12 in its scripts, the effect playing animation is drawn with each sprite part shifted vertically to the battlefield terrain height at the part's centre x (keeping the part's vertical offset from the effect origin), so a row of flames or similar effects lies on the ground along slopes instead of cutting into the terrain or floating above it. Only drawing changes: the effect object's position, attack boxes and replay/online state are unchanged. The unit viewer draws the effect unchanged."
+      }
+    },
+    {
+      "name": "iron_slider",
+      "version": 1,
+      "base_classes": [
+        394
+      ],
+      "requires_fields": [
+        "sprite_descriptor"
+      ],
+      "params": {
+        "second_form": {
+          "type": "unit_key",
+          "required": true,
+          "internal": true
+        }
+      },
+      "doc": {
+        "ZS": "钢铁哨兵第一形态：单位以原生保留的 BattleAction_IronSlider 运行（MSD 1.46 未发布的 IRON SLIDER，UnitID 394），脚本采用 MSA 7.13.0 IRON SENTINEL 的动作记录编号（待机 6、行走 7、普通攻击 9、绝招 10、攻击后等待 11、受击后退 12、损毁 13；菜单 0–2）。核心按 MSA 处理：普通攻击的火箭（脚本编号 60）升出舞台上沿后从上沿外瞄准对方最前方单位落下，目标不在攻击距离边缘以内时落向边缘的地面，水平飞离发射点达远程投射距离（字 26）即爆炸；绝招的主炮导弹（64）、侧炮炮弹（50、56、105、111、117、124、130、136）与残片（72、73）按 MSA 编号建立；损毁动画播完后召唤 second_form 指定的内部单位（第二形态）。",
+        "EN": "Iron Sentinel first form: the unit runs on the native BattleAction_IronSlider kept in MSD 1.46 (the unreleased IRON SLIDER, UnitID 394), with scripts numbered as in the MSA 7.13.0 IRON SENTINEL action record (standby 6, walk 7, normal attack 9, special 10, post-attack wait 11, knockback slide 12, destruction 13; menu 0-2). The core follows MSA: normal-attack rockets (script id 60) rise off the top of the stage and come down from above onto the opposing front-most unit, aiming at the ground at the edge of the attack range when that unit is beyond it, and explode once they are the far projectile distance (word 26) away from the launch point; the special's cannon missiles (64), side-cannon shells (50, 56, 105, 111, 117, 124, 130, 136) and debris (72, 73) are created by their MSA ids; after the destruction animation the internal unit given by second_form is summoned (second form)."
+      }
+    },
+    {
+      "name": "iron_slider_second_form",
+      "version": 1,
+      "base_classes": [
+        395
+      ],
+      "requires_fields": [
+        "sprite_descriptor"
+      ],
+      "params": {},
+      "doc": {
+        "ZS": "钢铁哨兵第二形态：单位以原生保留的 BattleAction_IronSlider_2 运行（UnitID 395），出场时设为免击退（原生与 MSA 相同）；脚本编号同 MSA（待机 17、行走 18、巨型导弹 19、损毁 21），三种攻击都发射巨型导弹（脚本编号 24）。只用于由 iron_slider 召唤的内部单位。",
+        "EN": "Iron Sentinel second form: the unit runs on the native BattleAction_IronSlider_2 (UnitID 395) and is immune to knockback from its first update (as in both the native class and MSA); scripts use the MSA numbering (standby 17, walk 18, giant missile 19, destruction 21) and all three attacks launch the giant missile (script id 24). Only for the internal unit summoned by iron_slider."
       }
     }
   ]

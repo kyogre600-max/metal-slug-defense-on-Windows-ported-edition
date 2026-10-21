@@ -14,8 +14,6 @@ static const wchar_t* entry_for_name(const std::wstring& name) {
         return L"all_unlocked_max_level_launcher.py";
     if (_wcsicmp(name.c_str(), L"Start_MSD_Max_Level.exe") == 0)
         return L"max_level_launcher.py";
-    if (_wcsicmp(name.c_str(), L"Start_LAB.exe") == 0)
-        return L"lab_launcher.py";
     return L"portable_launcher.py";
 }
 
@@ -30,7 +28,6 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR command_line,int){
     std::wstring python=root+L"\\windows_runtime\\pythonw.exe";
     std::wstring entry=root+L"\\"+selected_entry;
     std::wstring args=L"\""+python+L"\" -B -I -S \""+entry+L"\"";
-    if(_wcsicmp(name.c_str(),L"Start_LAB.exe")==0)args+=L" --windowed";
     if(command_line&&*command_line){args+=L" ";args+=command_line;}
     STARTUPINFOW si{};si.cb=sizeof(si);PROCESS_INFORMATION pi{};
     if(!CreateProcessW(python.c_str(),&args[0],nullptr,nullptr,FALSE,0,nullptr,root.c_str(),&si,&pi)){

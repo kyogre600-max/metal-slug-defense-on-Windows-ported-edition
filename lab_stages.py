@@ -13,6 +13,8 @@
   ImageDataInfo（GOT 0x93681c）得到文件名，分别载入菜单图像 0、1；GT_InfoWindowDraw 以 drawPict 的转换表 28
   绘制 GetStageThumbnail 的图块（转换项 x,y,w,h,锚点,标志,页；页选第一或第二张图）。
 世界只开放 WorldType 0 中有区域的世界：0–2 为地图 1–3，9–11 为里地图 1–3（其余行为空）。
+里地图扩展页（里世界 4 起，世界号 12 起，ura_world.py）在其记录建立后列在里地图 3 之后：区域与关卡取世界目录，
+StageID 同原生规则，getMissionInfo 由核心钩子返回宿主的任务记录；缩略图为关卡 thumbnail 图像。
 """
 import struct
 
@@ -30,10 +32,20 @@ def stage_id(world, area, stage):
     return (world + 1) * 1000 + (area + 1) * 10 + stage + 1
 
 
+def ura_pages(p):
+    """已建立记录的里地图扩展页 [(页号, 世界号, 世界)]；未建立（如独立 LAB 入口）时为空。"""
+    ura = getattr(p, 'ura_world', None)
+    if ura is None or not ura.pages:
+        return []
+    from ura_world import URA, URA_MAGIC
+    return list(ura.pages) if p.word(URA) == URA_MAGIC else []
+
+
 class StageCatalog:
     def __init__(self, p):
         self.p = p
         self.language = p.word(p.app_instance() + 0x3d64)   # 区域名与缩略图表按此语言读取
+        self.ura_ready = bool(ura_pages(p))                # 扩展页记录建立后重新读取目录
         self.worlds = None            # [(world, [stage 记录…])]
         self.by_id = {}
 
@@ -108,6 +120,31 @@ class StageCatalog:
                     self.by_id[sid] = entry
             if stages:
                 worlds.append((world, stages))
+        ura = getattr(p, 'ura_world', None)
+        for _, world, data in ura_pages(p):
+            stages = []
+            for area, region in enumerate(data['areas']):
+                name = ''
+                if 'name' in region:                   # 自制区域名称（世界目录，11 种语言，顺序同原生名称表）
+                    from campaign_catalog import AREA_NAME_LANGUAGES
+                    if 0 <= language < len(AREA_NAME_LANGUAGES):
+                        name = region['name'][AREA_NAME_LANGUAGES[language]]
+                else:
+                    name_index = region['native_name']
+                    if self.valid(names) and 0 <= name_index < 57 and self.valid(p.word(names + 4 * name_index)):
+                        name = p.read(p.word(names + 4 * name_index), 96).split(bytes(1))[0].decode('utf-8', 'replace')
+                for stage, item in enumerate(region['stages']):
+                    sid = stage_id(world, area, stage)
+                    if not p.call('_ZN10BattleInfo14getMissionInfoEi', info, sid):
+                        continue
+                    thumb = item.get('thumbnail')
+                    entry = {'id': sid, 'world': world, 'area': area, 'stage': stage, 'area_name': name,
+                             'bgm': 0, 'files': (None, None), 'parts': [],
+                             'image': ura.catalog.ura_images.get(thumb) if thumb else None}
+                    stages.append(entry)
+                    self.by_id[sid] = entry
+            if stages:
+                worlds.append((world, stages))
         self.worlds = worlds
         return worlds
 
@@ -122,6 +159,9 @@ class StageCatalog:
     def thumbnail(self, skin, entry):
         """按原生转换项合成缩略图（RGBA，原尺寸）；图块页 0/1 对应区域的第一、第二张缩略图。"""
         from PIL import Image
+        if entry.get('image'):
+            with Image.open(entry['image']) as source:
+                return source.convert('RGBA')
         pieces = []
         for page, (x, y, w, h), (ox, oy) in entry['parts']:
             name = entry['files'][page] if page < len(entry['files']) else None

@@ -1,0 +1,125 @@
+{
+  "note": "IRON CAB 激光炮帧修正（R3，2026-10-19，用户实机反馈）：MSA 素材的激光炮后端为一块平涂的暗色矩形（RGB 49,49,24），",
+  "frames": [
+    {
+      "file": "cannon_00.png",
+      "ax": 44,
+      "ay": 0,
+      "size": [
+        66,
+        75
+      ],
+      "source": "frames/cannon_00.png"
+    },
+    {
+      "file": "cannon_01.png",
+      "ax": 51,
+      "ay": 0,
+      "size": [
+        73,
+        75
+      ],
+      "source": "frames/cannon_01.png"
+    },
+    {
+      "file": "cannon_02.png",
+      "ax": 72,
+      "ay": 0,
+      "size": [
+        94,
+        81
+      ],
+      "source": "frames/cannon_02.png"
+    },
+    {
+      "file": "cannon_03.png",
+      "ax": 76,
+      "ay": 0,
+      "size": [
+        98,
+        83
+      ],
+      "source": "frames/cannon_03.png"
+    },
+    {
+      "file": "cannon_04.png",
+      "ax": 72,
+      "ay": 0,
+      "size": [
+        94,
+        80
+      ],
+      "source": "frames/cannon_04.png"
+    },
+    {
+      "file": "cannon_05.png",
+      "ax": 71,
+      "ay": 0,
+      "size": [
+        92,
+        80
+      ],
+      "source": "frames/cannon_05.png"
+    },
+    {
+      "file": "cannon_06.png",
+      "ax": 69,
+      "ay": 0,
+      "size": [
+        91,
+        80
+      ],
+      "source": "frames/cannon_06.png"
+    },
+    {
+      "file": "cannon_07.png",
+      "ax": 41,
+      "ay": 0,
+      "size": [
+        63,
+        79
+      ],
+      "source": "frames/cannon_07.png"
+    },
+    {
+      "file": "cannon_08.png",
+      "ax": 41,
+      "ay": 0,
+      "size": [
+        63,
+        77
+      ],
+      "source": "frames/cannon_08.png"
+    },
+    {
+      "file": "cannon_09.png",
+      "ax": 44,
+      "ay": 0,
+      "size": [
+        66,
+        75
+      ],
+      "source": "frames/cannon_09.png"
+    },
+    {
+      "file": "cannon_10.png",
+      "ax": 47,
+      "ay": 0,
+      "size": [
+        70,
+        75
+      ],
+      "source": "frames/cannon_10.png"
+    },
+    {
+      "file": "cannon_11.png",
+      "ax": 48,
+      "ay": 0,
+      "size": [
+        72,
+        74
+      ],
+      "source": "frames/cannon_11.png"
+    }
+  ]
+}

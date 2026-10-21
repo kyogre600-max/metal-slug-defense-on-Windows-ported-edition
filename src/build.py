@@ -20,7 +20,7 @@ def main():
     if ')MSD"' in library:raise ValueError('behavior_library.json contains the raw-string delimiter')
     manifest_inc=ROOT/'behavior_manifest.inc';generated='static const char BEHAVIOR_MANIFEST[]=R"MSD('+library+')MSD";\n'
     if not manifest_inc.is_file() or manifest_inc.read_text(encoding='utf-8')!=generated:manifest_inc.write_text(generated,encoding='utf-8')
-    sources=[ROOT/'aot_runtime.cpp',ROOT/'native_imports.cpp',ROOT/'native_audio.cpp',ROOT/'generated/dispatch.cpp',*sorted((ROOT/'generated').glob('blocks_*.cpp')),ROOT/'community_content.cpp',ROOT/'event_trial_hooks.cpp',ROOT/'audio_options.cpp',ROOT/'lab_hooks.cpp',ROOT/'netplay.cpp']
+    sources=[ROOT/'aot_runtime.cpp',ROOT/'native_imports.cpp',ROOT/'native_audio.cpp',ROOT/'generated/dispatch.cpp',*sorted((ROOT/'generated').glob('blocks_*.cpp')),ROOT/'community_content.cpp',ROOT/'event_trial_hooks.cpp',ROOT/'audio_options.cpp',ROOT/'lab_hooks.cpp',ROOT/'netplay.cpp',ROOT/'ura_world_hooks.cpp']
     started=time.perf_counter()
     def compile_one(src):
         obj=out/(src.stem+'.o');log=out/(src.stem+'.log')

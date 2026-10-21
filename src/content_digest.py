@@ -46,6 +46,14 @@ class DigestCache:
         self.dirty = True
         return value
 
+    def digest_file(self, path):
+        """返回 path 当前内容的摘要；缓存命中时不读取文件（大幅图像源只在变化后重新读取）。"""
+        stat = path.stat()
+        entry = self.entries.get(str(path.resolve()))
+        if isinstance(entry, list) and len(entry) == 3 and entry[0] == stat.st_size and entry[1] == stat.st_mtime_ns:
+            return entry[2]
+        return self.digest(path, path.read_bytes())
+
     def save(self):
         if not self.dirty or self.path is None:
             return

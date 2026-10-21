@@ -46,3 +46,40 @@ def import_png(source,destination):
     destination.parent.mkdir(parents=True,exist_ok=True)
     temp=destination.with_suffix('.obm.tmp');temp.write_bytes(raw);temp.replace(destination)
     return {'file':destination.name,'blake2b':blake2(raw),'size':[tw,th],'source_size':[w,h],'colors':len(palette)}
+
+
+# 图像源场景图集（2026-10-19，MS6 关卡移植 S0）：场景的 texture 可登记无损 PNG / WebP。
+# 启动时只读取尺寸与摘要；原生打开对应 OBM 时再解码为直接 RGBA（OI kind 1、32 位，原生 OGLTexture / ImageDesc 均支持），
+# 画布补透明边缘到二的整数次幂。仓库与内存中只保存压缩后的源文件，最近一次解码结果保留以免同一次载入重复解码。
+IMAGE_TEXTURE_SUFFIXES=('.png','.webp')
+
+def pow2(n):
+    return 1<<(n-1).bit_length()
+
+class ImageTexture:
+    """一个图像源；runtime_name 为原生场景记录使用的 OBM 文件名。"""
+    _last=(None,None)
+    def __init__(self,path):
+        from PIL import Image
+        self.path=Path(path);self.file_size=self.path.stat().st_size
+        with Image.open(self.path) as image:
+            if image.format not in ('PNG','WEBP') or getattr(image,'n_frames',1)!=1:raise ValueError('场景图像源要求单帧 PNG 或 WebP：'+self.path.name)
+            if image.format=='WEBP' and image.info.get('lossless') is False:raise ValueError('WebP 场景图像源要求无损编码：'+self.path.name)
+            self.source_size=image.size
+        w,h=self.source_size
+        if not 0<w<=8192 or not 0<h<=8192:raise ValueError('场景图像源尺寸超出范围：'+self.path.name)
+        self.size=(pow2(w),pow2(h))
+        self.runtime_name=self.path.name+'.obm'
+    def __len__(self):return self.file_size
+    def obm(self):
+        key=(str(self.path),self.path.stat().st_mtime_ns)
+        if ImageTexture._last[0]==key:return ImageTexture._last[1]
+        from PIL import Image
+        with Image.open(self.path) as image:rgba=image.convert('RGBA')
+        if rgba.size!=self.source_size:raise ValueError('场景图像源在运行中被修改：'+self.path.name)
+        tw,th=self.size
+        if (tw,th)!=rgba.size:
+            canvas=Image.new('RGBA',(tw,th),(0,0,0,0));canvas.paste(rgba,(0,0));rgba=canvas
+        raw=b'OI\x01\x20'+struct.pack('<HH',tw,th)+rgba.tobytes()
+        ImageTexture._last=(key,raw)
+        return raw

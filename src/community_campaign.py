@@ -3,6 +3,7 @@ from pathlib import Path
 import json,struct,base64,contextlib,io
 from event_trial import HEADER,MAGIC,atomic_bytes
 from content_panel import Panel
+from event_content import TRIGGER_WHEN,TRIGGER_ACTIONS
 
 EXT=0x1ffec000
 EXT_MAGIC=0x45585431
@@ -19,6 +20,33 @@ def recover(saves):
         if raw is None:target.unlink(missing_ok=True)
         else:atomic_bytes(target,base64.b64decode(raw,validate=True))
     path.unlink()
+
+def mission_words(p,catalog,scene_ids,info,s,mission_id,blob):
+    """世界目录的一个关卡 → 原生任务记录的 30 个词（以模板关卡记录为底）；名单、波次与触发表由 blob 分配。
+    扩展世界（任务编号 1000000 起）与里地图扩展页（ura_world.py，原生关卡编号）共用。"""
+    source=p.call('_ZN10BattleInfo14getMissionInfoEi',info,s.get('template',1011))
+    if not source:raise ValueError('原生关卡模板不存在')
+    words=list(struct.unpack('<30I',p.read(source,120)));words[0]=mission_id
+    words[1]=s['scene'] if type(s['scene']) is int else scene_ids[s['scene']]
+    words[4]=s.get('enemy_base_hp',10000);words[6]=s.get('reward_msp',0);words[8]=s.get('stamina',0)
+    words[16]=struct.unpack('<I',struct.pack('<f',float(s.get('strength_steps',0))))[0]
+    enemies=[(i,catalog.unit_id(e['unit']),e.get('level',40)) for i,e in enumerate(s['enemies'])]
+    words[17]=blob(b''.join(struct.pack('<3i',*e) for e in enemies));words[18]=len(enemies)
+    waves=s.get('waves',[])
+    words[19]=blob(b''.join(struct.pack('<hbb',w['tick'],w['enemy'],0) for w in waves)+struct.pack('<hbb',-1,0,0));words[20]=len(waves)
+    for off in (21,22,23,24,28,29):words[off]=0
+    # 出兵循环与触发（词 21/22）、开战预置单位（词 23/24）、难度标签（词 9）与评级时间（词 11–15），
+    # 写法与自制 EVENT 相同（event_content.build_mission）。道具与俘虏放置表（词 28/29）不写。
+    conds=[(0,s['loop'],1,0,1)] if 'loop' in s else []
+    for trigger in s.get('triggers',[]):
+        action=next(a for a in TRIGGER_ACTIONS if a in trigger)
+        conds.append((TRIGGER_WHEN[trigger['when']][0],trigger['value'],TRIGGER_ACTIONS.index(action),trigger[action],int(trigger.get('repeat',False))))
+    if conds:words[21]=blob(b''.join(struct.pack('<iiiiB3x',*c) for c in conds));words[22]=len(conds)
+    placed=s.get('placed',[])
+    if placed:words[23]=blob(b''.join(struct.pack('<bxh',u['enemy'],u['x']>>1) for u in placed));words[24]=len(placed)
+    if 'difficulty' in s:words[9]=s['difficulty']
+    if 'rank_times' in s:words[11:16]=s['rank_times']
+    return words
 
 class CommunityCampaign:
     def __init__(self,p,trial,*,ui_enabled=False):
@@ -58,7 +86,7 @@ class CommunityCampaign:
             self.clear_music();self.trial.leave(True);self.clear_runtime()
         self.opened=True;self.active=False;self.world=None;self.area=None;self.page=0;self.message='';return True
     def rows(self):
-        if self.world is None:return list(self.catalog.worlds.values())
+        if self.world is None:return [w for w in self.catalog.worlds.values() if 'ura_page' not in w]   # 里地图扩展页的世界经原生里地图进入
         world=self.catalog.worlds[self.world]
         if self.area is None:return world.get('areas',[])
         return next(a for a in world['areas'] if a['key']==self.area)['stages']
@@ -135,17 +163,7 @@ class CommunityCampaign:
     def prepare_world(self,key):
         p=self.p;t=self.trial;self.clear_runtime();world=self.catalog.worlds[key];records=[];stages=[];bgm={}
         for index,s in enumerate(stage for a in world['areas'] for stage in a['stages']):
-            source=p.call('_ZN10BattleInfo14getMissionInfoEi',t.info,s.get('template',1011))
-            if not source:raise ValueError('原生关卡模板不存在')
-            words=list(struct.unpack('<30I',p.read(source,120)));words[0]=1000000+index
-            words[1]=s['scene'] if type(s['scene']) is int else self.scene_ids[s['scene']]
-            words[4]=s.get('enemy_base_hp',10000);words[6]=s.get('reward_msp',0);words[8]=s.get('stamina',0)
-            words[16]=struct.unpack('<I',struct.pack('<f',float(s.get('strength_steps',0))))[0]
-            enemies=[(i,self.catalog.unit_id(e['unit']),e.get('level',40)) for i,e in enumerate(s['enemies'])]
-            words[17]=self.blob(b''.join(struct.pack('<3i',*e) for e in enemies));words[18]=len(enemies)
-            waves=s.get('waves',[])
-            words[19]=self.blob(b''.join(struct.pack('<hbb',w['tick'],w['enemy'],0) for w in waves)+struct.pack('<hbb',-1,0,0));words[20]=len(waves)
-            for off in (21,22,23,24,28,29):words[off]=0
+            words=mission_words(p,self.catalog,self.scene_ids,t.info,s,1000000+index,self.blob)
             records.append(struct.pack('<30I',*words))
             stage=dict(s,id=words[0],group=0,local_stage_key=s['key'],stamina_cost=words[8]);stages.append(stage)
             music=s.get('music',100)

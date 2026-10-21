@@ -77,8 +77,36 @@ static void scale_integer(Context& c,uint32_t address,uint32_t pair){
  int64_t value=int64_t(rd<int32_t>(c,address))*a/b;
  wr<int32_t>(c,address,int32_t(std::max<int64_t>(INT32_MIN,std::min<int64_t>(INT32_MAX,value))));
 }
+// 工兵生命（2026-10-20，用户设定）：头部 +176 为按生命计算的修筑类单位表（每项 3 个字：UnitID、百分比、下限），+180 为项数。
+// 表中单位的生命 = max(下限, 修筑对象同等级生命 × 百分比 / 100)。修筑对象为状态 +0xa0（字 40；BattleAction_Kouhei::update 状态 50
+// 以 getStatus(39) 调用 createChildObject，getStatus 的编号 n 对应字 n+1，如生命为编号 2、字 3），其生命经原生
+// BattleInfo::getUnitStatus 取得（含该单位自身的倍率）。
+// 不在表中的单位保持原生：生命 1，受击即撤退（“一击即跑”）。
+bool msd_guest_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1,uint32_t a2,uint32_t a3,uint32_t* result);
+static constexpr uint32_t ENG_INFO_INSTANCE=0x101cfa4du,ENG_UNIT_STATUS=0x101cfbcdu;
+static uint32_t engineer_entry(Context& c,uint32_t uid){
+ if(!active(c)||!head(c,176u))return 0u;
+ uint32_t t=head(c,176u),n=head(c,180u);
+ for(uint32_t i=0;i<n;++i)if(rd<uint32_t>(c,t+i*12u)==uid)return t+i*12u;
+ return 0u;
+}
+static uint32_t engineer_depth=0u;   // 只在单次嵌套调用内非零
+static void engineer_hp(Context& c,uint32_t out){
+ uint32_t uid=rd<uint32_t>(c,out),e=engineer_entry(c,uid);if(!e||engineer_depth)return;
+ uint32_t pct=rd<uint32_t>(c,e+4u),minimum=rd<uint32_t>(c,e+8u),child=rd<uint32_t>(c,out+0xa0u);int64_t hp=0;
+ if(child&&child!=uid&&real_unit(c,child)){
+  // 嵌套调用的状态缓冲区放在当前栈指针之下，调用期间栈指针移到缓冲区之下。
+  uint32_t sp=c.r[13],buf=(sp-0x100u)&~7u,info=0u;++engineer_depth;c.r[13]=buf;
+  if(msd_guest_call(c,ENG_INFO_INSTANCE,0u,0u,0u,0u,&info)&&info){
+   for(uint32_t o=0;o<0xecu;o+=4u)wr<uint32_t>(c,buf+o,0u);
+   if(msd_guest_call(c,ENG_UNIT_STATUS,info,child,rd<uint32_t>(c,out+8u),buf,nullptr))hp=int64_t(rd<int32_t>(c,buf+0xcu))*pct/100;
+  }
+  c.r[13]=sp;--engineer_depth;
+ }
+ wr<int32_t>(c,out+0xcu,int32_t(std::max<int64_t>(minimum,std::min<int64_t>(hp,INT32_MAX))));
+}
 static void apply_combat_status(Context& c,uint32_t out){
- uint32_t p=combat_profile(c,rd<uint32_t>(c,out));if(!p)return;
+ uint32_t p=combat_profile(c,rd<uint32_t>(c,out));if(!p){engineer_hp(c,out);return;}
  scale_integer(c,out+0xcu,p);
  // 近距、普攻、绝招伤害分别为状态偏移 0x3c/0x58/0x74（词 15/22/29）；0x34（词 13）为被击毁时给予敌方的 AP，保持原值。
  for(uint32_t off:{0x3cu,0x58u,0x74u})scale_integer(c,out+off,p+8u);
@@ -87,6 +115,7 @@ static void apply_combat_status(Context& c,uint32_t out){
  // 近距、远距攻击判定与三类弹体的目的距离分别缩放。
  // 近距弹体目的距离为 0x4c（词 19）；0x40（词 16）为近距击退力，保持原值。
  for(uint32_t off:{0x18u,0x1cu,0x4cu,0x68u,0x84u})scale_integer(c,out+off,p+24u);
+ engineer_hp(c,out);
 }
 #define HOOK(NAME,PC,BODY) static Block old_##NAME;static void NAME(Context& c){BODY old_##NAME(c);}
 // 抛物线弹体保持垂直轨迹，水平位移按射程倍率缩放。
@@ -526,6 +555,8 @@ HOOK(zombie_flight_clearance,0x101af795u, z_flight_clearance(c);)
 //   与按原生的竖直运动（actionMoveY(vy)、vy += 1.32）推算的剩余帧数求出浮点横移，记入 +0x30（原生的累加量，接管后不再使用），
 //   +0x1c 记为 2；之后每帧 actionMoveX(横移)、actionMoveY(vy)、vy += 1.32，adjustHitGround 着地时预约状态 61。
 //   落点距离（自投出点）因此等于目的距离（误差在 1 个世界单位内）。
+//   剩余帧数只在下落段（本帧竖直位移大于 0）判定到达落点地面（2026-10-21 r75）：向高处投掷时（自制坡道战场，落点地面高于出手后的弹体），
+//   上升段第 1 帧即满足 y 不小于落点地面，原先求得 1 帧，横移等于整段剩余距离，弹体此后每帧以该横移飞出战场。
 // - 落地：弹体的框碰到地面时原生调用 BulletAction_NativeBird::hitGround（0x16d8e8，预约状态 60），本钩子改为预约状态 61；
 //   弹体中心到达地面时 update 自身的 adjustHitGround 也预约 60（位置已贴地）。碰到敌人时 BattleBulletDefault::attackAction
 //   （0x175e04）预约 60（位置在空中）。
@@ -580,7 +611,7 @@ static void l_flight(Context& c,uint32_t b){
   int32_t moved=int32_t(rd<uint32_t>(c,b+0x2cu))>>8;
   float rest=float(int32_t(rd<uint32_t>(c,b+0x34u))-moved),x=rd<float>(c,b+0x8cu),y=rd<float>(c,b+0x90u),vy=rd<float>(c,b+0x3cu);
   float ground=float(l_altitude(c,x+dir*rest));int n=0;
-  while(n<600){y+=vy;vy+=L_GRAVITY;++n;if(y>=ground)break;}
+  while(n<600){float step=vy;y+=vy;vy+=L_GRAVITY;++n;if(step>0.0f&&y>=ground)break;}
   wr<float>(c,b+0x30u,rest>0.0f?rest/float(n):0.0f);wr<uint32_t>(c,b+0x1cu,2u);
  }
  msd_guest_call(c,L_MOVE_X,b,l_bits(dir*rd<float>(c,b+0x30u)),0u,0xffffffffu,nullptr);
@@ -646,6 +677,295 @@ static bool item_hit_exempt(Context& c){
 static Block old_item_hit_base;static uint32_t item_hit_hooks=0u;
 static void item_hit_base(Context& c){if(item_hit_exempt(c))return;old_item_hit_base(c);}
 extern "C" __declspec(dllexport) uint32_t msd_community_item_exempt_version(){return item_hit_hooks==1u?1u:0u;}
+// 工兵受击（2026-10-20）：BattleAction_Kouhei::damageAction（0x16d772）每次受击都预约状态 100（撤退），与生命无关。
+// 按生命计算的单位（头部 +176 表）在原生扣血之后生命仍大于 0 时只播放受击闪光（同 BattleObject::playHitEffect 0x1de114：+0x110 写 4.0），
+// 继续行进或修筑；生命耗尽时按原生撤退。不在表中的单位保持原生。
+static Block old_engineer_damage;static uint32_t engineer_hooks=0u;
+static void engineer_damage(Context& c){
+ uint32_t o=c.r[1];
+ if(o&&engineer_entry(c,rd<uint32_t>(c,o+0x128u))&&rd<int32_t>(c,o+0x308u)>0){wr<uint32_t>(c,o+0x110u,0x40800000u);c.pc=c.r[14];return;}
+ old_engineer_damage(c);
+}
+extern "C" __declspec(dllexport) uint32_t msd_community_engineer_hp_version(){return engineer_hooks==1u?1u:0u;}
+// ---------- IRON SENTINEL（钢铁哨兵，2026-10-21，行为库 v12：iron_slider / iron_slider_second_form）----------
+// MSD 1.46 原生保留未发布的 IRON SLIDER（UnitID 394/395）的动作类 BattleAction_IronSlider / _2 与弹体类
+// BulletAction_IronSlider_Atack_L/SP/S/S_SUB/2/2_SUB，是 MSA 7.13.0 同名类的较早版本。社区单位以这两个动作类运行
+// （加载器以行为写入动作对象），脚本为 MSA 7.13 的动作记录（编号不变）。以下钩子把较早版本与 MSA 7.13 的差异按 MSA 处理：
+//  1 setAnimationID：原生请求的槽号换成 MSA 槽号（第一形态 8→9；第二形态 94/95/96/97→17/18/19/21；主炮导弹 52→14；
+//    巨型导弹 77→25、84→23；侧炮炮弹 43→共用爆炸 0xff03 + 槽 15）。
+//  2 BattleAction_IronSlider::createObject：MSA 编号（侧炮 50/56/105/111/117/124/130/136、火箭 60、主炮导弹 64、残片 72/73），
+//    其他编号不建立对象（同 MSA）。火箭另记录 VALS：+0x1c 发射时单位 x、+0x20 投射距离（字 26）、+0x24 攻击距离边缘的 x
+//    （单位 x ± (半宽 + 字 7)）。
+//  3 BattleAction_IronSlider_2::createObject：MSA 编号 24（巨型导弹，参数 40）。
+//  4 summonUnit 调用 createChildObject 时（返回地址 0x101bdadd）：原生写死的 395 换成第一形态状态 +0xa0 的子单位（第二形态）。
+//  5 两个 update 首次调用 setImageOffsetPosition 时：取消较早版本的 (0,30) 绘制偏移（MSA 无此偏移）。
+//  6 BulletAction_IronSlider_Atack_L::update：状态 40 首帧按 MSA 重新进入（y = 舞台上沿 65 − 80，动作 61）并瞄准对方最前方单位
+//    （BattleObjectManager +0x38/+0x3c，瞄准其中心，角度按 MSA 限定在朝下一侧）；目标超出攻击距离边缘时落向边缘的地面。
+//    之后水平飞离发射点达投射距离即爆炸。命中 / 失效 / 落地（60/140/200）在 (20,20) 生成共用爆炸 0xff03。
+//  7 BulletAction_IronSlider_Atack_SP::update：60/140/200 在 (0,20) 生成本单位的爆炸动作 103（带攻击框，同 MSA）后移除。
+//  （以下 2026-10-21 R4，核心 r74）
+//  8 summonUnit 中 createChildObject 返回后（0x101bdadc）：第一形态并非因生命耗尽而损毁（据点被毁时生命仍大于 0），或本方据点
+//    生命已为 0（战斗结束后新单位不再由状态 0 进入待机），第二形态立即预约状态 100，播放其损毁动作后移除。
+//  9 update 中 summonUnit 返回后（0x101bddc4）：第一形态不在召唤的同一帧移除，改预约状态 140（原生：动画结束即移除），于下一帧移除。
+//    第二形态在被召唤的帧尚未更新、不绘制，原先这一帧画面中没有车体（闪现）。
+// 10 BulletAction_IronSlider_Atack_2::update 状态 40（巨型导弹自舞台上方斜落；原生与 MSA 只在进入下落时按对方最前方单位的位置
+//    定一次起点）：每 tick 按对方最前方单位当前的 x 重设水平速度，使导弹在该单位所在处落地（竖直速度不变，水平速度不超过竖直速度）。
+// 只读写客体对象内存，无静态状态（回滚快照随客体内存保存）。
+static constexpr uint32_t IS_VT1=0x1092db60u,IS_VT2=0x1092db90u;
+static constexpr uint32_t IS_ACT_2=0x109601f8u,IS_ACT_SP=0x10960200u,IS_ACT_L=0x10960204u,IS_ACT_S=0x10960208u,IS_ACT_SSUB=0x1096020cu;
+static constexpr uint32_t IS_ADD_EFFECT=0x10181cd4u,IS_FALLOUT=0x1018fd68u,IS_WIDTH=0x101ddb2eu,IS_HEIGHT=0x101ddb4au,
+ IS_ATAN=0x1013fd60u,IS_COS=0x1013fc14u,IS_SIN=0x1013fc54u,IS_MOVE_X=0x101dde10u,IS_MOVE_Y=0x101dde4eu,
+ IS_NOT_AIM=0x1017f728u,IS_SET_ANIM=0x101de016u,IS_KILL=0x101dd86cu,IS_STAGE=0x101e1ae0u,IS_ALTITUDE=0x101e1c72u,
+ IS_MANAGER=0x10977f50u,IS_RESERVE=0x101dda28u,IS_TEAM_UNITS=0x101df318u;
+static uint32_t iron_slider_hooks=0u;
+static uint32_t is_class(Context& c,uint32_t obj){
+ uint32_t act=obj?rd<uint32_t>(c,obj+0x58u):0u;   // BattleObject::initialize：+0x58 动作对象、+0x5c 精灵、+0x70 队伍
+ return act>=0x10000000u&&act<0x20000000u?rd<uint32_t>(c,act):0u;
+}
+static uint32_t is_status(Context& c,uint32_t obj,uint32_t word){
+ return rd<uint32_t>(c,obj+0x128u+0xecu*rd<uint32_t>(c,obj+0x300u)+word*4u);
+}
+static void is_effect(Context& c,uint32_t act,uint32_t obj,int32_t x,int32_t y,uint32_t id){
+ const uint32_t stack[3]={0u,id,0xffffffffu};
+ msd_guest_call_stack(c,IS_ADD_EFFECT,act,obj,uint32_t(x),uint32_t(y),stack,3u,nullptr);
+}
+static uint32_t is_call(Context& c,uint32_t fn,uint32_t a0,uint32_t a1=0u,uint32_t a2=0u,uint32_t a3=0u){
+ uint32_t r=0u;msd_guest_call(c,fn,a0,a1,a2,a3,&r);return r;
+}
+static void is_anim(Context& c){
+ if(!active(c))return;
+ uint32_t obj=c.r[0],act=rd<uint32_t>(c,obj+0x58u),slot=c.r[1];
+ if(act==IS_ACT_SP){if(slot==52u)c.r[1]=14u;return;}
+ if(act==IS_ACT_2){if(slot==77u)c.r[1]=25u;else if(slot==84u)c.r[1]=23u;return;}
+ if(act==IS_ACT_SSUB){if(slot==43u){is_effect(c,act,obj,0,0,0xff03u);c.r[1]=15u;}return;}
+ uint32_t vt=is_class(c,obj);
+ if(vt==IS_VT1){if(slot==8u)c.r[1]=9u;}
+ else if(vt==IS_VT2&&slot>=94u&&slot<=97u){static const uint32_t form2[4]={17u,18u,19u,21u};c.r[1]=form2[slot-94u];}
+}
+HOOK(iron_slider_anim,0x101de017u, is_anim(c);)
+// createObject(this, 对象, 编号, x, 栈 [0] y, 栈 [4] z) → addBulletNotAim(this, 对象, x, y, z, 编号, 弹体动作, 参数)。
+static bool is_create1(Context& c){
+ if(!active(c)||rd<uint32_t>(c,c.r[0])!=IS_VT1)return false;
+ uint32_t act=c.r[0],obj=c.r[1],id=c.r[2],x=c.r[3],sp=c.r[13],y=rd<uint32_t>(c,sp),z=rd<uint32_t>(c,sp+4u);
+ uint32_t bullet_action=0u,param=0u;
+ switch(id){
+  case 50u:case 56u:case 105u:case 111u:case 117u:case 124u:case 130u:case 136u:bullet_action=IS_ACT_S;param=30u;break;
+  case 60u:bullet_action=IS_ACT_L;break;
+  case 64u:bullet_action=IS_ACT_SP;break;
+  case 72u:case 73u:{const uint32_t stack[4]={z,id,0xffffffffu,0xffffffffu};
+   msd_guest_call_stack(c,IS_FALLOUT,act,obj,x,y,stack,4u,nullptr);break;}
+  default:break;
+ }
+ if(bullet_action){
+  const uint32_t stack[4]={z,id,bullet_action,param};uint32_t bullet=0u;
+  msd_guest_call_stack(c,IS_NOT_AIM,act,obj,x,y,stack,4u,&bullet);
+  if(bullet&&id==60u){
+   int32_t ux=int32_t(rd<float>(c,obj+0x8cu)),half=int32_t(is_call(c,IS_WIDTH,obj));
+   int32_t reach=half+int32_t(is_status(c,obj,7u)),dir=rd<uint32_t>(c,obj+0x78u)==0x5au?1:-1;
+   wr<int32_t>(c,bullet+0x1cu,ux);wr<int32_t>(c,bullet+0x20u,int32_t(is_status(c,obj,26u)));wr<int32_t>(c,bullet+0x24u,ux+dir*reach);
+  }
+ }
+ c.pc=c.r[14];return true;
+}
+static Block old_iron_slider_create1;static void iron_slider_create1(Context& c){if(is_create1(c))return;old_iron_slider_create1(c);}
+static bool is_create2(Context& c){
+ if(!active(c)||rd<uint32_t>(c,c.r[0])!=IS_VT2)return false;
+ if(c.r[2]==24u){
+  uint32_t sp=c.r[13];const uint32_t stack[4]={rd<uint32_t>(c,sp+4u),24u,IS_ACT_2,40u};
+  msd_guest_call_stack(c,IS_NOT_AIM,c.r[0],c.r[1],c.r[3],rd<uint32_t>(c,sp),stack,4u,nullptr);
+ }
+ c.pc=c.r[14];return true;
+}
+static Block old_iron_slider_create2;static void iron_slider_create2(Context& c){if(is_create2(c))return;old_iron_slider_create2(c);}
+HOOK(iron_slider_summon,0x101de225u,
+ if(active(c)&&c.r[14]==0x101bdaddu){uint32_t child=is_status(c,c.r[0],40u);if(child>=U&&record(c,child))c.r[1]=child;})
+HOOK(iron_slider_offset,0x101de193u, if(active(c)&&(c.r[14]==0x101bdb0bu||c.r[14]==0x101996a9u))c.r[2]=0u;)
+static bool is_rocket(Context& c){
+ if(!active(c)||c.r[0]!=IS_ACT_L)return false;
+ uint32_t act=c.r[0],b=c.r[1],state=c.r[2];
+ if(state==60u||state==140u||state==200u){is_effect(c,act,b,20,20,0xff03u);is_call(c,IS_KILL,b);c.pc=c.r[14];return true;}
+ if(state!=40u)return false;   // 20：原生（升出舞台上沿后进入 40）
+ if(c.r[3]==0u){
+  const float top=-15.0f;   // MSA：舞台上沿 65 − 80
+  float x=rd<float>(c,b+0x8cu);
+  wr<float>(c,b+0x90u,top);wr<float>(c,b+0x98u,top);
+  is_call(c,IS_SET_ANIM,b,61u,0u,1u);
+  bool right=rd<uint32_t>(c,b+0x78u)==0x5au;
+  int32_t limit=rd<int32_t>(c,b+0x24u);
+  uint32_t team=rd<uint32_t>(c,b+0x70u)&1u,t=rd<uint32_t>(c,IS_MANAGER+0x38u+(team^1u)*4u);
+  float tx=float(limit),ty=0.0f;bool aimed=false;
+  if(t){
+   float ex=rd<float>(c,t+0x8cu),half=float(int32_t(is_call(c,IS_WIDTH,t)));
+   if(right?ex-half<=float(limit):ex+half>=float(limit)){
+    tx=ex;ty=float(int32_t(rd<float>(c,t+0x90u))-(int32_t(is_call(c,IS_HEIGHT,t))>>1));aimed=true;
+   }
+  }
+  if(!aimed){
+   uint32_t stage=is_call(c,IS_STAGE,0u);
+   ty=stage?float(int32_t(is_call(c,IS_ALTITUDE,stage,uint32_t(limit),1u))):0.0f;
+  }
+  uint32_t raw=is_call(c,IS_ATAN,uint32_t(int32_t(tx-x)),uint32_t(int32_t(ty-top))),a=raw&0xfffu;
+  if(right)a=(raw&0xc00u)==0x800u?0xc00u:(a<0x400u?a:0x400u);
+  else a=a>0xc00u?0xc00u:(a>0x400u?a:0x400u);
+  float speed=rd<float>(c,b+0x138u);if(!(speed>0.0f))speed=20.0f;
+  float vx=float(int32_t(is_call(c,IS_COS,a)))*(1.0f/4096.0f)*speed,vy=float(int32_t(is_call(c,IS_SIN,a)))*(1.0f/4096.0f)*speed;
+  msd_guest_call(c,IS_MOVE_X,b,l_bits(vx),0u,0xffffffffu,nullptr);
+  msd_guest_call(c,IS_MOVE_Y,b,l_bits(vy),0u,0xffffffffu,nullptr);
+ }else{
+  int32_t start=rd<int32_t>(c,b+0x1cu),dist=rd<int32_t>(c,b+0x20u),x=int32_t(rd<float>(c,b+0x8cu));
+  if(std::abs(start-x)>=dist){is_effect(c,act,b,20,20,0xff03u);is_call(c,IS_KILL,b);}
+ }
+ c.pc=c.r[14];return true;
+}
+static Block old_iron_slider_rocket;static void iron_slider_rocket(Context& c){if(is_rocket(c))return;old_iron_slider_rocket(c);}
+static bool is_missile(Context& c){
+ if(!active(c)||c.r[0]!=IS_ACT_SP)return false;
+ uint32_t state=c.r[2];if(state!=60u&&state!=140u&&state!=200u)return false;
+ is_effect(c,c.r[0],c.r[1],0,20,103u);is_call(c,IS_KILL,c.r[1]);c.pc=c.r[14];return true;
+}
+static Block old_iron_slider_missile;static void iron_slider_missile(Context& c){if(is_missile(c))return;old_iron_slider_missile(c);}
+static void is_spawn(Context& c,uint32_t child,uint32_t obj){
+ uint32_t base=is_call(c,IS_TEAM_UNITS,IS_MANAGER,rd<uint32_t>(c,obj+0x70u),0u);   // 队伍单位链表首项为据点
+ if(rd<int32_t>(c,obj+0x308u)>0||(base&&rd<int32_t>(c,base+0x308u)<=0))is_call(c,IS_RESERVE,child,100u,0u);
+}
+HOOK(iron_slider_spawn,0x101bdaddu, if(active(c)&&c.r[0]&&is_class(c,c.r[4])==IS_VT1)is_spawn(c,c.r[0],c.r[4]);)
+HOOK(iron_slider_handoff,0x101bddc5u, if(active(c)&&is_class(c,c.r[4])==IS_VT1){is_call(c,IS_RESERVE,c.r[4],140u,0u);c.pc=0x101bddcbu;return;})
+static void is_giant(Context& c){
+ if(!active(c)||c.r[0]!=IS_ACT_2||c.r[2]!=40u)return;
+ uint32_t b=c.r[1],t=rd<uint32_t>(c,IS_MANAGER+0x38u+((rd<uint32_t>(c,b+0x70u)&1u)^1u)*4u);
+ float vy=rd<float>(c,b+0xa8u);
+ if(!t||!(vy>0.0f))return;
+ uint32_t stage=is_call(c,IS_STAGE,0u);
+ float tx=rd<float>(c,t+0x8cu),x=rd<float>(c,b+0x8cu),y=rd<float>(c,b+0x90u);
+ float ground=stage?float(int32_t(is_call(c,IS_ALTITUDE,stage,uint32_t(int32_t(tx)),1u))):rd<float>(c,t+0x90u),ticks=(ground-y)/vy;
+ if(!(ticks>=1.0f))return;
+ float vx=std::max(-vy,std::min(vy,(tx-x)/ticks));
+ msd_guest_call(c,IS_MOVE_X,b,l_bits(vx),0u,0xffffffffu,nullptr);
+}
+HOOK(iron_slider_giant,0x10177b21u, is_giant(c);)
+extern "C" __declspec(dllexport) uint32_t msd_community_iron_slider_version(){return iron_slider_hooks==10u?1u:0u;}
+// 高分辨率战场（2026-10-19，MS6 关卡移植 S0）：头部 +172 为自制场景（ID ≥ 138）逐场景的标记字节表，位 0 表示图集按 2 倍精灵比例制作。
+// BattleStageBase::drawBack / drawFront 的绘制块（0x1e147c / 0x1e1518）以 s16（BattleStageBase +0x10 的战斗缩放 2.0）作为 drawConv 的
+// 横纵缩放，纵向基准 s18（缩放 ×32）与横向镜头偏移 r9 在此前已算好。带标记的场景只把图块缩放减半：1 个图集像素对应 1 个逻辑单位，
+// 纵向基准仍为 64，镜头、边界、地形与据点坐标不变。原版场景与未标记的自制场景保持原路径。
+static bool stage_hires(Context& c,uint32_t base){
+ if(!active(c)||!head(c,172u))return false;
+ uint32_t id=rd<uint32_t>(c,base+8u);
+ if(id<138u||id>=138u+head(c,68))return false;
+ return (rd<uint8_t>(c,head(c,172u)+id-138u)&1u)!=0u;
+}
+static Block old_stage_back_draw,old_stage_front_draw;static uint32_t stage_scale_hooks=0u;
+static void stage_back_draw(Context& c){if(stage_hires(c,c.r[4]))setfs(c,16,fs(c,16)*0.5f);old_stage_back_draw(c);}
+static void stage_front_draw(Context& c){if(stage_hires(c,c.r[4]))setfs(c,16,fs(c,16)*0.5f);old_stage_front_draw(c);}
+extern "C" __declspec(dllexport) uint32_t msd_community_stage_scale_version(){return stage_scale_hooks==2u?1u:0u;}
+// 自制战场的地形跟随（2026-10-20，里世界 4 实机反馈：坡道上被击退的单位只横向位移、偏离地形线，向上坡被推开后可能卡住）。
+// 原生 BattleObject::update（0x1dd874）先把待定位置（+0x94 / +0x98）提交为当前位置（+0x8c / +0x90），再按动画脚本的移动参数（op7）
+// 推进待定 x；待定 y 只在各单位动作类调用 BattleCommonActions::actionMove 时改为地形高度。多数动作类在受击击退（状态 80）等滑行中
+// 不调用，单位在坡道上只横向位移：下坡时悬空，上坡时低于地形；低于地形超过 40 后 actionMove 把前方视为高台而清除移动，单位停在原地。
+// 自制场景（ID ≥ 138）中，贴地的单位（当前 y 与所在 x 的地形相差不超过 2，未在下落）本帧有横向待定位移而没有纵向位移时，把待定 y
+// 改为待定 x 处的地形高度；单步高差超过 40 时保持原生处理。空中单位、跳跃与下落不受影响，原版场景保持原路径。
+static constexpr uint32_t BATTLE_STAGE=0x1097a714u;   // BattleStage::getInstance() 返回的静态对象
+static bool custom_stage(Context& c){
+ if(!active(c))return false;
+ uint32_t base=rd<uint32_t>(c,BATTLE_STAGE+0xcu);if(!base)return false;
+ uint32_t id=rd<uint32_t>(c,base+8u);
+ return id>=138u&&id<138u+head(c,68);
+}
+// 与 BattleStage::getAltitude(x,true)（0x1e1c72）相同的计算：x 限制在 [0, +0x18]，按地形点（+0x14，每点 x、y）线性插值并向零取整。
+static int32_t stage_altitude(Context& c,int32_t x){
+ const uint32_t s=BATTLE_STAGE;
+ if(x<0)x=0;
+ int32_t w=int32_t(rd<uint32_t>(c,s+0x18u));if(x>=w)x=w;
+ if(rd<uint32_t>(c,s+8u)==0x14u&&x>=int32_t(rd<uint32_t>(c,s+0x20u)))return 9999;
+ uint32_t q=rd<uint32_t>(c,s+0x14u);
+ for(uint32_t i=0;i<8192u;++i,q+=8u){
+  int32_t x0=int32_t(rd<uint32_t>(c,q)),x1=int32_t(rd<uint32_t>(c,q+8u));
+  if(x0<=x&&x<=x1){
+   int32_t y0=int32_t(rd<uint32_t>(c,q+4u)),y1=int32_t(rd<uint32_t>(c,q+12u));
+   if(y0==y1)return y0;
+   return y0+int32_t(float(x-x0)/float(x1-x0)*float(y1-y0));
+  }
+ }
+ return int32_t(rd<uint32_t>(c,rd<uint32_t>(c,s+0x14u)+4u));
+}
+static void ground_follow(Context& c){
+ uint32_t o=c.r[0];
+ if(rd<uint32_t>(c,o)!=head(c,84u)||!rd<uint8_t>(c,o+0x64u)||rd<uint8_t>(c,o+0x117u))return;
+ float x0=rd<float>(c,o+0x8cu),x1=rd<float>(c,o+0x94u),y0=rd<float>(c,o+0x90u),y1=rd<float>(c,o+0x98u);
+ if(x1==x0||y1!=y0||rd<float>(c,o+0x68u)!=0.0f||!custom_stage(c))return;
+ float d=y0-float(stage_altitude(c,int32_t(x0)));if(d>2.0f||d<-2.0f)return;
+ float there=float(stage_altitude(c,int32_t(x1)));d=there-y0;if(d>40.0f||d<-40.0f)return;
+ wr<float>(c,o+0x98u,there);
+}
+// 出兵高度：原生 BattleObjectManager::createUnit（0x1df344）把新单位放在据点前缘（据点 x ± (据点宽 − 单位宽) ∓ 2），y 直接取据点的 y。
+// 自制场景中，据点在地面且单位的起始处理没有另行设定高度时，y 改为出兵点的地形高度（据点前后不平坦的战场不再把单位放进地形之下）。
+static void spawn_ground(Context& c){
+ uint32_t u=c.r[4],k=c.r[7];
+ if(!k||rd<uint32_t>(c,u)!=head(c,84u)||!custom_stage(c))return;
+ float ky=rd<float>(c,k+0x90u);
+ if(rd<float>(c,u+0x90u)!=ky||rd<float>(c,u+0x98u)!=ky)return;
+ float d=ky-float(stage_altitude(c,int32_t(rd<float>(c,k+0x8cu))));if(d>2.0f||d<-2.0f)return;
+ int32_t a=stage_altitude(c,int32_t(rd<float>(c,u+0x8cu)));
+ wr<float>(c,u+0x90u,float(a));wr<float>(c,u+0x98u,float(a));
+ if(int32_t(rd<uint32_t>(c,u+0x3e0u))==int32_t(ky))wr<uint32_t>(c,u+0x3e0u,uint32_t(a));
+}
+// 子单位高度：原生 BattleObject::createChildObject(UnitID,int,int,int,bool)（0x1de224）把子单位放在父对象 x ± dx、y + dy（dy 为
+// 第 5 个参数，位于栈 +16）。正规军运兵车（UnitID 396，BattleAction_TruckSlug::update 0x194446）放兵时 dx 为车宽 + 45、dy 为 0，
+// 步兵直接取车的高度；车在坡道上时放兵点的地形可能比车高出 40 以上，步兵此后每一步都被 actionMove 视为高台而停在原地。
+// 自制场景中，父对象为该动作类（动作对象 +0x58 的虚表为 BattleAction_TruckSlug，0x1092dbc0）、在地面且 dy 为 0 时，把子单位的 y 改为
+// 其所在 x 的地形高度。其他放兵单位的动作类自行处理（例如修筑类在创建后再移动子单位的 x），不经此改写。
+// 原生写入位置与返回在同一块中（0x1de248 方向非 90、0x1de252 方向 90），此处在原块执行之后改写。
+static constexpr uint32_t TRUCK_SLUG_VTABLE=0x1092dbc0u;
+static void child_ground(Context& c,uint32_t child,uint32_t parent,uint32_t dy){
+ if(!child||dy||rd<uint32_t>(c,child)!=head(c,84u)||!custom_stage(c))return;
+ uint32_t action=rd<uint32_t>(c,parent+0x58u);if(!action||rd<uint32_t>(c,action)!=TRUCK_SLUG_VTABLE)return;
+ float py=rd<float>(c,parent+0x90u);
+ float d=py-float(stage_altitude(c,int32_t(rd<float>(c,parent+0x8cu))));if(d>2.0f||d<-2.0f)return;
+ if(rd<float>(c,child+0x90u)!=py)return;
+ float a=float(stage_altitude(c,int32_t(rd<float>(c,child+0x8cu))));
+ wr<float>(c,child+0x90u,a);wr<float>(c,child+0x98u,a);
+}
+static Block old_ground_follow_update,old_spawn_ground_height,old_child_left,old_child_right;static uint32_t ground_follow_hooks=0u;
+static void ground_follow_update(Context& c){ground_follow(c);old_ground_follow_update(c);}
+static void spawn_ground_height(Context& c){spawn_ground(c);old_spawn_ground_height(c);}
+static void child_left(Context& c){uint32_t ch=c.r[0],pa=c.r[4],dy=rd<uint32_t>(c,c.r[13]+16u);old_child_left(c);child_ground(c,ch,pa,dy);}
+static void child_right(Context& c){uint32_t ch=c.r[0],pa=c.r[4],dy=rd<uint32_t>(c,c.r[13]+16u);old_child_right(c);child_ground(c,ch,pa,dy);}
+extern "C" __declspec(dllexport) uint32_t msd_community_ground_follow_version(){return ground_follow_hooks==4u?1u:0u;}
+// 效果贴地（ground_hugging_effect，标记 32768，ZSpec 字 42 = 效果动作号 + 1；2026-10-21 辣椒僵尸的火焰在坡道上穿地）。
+// 原生 BattleCommonActions::addEffectImpl（0x181c1e）把脚本 op12 的效果放在单位 x ± dx、y + dy，横向排开的火焰带因此是一条
+// 位于单位高度的水平线。绘制路径：BattleObject::draw（0x1ddd00）→ 效果默认动作 BattleEffectDefault::draw（0x16f990：r1 对象、
+// r2 精灵、r3 世界 x，栈 [0] 世界 y、[4] / [8] 镜头 x / y）→ BattleSprite::drawImpl（0x1db920）逐分件调用 GraphicsOpt::drawConv
+// （0x1dbab6 起的块设置参数：r2 / r3 为分件原点的屏幕 x / y 浮点位，栈 [0] 为 C_CONV（短整数：矩形 x、y、宽、高，锚点 x、y，
+// 翻转标志，图像号），[4] 为横向比例，[16] 为翻转方式）。带此标记的单位所生成、当前动作号为该槽的效果，在 drawConv 之前把各分件的
+// y 平移 地形高度（分件中心的世界 x 处，BattleStage::getAltitude 同算法）− 效果的世界 y，分件铺在所在位置的地表上。
+// 只改绘制，不写客体内存（对象坐标、攻击框、回滚快照不变）；动作浏览中按原样绘制。
+static constexpr uint32_t Z_GROUND_EFFECT=32768u;
+static uint32_t hug_sprite=0u;static int32_t hug_y=0,hug_camera=0;
+static void hug_effect_begin(Context& c){
+ hug_sprite=0u;
+ uint32_t obj=c.r[1];
+ if(!active(c)||!head(c,168u)||!obj||z_viewer(c))return;
+ uint32_t uid=rd<uint32_t>(c,obj+0x128u);if(!record(c,uid))return;
+ uint32_t s=rd<uint32_t>(c,head(c,168u)+(uid-U)*4u);
+ if(!s||!(zw(c,s,0)&Z_GROUND_EFFECT)||rd<uint32_t>(c,obj+0xc4u)+1u!=zw(c,s,42))return;
+ if(!rd<uint32_t>(c,BATTLE_STAGE+0x14u)||!rd<uint32_t>(c,BATTLE_STAGE+0x18u))return;
+ hug_sprite=c.r[2];hug_y=int32_t(rd<uint32_t>(c,c.r[13]));hug_camera=int32_t(rd<uint32_t>(c,c.r[13]+4u));
+}
+static void hug_effect_part(Context& c){
+ if(!hug_sprite||c.r[4]!=hug_sprite)return;
+ uint32_t sp=c.r[13],conv=rd<uint32_t>(c,sp);
+ uint32_t flip=rd<uint32_t>(c,sp+16u)^uint32_t(int32_t(rd<int16_t>(c,conv+12u)));
+ float sx=rd<float>(c,sp+4u);if(flip&1u)sx=-sx;if(flip&8u)sx=-sx;
+ float x,y;std::memcpy(&x,&c.r[2],4);std::memcpy(&y,&c.r[3],4);
+ float cx=x+sx*(float(rd<int16_t>(c,conv+4u))*0.5f-float(rd<int16_t>(c,conv+8u)));
+ int32_t a=stage_altitude(c,int32_t(std::floor(cx))+hug_camera);if(a==9999)return;
+ y+=float(a-hug_y);std::memcpy(&c.r[3],&y,4);
+}
+static Block old_hug_effect_draw,old_hug_effect_conv,old_hug_effect_done;static uint32_t hug_effect_hooks=0u;
+static void hug_effect_draw(Context& c){hug_effect_begin(c);old_hug_effect_draw(c);}
+static void hug_effect_conv(Context& c){old_hug_effect_conv(c);hug_effect_part(c);}
+static void hug_effect_done(Context& c){hug_sprite=0u;old_hug_effect_done(c);}
+extern "C" __declspec(dllexport) uint32_t msd_community_ground_effect_version(){return hug_effect_hooks==3u?1u:0u;}
 // 伞兵落地时，原生动作固定生成 UnitID 45；社区映射保留其正规军身份。投出子单位的生命分档单位同样经此映射（落地映射表登记子单位）。
 HOOK(paratrooper_landing,0x101de225u, uint32_t uid=rd<uint32_t>(c,c.r[0]+0x128u);uint32_t p=record(c,uid);if(p&&(rd<uint32_t>(c,p+4u)==160u||z_throws(c,c.r[0]))&&c.r[1]==45u&&head(c,100)){uint32_t target=rd<uint32_t>(c,head(c,100)+(uid-U)*4u);if(target)c.r[1]=target;})
 extern "C" __declspec(dllexport) uint32_t msd_community_paratrooper_landing_version(){return 1u;}

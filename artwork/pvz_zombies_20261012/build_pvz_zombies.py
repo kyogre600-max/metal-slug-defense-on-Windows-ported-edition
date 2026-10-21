@@ -1349,7 +1349,9 @@ NEW_UNITS = {
     'jalapeno': dict(ap=200, price=250, hp=[75, 17], dmg=[1, 1], interval_ratio=[33, 65], attributes={'normal': 1},
                      words={'7': BITE_RANGE, '24': 999, '31': 999, '27': 1, '34': 1, '29': 0, '35': 0, '36': 0},
                      behaviors=[{'name': 'self_destruct_attack', 'version': 1, 'params': {}},
-                                {'name': 'ground_only_attack', 'version': 1, 'params': {}}]),
+                                {'name': 'ground_only_attack', 'version': 1, 'params': {}},
+                                # 2026-10-21：火焰带各分件按所在位置的地形高度绘制（坡道上不穿地、不悬空）
+                                {'name': 'ground_hugging_effect', 'version': 1, 'params': {'animation': FLAME_SLOT}}]),
     'squash': dict(ap=150, price=200, hp=[225, 68], dmg=[7, 2], interval_ratio=[24, 65],
                    words={'7': SMASH_RANGE, '24': 999, '31': 999, '27': 1, '34': 1, '29': 0, '35': 0, '36': 0},
                    behaviors=[{'name': 'self_destruct_attack', 'version': 1, 'params': {}}]),

@@ -1,0 +1,1887 @@
+{
+ "walk": [
+  {
+   "file": "walk_00.png",
+   "ax": 86,
+   "ay": 206,
+   "size": [
+    177,
+    206
+   ],
+   "body": [
+    23,
+    0
+   ],
+   "body_match": 0.873
+  },
+  {
+   "file": "walk_01.png",
+   "ax": 82,
+   "ay": 205,
+   "size": [
+    163,
+    205
+   ],
+   "body": [
+    19,
+    0
+   ],
+   "body_match": 0.876
+  },
+  {
+   "file": "walk_02.png",
+   "ax": 77,
+   "ay": 206,
+   "size": [
+    154,
+    206
+   ],
+   "body": [
+    14,
+    0
+   ],
+   "body_match": 0.877
+  },
+  {
+   "file": "walk_03.png",
+   "ax": 72,
+   "ay": 203,
+   "size": [
+    154,
+    203
+   ],
+   "body": [
+    9,
+    0
+   ],
+   "body_match": 0.871
+  },
+  {
+   "file": "walk_04.png",
+   "ax": 63,
+   "ay": 204,
+   "size": [
+    153,
+    204
+   ],
+   "body": [
+    0,
+    0
+   ],
+   "body_match": 0.861
+  },
+  {
+   "file": "walk_05.png",
+   "ax": 68,
+   "ay": 205,
+   "size": [
+    164,
+    205
+   ],
+   "body": [
+    5,
+    0
+   ],
+   "body_match": 0.864
+  },
+  {
+   "file": "walk_06.png",
+   "ax": 74,
+   "ay": 207,
+   "size": [
+    176,
+    207
+   ],
+   "body": [
+    11,
+    0
+   ],
+   "body_match": 0.872
+  },
+  {
+   "file": "walk_07.png",
+   "ax": 79,
+   "ay": 207,
+   "size": [
+    178,
+    207
+   ],
+   "body": [
+    16,
+    0
+   ],
+   "body_match": 0.874
+  }
+ ],
+ "legs": [
+  {
+   "file": "legs_00.png",
+   "ax": 3,
+   "ay": 126,
+   "size": [
+    94,
+    126
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_01.png",
+   "ax": 2,
+   "ay": 124,
+   "size": [
+    83,
+    124
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_02.png",
+   "ax": 2,
+   "ay": 125,
+   "size": [
+    79,
+    125
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_03.png",
+   "ax": 2,
+   "ay": 122,
+   "size": [
+    84,
+    122
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_04.png",
+   "ax": 3,
+   "ay": 123,
+   "size": [
+    93,
+    123
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_05.png",
+   "ax": 4,
+   "ay": 124,
+   "size": [
+    100,
+    124
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_06.png",
+   "ax": 4,
+   "ay": 127,
+   "size": [
+    106,
+    127
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "legs_07.png",
+   "ax": 4,
+   "ay": 126,
+   "size": [
+    103,
+    126
+   ],
+   "match": 1.0
+  }
+ ],
+ "launcher": [
+  {
+   "file": "launcher_00.png",
+   "ax": 5,
+   "ay": 198,
+   "size": [
+    61,
+    39
+   ],
+   "match": 1.0
+  },
+  {
+   "file": "launcher_01.png",
+   "ax": 5,
+   "ay": 198,
+   "size": [
+    64,
+    55
+   ]
+  },
+  {
+   "file": "launcher_02.png",
+   "ax": 5,
+   "ay": 201,
+   "size": [
+    64,
+    58
+   ]
+  },
+  {
+   "file": "launcher_03.png",
+   "ax": 5,
+   "ay": 201,
+   "size": [
+    64,
+    58
+   ]
+  },
+  {
+   "file": "launcher_04.png",
+   "ax": 5,
+   "ay": 198,
+   "size": [
+    64,
+    55
+   ]
+  },
+  {
+   "file": "launcher_05.png",
+   "ax": 5,
+   "ay": 198,
+   "size": [
+    64,
+    55
+   ]
+  },
+  {
+   "file": "launcher_06.png",
+   "ax": 5,
+   "ay": 198,
+   "size": [
+    64,
+    55
+   ]
+  }
+ ],
+ "missile_down": [
+  {
+   "file": "missile_down_00.png",
+   "ax": 11,
+   "ay": 49,
+   "size": [
+    22,
+    49
+   ]
+  },
+  {
+   "file": "missile_down_01.png",
+   "ax": 10,
+   "ay": 36,
+   "size": [
+    20,
+    36
+   ]
+  }
+ ],
+ "missile_up": [
+  {
+   "file": "missile_up_00.png",
+   "ax": 11,
+   "ay": 0,
+   "size": [
+    22,
+    49
+   ]
+  },
+  {
+   "file": "missile_up_01.png",
+   "ax": 10,
+   "ay": 0,
+   "size": [
+    20,
+    36
+   ]
+  }
+ ],
+ "missile_side": [
+  {
+   "file": "missile_side_00.png",
+   "ax": 0,
+   "ay": 11,
+   "size": [
+    58,
+    22
+   ]
+  },
+  {
+   "file": "missile_side_01.png",
+   "ax": 0,
+   "ay": 10,
+   "size": [
+    45,
+    20
+   ]
+  }
+ ],
+ "smoke": [
+  {
+   "file": "smoke_00.png",
+   "ax": 11,
+   "ay": 10,
+   "size": [
+    23,
+    20
+   ]
+  },
+  {
+   "file": "smoke_01.png",
+   "ax": 12,
+   "ay": 12,
+   "size": [
+    24,
+    24
+   ]
+  },
+  {
+   "file": "smoke_02.png",
+   "ax": 14,
+   "ay": 13,
+   "size": [
+    28,
+    27
+   ]
+  },
+  {
+   "file": "smoke_03.png",
+   "ax": 14,
+   "ay": 14,
+   "size": [
+    28,
+    29
+   ]
+  },
+  {
+   "file": "smoke_04.png",
+   "ax": 16,
+   "ay": 14,
+   "size": [
+    32,
+    29
+   ]
+  },
+  {
+   "file": "smoke_05.png",
+   "ax": 17,
+   "ay": 15,
+   "size": [
+    34,
+    30
+   ]
+  },
+  {
+   "file": "smoke_06.png",
+   "ax": 17,
+   "ay": 15,
+   "size": [
+    34,
+    30
+   ]
+  },
+  {
+   "file": "smoke_07.png",
+   "ax": 17,
+   "ay": 14,
+   "size": [
+    35,
+    29
+   ]
+  },
+  {
+   "file": "smoke_08.png",
+   "ax": 17,
+   "ay": 15,
+   "size": [
+    34,
+    30
+   ]
+  },
+  {
+   "file": "smoke_09.png",
+   "ax": 18,
+   "ay": 15,
+   "size": [
+    36,
+    30
+   ]
+  },
+  {
+   "file": "smoke_10.png",
+   "ax": 15,
+   "ay": 13,
+   "size": [
+    30,
+    26
+   ]
+  },
+  {
+   "file": "smoke_11.png",
+   "ax": 16,
+   "ay": 12,
+   "size": [
+    32,
+    25
+   ]
+  },
+  {
+   "file": "smoke_12.png",
+   "ax": 15,
+   "ay": 11,
+   "size": [
+    31,
+    22
+   ]
+  }
+ ],
+ "cannon": [
+  {
+   "file": "cannon_00.png",
+   "ax": 43,
+   "ay": 0,
+   "size": [
+    64,
+    74
+   ]
+  },
+  {
+   "file": "cannon_01.png",
+   "ax": 50,
+   "ay": 0,
+   "size": [
+    71,
+    74
+   ],
+   "part": "charge",
+   "match": 0.761
+  },
+  {
+   "file": "cannon_02.png",
+   "ax": 71,
+   "ay": 0,
+   "size": [
+    92,
+    80
+   ],
+   "part": "full",
+   "match": 0.601
+  },
+  {
+   "file": "cannon_03.png",
+   "ax": 75,
+   "ay": 0,
+   "size": [
+    96,
+    82
+   ],
+   "part": "full",
+   "match": 0.577
+  },
+  {
+   "file": "cannon_04.png",
+   "ax": 71,
+   "ay": 0,
+   "size": [
+    92,
+    79
+   ],
+   "part": "fire",
+   "match": 0.616
+  },
+  {
+   "file": "cannon_05.png",
+   "ax": 70,
+   "ay": 0,
+   "size": [
+    90,
+    79
+   ],
+   "part": "fire",
+   "match": 0.626
+  },
+  {
+   "file": "cannon_06.png",
+   "ax": 68,
+   "ay": 0,
+   "size": [
+    89,
+    79
+   ],
+   "part": "fire",
+   "match": 0.687
+  },
+  {
+   "file": "cannon_07.png",
+   "ax": 40,
+   "ay": 0,
+   "size": [
+    61,
+    78
+   ],
+   "part": "fire",
+   "match": 0.713
+  },
+  {
+   "file": "cannon_08.png",
+   "ax": 40,
+   "ay": 0,
+   "size": [
+    61,
+    76
+   ],
+   "part": "fire",
+   "match": 0.736
+  },
+  {
+   "file": "cannon_09.png",
+   "ax": 43,
+   "ay": 0,
+   "size": [
+    64,
+    74
+   ],
+   "part": "fire",
+   "match": 0.994
+  },
+  {
+   "file": "cannon_10.png",
+   "ax": 46,
+   "ay": 0,
+   "size": [
+    68,
+    74
+   ],
+   "part": "fire",
+   "match": 0.772
+  },
+  {
+   "file": "cannon_11.png",
+   "ax": 47,
+   "ay": 0,
+   "size": [
+    70,
+    73
+   ],
+   "part": "fire",
+   "match": 0.737
+  }
+ ],
+ "orb": [
+  {
+   "file": "orb_00.png",
+   "ax": 6,
+   "ay": 6,
+   "size": [
+    13,
+    13
+   ]
+  },
+  {
+   "file": "orb_01.png",
+   "ax": 12,
+   "ay": 12,
+   "size": [
+    25,
+    25
+   ]
+  },
+  {
+   "file": "orb_02.png",
+   "ax": 16,
+   "ay": 16,
+   "size": [
+    33,
+    33
+   ]
+  },
+  {
+   "file": "orb_03.png",
+   "ax": 20,
+   "ay": 20,
+   "size": [
+    41,
+    41
+   ]
+  },
+  {
+   "file": "orb_04.png",
+   "ax": 14,
+   "ay": 14,
+   "size": [
+    29,
+    29
+   ]
+  },
+  {
+   "file": "orb_05.png",
+   "ax": 18,
+   "ay": 18,
+   "size": [
+    37,
+    37
+   ]
+  },
+  {
+   "file": "orb_06.png",
+   "ax": 22,
+   "ay": 22,
+   "size": [
+    45,
+    45
+   ]
+  },
+  {
+   "file": "orb_07.png",
+   "ax": 22,
+   "ay": 22,
+   "size": [
+    45,
+    45
+   ]
+  },
+  {
+   "file": "orb_08.png",
+   "ax": 29,
+   "ay": 28,
+   "size": [
+    59,
+    57
+   ]
+  },
+  {
+   "file": "orb_09.png",
+   "ax": 27,
+   "ay": 26,
+   "size": [
+    55,
+    53
+   ]
+  },
+  {
+   "file": "orb_10.png",
+   "ax": 25,
+   "ay": 24,
+   "size": [
+    51,
+    49
+   ]
+  },
+  {
+   "file": "orb_11.png",
+   "ax": 20,
+   "ay": 20,
+   "size": [
+    41,
+    41
+   ]
+  },
+  {
+   "file": "orb_12.png",
+   "ax": 25,
+   "ay": 18,
+   "size": [
+    50,
+    37
+   ]
+  },
+  {
+   "file": "orb_13.png",
+   "ax": 23,
+   "ay": 16,
+   "size": [
+    46,
+    33
+   ]
+  },
+  {
+   "file": "orb_14.png",
+   "ax": 21,
+   "ay": 18,
+   "size": [
+    42,
+    37
+   ]
+  },
+  {
+   "file": "orb_15.png",
+   "ax": 20,
+   "ay": 20,
+   "size": [
+    41,
+    41
+   ]
+  },
+  {
+   "file": "orb_16.png",
+   "ax": 22,
+   "ay": 22,
+   "size": [
+    45,
+    45
+   ]
+  }
+ ],
+ "orb_big": [
+  {
+   "file": "orb_big_00.png",
+   "ax": 31,
+   "ay": 30,
+   "size": [
+    63,
+    61
+   ]
+  },
+  {
+   "file": "orb_big_01.png",
+   "ax": 29,
+   "ay": 28,
+   "size": [
+    59,
+    57
+   ]
+  },
+  {
+   "file": "orb_big_02.png",
+   "ax": 31,
+   "ay": 30,
+   "size": [
+    63,
+    61
+   ]
+  }
+ ],
+ "beam": [
+  {
+   "file": "beam_00.png",
+   "ax": 64,
+   "ay": 16,
+   "size": [
+    64,
+    32
+   ]
+  },
+  {
+   "file": "beam_01.png",
+   "ax": 64,
+   "ay": 12,
+   "size": [
+    64,
+    28
+   ]
+  },
+  {
+   "file": "beam_02.png",
+   "ax": 64,
+   "ay": 4,
+   "size": [
+    64,
+    20
+   ]
+  },
+  {
+   "file": "beam_03.png",
+   "ax": 64,
+   "ay": 2,
+   "size": [
+    64,
+    18
+   ]
+  },
+  {
+   "file": "beam_04.png",
+   "ax": 64,
+   "ay": -2,
+   "size": [
+    64,
+    14
+   ]
+  },
+  {
+   "file": "beam_05.png",
+   "ax": 64,
+   "ay": -6,
+   "size": [
+    64,
+    10
+   ]
+  },
+  {
+   "file": "beam_06.png",
+   "ax": 64,
+   "ay": -8,
+   "size": [
+    64,
+    8
+   ]
+  },
+  {
+   "file": "beam_07.png",
+   "ax": 64,
+   "ay": -10,
+   "size": [
+    64,
+    6
+   ]
+  },
+  {
+   "file": "beam_08.png",
+   "ax": 64,
+   "ay": -12,
+   "size": [
+    64,
+    4
+   ]
+  },
+  {
+   "file": "beam_09.png",
+   "ax": 61,
+   "ay": -14,
+   "size": [
+    61,
+    2
+   ]
+  },
+  {
+   "file": "beam_10.png",
+   "ax": 62,
+   "ay": -15,
+   "size": [
+    62,
+    1
+   ]
+  }
+ ],
+ "beam_spark": [
+  {
+   "file": "beam_spark_00.png",
+   "ax": 57,
+   "ay": 2,
+   "size": [
+    57,
+    20
+   ]
+  },
+  {
+   "file": "beam_spark_01.png",
+   "ax": 51,
+   "ay": 15,
+   "size": [
+    51,
+    32
+   ]
+  },
+  {
+   "file": "beam_spark_02.png",
+   "ax": 52,
+   "ay": 17,
+   "size": [
+    52,
+    35
+   ]
+  },
+  {
+   "file": "beam_spark_03.png",
+   "ax": 28,
+   "ay": 16,
+   "size": [
+    28,
+    34
+   ]
+  }
+ ],
+ "destroyed": [
+  {
+   "file": "destroyed_00.png",
+   "ax": 65,
+   "ay": 117,
+   "size": [
+    130,
+    117
+   ]
+  }
+ ],
+ "icon": [
+  {
+   "file": "icon_00.png",
+   "ax": 0,
+   "ay": 0,
+   "size": [
+    40,
+    40
+   ]
+  }
+ ],
+ "boom": [
+  {
+   "file": "boom_00.png",
+   "ax": 16,
+   "ay": 28,
+   "size": [
+    32,
+    32
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_01.png",
+   "ax": 16,
+   "ay": 28,
+   "size": [
+    32,
+    32
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_02.png",
+   "ax": 14,
+   "ay": 26,
+   "size": [
+    28,
+    26
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_03.png",
+   "ax": 14,
+   "ay": 27,
+   "size": [
+    30,
+    27
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_04.png",
+   "ax": 16,
+   "ay": 28,
+   "size": [
+    31,
+    28
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_05.png",
+   "ax": 15,
+   "ay": 29,
+   "size": [
+    30,
+    29
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_06.png",
+   "ax": 15,
+   "ay": 31,
+   "size": [
+    30,
+    31
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_07.png",
+   "ax": 15,
+   "ay": 32,
+   "size": [
+    30,
+    32
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_08.png",
+   "ax": 15,
+   "ay": 33,
+   "size": [
+    30,
+    33
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_09.png",
+   "ax": 15,
+   "ay": 34,
+   "size": [
+    30,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_10.png",
+   "ax": 15,
+   "ay": 34,
+   "size": [
+    30,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_11.png",
+   "ax": 15,
+   "ay": 34,
+   "size": [
+    30,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_12.png",
+   "ax": 15,
+   "ay": 36,
+   "size": [
+    29,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_13.png",
+   "ax": 15,
+   "ay": 37,
+   "size": [
+    30,
+    36
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_14.png",
+   "ax": 15,
+   "ay": 38,
+   "size": [
+    29,
+    35
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_15.png",
+   "ax": 15,
+   "ay": 39,
+   "size": [
+    28,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_16.png",
+   "ax": 14,
+   "ay": 39,
+   "size": [
+    26,
+    32
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_17.png",
+   "ax": 14,
+   "ay": 41,
+   "size": [
+    25,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_18.png",
+   "ax": 14,
+   "ay": 42,
+   "size": [
+    26,
+    34
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_19.png",
+   "ax": 14,
+   "ay": 42,
+   "size": [
+    25,
+    33
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_20.png",
+   "ax": 14,
+   "ay": 43,
+   "size": [
+    23,
+    32
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_21.png",
+   "ax": 14,
+   "ay": 44,
+   "size": [
+    22,
+    33
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_22.png",
+   "ax": 14,
+   "ay": 46,
+   "size": [
+    22,
+    31
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_23.png",
+   "ax": 14,
+   "ay": 46,
+   "size": [
+    22,
+    25
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_24.png",
+   "ax": 14,
+   "ay": 46,
+   "size": [
+    21,
+    23
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_25.png",
+   "ax": 12,
+   "ay": 46,
+   "size": [
+    18,
+    22
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_26.png",
+   "ax": 11,
+   "ay": 40,
+   "size": [
+    16,
+    15
+   ],
+   "native": [
+    402,
+    2
+   ]
+  },
+  {
+   "file": "boom_27.png",
+   "ax": 8,
+   "ay": 40,
+   "size": [
+    13,
+    13
+   ],
+   "native": [
+    402,
+    2
+   ]
+  }
+ ],
+ "blast": [
+  {
+   "file": "blast_00.png",
+   "ax": 40,
+   "ay": 76,
+   "size": [
+    80,
+    80
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_01.png",
+   "ax": 40,
+   "ay": 76,
+   "size": [
+    80,
+    80
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_02.png",
+   "ax": 36,
+   "ay": 60,
+   "size": [
+    73,
+    60
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_03.png",
+   "ax": 38,
+   "ay": 64,
+   "size": [
+    77,
+    64
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_04.png",
+   "ax": 40,
+   "ay": 67,
+   "size": [
+    80,
+    67
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_05.png",
+   "ax": 38,
+   "ay": 69,
+   "size": [
+    78,
+    69
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_06.png",
+   "ax": 39,
+   "ay": 72,
+   "size": [
+    79,
+    72
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_07.png",
+   "ax": 40,
+   "ay": 75,
+   "size": [
+    79,
+    75
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_08.png",
+   "ax": 38,
+   "ay": 77,
+   "size": [
+    75,
+    77
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_09.png",
+   "ax": 38,
+   "ay": 78,
+   "size": [
+    75,
+    78
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_10.png",
+   "ax": 38,
+   "ay": 80,
+   "size": [
+    75,
+    80
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_11.png",
+   "ax": 38,
+   "ay": 82,
+   "size": [
+    75,
+    82
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_12.png",
+   "ax": 38,
+   "ay": 86,
+   "size": [
+    74,
+    82
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_13.png",
+   "ax": 38,
+   "ay": 87,
+   "size": [
+    74,
+    83
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_14.png",
+   "ax": 38,
+   "ay": 89,
+   "size": [
+    74,
+    84
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_15.png",
+   "ax": 38,
+   "ay": 91,
+   "size": [
+    71,
+    83
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_16.png",
+   "ax": 37,
+   "ay": 92,
+   "size": [
+    67,
+    79
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_17.png",
+   "ax": 37,
+   "ay": 94,
+   "size": [
+    67,
+    81
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_18.png",
+   "ax": 37,
+   "ay": 95,
+   "size": [
+    67,
+    80
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_19.png",
+   "ax": 37,
+   "ay": 96,
+   "size": [
+    63,
+    81
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_20.png",
+   "ax": 37,
+   "ay": 97,
+   "size": [
+    58,
+    77
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_21.png",
+   "ax": 37,
+   "ay": 98,
+   "size": [
+    57,
+    77
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_22.png",
+   "ax": 37,
+   "ay": 100,
+   "size": [
+    56,
+    73
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_23.png",
+   "ax": 37,
+   "ay": 100,
+   "size": [
+    55,
+    69
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_24.png",
+   "ax": 37,
+   "ay": 101,
+   "size": [
+    54,
+    60
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_25.png",
+   "ax": 34,
+   "ay": 103,
+   "size": [
+    49,
+    60
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_26.png",
+   "ax": 34,
+   "ay": 82,
+   "size": [
+    47,
+    37
+   ],
+   "native": [
+    402,
+    4
+   ]
+  },
+  {
+   "file": "blast_27.png",
+   "ax": 34,
+   "ay": 81,
+   "size": [
+    46,
+    33
+   ],
+   "native": [
+    402,
+    4
+   ]
+  }
+ ],
+ "debris_a": [
+  {
+   "file": "debris_a_00.png",
+   "ax": 14,
+   "ay": 15,
+   "size": [
+    30,
+    30
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_01.png",
+   "ax": 14,
+   "ay": 14,
+   "size": [
+    29,
+    30
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_02.png",
+   "ax": 12,
+   "ay": 13,
+   "size": [
+    27,
+    29
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_03.png",
+   "ax": 13,
+   "ay": 12,
+   "size": [
+    29,
+    28
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_04.png",
+   "ax": 14,
+   "ay": 13,
+   "size": [
+    29,
+    28
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_05.png",
+   "ax": 15,
+   "ay": 14,
+   "size": [
+    30,
+    29
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_06.png",
+   "ax": 15,
+   "ay": 15,
+   "size": [
+    31,
+    29
+   ],
+   "native": [
+    402,
+    11
+   ]
+  },
+  {
+   "file": "debris_a_07.png",
+   "ax": 15,
+   "ay": 15,
+   "size": [
+    31,
+    30
+   ],
+   "native": [
+    402,
+    11
+   ]
+  }
+ ],
+ "debris_b": [
+  {
+   "file": "debris_b_00.png",
+   "ax": 7,
+   "ay": 7,
+   "size": [
+    15,
+    14
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_01.png",
+   "ax": 5,
+   "ay": 7,
+   "size": [
+    12,
+    14
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_02.png",
+   "ax": 3,
+   "ay": 7,
+   "size": [
+    9,
+    13
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_03.png",
+   "ax": 4,
+   "ay": 5,
+   "size": [
+    10,
+    10
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_04.png",
+   "ax": 5,
+   "ay": 3,
+   "size": [
+    11,
+    7
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_05.png",
+   "ax": 6,
+   "ay": 1,
+   "size": [
+    12,
+    4
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_06.png",
+   "ax": 6,
+   "ay": 2,
+   "size": [
+    14,
+    6
+   ],
+   "native": [
+    402,
+    12
+   ]
+  },
+  {
+   "file": "debris_b_07.png",
+   "ax": 7,
+   "ay": 5,
+   "size": [
+    15,
+    10
+   ],
+   "native": [
+    402,
+    12
+   ]
+  }
+ ],
+ "meta": {
+  "launcher_match": 1.0,
+  "launcher_flash_color_matched": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "cannon_pole": [
+   43,
+   0
+  ],
+  "cannon_muzzle": [
+   0,
+   55
+  ],
+  "orb_center": [
+   -42.5,
+   55.0
+  ]
+ }
+}

@@ -47,6 +47,30 @@ PROFILE_ORDER=('hp_multiplier','damage_multiplier','move_speed_multiplier','atta
                'knockback_distance_multiplier','ballistic_range_multiplier')
 PROFILE_FIELDS=frozenset(PROFILE_ORDER)
 
+
+# 修筑类单位（原生动作类 BattleAction_Kouhei）的生命方式（2026-10-20，用户设定；核心导出 msd_community_engineer_hp_version）：
+#   "hp"：生命 = max(minimum, 修筑对象同等级生命 × percent / 100)，受击后生命仍大于 0 时继续行进或修筑，耗尽时撤退；
+#   "hit_and_run"：原生（生命 1，受击即撤退）。
+# content.json 的 engineer_hp 为缺省方式与原版 UnitID 的单独设定（units，键为 UnitID 字符串）；单位文件可写同格式的 engineer_hp。
+KOUHEI_VTABLE=0x10929950
+# 原生保留、无原版单位使用的动作类（行为 iron_slider / iron_slider_second_form，2026-10-21）：内部字段 native_action → 虚表符号。
+NATIVE_ACTIONS={'IronSlider':'_ZTV23BattleAction_IronSlider','IronSlider_2':'_ZTV25BattleAction_IronSlider_2'}
+# 浮点状态词：移速 5（另有倍率字段）以外的第二参数 16/23/30 与弹速 18/25/32。
+FLOAT_WORDS=frozenset((16,18,23,25,30,32))
+# 动作类为 BattleAction_Kouhei 的原版单位（1.46.0 动作表，安装时另按动作表核对）；迫击炮兵类（163、171）不在其中。
+KOUHEI_IDS=frozenset((5,73,74,75,76,77,95,108,155,184,244,246,264,282,306,346,348,350,352,355,357,367,369,392))
+ENGINEER_MODES=('hp','hit_and_run')
+def check_engineer_hp(spec,where,mode_required=False):
+    # 单独设定（units 中的项与单位文件）可只写 percent / minimum，方式沿用缺省。
+    if not isinstance(spec,dict) or ('mode' in spec or mode_required) and spec.get('mode') not in ENGINEER_MODES or set(spec)-{'mode','percent','minimum','units'}:raise ValueError('Invalid engineer HP setting: '+where)
+    for name,low,high in (('percent',1,100),('minimum',1,1000000)):
+        v=spec.get(name)
+        if v is not None and (not isinstance(v,int) or isinstance(v,bool) or not low<=v<=high):raise ValueError('Invalid engineer HP '+name+': '+where)
+def engineer_setting(default,spec):
+    """合并缺省与单独设定，返回 (方式, 百分比, 下限)。"""
+    merged=dict(mode='hit_and_run',percent=5,minimum=300)
+    for part in (default or {},spec or {}):merged.update((k,v) for k,v in part.items() if k!='units')
+    return merged['mode'],merged['percent'],merged['minimum']
 def patch_stock_row(row,fields):
     """把补丁写入原版单位的数据行（0x390 字节），取整规则与社区单位相同。"""
     def scale(offsets,pair,mode):
@@ -108,6 +132,13 @@ def load_manifest(root):
     if not isinstance(folder,str) or Path(folder).name!=folder:raise ValueError('Invalid unit folder')
     disabled=index.get('disabled_units',[])
     if not isinstance(disabled,list) or any(k not in unit_ids for k in disabled) or len(set(disabled))!=len(disabled):raise ValueError('Invalid disabled body units')
+    engineer=index.get('engineer_hp')
+    if engineer is not None:
+        check_engineer_hp(engineer,'content.json',True)
+        for uid,spec in engineer.get('units',{}).items():
+            if not uid.isdigit() or int(uid) not in KOUHEI_IDS:raise ValueError('Invalid engineer HP unit: '+uid)
+            check_engineer_hp(spec,uid)
+            if 'units' in spec:raise ValueError('Invalid engineer HP setting: '+uid)
     units={};skipped=set()
     for path in sorted((root/folder).glob('*.json')):
         data=json.loads(path.read_text(encoding='utf-8'))
@@ -172,13 +203,29 @@ def check_unit(u):
                 'knockback_distance_multiplier','ballistic_range_multiplier',
                 'knockback_threshold_multiplier','normal_projectile_distance_multiplier',
                 'special_projectile_distance_multiplier','summon_interval_multiplier',
-                'construction_time_multiplier','summon_interval_additional_multiplier'):
+                'construction_time_multiplier','summon_interval_additional_multiplier','near_damage_multiplier'):
         ratio(u.get(key,[1,1]))
     ratio(u.get('special_cooldown_multiplier',[1,1]))
+    # 浮点状态词的绝对值（2026-10-21）：第二参数 16/23/30 与弹速 18/25/32 为浮点数，写入六个等级锚点。
+    for word,value in u.get('status_float_values',{}).items():
+        if not word.isdigit() or int(word) not in FLOAT_WORDS or isinstance(value,bool) or not isinstance(value,(int,float)) or not 0<=value<=10000:raise ValueError('Invalid float status word')
     for word,value in u.get('status_word_values',{}).items():
         # 单个整数写入六个等级锚点；也可写六个整数的列表，依次为 Lv1、Lv10、Lv20、Lv30、Lv40、Lv50 锚点（2026-10-15）。
         values=value if isinstance(value,list) and len(value)==6 else [value]
         if not word.isdigit() or int(word) not in ANCHOR_INDEX or int(word) in (1,2,3,4,5,13,14) or any(not isinstance(v,int) or isinstance(v,bool) or not -2147483648<=v<=2147483647 for v in values):raise ValueError('Invalid absolute status word')
+    # 小地图标记的宽与高（数据行 +0x34c / +0x350，即 BattleUnitStatus 字 45 / 46；原生 BattlePlayerOperator::drawUI 按此画实心矩形）。
+    # 原版大多为 4×4，大型单位为 10×10 至 20×20（2026-10-20）。
+    if 'engineer_hp' in u:
+        check_engineer_hp(u['engineer_hp'],u['key'])
+        if u['base_id'] not in KOUHEI_IDS:raise ValueError('Engineer HP setting for a non-engineer unit: '+u['key'])
+        if 'units' in u['engineer_hp']:raise ValueError('Invalid engineer HP setting: '+u['key'])
+    if u.get('image_direction',90) not in (90,270):raise ValueError('Invalid image direction')
+    marker=u.get('minimap_marker')
+    if marker is not None and (not isinstance(marker,list) or len(marker)!=2 or any(not isinstance(v,int) or isinstance(v,bool) or not 1<=v<=64 for v in marker)):raise ValueError('Invalid minimap marker')
+    # 绝招可发动时的蓝光宽与高（数据行 +0x344 / +0x348，即 BattleUnitStatus 字 43 / 44；原生 BattleUnit::draw 按两倍值绘制，
+    # 为 0 时取当前帧第一个矩形的尺寸）。
+    glow=u.get('special_effect_size')
+    if glow is not None and (not isinstance(glow,list) or len(glow)!=2 or any(not isinstance(v,int) or isinstance(v,bool) or not 0<=v<=1000 for v in glow)):raise ValueError('Invalid special effect size')
     flame=u.get('flame_interrupt')
     if flame is not None:
         bullets=flame.get('ending_bullet_animations')
@@ -209,6 +256,9 @@ def check_references(u,by_key):
     if not isinstance(u.get('internal_only',False),bool):raise ValueError('Invalid internal unit flag')
     child=u.get('child_unit_key')
     if child is not None and (child not in by_key or not by_key[child].get('internal_only') or child==u['key']):raise ValueError('Invalid internal child reference')
+    form=u.get('second_form_key')
+    if form is not None and (form not in by_key or not by_key[form].get('internal_only') or form==u['key'] or by_key[form].get('native_action')!='IronSlider_2'):raise ValueError('Invalid second form reference')
+    if 'native_action' in u and u['native_action'] not in NATIVE_ACTIONS:raise ValueError('Invalid native action class')
     landing=u.get('landing_unit_key')
     if landing is not None and (u['base_id']!=160 or landing not in by_key or by_key[landing].get('internal_only')):raise ValueError('Invalid paratrooper landing reference')
     summoned=u.get('summoned_unit_key')
@@ -248,6 +298,8 @@ def check_unit_assets(u,dims,descriptor_path,is_stock):
             for cmd in commands:
                 op,values=cmd['opcode'],cmd['values']
                 if op==0 and values[0]!=-1 and values[0] not in starts:raise ValueError('Animation references invalid frame')
+                # op12 也可写共用效果编号 0xff00–0xfffe（原生 addEffectImpl：编号 ≥ 0xff00 时取共用效果 UnitID 402，动画为低 8 位；2026-10-20）。
+                if op==12 and 0xff00<=values[0]<=0xfffe:continue
                 if op in (10,11,12,22) and not 0<=values[0]<desc['script_count']:raise ValueError('Animation references invalid child script')
                 if op in (3,4) and not -1<=values[0]<len(desc['hit_bounds' if op==3 else 'attack_bounds']):raise ValueError('Animation references invalid collision rectangle')
         for field in ('hit_bounds','attack_bounds'):
@@ -345,7 +397,10 @@ class CommunityContent:
             leaf=Path(p.string(args[0])).name if name=='fopen' else None
             if leaf in self.assets and p.string(args[1]).startswith('r'):
                 self.overridden_assets.add(leaf)
-                handle=p.alloc(16);p.handles[handle]=io.BytesIO(self.assets[leaf]);return handle
+                raw=self.assets[leaf]
+                # 场景图像源（content_assets.ImageTexture）在原生打开时解码为直接 RGBA 的 OBM。
+                if not isinstance(raw,(bytes,bytearray)):raw=raw.obm();p.log('SCENE_IMAGE_TEXTURE',leaf,len(raw))
+                handle=p.alloc(16);p.handles[handle]=io.BytesIO(raw);return handle
             if leaf in self.sound_files and p.string(args[1]) in ('rb','r'):
                 handle=p.alloc(16);p.handles[handle]=io.BytesIO(Path(self.sound_files[leaf]).read_bytes());return handle
             return self.original_filecall(name,args)
@@ -380,6 +435,8 @@ class CommunityContent:
         if self.sounds and (not hasattr(p.uc.lib,'msd_community_sound_version') or p.uc.lib.msd_community_sound_version()!=1):raise RuntimeError('Native core lacks custom sounds')
         if self.icon_pages and (not hasattr(p.uc.lib,'msd_community_icon_pages_version') or p.uc.lib.msd_community_icon_pages_version()!=1):raise RuntimeError('Native core lacks multi-page unit icons')
         p.uc.lib.msd_enable_community_content()
+        # 钢铁哨兵（行为 iron_slider）的 7 个钩子同样在启用社区内容时登记。
+        if any(u.get('native_action') for u in self.units) and (not hasattr(p.uc.lib,'msd_community_iron_slider_version') or p.uc.lib.msd_community_iron_slider_version()!=1):raise RuntimeError('Native core lacks the Iron Slider adaptation')
         # 生命分档单位的钩子在启用社区内容时登记，版本函数在全部找到原生块后返回 1。
         # 生命分档单位：核心版本 1 为首批 7 个钩子，2 另含前方最近敌人（front_nearest_target，标记 64）的 5 个钩子，
         # 3 另含分档受击动作（stage_knockback_animation，标记 128），4 另含雪地步兵类（基准 182）的分档入口，
@@ -390,6 +447,8 @@ class CommunityContent:
         # 2026-10-18 炸药（lob_blast，标记 8192）与按攻击属性的死亡（death_by_attribute，标记 16384）：基准 221 的 3 个钩子。
         if any(u['zombie_spec']['flags']&(8192|16384) for u in self.units if u.get('zombie_spec')) and (not hasattr(p.uc.lib,'msd_community_hunter_version') or p.uc.lib.msd_community_hunter_version()<1):raise RuntimeError('Native core lacks dynamite and attribute deaths')
         if any(u['zombie_spec'].get(k) for u in self.units if u.get('zombie_spec') for k in ('death_normal_variant','death_explosion_variant','death_fire_variant')) and p.uc.lib.msd_community_hunter_version()<2:raise RuntimeError('Native core lacks death animation variants')
+        # 2026-10-21 效果贴地（ground_hugging_effect，标记 32768）：效果默认绘制与逐分件绘制的 3 个钩子。
+        if any(u['zombie_spec']['flags']&32768 for u in self.units if u.get('zombie_spec')) and (not hasattr(p.uc.lib,'msd_community_ground_effect_version') or p.uc.lib.msd_community_ground_effect_version()<1):raise RuntimeError('Native core lacks ground-hugging effects')
         self.ready=False
 
     def stock_patches(self):
@@ -569,6 +628,9 @@ class CommunityContent:
                 struct.pack_into('<i',row,0x368 if group=='normal' else 0x36c,category)
             a,b=u['special_damage_multiplier']
             for off in (0x74,0xfc,0x180,0x204,0x288,0x30c):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*a//b)
+            # 近距伤害（词 15）的追加倍率（2026-10-21）：与绝招追加倍率相同，作用于数据行锚点并向下取整，再经 damage_multiplier。
+            a,b=ratio(u.get('near_damage_multiplier',[1,1]))
+            for off in anchor_offsets(15):struct.pack_into('<i',row,off,struct.unpack_from('<i',row,off)[0]*a//b)
             # Native status IDs 24/31 map to status words 27/34.
             # These six anchors match getUnitStatus's level interpolation.
             # Production time and the special-readiness timer remain separate.
@@ -587,6 +649,13 @@ class CommunityContent:
             for word,value in u.get('status_word_values',{}).items():
                 values=value if isinstance(value,list) else [value]*6
                 for off,v in zip(anchor_offsets(int(word)),values):struct.pack_into('<i',row,off,v)
+            for word,value in u.get('status_float_values',{}).items():
+                for off in anchor_offsets(int(word)):struct.pack_into('<f',row,off,float(value))
+            # 普通、特殊弹体的目的距离以绝对值登记时，原生距离元数据随之更新（同 normal_attack_range_from_projectile）。
+            if '26' in u.get('status_word_values',{}):row[0x370:0x374]=row[26*4:27*4]
+            if '33' in u.get('status_word_values',{}):row[0x374:0x378]=row[33*4:34*4]
+            if 'minimap_marker' in u:struct.pack_into('<2i',row,0x34c,*u['minimap_marker'])
+            if 'special_effect_size' in u:struct.pack_into('<2i',row,0x344,*u['special_effect_size'])
             # 击退门槛为状态词 4（原生插值后乘 100 作为击退计量）；六个等级锚点按倍率四舍五入。
             # 非正值（原版 -1）表示每次受击均击退，计量不回填，该标记保持原值。
             a,b=u.get('knockback_threshold_multiplier',[1,1])
@@ -594,7 +663,7 @@ class CommunityContent:
                 value=struct.unpack_from('<i',row,off)[0]
                 if value>0:struct.pack_into('<i',row,off,(2*value*a+b)//(2*b))
             struct.pack_into('<i',row,0x378,u['faction']);rows+=row
-            child_key=u.get('child_unit_key') or u.get('summoned_unit_key') or u.get('throw_child_key')
+            child_key=u.get('child_unit_key') or u.get('summoned_unit_key') or u.get('throw_child_key') or u.get('second_form_key')
             if child_key:
                 child=next(entry['id'] for entry in self.units if entry['key']==child_key)
                 struct.pack_into('<I',rows,len(rows)-0x390+0xa4,child)
@@ -604,6 +673,9 @@ class CommunityContent:
                 methods=bytearray(p.read(p.word(action),40))
                 methods[8:12]=p.read(p.word(reference)+8,4)
                 action=self.alloc(struct.pack('<I',self.alloc(methods)))
+            if 'native_action' in u:
+                # 原生保留、无原版单位使用的动作类（钢铁哨兵）：动作对象只含虚表指针。
+                action=self.alloc(struct.pack('<I',p.symbols[NATIVE_ACTIONS[u['native_action']]]+8))
             action_rows+=struct.pack('<I',action)
             descriptor=p.word(table+bid*8);header=bytearray(p.read(descriptor,32))
             textures=u.get('textures',[u.get('texture')]);image_count=p.word(descriptor)
@@ -629,7 +701,8 @@ class CommunityContent:
                 values=[v for cmd in content_sounds.resolve_animation(commands,self.sound_ids) for v in [cmd['opcode'],*cmd['values']]]
                 scripts[int(key)]=self.alloc(struct.pack('<'+'i'*len(values),*values))
             struct.pack_into('<I',header,24,self.alloc(struct.pack('<'+'I'*count,*scripts)))
-            images+=struct.pack('<II',self.alloc(header),p.word(table+bid*8+4))
+            # 图像表第 2 字为原画朝向（90 朝右、270 朝左，原生按此决定是否镜像）；默认取基准单位，单位文件可用 image_direction 指定。
+            images+=struct.pack('<II',self.alloc(header),u.get('image_direction',p.word(table+bid*8+4)))
             menu_bid=u.get('menu_reference_id',bid)
             menurow=p.read(menu_rows[menu_bid],20)
             # 原生修筑单位分别登记生产入口与完成箱体的界面预览标识。
@@ -772,10 +845,45 @@ class CommunityContent:
         fields+=(0,)
         # 头部偏移 168：生命分档等行为（行为库 v3 起，src/community_content.cpp 的 ZSpec，39 个字）的逐槽指针表；无此类单位时为 0。
         fields+=(self.install_zombie_specs(units),)
+        # 头部偏移 172：自制场景（ID 138 起，manifest['stages'] 顺序）逐场景标记字节表，位 0 为 2 倍素材（resolution 2，绘制时图块缩放减半）；无此类场景时为 0。
+        stage_rows=self.manifest.get('stages',[])
+        flags=bytes(1 if s.get('resolution',1)==2 else 0 for s in stage_rows)
+        if any(flags):
+            if not hasattr(p.uc.lib,'msd_community_stage_scale_version') or p.uc.lib.msd_community_stage_scale_version()!=1:
+                raise RuntimeError('Native core lacks high-resolution scene drawing (stage_scale hooks)')
+            fields+=(self.alloc(flags+b'\0'*(-len(flags)%4)),)
+        else:fields+=(0,)
+        # 头部偏移 176/180：按生命计算的修筑类单位表（每项 UnitID、百分比、下限）与项数；无此类单位时为 0。
+        fields+=self.install_engineer_hp(action_rows,units)
         p.write(HEADER,struct.pack('<%dI'%len(fields),*fields));self.ready=True
         self.map_initial_choices_applied=not (self.manifest.get('missions') or self.manifest.get('campaign_choices'))
         assert p.read(p.word(db+4),400*0x390)==bytes(rows[:400*0x390])
         p.log('COMMUNITY_REGISTERED',n,'unit IDs',[u['id'] for u in self.units])
+
+    def install_engineer_hp(self,action_rows,units):
+        p=self.p;default=self.manifest.get('engineer_hp');stock=(default or {}).get('units',{})
+        def kouhei(uid):
+            action=struct.unpack_from('<I',action_rows,uid*4)[0]
+            return bool(action) and p.word(action)==KOUHEI_VTABLE
+        entries=[]
+        for uid in range(1,400):
+            if not kouhei(uid):
+                if str(uid) in stock:raise ValueError('Engineer HP setting for a non-engineer unit: %d'%uid)
+                continue
+            mode,percent,minimum=engineer_setting(default,stock.get(str(uid)))
+            if mode=='hp':entries.append((uid,percent,minimum))
+        for i,u in enumerate(units):
+            if not u:continue
+            if not kouhei(UNIT_ID_BASE+i):
+                if 'engineer_hp' in u:raise ValueError('Engineer HP setting for a non-engineer unit: '+u['key'])
+                continue
+            mode,percent,minimum=engineer_setting(default,u.get('engineer_hp'))
+            if mode=='hp':entries.append((UNIT_ID_BASE+i,percent,minimum))
+        self.engineer_hp_units=[e[0] for e in entries]
+        if not entries:return (0,0)
+        if not hasattr(p.uc.lib,'msd_community_engineer_hp_version') or p.uc.lib.msd_community_engineer_hp_version()!=1:
+            raise RuntimeError('Native core lacks engineer HP hooks')
+        return (self.alloc(b''.join(struct.pack('<3I',*e) for e in entries)),len(entries))
 
     def install_zombie_specs(self,units):
         specs=[(u or {}).get('zombie_spec') for u in units]
@@ -783,7 +891,7 @@ class CommunityContent:
         pointers=[]
         for spec in specs:
             if not spec:pointers.append(0);continue
-            words=[0]*42;words[0]=spec['flags']
+            words=[0]*43;words[0]=spec['flags']
             thresholds=spec.get('thresholds',[]);words[1]=len(thresholds)
             for i,(a,b) in enumerate(thresholds):words[2+i]=a;words[8+i]=b
             words[14]=sum(1<<(i+1) for i,flag in enumerate(spec.get('transitions',[])) if flag)
@@ -809,7 +917,9 @@ class CommunityContent:
             # 39–41：普通、爆炸、火焰死亡的另一版本（死亡时横坐标取整为奇数时播放；0 为不使用）
             words[39]=spec.get('death_normal_variant',0);words[40]=spec.get('death_explosion_variant',0)
             words[41]=spec.get('death_fire_variant',0)
-            pointers.append(self.alloc(struct.pack('<42I',*words)))
+            # 2026-10-21：42 贴地绘制的效果动作号 + 1（ground_hugging_effect，0 为不使用）
+            words[42]=spec['hug_animation']+1 if 'hug_animation' in spec else 0
+            pointers.append(self.alloc(struct.pack('<43I',*words)))
         return self.alloc(struct.pack('<'+'I'*len(pointers),*pointers))
 
     def grant_world_clear_rewards(self):

@@ -8,6 +8,11 @@ This edition adds keyboard controls and a **16:9 layout**. Expanded backgrounds 
 
 **Stamina regenerates at 1 point per second.** The original Android version regenerates 1 point per minute.
 
+**Update 26.10.5**
+
+- Added **two missions based on Metal Slug 6**, playable in Ura World 4 (EX MAP 4).
+- Added some of the units that appear in Metal Slug 6: IRON CAB and IRON SENTINEL.
+
 **Update 26.10.4**
 
 - Added **three new units from Metal Slug 6**: MV-280C, GIANT HUNTER WALKER and HUNTER.
@@ -117,6 +122,10 @@ Run **Start_MSD_All_Unlocked_Max_Level.exe**; the corresponding VBS entry remain
 
 This entry shares the current formal core and preserves its independent progress on subsequent launches. Existing normal and maximum-level saves retain their own directories. To migrate this profile, copy the entire `play_save_all_unlocked_max_level/` folder. Preset files are distributed under `game_data/all_unlocked_max_level/`; implementation and validation scope are recorded in [the profile report](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md).
 
+### Engineer HP
+
+Engineer units, which advance to build a structure or vehicle on the battlefield, no longer retreat on the first hit. Their HP equals 5% of the HP of the structure they build at the same level, with a minimum of 300 at every level. While HP remains above 0, an engineer keeps advancing or building; when HP is depleted, it retreats as in the original game. The unit STATUS in the upgrade and shop screens shows the HP of the structure; the engineer's own HP follows this rule. The rule is set by `engineer_hp` in `community_content/content.json`, and individual units can use the original retreat on the first hit (`hit_and_run`). Details and per-unit values: [ENGINEER_HP_2026-10-20.md](docs/ENGINEER_HP_2026-10-20.md).
+
 ### Online play
 
 Open VERSUS from the main menu and choose LAN (players on the same network) or ONLINE (remote play). Both modes use your current deck and unit levels. For ONLINE, the host creates a room and gives the other player one of the addresses shown together with the room code; the other player enters both. No server is involved, so the host must be reachable from the other player's network: router UPnP (tried automatically), a forwarded UDP port (47631 by default, changeable in the host window; give the other player the WAN IP shown on your router's status page), IPv6, or a virtual LAN tool such as Radmin VPN, Hamachi or ZeroTier. If the host's internet provider uses carrier-grade NAT, swap roles or use one of the other options. On first use, Windows Firewall may ask for permission; allow access on both private and public networks.
@@ -132,6 +141,11 @@ Esta adaptación para Windows se basa en la versión de Android de **Metal Slug 
 Esta edición añade controles de teclado y un **formato 16:9**. Los fondos ampliados y la interfaz reubicada conservan las proporciones originales y todo el contenido visible. La pantalla completa sin bordes está activada por defecto.
 
 **La energía (stamina) se recupera a 1 punto por segundo.** La versión original de Android recupera 1 punto por minuto.
+
+**Actualización 26.10.5**
+
+- Se añadieron **dos misiones basadas en Metal Slug 6**, que puedes jugar en el Mundo Ura 4 (EX MAP 4).
+- Se añadieron algunas de las unidades que aparecen en Metal Slug 6: IRON CAB e IRON SENTINEL.
 
 **Actualización 26.10.4**
 
@@ -242,6 +256,10 @@ Ejecuta **Start_MSD_All_Unlocked_Max_Level.exe**; la entrada VBS correspondiente
 
 Esta entrada comparte el núcleo oficial actual y conserva su progreso independiente en los inicios posteriores. Las partidas normales y de nivel máximo existentes conservan sus propias carpetas. Para migrar este perfil, copia toda la carpeta `play_save_all_unlocked_max_level/`. Los archivos del perfil se distribuyen en `game_data/all_unlocked_max_level/`; la implementación y el alcance de la validación se describen en [el informe del perfil](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md).
 
+### Vida de los ingenieros
+
+Las unidades de ingeniería, que avanzan para construir una estructura o un vehículo en el campo de batalla, ya no se retiran con el primer impacto. Su vida equivale al 5 % de la vida de la estructura que construyen al mismo nivel, con un mínimo de 300 en todos los niveles. Mientras su vida sea mayor que 0, siguen avanzando o construyendo; al agotarse, se retiran como en el juego original. El STATUS de las pantallas de mejora y tienda muestra la vida de la estructura; la vida del ingeniero sigue esta regla. La regla se define en `engineer_hp` de `community_content/content.json`, y unidades concretas pueden usar la retirada original al primer impacto (`hit_and_run`). Detalles y valores por unidad: [ENGINEER_HP_2026-10-20.md](docs/ENGINEER_HP_2026-10-20.md).
+
 ### Juego en línea
 
 Abre VERSUS desde el menú principal y elige LAN (jugadores en la misma red) u ONLINE (juego remoto). Ambos modos usan tu mazo actual y los niveles de tus unidades. En ONLINE, el anfitrión crea una sala y le pasa al otro jugador una de las direcciones que aparecen junto con el código de la sala; el otro jugador escribe ambos datos. No se usa ningún servidor, así que el anfitrión debe ser accesible desde la red del otro jugador: UPnP del router (se intenta automáticamente), un puerto UDP redirigido (47631 por defecto, se puede cambiar en la ventana del anfitrión; pásale al otro jugador la IP WAN que muestra la página de estado del router), IPv6 o una herramienta de red local virtual como Radmin VPN, Hamachi o ZeroTier. Si el proveedor de internet del anfitrión usa CGNAT, intercambien los papeles o usen otra de estas opciones. La primera vez, el Firewall de Windows puede pedir permiso; permite el acceso en redes privadas y públicas.
@@ -257,6 +275,11 @@ Los mundos configurables, los enemigos comunitarios registrados, y los escenario
 本版本新增键盘操控系统，并将画面调整为 **16:9 布局**。通过扩展背景与调整界面位置，保持角色及素材的原有比例，并保留原画面的可见内容。默认采用无边框全屏模式。
 
 **体力每秒恢复 1 点。** 安卓原版的恢复速率为每分钟 1 点。
+
+**26.10.5 更新**
+
+- 新增**两个取材自《合金弹头6》的任务**，可在里世界 4 游玩
+- 新增部分在《合金弹头6》中登场的单位：铁甲车头（IRON CAB）、钢铁哨兵（IRON SENTINEL）
 
 **26.10.4 更新**
 
@@ -366,6 +389,10 @@ LAB 功能说明：[LAB 修复记录](docs/LAB_BUGFIX_2026.10.07.md)、[LAB 菜�
 启动 **Start_MSD_All_Unlocked_Max_Level.exe**，对应 VBS 入口继续可用。首次启动时在 `play_save_all_unlocked_max_level/` 创建独立存档，包含全部 **399 个原版单位记录（UnitID 1–399）和 17 款可选社区单位，均为 Lv40**；“我方阵营”的 **九项基地强化均为 Lv30**，六阵营核心全部持有。地图 1、2、3 的关卡开放并完成通关，**48 项区域人质奖励效果均为 100%**。历史活动进度沿用初始预设。
 
 该入口共用当前正式版核心，后续启动保留该独立存档的游戏进度。既有普通入口和原满级入口继续使用各自存档目录。迁移时复制完整的 `play_save_all_unlocked_max_level/`；预设位于 `game_data/all_unlocked_max_level/`，实施与核验范围见 [独立预设说明](docs/ALL_UNLOCKED_MAX_LEVEL_2026.10.07.md)。
+
+### 工兵生命
+
+修筑类单位（前进至战场修筑建筑或载具的工兵）受击后不再立即撤退。其生命为修筑对象同等级生命的 5%，各等级下限为 300。生命大于 0 时继续前进或修筑，耗尽时按原版撤退。单位强化与商店界面的 STATUS 显示修筑对象的生命，工兵自身生命按本规则计算。规则由 `community_content/content.json` 的 `engineer_hp` 设定，个别单位可设为原版的受击即撤退（`hit_and_run`）。说明与各单位数值见 [ENGINEER_HP_2026-10-20.md](docs/ENGINEER_HP_2026-10-20.md)。
 
 ### 联机对战
 

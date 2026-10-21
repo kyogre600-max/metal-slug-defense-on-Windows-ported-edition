@@ -1979,6 +1979,13 @@
       "params": {}
     },
     {
+      "name": "ground_hugging_effect",
+      "version": 1,
+      "params": {
+        "animation": 16
+      }
+    },
+    {
       "name": "front_nearest_target",
       "version": 1,
       "params": {}

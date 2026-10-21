@@ -827,3 +827,25 @@
 - 核心 `MSD_Core_LAB_r63_20261015.dll`（`--no-activate --no-sha256` 构建后激活；根目录与 `src/` 核心配置、两份 `lab_runtime.py`；根目录 `build/` 只保留 r63，r62 留在 `src/build/`）；`src/community_content.cpp`。
 - `community_content/units/pvz_gatling.json`、`pvz_balloon.json`；`unit_viewer_bounds.json`（含镜像）只替换两条签名（机枪豌豆 `16629d4403d5a8ab` → `a2d899d826a742af`，气球 `7854deab14019dc9` → `021f196b6211596d`，以同一算法对修订前定义重算得原签名；图像范围不变）。
 - 生成脚本 `artwork/pvz_zombies_20261012/build_pvz_zombies.py`；修改前副本 `verification/balloon_stuck_20261015/before/`。
+
+## 32. 辣椒火焰沿地形绘制（2026-10-21，核心 r72）
+
+- 用户报告：辣椒僵尸引燃后的火焰是一条直线，在有坡道的战场上会穿入地形；要求整个地表都燃烧一次。
+- 原因：攻击脚本以 9 个 `op12 [16, 0, x, 0]` 放出火焰带（每段 43 个 24 像素的火焰分件）。原生 `BattleCommonActions::addEffectImpl`（0x181c1e）把效果放在单位 x ± dx、y + dy，9 段因此都在辣椒自身的高度上（PvZ 素材以 2 倍绘制，各段实际相隔 2048）。里地图 4 第 4 关（场景 141，地形高度 320–440）中，辣椒在坡顶（x 1420，y 320）引燃时，火焰在左侧低地上方最多悬空 120，在右侧穿过坡体（`runs/r71_before_153303_20084/screens/`）。
+- 伤害未受影响：同一场景中 6 名叛军步兵分布在比辣椒低 0–120 的位置（x 200、600、900、1180、1470/1370、1700），我方与敌方阵营的辣椒均使每人受到 900，攻击框 (−8000,−400,16000,420) 不需修改。
+
+### 32.1 修改
+
+- 行为库 v11 新增 `ground_hugging_effect`（参数 `animation`，基准 313）：本单位以 op12 生成、当前动作号为该槽的效果，绘制时各分件的 y 平移“分件中心所在世界 x 的地形高度 − 效果的世界 y”。只改绘制，不写客体内存（对象坐标、攻击框、回滚快照不变）；动作浏览中按原样绘制。
+- 核心（`src/community_content.cpp`，3 个钩子，`msd_community_ground_effect_version()` 为 1）：`BattleEffectDefault::draw`（0x16f990）入口记录精灵、效果的世界 y 与镜头 x；`BattleSprite::drawImpl` 逐分件块（0x1dbab6）在调用 `GraphicsOpt::drawConv` 前按 C_CONV 的锚点、宽度、比例与翻转求分件中心的世界 x，以 `stage_altitude`（同 `BattleStage::getAltitude(x,true)`）取地形高度并改写 y；`drawImpl` 结束块（0x1dbaf2）清除记录。原版场景与自制场景同样处理；地形高度为 9999（场景 20 的特殊区段）时保持原样。
+- 加载器（`community_content.py` 及镜像）：ZSpec 42 → 43 字，字 42 为效果动作号 + 1（标记 32768）；带此标记的单位要求核心提供上述版本函数。`behaviors.py`（及镜像）把行为转为 ZSpec。
+- 单位文件 `pvz_jalapeno.json` 增加 `{"name": "ground_hugging_effect", "version": 1, "params": {"animation": 16}}`；生成脚本 `build_pvz_zombies.py` 同步。其他数值、动作脚本与素材不变。
+- `unit_viewer_bounds.json`（含镜像）只替换辣椒的签名（`031f8476cd83e97f` → `9cff4e4040dac151`）：动作演示中运行时测得的图像范围与原条目逐项相同。行为目录 `docs/modding/BEHAVIOR_CATALOG.md` 由 `content_tool.py list-behaviors --markdown` 重新生成。
+
+### 32.2 验证（隔离存档，核心 r72，未计算 SHA-256；`verification/jalapeno_terrain_20261021/`）
+
+- `driver_flame.py`（LAB，里地图 4 第 4 关）：修正后火焰沿地形铺开，左侧沿坡下到据点前，右侧随两个坡顶起伏（`runs/r72_cliff_*/screens/`）；敌方阵营（`--swap`，翻转绘制）同样贴地；原版地图 1011（场景 0）平地部分与修正前相同，战场宽度以外按该场景末端地形（402）绘制。
+- `driver_ui_jalapeno.py`：ACTION 近距离攻击演示照常播放（状态 30、140），火焰仍为一行，不现场测量图像范围。
+- 单元测试 14 项（`test_unit_browser` 7、`test_build_holds_only_active_core`、`test_content_interfaces` 中 6 项）通过；`content_tool.py validate` 通过。r71 核心载入新行为库时按设计拒绝（行为库与核心清单不一致）。
+- 回滚（`n1_jalapeno.py`，N1 单进程，里地图 4 第 4 关）：以辣椒为首的混合编队 1500 帧（回滚 440 次、重算 1906 帧；此组辣椒未碰到敌人），以及 10 格全为辣椒、据点生命保持 2000000 的 2400 帧（火焰出现 148 帧，回滚 698 次、重算 3100 帧），随机回滚与参照逐帧一致（`n1_compare.json`、`n1b_compare.json`）。
+- 未覆盖：联机两机实测；低配设备上的绘制耗时（每个分件多一次地形查找）；以后新增的、带此行为的其他单位。

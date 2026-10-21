@@ -3,6 +3,8 @@
 - 主菜单第三个按钮的文字由宿主光栅化（probe.draw_text）。各语言的 Wi-Fi 对战按钮文字（libAppMain.so 字符串表中的
   独立字符串）整串替换为“对战”，Wi-Fi 模式因 Google Play 登录判断不可用。
 - 点击该按钮时保留原生按压白光，由宿主调用原生布局切换函数进入 SHOP 子页面（scene28/state4），底栏 SHOP 不接收按压触点。
+  按钮命中范围取原生面板任务的点击区（wifi_rect，四周比按钮图块各大约 11 px）；此前宿主只拦截图块范围，外沿的点击交给原生，
+  进入原版 Wi-Fi VERSUS（场景 67，Google Play 界面）（2026-10-21 修正）。
   页面打开期间，src/lab_hooks.cpp 的 drawConv 替换表（头部 +0xb40，'VSPG'）把 SHOP 标题字换为原生 VERSUS 整词，
   三张卡的插画与标签图块换为本地对战 / 局域网对战 / 远程对战，并跳过底栏 SHOP 的 LOCK 叠层；位置、缩放与入场动画
   沿用原生调用。原生 BACK 返回 MENU 时页面关闭；在页面中点击底栏 SHOP 时解除原生“当前页”标记，由原生切换动画进入商店（场景离开 28 时页面关闭）。
@@ -39,7 +41,7 @@ ORDER_X = (-58, 226, 510, 794)              # VERSUS 页的原生横坐标：卡
 CARD_Y = 160
 CARD_HIT = (-10, -10, 244, 308)             # 原生点击区域（任务 +0xf4/+0xf8 偏移、+0xfc/+0x100 尺寸，原生单位）
 CONTENT_TOP, CONTENT_BOTTOM = 112, 572      # 顶栏与底栏之间的内容区（1280×720 逻辑坐标）
-WIFI_BUTTON = (708, 410, 424, 74)           # 1280×720 逻辑坐标：主菜单第三个按钮
+NATIVE_TO_CANVAS = 1280 / 1137.78           # 原生 960 基准（16:9 宽 1137.8）到 1280×720 画布
 SHOP_BUTTON = (532, 650)                    # 底栏 SHOP
 SHOP_TASK = 0x36e0                          # app 偏移：底栏 SHOP 按钮任务
 WIFI_TASK = 0x3384                          # 主菜单第三项（原生 panel index 9）
@@ -78,6 +80,7 @@ class VersusPage:
         self.leaving = 0                        # 离开 VERSUS 页后的帧数
         self.pressed = None
         self.press_cancelled = False
+        self.wifi_box = None                    # 按下时的主菜单第三个面板点击区（wifi_rect）
         self.images = {}                        # 语言 → 已建立的原生图像
         self.error = None
         self.lobby = None                       # 联机大厅（netplay_lobby.NetplayLobby，lab_runtime 建立）
@@ -303,6 +306,17 @@ class VersusPage:
         task = p.word(p.app_instance() + offset)
         return bool(task and (p.word(task) & ~1) == (p.symbols[symbol] & ~1))
 
+    def wifi_rect(self):
+        """主菜单第三个面板的原生点击区（任务 +0xf4..+0x100：相对位置的偏移与宽高，原生坐标）换算到画布，
+        原生 TouchEvent 减去整数边距 app+0x3c（同 unit_browser.entry_rect）。"""
+        p = self.p
+        app = p.app_instance()
+        task = p.word(app + WIFI_TASK)
+        f = lambda offset: struct.unpack('<f', p.read(task + offset, 4))[0]
+        margin = struct.unpack('<i', p.read(app + 0x3c, 4))[0]
+        return ((f(0x84) + f(0x9c) + f(0xf4) + margin) * NATIVE_TO_CANVAS, (f(0x88) + f(0xa0) + f(0xf8)) * NATIVE_TO_CANVAS,
+                f(0xfc) * NATIVE_TO_CANVAS, f(0x100) * NATIVE_TO_CANVAS)
+
     def can_open(self):
         scene, state = self.menu_state()
         lab = self.lab
@@ -475,17 +489,18 @@ class VersusPage:
         if trial is not None and trial.browser.active:
             return False                                    # 历史活动浏览页借用主菜单，第三行由浏览页处理
         if self.state == 'closed':
-            if action == 1 and self.can_open() and inside(WIFI_BUTTON, x, y):
+            if action == 1 and self.can_open() and inside(self.wifi_rect(), x, y):
                 self.end_press()
                 self.pressed = 'wifi'
                 self.press_cancelled = False
+                self.wifi_box = self.wifi_rect()
                 self.native_touch(self.p, action, x, y)
                 return True
             if self.pressed == 'wifi':
                 if action == 5:
-                    self.move_press(WIFI_BUTTON, x, y)
+                    self.move_press(self.wifi_box, x, y)
                 if action == 3:
-                    activate = not self.press_cancelled and inside(WIFI_BUTTON, x, y) and self.can_open()
+                    activate = not self.press_cancelled and inside(self.wifi_box, x, y) and self.can_open()
                     self.end_press()
                     if activate:
                         self.open()

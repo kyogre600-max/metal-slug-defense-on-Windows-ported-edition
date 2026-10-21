@@ -299,10 +299,12 @@ class Lab:
         return None
 
     def stage_catalog(self):
-        """原生地图 1–3 与里地图 1–3 的全部小关（lab_stages.StageCatalog，首次使用及游戏语言改变时读取原生表）。"""
+        """原生地图 1–3、里地图 1–3 与里地图扩展页的全部小关（lab_stages.StageCatalog，首次使用、游戏语言改变
+        及扩展页记录建立时读取）。"""
+        from lab_stages import StageCatalog, ura_pages
         language = self.p.word(self.app() + 0x3d64)
-        if getattr(self, 'stages', None) is None or self.stages.language != language:
-            from lab_stages import StageCatalog
+        if (getattr(self, 'stages', None) is None or self.stages.language != language
+                or self.stages.ura_ready != bool(ura_pages(self.p))):
             self.stages = StageCatalog(self.p)
         return self.stages
 
@@ -314,7 +316,8 @@ class Lab:
             entry = None
         if not entry:
             return str(sid)
-        return T(self.p, 'stage_no', T(self.p, f"world_{entry['world']}"), entry['area'] + 1, entry['stage'] + 1)
+        from lab_ui import world_name
+        return T(self.p, 'stage_no', world_name(self.p, entry['world']), entry['area'] + 1, entry['stage'] + 1)
 
     def resolve_deck(self, deck):
         """把配置项解析为 10 个 (UnitID, 存档等级) 或 None；单位可写 UnitID 或社区单位 key。"""

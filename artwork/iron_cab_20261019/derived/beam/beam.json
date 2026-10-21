@@ -1,0 +1,82 @@
+{
+  "note": "IRON CAB 激光光束（R7，2026-10-19，用户要求）：MSA 素材的光束只是一根平直的色带，从光球中心盖在激光炮帧的光球上，",
+  "states": {
+    "4_8": {
+      "frame": {
+        "file": "cannon04_beam17.png",
+        "ax": 68,
+        "ay": 0
+      },
+      "body": {
+        "file": "body04_17.png",
+        "ax": 64,
+        "ay": 8
+      },
+      "split": -68,
+      "source": "derived/cannon/cannon_04.png"
+    },
+    "5_6": {
+      "frame": {
+        "file": "cannon05_beam13.png",
+        "ax": 63,
+        "ay": 0
+      },
+      "body": {
+        "file": "body05_13.png",
+        "ax": 64,
+        "ay": 6
+      },
+      "split": -63,
+      "source": "derived/cannon/cannon_05.png"
+    },
+    "5_5": {
+      "frame": {
+        "file": "cannon05_beam11.png",
+        "ax": 63,
+        "ay": 0
+      },
+      "body": {
+        "file": "body05_11.png",
+        "ax": 64,
+        "ay": 5
+      },
+      "split": -63,
+      "source": "derived/cannon/cannon_05.png"
+    },
+    "5_4": {
+      "frame": {
+        "file": "cannon05_beam9.png",
+        "ax": 63,
+        "ay": 0
+      },
+      "body": {
+        "file": "body05_9.png",
+        "ax": 64,
+        "ay": 4
+      },
+      "split": -63,
+      "source": "derived/cannon/cannon_05.png"
+    },
+    "thin_2": {
+      "body": {
+        "file": "body_thin_5.png",
+        "ax": 64,
+        "ay": 2
+      }
+    },
+    "thin_1": {
+      "body": {
+        "file": "body_thin_3.png",
+        "ax": 64,
+        "ay": 1
+      }
+    },
+    "thin_0": {
+      "body": {
+        "file": "body_thin_1.png",
+        "ax": 64,
+        "ay": 0
+      }
+    }
+  }
+}

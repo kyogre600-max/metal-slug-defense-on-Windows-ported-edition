@@ -9,6 +9,11 @@
 from pathlib import Path
 import json,re,struct,math
 from content_digest import DigestCache,blake2
+from content_assets import ImageTexture,IMAGE_TEXTURE_SUFFIXES
+from event_content import TRIGGER_WHEN,TRIGGER_ACTIONS,MAX_TRIGGERS
+
+# 原生区域名称表 strAreaNameTbl 的语言顺序（11 项，下标 = 游戏语言；DE、ZS 的原版名称为空字符串）
+AREA_NAME_LANGUAGES=('EN','JP','KR','ES','PT','FR','DE','IT','ZS','ZT','RU')
 
 def stable_key(value):
     if not isinstance(value,str) or not re.fullmatch(r'[a-zA-Z0-9_.-]{1,120}',value):
@@ -36,23 +41,31 @@ class Catalog:
         digests=DigestCache()
         for name,digest in body.get('assets',{}).items():
             if Path(name).name!=name or '\\' in name or name in ('.','..'):raise ValueError('资源要求独立文件名')
-            if Path(name).suffix not in ('.obm','.msdf'):raise ValueError('运行资源要求 .obm 或 .msdf 文件')
-            path=self.root/name;raw=read(path)
+            suffix=Path(name).suffix.lower()
+            if suffix not in ('.obm','.msdf')+IMAGE_TEXTURE_SUFFIXES:raise ValueError('运行资源要求 .obm、.msdf，或场景图像源 .png / .webp')
+            path=self.root/name
+            if suffix in IMAGE_TEXTURE_SUFFIXES:
+                # 图像源只读尺寸，摘要按“大小+修改时间”缓存，命中时不读取文件；像素在原生打开时解码（content_assets.ImageTexture）。
+                if digest is not None and digests.digest_file(path)!=digest:raise ValueError('资源校验值不一致：'+name)
+                self.add_asset(name,ImageTexture(path),'body');continue
+            raw=read(path)
             if digest is not None and digests.digest(path,raw)!=digest:raise ValueError('资源校验值不一致：'+name)
             self.add_asset(name,raw,'body')
         digests.save()
         fragments=[{'owner':'body','raw':body,'visible':{'body'}}]
+        self.mod_assets={}
         for mod in mods:
-            raw=mod['raw'];owner=mod['owner']
+            raw=mod['raw'];owner=mod['owner'];self.mod_assets[owner]=mod['assets']
             if 'assets' in raw:raise ValueError(owner+'：模组片段的资源放在 assets/，不写 assets 字段')
             visible=set(mod['visible'])|{'body',owner}
             for row in (*raw.get('scenes',[]),*raw.get('music',[])):
                 name=row.get('texture') if 'texture' in row else row.get('file')
                 if isinstance(name,str) and name in mod['assets'] and name not in self.asset_owner:
-                    if Path(name).suffix not in ('.obm','.msdf'):raise ValueError('运行资源要求 .obm 或 .msdf 文件')
-                    self.add_asset(name,read(mod['assets'][name]),owner)
+                    suffix=Path(name).suffix.lower()
+                    if suffix not in ('.obm','.msdf')+IMAGE_TEXTURE_SUFFIXES:raise ValueError('运行资源要求 .obm、.msdf，或场景图像源 .png / .webp')
+                    self.add_asset(name,ImageTexture(mod['assets'][name]) if suffix in IMAGE_TEXTURE_SUFFIXES else read(mod['assets'][name]),owner)
             fragments.append({'owner':owner,'raw':raw,'visible':visible})
-        if sum(map(len,self.assets.values()))>512*1024*1024:raise ValueError('目录资源合计超过 512 MiB')
+        if sum(len(v) for v in self.assets.values() if not isinstance(v,ImageTexture))>512*1024*1024:raise ValueError('目录资源合计超过 512 MiB')
         self.raw=body if len(fragments)==1 else {'schema':1,'body':body,'mods':[{'id':f['owner'],'campaign':f['raw']} for f in fragments[1:]]}
         self.scenes={};self.music={};self.worlds={};self.visible={f['owner']:f['visible'] for f in fragments}
         for f in fragments:
@@ -62,17 +75,22 @@ class Catalog:
         for scene in self.scenes.values():
             self.enter(scene)
             integer(scene.get('base_id',0),0,137)
-            if scene.get('texture') not in self.assets or not scene['texture'].endswith('.obm'):raise ValueError('场景缺少已登记 OBM')
-            self.see_asset(scene['texture'])
-            raw=self.assets[scene['texture']]
-            if len(raw)<8 or raw[:2]!=b'OI':raise ValueError('无效场景图集')
-            w,h=struct.unpack_from('<HH',raw,4);kind,bits=raw[2:4]
-            if kind==1 and bits==4:expected=72+(w*h+1)//2
-            elif kind in (1,4) and bits==8:expected=8+(1024 if kind==1 else 512)+w*h
-            elif kind in (0,1) and bits in (24,32):expected=8+w*h*(3 if kind==0 else 4)
-            else:raise ValueError('无效 OBM 格式')
-            if not 0<w<=8192 or not 0<h<=8192 or len(raw)!=expected:raise ValueError('场景图集尺寸或字节数不符合约定')
-            if w&(w-1) or h&(h-1):raise ValueError('场景运行图集要求二的整数次幂画布；PNG 导入工具可补充透明边缘')
+            texture=scene.get('texture')
+            if texture not in self.assets or not (texture.endswith('.obm') or isinstance(self.assets[texture],ImageTexture)):raise ValueError('场景缺少已登记 OBM 或图像源')
+            self.see_asset(texture)
+            # resolution：1 为原版精灵比例（1 个图集像素 = 2 个逻辑单位）；2 为 2 倍素材（1 个图集像素 = 1 个逻辑单位，需核心 stage_scale 钩子）。
+            integer(scene.get('resolution',1),1,2)
+            raw=self.assets[texture]
+            if isinstance(raw,ImageTexture):w,h=raw.size
+            else:
+                if len(raw)<8 or raw[:2]!=b'OI':raise ValueError('无效场景图集')
+                w,h=struct.unpack_from('<HH',raw,4);kind,bits=raw[2:4]
+                if kind==1 and bits==4:expected=72+(w*h+1)//2
+                elif kind in (1,4) and bits==8:expected=8+(1024 if kind==1 else 512)+w*h
+                elif kind in (0,1) and bits in (24,32):expected=8+w*h*(3 if kind==0 else 4)
+                else:raise ValueError('无效 OBM 格式')
+                if not 0<w<=8192 or not 0<h<=8192 or len(raw)!=expected:raise ValueError('场景图集尺寸或字节数不符合约定')
+                if w&(w-1) or h&(h-1):raise ValueError('场景运行图集要求二的整数次幂画布；PNG 导入工具可补充透明边缘')
             if 'graphics' in scene:
                 if scene.get('base_id',0)!=0:raise ValueError('自定义图块使用基础场景 0')
                 graphics=scene['graphics'];rects=graphics['rects']
@@ -142,10 +160,36 @@ class Catalog:
                         integer(wave['tick'],previous+1,32766);previous=wave['tick']
                         integer(wave['enemy'],0,len(enemies)-1)
                     if len(stage.get('waves',[]))>8192:raise ValueError('出击波次超过 8192')
+                    # 出兵循环、触发、开战预置单位、难度标签与评级时间：字段与自制 EVENT 相同（event_content.py 文首）。
+                    if 'loop' in stage:integer(stage['loop'],1,32766)
+                    triggers=stage.get('triggers',[])
+                    if not isinstance(triggers,list) or len(triggers)+('loop' in stage)>MAX_TRIGGERS:raise ValueError('出兵触发连同 loop 至多 32 条')
+                    for trigger in triggers:
+                        actions=[a for a in TRIGGER_ACTIONS if isinstance(trigger,dict) and a in trigger]
+                        if not isinstance(trigger,dict) or len(actions)!=1 or trigger.get('when') not in TRIGGER_WHEN or set(trigger)-{'when','value','repeat',*TRIGGER_ACTIONS}:
+                            raise ValueError('出兵触发要求 when（time、base_hp 或 front）、value、spawn/jump/strength 之一与可选 repeat')
+                        integer(trigger.get('value'),*TRIGGER_WHEN[trigger['when']][1:])
+                        if type(trigger.get('repeat',False)) is not bool:raise ValueError('出兵触发的 repeat 要求布尔值')
+                        action=actions[0]
+                        if action=='spawn':integer(trigger['spawn'],0,len(enemies)-1)
+                        elif action=='jump':integer(trigger['jump'],0,32766)
+                        else:integer(trigger['strength'],1,100)
+                    placed=stage.get('placed',[])
+                    if not isinstance(placed,list) or len(placed)>32:raise ValueError('开战预置单位至多 32 个')
+                    for unit in placed:
+                        if not isinstance(unit,dict) or set(unit)!={'enemy','x'}:raise ValueError('开战预置单位要求 enemy 与 x')
+                        integer(unit['enemy'],0,len(enemies)-1);integer(unit['x'],-65536,65534)
+                    integer(stage.get('difficulty',0),0,5)
+                    if 'rank_times' in stage:
+                        times=stage['rank_times']
+                        if not isinstance(times,list) or len(times)!=5:raise ValueError('评级时间要求 [S, A, B, C, D]（秒）')
+                        for v in times:integer(v,1,3600)
+                        if any(a>=b for a,b in zip(times,times[1:])):raise ValueError('评级时间须由 S 到 D 递增')
                     rewards=stage.get('reward_units',[])
                     for unit in rewards:self.unit_id(unit)
                     self.stages[stage['key']]=stage;self.locations[stage['key']]=(world['key'],area['key'])
         if len(self.stages)>100000:raise ValueError('当前目录容量为 100000 条关卡')
+        self.check_ura_pages()
         for item in [*self.worlds.values(),*(a for w in self.worlds.values() for a in w.get('areas',[])),*self.stages.values()]:
             self.enter(item)
             for key in item.get('requires',[]):
@@ -170,6 +214,54 @@ class Catalog:
         if visited!=len(self.stages):raise ValueError('解锁条件存在循环')
         self.fragment=None
         self.fingerprint=blake2(json.dumps(self.raw,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode())
+    def check_ura_pages(self):
+        """里地图扩展页（ura_world.py）：世界写 "ura_page"（4 起，连续，至多 6）时显示在原生里地图第 4 页之后。
+        世界：ura_background（571×320 网格背景图，左右两块，同原生里地图背景）；
+        区域：map_position [x, y]（世界地图坐标，0–1440 / 0–709）、native_name（原生区域名称编号 0–56，各语言文字取自原版）
+        或 name（自制区域名称，11 种语言 AREA_NAME_LANGUAGES 各一项，宿主追加到原生区域名称表之后，ura_world.py）；
+        关卡（每区域 1–6 关）：map_position [dx, dy]（相对区域坐标，原版范围约 ±125 / −50…30）、可选 thumbnail（128×56 略缩图）。
+        扩展页的区域按原版里世界整体开放，不处理 requires 与 reward_units（写了即拒绝）。"""
+        from PIL import Image
+        self.ura_worlds={};self.ura_images={}
+        def image(name,size,what):
+            if not isinstance(name,str) or Path(name).name!=name or Path(name).suffix.lower() not in IMAGE_TEXTURE_SUFFIXES:raise ValueError(what+'要求 PNG 或 WebP 文件名')
+            owner=self.fragment['owner']
+            if owner=='body':
+                if name not in self.assets:raise ValueError(what+'未登记于本体 assets：'+name)
+                path=self.root/name
+            else:
+                path=self.mod_assets.get(owner,{}).get(name)
+                if path is None:raise ValueError(what+'不在模组 assets/：'+name)
+            with Image.open(path) as im:
+                if im.size!=size:raise ValueError(f'{what}尺寸应为 {size[0]}×{size[1]}：{name}')
+            self.ura_images[name]=Path(path)
+        for world in self.worlds.values():
+            if 'ura_page' not in world:continue
+            self.enter(world)
+            page=integer(world['ura_page'],4,6)
+            if page in self.ura_worlds:raise ValueError('里地图扩展页重复：'+str(page))
+            self.ura_worlds[page]=world
+            image(world.get('ura_background'),(571,320),'里地图扩展页背景')
+            unsupported=[k for item in [world,*world.get('areas',[]),*(s for a in world.get('areas',[]) for s in a.get('stages',[]))]
+                         for k in ('requires','reward_units') if k in item]
+            if unsupported:raise ValueError('里地图扩展页暂不支持 '+'、'.join(sorted(set(unsupported))))
+            areas=world.get('areas',[])
+            if not 0<len(areas)<=16:raise ValueError('里地图扩展页要求 1–16 个区域')
+            for area in areas:
+                x,y=area.get('map_position',(None,None));integer(x,0,1440);integer(y,0,709)
+                if ('name' in area)==('native_name' in area):raise ValueError('里地图扩展页的区域须写 native_name 或 name 之一')
+                if 'name' in area:
+                    names=area['name']
+                    if not isinstance(names,dict) or set(names)!=set(AREA_NAME_LANGUAGES):raise ValueError('区域 name 须含 11 种语言：'+'、'.join(AREA_NAME_LANGUAGES))
+                    for text in names.values():
+                        if not isinstance(text,str) or not 0<len(text.encode('utf-8'))<=64 or '\0' in text:raise ValueError('区域 name 每项为 1–64 字节的文字')
+                else:integer(area['native_name'],0,56)
+                stages=area.get('stages',[])
+                if not 0<len(stages)<=6:raise ValueError('里地图扩展页的区域要求 1–6 关')
+                for stage in stages:
+                    dx,dy=stage.get('map_position',(None,None));integer(dx,-200,200);integer(dy,-80,80)
+                    if 'thumbnail' in stage:image(stage['thumbnail'],(128,56),'关卡略缩图')
+        if self.ura_worlds and sorted(self.ura_worlds)!=list(range(4,4+len(self.ura_worlds))):raise ValueError('里地图扩展页须从第 4 页起连续')
     def add_asset(self,name,raw,owner):
         if name in self.asset_owner:raise ValueError('资源文件名重复：'+name)
         if len(raw)>64*1024*1024:raise ValueError('单个资源超过 64 MiB')
@@ -208,8 +300,15 @@ def merge_scenes(content):
         if name in content.p.asset_cache.safe_names:raise ValueError('新增场景或音乐与原生资源文件名冲突：'+name)
     scenes=content.manifest.setdefault('stages',[])
     for scene in catalog.scenes.values():
-        row=dict(scene);row['id']=138+len(scenes);row.setdefault('base_id',0);scenes.append(row)
+        row=dict(scene);row['id']=138+len(scenes);row.setdefault('base_id',0)
+        source=catalog.assets[scene['texture']]
+        if isinstance(source,ImageTexture):row['texture']=source.runtime_name
+        scenes.append(row)
     for name,raw in catalog.assets.items():
+        if isinstance(raw,ImageTexture):
+            runtime=raw.runtime_name
+            if runtime in content.p.asset_cache.safe_names or runtime in catalog.assets or (runtime in content.assets and content.assets[runtime] is not raw):raise ValueError('场景图像源的运行文件名冲突：'+runtime)
+            content.assets[runtime]=raw;content.asset_dimensions[runtime]=raw.size;continue
         if not name.endswith('.obm'):continue
         if name in content.assets and content.assets[name]!=raw:raise ValueError('社区资源与场景资源文件名冲突')
         content.assets[name]=raw;content.asset_dimensions[name]=struct.unpack_from('<HH',raw,4)

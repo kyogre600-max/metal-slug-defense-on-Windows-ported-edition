@@ -14,7 +14,6 @@ ENTRYPOINTS = {
     'MSD WINDOWS S1XLV.exe': 'portable_launcher.py',
     'Start_MSD_All_Units_Level1.exe': 'all_units_level1_launcher.py',
     'Start_MSD_All_Unlocked_Max_Level.exe': 'all_unlocked_max_level_launcher.py',
-    'Start_LAB.exe': 'lab_launcher.py',
     'Start_MSD_Max_Level.exe': 'max_level_launcher.py',
 }
 

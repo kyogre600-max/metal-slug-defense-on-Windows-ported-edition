@@ -2,7 +2,7 @@
 开始战斗时经闸门进入战斗，战斗结束后经原生闸门回到本界面；退出时回到原生主菜单（出击 / 强化 / Wi-Fi 对战）。
 
 内容：我方/敌方牌组（各 10 格，点格子选单位，±调整等级，一括等级、据点初始等级、复制对方、随机编队、清空）、
-地图（原生地图 1–3 与里地图 1–3 的全部小关，按世界与小关选择，上方为原生缩略图，见 lab_stages.py）、
+地图（原生地图 1–3、里地图 1–3 与里地图扩展页的全部小关，按世界与小关选择，上方为原生缩略图，见 lab_stages.py）、
 完全控制与四个 AI 开关、优势设定（原生关卡强化级数，生命/攻击各 +20%/级）、预设 A/B/C（lab_presets/）
 与战斗履历（lab_presets/history.jsonl）。全部设定保存到 lab_config.json；战斗使用的牌组与等级直接交给
 BattleController::entryUnit，不写存档。界面文字随游戏语言（lab_ui.TEXT）。
@@ -616,7 +616,8 @@ class LabPrep:
             c.paste(image, (tx + (tw - image.width) // 2, ty + (th - image.height) // 2))
         c.text((x + w / 2, ty + th + 14), f"{entry['area_name']}  {entry['area'] + 1}-{entry['stage'] + 1}",
                15, WHITE, 'mm', 2, w - 20)
-        self.stepper(x + 14, ty + th + 28, w - 28, T(p, f'world_{world}'), ('world', -1), ('world', 1))
+        from lab_ui import world_name
+        self.stepper(x + 14, ty + th + 28, w - 28, world_name(p, world), ('world', -1), ('world', 1))
         self.stepper(x + 14, ty + th + 60, w - 28, f"{entry['area'] + 1}-{entry['stage'] + 1}   ({si + 1}/{len(stages)})",
                      ('stage', -1), ('stage', 1))
 

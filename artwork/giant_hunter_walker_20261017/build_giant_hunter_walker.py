@@ -84,17 +84,18 @@ FALL_VY = 2.5                   # 缓降速度（精灵像素/tick；400 世界�
 SWAY = (0.5, 8)                 # 缓降时左右摆动：0.5 精灵像素/tick，每 8 tick 换向（幅度约 ±2 精灵像素）
 FRONT = 42                      # 本体受击框半宽（精灵像素）：落点距离与原生射程相同，从本体前缘算起
 # R3：射程同 MSA（普攻 700、绝招 800）；卵的落点在射程内等距分布（暂定），最远一颗落在射程处
-NORMAL_RANGE, SPECIAL_RANGE = 700, 800
-NORMAL_DIST = tuple(NORMAL_RANGE * (i + 1) // 5 for i in range(5))      # 普攻 5 颗：140 / 280 / 420 / 560 / 700（世界单位，距本体前缘）
-SPECIAL_DIST = tuple(SPECIAL_RANGE * (i + 1) // 10 for i in range(10))  # 绝招 10 颗：80 / 160 / … / 800
+# R10：射程减小 1/3（用户设定），普攻 700 → 467、绝招 800 → 533（四舍五入），落点随之更密集
+NORMAL_RANGE, SPECIAL_RANGE = 467, 533
+NORMAL_DIST = tuple(NORMAL_RANGE * (i + 1) // 5 for i in range(5))      # 普攻 5 颗：93 / 186 / 280 / 373 / 467（世界单位，距本体前缘）
+SPECIAL_DIST = tuple(SPECIAL_RANGE * (i + 1) // 10 for i in range(10))  # 绝招 10 颗：53 / 106 / … / 533
 EGG_SLOTS = [17, 18, 19, 20, 23, 24, 25] + list(range(26, 40))          # 卵的脚本槽（槽 21、22 为爆开与坠地）
 EGG_RECT = [-9, -18 + EGG_DROP, 18, 18, 7]     # 卵的攻击框（攻击框 1，相对卵的锚点：底边中点；随画面下移 EGG_DROP）
 HIT_RECT = [-42, -116 + BODY_DROP, 84, 116 - BODY_DROP, 0]   # 本体受击框（受击框 1；上沿随本体下移，下沿仍为地面）
 
-DAMAGE_MULTIPLIER = [5, 3]          # 每颗卵 Lv40 1000（僵尸（青年）普攻与绝招 600 × 5/3；用户设定）
-SPECIAL_DAMAGE_MULTIPLIER = [2, 1]  # R9：绝招每颗卵 Lv40 2000（再 ×2，普攻仍 1000；用户设定）
+DAMAGE_MULTIPLIER = [4, 3]          # R11：每颗卵 Lv40 800（僵尸（青年）普攻与绝招 600 × 4/3；用户设定；R3–R10 为 [5,3] 即 1000）
+SPECIAL_DAMAGE_MULTIPLIER = [2, 1]  # R9：绝招每颗卵为普攻的 2 倍（R11 起 Lv40 1600，R9–R10 为 2000；用户设定）
 KNOCKBACK_THRESHOLD = [20, 3]       # R9：击退门槛（抗击退）200（僵尸（青年）30 × 20/3；用户指定，不随生命联动）
-AP, HP_MULTIPLIER = 400, [150, 17]  # Lv40 生命 30000（僵尸（青年）3400 × 150/17；用户设定）；AP 400（R6，原 650）
+AP, HP_MULTIPLIER = 500, [120, 17]  # R10：Lv40 生命 24000（僵尸（青年）3400 × 120/17）、AP 500（用户设定；R6–R9 为 400 / 30000）
 PRODUCTION = [27, 13]               # 再出击 45 秒 = 1350 tick（僵尸（青年）650 × 27/13；R6，原 2400 tick）
 
 PROVISIONAL = {   # 用户未指定、暂定的数值（待确认）
@@ -285,7 +286,7 @@ def unit_file(animations):
         'key': KEY, 'base_id': 313, 'faction': 3, 'identity': 'Invader',
         'shop_price': PROVISIONAL['shop_price'], 'available_from_start': True, 'ap': AP,
         'upgrade_cost_base': PROVISIONAL['upgrade_cost_base'],
-        'hp_multiplier': HP_MULTIPLIER,                   # 僵尸（青年）Lv40 3400 → 30000
+        'hp_multiplier': HP_MULTIPLIER,                   # 僵尸（青年）Lv40 3400 → 24000（R10）
         'knockback_threshold_multiplier': KNOCKBACK_THRESHOLD,  # R9 用户指定 200（此前随生命为 265）
         'production_reference_id': 313, 'production_interval_multiplier': PRODUCTION,   # 650 → 1350 tick
         'damage_multiplier': DAMAGE_MULTIPLIER, 'special_damage_multiplier': SPECIAL_DAMAGE_MULTIPLIER,
@@ -293,6 +294,8 @@ def unit_file(animations):
         # 状态词 7 开始吐卵的距离；24/31 每颗卵命中目标数；35/36 绝招冷却（之后 / 出场后第一次）
         'status_word_values': {'7': NORMAL_RANGE, '24': PROVISIONAL['targets'], '31': PROVISIONAL['targets'],
                                '35': 2000, '36': 1333},
+        # 小地图标记（数据行 +0x34c/+0x350）：按原版大型单位标记与图像尺寸的比例（宽约 1/25、高约 1/21.5）换算（2026-10-20）
+        'minimap_marker': [10, 13],
         'icon': {'page': 1, 'rect': [*ICON_AT, ICON_SIZE, ICON_SIZE], 'anchor': ICON_ANCHOR},
         'textures': [TEXTURE], 'sprite_descriptor': DESCRIPTOR, 'animations': animations,
         'localization': {code: {'name': n, 'description': d} for code, (n, d) in TEXT.items()},
